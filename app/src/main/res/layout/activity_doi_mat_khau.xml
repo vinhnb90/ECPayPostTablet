@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/rlBanner"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/bg_changepass">
+
+        <ImageButton
+            android:id="@+id/ibBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_back"
+            android:layout_margin="1dp"
+            android:background="@null"/>
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ĐỔI MẬT KHẨU"
+            android:layout_margin="15dp"
+            android:layout_centerHorizontal="true"
+            android:textSize="20sp"
+            android:textColor="@color/colorTextWhite"/>
+
+        <ImageView
+            android:id="@+id/ivAvatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/avatar" />
+
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Username"
+            android:textColor="@color/colorTextWhite"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/ivAvatar"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:id="@+id/tvSDT"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0987 212 472"
+            android:textColor="@color/colorTextWhite"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/tvUsername" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etMatKhauCu"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_edittext_border"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:hint="Mật khẩu cũ"
+            android:inputType="textPassword"
+            android:drawableLeft="@mipmap/ic_tick"/>
+
+        <EditText
+            android:id="@+id/etMatKhauMoi"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_edittext_border"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:hint="Mật khẩu mới"
+            android:inputType="textPassword"
+            android:drawableLeft="@mipmap/ic_matkhau"/>
+
+        <EditText
+            android:id="@+id/etNhapLaiMatKhauMoi"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_edittext_border"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="10dp"
+            android:hint="Nhập lại mật khẩu mới"
+            android:inputType="textPassword"
+            android:imeOptions="actionDone"
+            android:drawableLeft="@mipmap/ic_matkhau"/>
+
+        <TextView
+            android:id="@+id/tvLoi"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="0.8"
+            android:layout_gravity="center_horizontal"
+            android:text=""
+            android:textColor="@color/colorRed"
+            android:gravity="center"
+            android:textStyle="italic"/>
+
+        <Button
+            android:id="@+id/btDoiMatKhau"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_button"
+            android:textColor="@color/colorTextWhite"
+            android:text="ĐỔI MẬT KHẨU"/>
+    </LinearLayout>
+
+</LinearLayout>

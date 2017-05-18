@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorRow">
+
+    <TextView
+        android:id="@+id/tvTenKH"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tên khách hàng"
+        android:textStyle="bold"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"/>
+
+    <TextView
+        android:id="@+id/tvMaKH"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PD00111"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/tvTenKH"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:id="@+id/tvTitleKy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Kỳ"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@+id/tvTenKH"
+        android:layout_marginLeft="40dp"/>
+
+    <TextView
+        android:id="@+id/tvKy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="03/2017"
+        android:layout_below="@+id/tvTitleKy"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_toRightOf="@+id/tvTenKH"
+        android:layout_marginLeft="40dp"/>
+
+    <TextView
+        android:id="@+id/tvTongTien"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1.000.000 đ"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="40dp"/>
+
+    <TextView
+        android:id="@+id/tvTinhTrang"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đã thu nguồn khác"
+        android:layout_below="@+id/tvTongTien"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/colorTextGreen"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="40dp"/>
+
+</RelativeLayout>

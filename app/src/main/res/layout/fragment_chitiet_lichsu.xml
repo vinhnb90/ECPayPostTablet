@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/tvTitleTenKH"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:text="Tên khách hàng:"/>
+
+    <TextView
+        android:id="@+id/tvTenKH"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:text="Tên khách hàng"
+        android:textStyle="bold"/>
+
+    <View
+        android:id="@+id/view1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tvTenKH"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/colorLightGray" />
+
+    <TextView
+        android:id="@+id/tvTitleMaKH"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view1"
+        android:layout_alignParentLeft="true"
+        android:text="Mã khách hàng:"/>
+
+    <TextView
+        android:id="@+id/tvMaKH"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view1"
+        android:layout_alignParentRight="true"
+        android:text="PD11248"
+        android:textStyle="bold"/>
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tvMaKH"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/colorLightGray" />
+
+    <TextView
+        android:id="@+id/tvTitleKyThanhToan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view2"
+        android:layout_alignParentLeft="true"
+        android:text="Kỳ thanh toán:"/>
+
+    <TextView
+        android:id="@+id/tvKyThanhToan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view2"
+        android:layout_alignParentRight="true"
+        android:text="03/2017"
+        android:textStyle="bold"/>
+
+    <View
+        android:id="@+id/view3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tvKyThanhToan"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/colorLightGray" />
+
+    <TextView
+        android:id="@+id/tvTitleNgayPhatSinh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view3"
+        android:layout_alignParentLeft="true"
+        android:text="Ngày phát sinh:"/>
+
+    <TextView
+        android:id="@+id/tvNgayPhatSinh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view3"
+        android:layout_alignParentRight="true"
+        android:text="25/03/2017"
+        android:textStyle="bold"/>
+
+    <View
+        android:id="@+id/view4"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tvNgayPhatSinh"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/colorLightGray" />
+
+    <TextView
+        android:id="@+id/tvTitleSoTien"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view4"
+        android:layout_alignParentLeft="true"
+        android:text="Số tiền:"/>
+
+    <TextView
+        android:id="@+id/tvSoTien"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view4"
+        android:layout_alignParentRight="true"
+        android:textColor="@color/colorRed"
+        android:text="700.000 đ"
+        android:textStyle="bold"/>
+
+    <View
+        android:id="@+id/view5"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tvSoTien"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/colorLightGray" />
+
+    <TextView
+        android:id="@+id/tvTitleTrangThai"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view5"
+        android:layout_alignParentLeft="true"
+        android:text="Trạng thái:"/>
+
+    <TextView
+        android:id="@+id/tvTrangThai"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view5"
+        android:layout_alignParentRight="true"
+        android:text="Đã thanh toán"
+        android:textColor="@color/colorTextGreen"
+        android:textStyle="bold"/>
+
+</RelativeLayout>

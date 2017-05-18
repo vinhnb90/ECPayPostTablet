@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">PosTabletECPay</string>
+    <string name="title_home">Trang chủ</string>
+    <string name="title_pay">Thanh toán</string>
+    <string name="title_report">Báo cáo</string>
+    <string name="title_accout">Tài khoản</string>
+</resources>

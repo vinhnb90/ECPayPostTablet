@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <CheckBox
+        android:id="@+id/cbChon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="5dp"/>
+
+    <LinearLayout
+        android:id="@+id/ll1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/cbChon">
+
+        <TextView
+            android:id="@+id/tvMaKH"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PD384728938" />
+
+        <TextView
+            android:id="@+id/tvKy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kỳ 03/2017" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/ll1"
+        android:layout_marginLeft="20dp">
+
+        <TextView
+            android:id="@+id/tvTenKH"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ten"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tvTongTien"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="100.000 đ" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvTinhTrang"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:text="Chưa thanh toán"
+        android:layout_marginRight="5dp"
+        android:textColor="@color/colorDarkOrange"/>
+</RelativeLayout>

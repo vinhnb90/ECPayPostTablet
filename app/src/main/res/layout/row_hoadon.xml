@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/llMain"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorRow"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_row_border_top"
+        android:padding="5dp">
+
+        <Button
+            android:id="@+id/btConNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Còn nợ"
+            android:background="@drawable/bg_button_orange"
+            android:textColor="@color/colorTextWhite"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="10dp"/>
+
+        <RelativeLayout
+            android:id="@+id/rlThongTinChinh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/btConNo"
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:id="@+id/tvTenKH"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:text="Tên khách hàng"
+                android:textColor="@color/colorTextBlack"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvMaKH"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PD011432"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/tvTenKH"/>
+
+            <TextView
+                android:id="@+id/tvLoTrinh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="D04365"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/tvTenKH"/>
+
+            <TextView
+                android:id="@+id/tvTongTien"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1.000.000 đ"
+                android:layout_alignParentRight="true"
+                android:textColor="@color/colorRed"
+                android:textStyle="bold"
+                android:layout_below="@+id/tvTenKH"/>
+
+            <TextView
+                android:id="@+id/tvDiaChi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Địa chỉ khách hàng"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/tvTongTien"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:layout_marginTop="-1dp"
+        android:background="@drawable/bg_row_border_bottom">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvKy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="In thông báo"
+            android:textAllCaps="false"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/rvKy"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:layout_margin="5dp"/>
+    </RelativeLayout>
+
+</LinearLayout>

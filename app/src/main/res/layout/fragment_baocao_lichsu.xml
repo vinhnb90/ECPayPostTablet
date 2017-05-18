@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RadioGroup
+        android:id="@+id/rgSearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="10dp">
+
+        <RadioButton
+            android:id="@+id/rbMaKH"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:checked="true"
+            android:text="Mã KH"/>
+
+        <RadioButton
+            android:id="@+id/rbTenKH"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:text="Tên KH"/>
+
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/etSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_toLeftOf="@+id/rgSearch"
+        android:padding="5dp"
+        android:textSize="14sp"
+        android:hint="Tìm kiếm báo cáo"
+        android:drawableLeft="@drawable/ic_search_black_24dp"
+        android:background="@drawable/bg_edittext_border"/>
+
+    <Button
+        android:id="@+id/btTimKiem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TÌM KIẾM"
+        android:background="@drawable/bg_button"
+        android:textColor="@color/colorTextWhite"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/etSearch"
+        android:layout_margin="10dp"/>
+
+    <TextView
+        android:id="@+id/tvUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Username"
+        android:textStyle="bold"
+        android:layout_below="@+id/btTimKiem"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+        android:id="@+id/tvMaKH"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(PD010012)"
+        android:layout_toRightOf="@+id/tvUsername"
+        android:layout_below="@+id/btTimKiem"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvDanhSach"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tvUsername">
+
+    </android.support.v7.widget.RecyclerView>
+</RelativeLayout>
