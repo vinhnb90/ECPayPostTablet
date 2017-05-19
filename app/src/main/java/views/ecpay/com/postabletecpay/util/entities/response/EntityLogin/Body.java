@@ -7,7 +7,7 @@ public class Body {
 
 @SerializedName("audit-number")
 @Expose
-private Integer auditNumber;
+private Long auditNumber;
 @SerializedName("mac")
 @Expose
 private String mac;
@@ -24,11 +24,11 @@ private String pinLogin;
 @Expose
 private String responseLogin;
 
-public Integer getAuditNumber() {
+public Long getAuditNumber() {
 return auditNumber;
 }
 
-public void setAuditNumber(Integer auditNumber) {
+public void setAuditNumber(Long auditNumber) {
 this.auditNumber = auditNumber;
 }
 

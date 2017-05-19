@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 
 import views.ecpay.com.postabletecpay.model.LoginModel;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.commons.Common.CODE_REPONSE_LOGIN;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponse;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
@@ -33,11 +34,11 @@ public class LoginPresenter implements ILoginPresenter {
         Boolean isErr = false;
 
         mILoginView.hidePbarLogin();
-        if ((userName == null || userName.isEmpty() || userName.trim().equals("")) && !isErr) {
+        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || pass.length()> Common.LENGTH_USER_NAME) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_USER.toString();
             isErr = true;
         }
-        if ((pass == null || pass.isEmpty() || pass.trim().equals("")) && !isErr) {
+        if ((pass == null || pass.isEmpty() || pass.trim().equals("") || pass.length()> Common.LENGTH_PASS) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_PASS.toString();
             isErr = true;
         }
@@ -74,7 +75,7 @@ public class LoginPresenter implements ILoginPresenter {
             //get and convert mac adress to hex
             macAdressHexValue = Common.getMacAddress(context);
         } catch (Exception e) {
-            textMessage = Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString();
+            textMessage = e.getMessage();
             mILoginView.showTextMessage(textMessage);
             return;
         }
@@ -150,7 +151,6 @@ public class LoginPresenter implements ILoginPresenter {
             return;
         }
 
-
         //create request to server
         String jsonRequestLogin = SoapAPI.getJsonRequestLogin(agent, passwordAgentEcrypted, commandId, auditNumber, macAdressHexValue, diskDriver, signatureEncrypted, pinLoginEncrypted, accountId);
 
@@ -161,7 +161,7 @@ public class LoginPresenter implements ILoginPresenter {
                 soapLogin = new SoapAPI.AsyncSoapLogin(soapLoginCallBack);
 
                 if (soapLogin.getStatus() != AsyncTask.Status.RUNNING) {
-                    soapLogin.execute();
+                    soapLogin.execute(jsonRequestLogin);
 
                     //thread time out
                     Thread soapLoginThread = new Thread(new Runnable() {
@@ -238,6 +238,13 @@ public class LoginPresenter implements ILoginPresenter {
 
             if (response == null) {
                 mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return;
+            }
+
+            CODE_REPONSE_LOGIN codeResponse= CODE_REPONSE_LOGIN.findCodeMessage(response.getFooter().getResponseCode());
+            if(codeResponse != CODE_REPONSE_LOGIN.e000)
+            {
+                mILoginView.showTextMessage(codeResponse.getMessage());
                 return;
             }
 

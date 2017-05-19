@@ -51,6 +51,7 @@
         android:visibility="visible" />
 
     <EditText
+        android:text="12345678"
         android:id="@+id/etTaiKhoan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -64,6 +65,7 @@
         android:padding="5dp" />
 
     <EditText
+        android:text="12345678"
         android:id="@+id/etMatKhau"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -7,7 +7,21 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.MarshalBase64;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.AndroidHttpTransport;
+import org.ksoap2.transport.HttpTransportSE;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.Proxy;
+import java.net.SocketTimeoutException;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -15,12 +29,15 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import views.ecpay.com.postabletecpay.model.adapter.LoginRequestAdapter;
+import views.ecpay.com.postabletecpay.model.adapter.LoginResponseAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.Body;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.Footer;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.Header;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.LoginRequest;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponse;
+
+import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
 
 /**
  * Created by VinhNB on 5/12/2017.
@@ -87,21 +104,18 @@ public class SoapAPI {
 
     //region class api soap
     public static class AsyncSoapLogin extends AsyncTask<String, String, LoginResponse> {
-        private ExcuteAPI excuteAPI;
+
+        //request action to eStore
+        private static final String METHOD_NAME = "execute";
+        private static final String NAMESPACE = "http://services.ecpay.org/";
+        private static final String URL = ENDPOINT_URL;
+        private static final String SOAP_ACTION = "request action to eStore";
+        private static final String METHOD_PARAM = "message";
         private AsyncSoapLoginCallBack callBack;
         private boolean isEndCallSoap = false;
 
         public AsyncSoapLogin(AsyncSoapLoginCallBack callBack) throws Exception {
             this.callBack = callBack;
-
-            try {
-                excuteAPI = new Retrofit.Builder().baseUrl(Common.ENDPOINT_URL).
-                        addConverterFactory(GsonConverterFactory.create()).
-                        build().create(ExcuteAPI.class);
-            } catch (Exception e) {
-                Log.e(this.getClass().getName().toString(), "Error when config retrofit : " + e.getMessage());
-                throw new Exception(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_LOGIN.toString());
-            }
         }
 
         @Override
@@ -113,30 +127,38 @@ public class SoapAPI {
         @Override
         protected LoginResponse doInBackground(String... jsons) {
             String json = jsons[0];
-            Call<LoginResponse> responseCall = excuteAPI.execute(json);
-            Response<LoginResponse> response = null;
 
-              /*  response = responseCall.execute();*/
-            responseCall.enqueue(new Callback<LoginResponse>() {
-                @Override
-                public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                    //end call
-                    isEndCallSoap = true;
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            request.addProperty(METHOD_PARAM, json);
 
-                    LoginResponse loginResponse = response.body();
-                    onPostExecute(loginResponse);
-                }
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(request);
 
-                @Override
-                public void onFailure(Call<LoginResponse> call, Throwable t) {
-                    //end call
-                    isEndCallSoap = true;
+            HttpTransportSE ht;
+            SoapPrimitive response = null;
 
-                    publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_LOGIN.toString());
-                }
-            });
+            try {
+                ht = new HttpTransportSE(URL);
+                ht.call(SOAP_ACTION, envelope);
+                response = (SoapPrimitive) envelope.getResponse();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-            return response.body();
+            String data = response.toString();
+            if (data.isEmpty())
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+
+            LoginResponse loginResponse = null;
+
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter(LoginRequest.class, new LoginResponseAdapter());
+            gsonBuilder.setPrettyPrinting();
+            final Gson gson = gsonBuilder.create();
+
+            loginResponse = gson.fromJson(data, LoginResponse.class);
+
+            return loginResponse;
         }
 
         @Override
@@ -150,7 +172,7 @@ public class SoapAPI {
         @Override
         protected void onPostExecute(LoginResponse loginResponse) {
             super.onPostExecute(loginResponse);
-            if (isEndCallSoap)
+            if (!isEndCallSoap)
                 callBack.onPost(loginResponse);
         }
 

@@ -82,7 +82,7 @@ public class Common {
                 return "Tên đăng nhập là chữ thường, chữ hoa, các kí tự đặc biệt, tối đa 20 kí tự và không để trống!";
 
             if (LOGIN_ERR_PASS == this)
-                return "Mật khẩu là chữ thường, chữ hoa, các kí tự đặc biệt, tối đa 20 kí tự và không để trống!";
+                return "Mật khẩu là chữ thường, chữ hoa, các kí tự đặc biệt, tối đa 8 kí tự và không để trống!";
 
             if (ERR_CREATE_FOLDER == this)
                 return "Xảy ra vấn đề khi tạo thư mục chứa tài nguyên trên SDCard!";
@@ -100,17 +100,57 @@ public class Common {
                 return "Không nhận được dữ liệu khi kết nối tới máy chủ!";
 
             if (ERR_CALL_SOAP_TIME_OUT == this)
-                return "Quá thời gian kết nối cho phép tới máy chủ !" + TIME_OUT_CONNECT / 1000 + " s";
+                return "Quá thời gian kết nối cho phép tới máy chủ " + TIME_OUT_CONNECT / 1000 + " s";
 
 
             return super.toString();
+        }
+    }
+
+    public enum CODE_REPONSE_LOGIN {
+        e000("000", "Tài khoản ví chưa đăng ký dịch vụ"),
+        e034("034", "Không giải mã được mã PIN"),
+        e035("035", "Mã PIN không đúng"),
+        e031("031", "Tài khoản ví đã bị hủy"),
+        e030("030", "Tài khoản ví chưa đăng ký dịch vụ"),
+        e032("032", "Tài khoản bị khóa"),
+        e033("033", "Tài khoản ví chưa được duyệt"),
+        e2038("2038", "Không thể login, sai địa chỉ MAC"),
+        e2039("2039", "Không thể login, sai địa chỉ IP"),
+        e2040("2040", "Không thể login, đã login ở 1 thiết bị khác"),
+        e2042("2042", "Tài khoản chưa được xác định loại tài khoản"),
+        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ");
+
+        CODE_REPONSE_LOGIN(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+        private String message;
+
+        public static CODE_REPONSE_LOGIN findCodeMessage(String code) {
+            for (CODE_REPONSE_LOGIN v : values()) {
+                if (v.getCode() == code) {
+                    return v;
+                }
+            }
+            return CODE_REPONSE_LOGIN.e9999;
         }
     }
     //endregion
 
     //region info communication server
     //unit: seconds
-    public static long TIME_OUT_CONNECT = 5000;
+    public static long TIME_OUT_CONNECT = 50000;
 
     public enum COMMAND_ID {
         LOGIN;
@@ -392,6 +432,9 @@ public class Common {
     //endregion
 
     //region method process ecrypt and decrypt data
+    public static int LENGTH_USER_NAME = 20;
+    public static int LENGTH_PASS = 8;
+
     public static Long createAuditNumber(String dateTimeNow) {
         if (dateTimeNow == null || dateTimeNow.isEmpty() || dateTimeNow.trim().equals(""))
             return null;
@@ -497,7 +540,7 @@ public class Common {
         Partner partner;
         Crypto crypto;
         String passEncrypted;
-        boolean padding = false;
+        boolean padding = true;
 
         partner = new Partner(null, publicKeyRSA, privateKeyRSA);
 
@@ -509,8 +552,10 @@ public class Common {
         if (crypto == null)
             throw new Exception(MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString());
 
+        byte[] passBytes = pass.getBytes();
 //        passEncrypted = Base64.encodeToString(crypto.encrypt(pass.getBytes()), Base64.DEFAULT);
-        passEncrypted = new String(Utils.encodeHex(crypto.encrypt(pass.getBytes())));
+        byte[] encryptBytes = crypto.encrypt(passBytes);
+        passEncrypted = new String(Utils.encodeHex(encryptBytes));
 /*
 
         //test to string
