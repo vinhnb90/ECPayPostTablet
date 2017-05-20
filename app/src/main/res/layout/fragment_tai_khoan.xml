@@ -38,7 +38,7 @@
         android:layout_marginRight="10dp">
 
         <ImageView
-            android:id="@+id/ivAvatar"
+            android:id="@+id/iv_frag_main_avatar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/avatar"
@@ -48,9 +48,9 @@
             android:id="@+id/llText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/ivAvatar"
-            android:layout_alignBottom="@+id/ivAvatar"
-            android:layout_toRightOf="@+id/ivAvatar"
+            android:layout_alignTop="@+id/iv_frag_main_avatar"
+            android:layout_alignBottom="@+id/iv_frag_main_avatar"
+            android:layout_toRightOf="@+id/iv_frag_main_avatar"
             android:gravity="center_vertical"
             android:layout_marginLeft="5dp"
             android:orientation="vertical">

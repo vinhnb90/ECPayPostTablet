@@ -17,6 +17,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -42,6 +43,8 @@ public class PopupMenu {
     private List<MenuItem> mItems;
     private int mWidth = 240;
     private float mScale;
+
+    private MenuItemAdapter adapter;
 
     public PopupMenu(Context context) {
         mContext = context;
@@ -87,7 +90,6 @@ public class PopupMenu {
      *
      * @param itemId
      * @param titleRes
-     *
      * @return item
      */
     public MenuItem add(int itemId, int titleRes) {
@@ -98,7 +100,7 @@ public class PopupMenu {
 
         return item;
     }
-    
+
     public MenuItem add(int itemId, String title) {
         MenuItem item = new MenuItem();
         item.setItemId(itemId);
@@ -128,13 +130,13 @@ public class PopupMenu {
 
         preShow();
 
-        MenuItemAdapter adapter = new MenuItemAdapter(mContext, mItems);
+        adapter = new MenuItemAdapter(mContext, mItems);
         mItemsView.setAdapter(adapter);
         mItemsView.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
-                    long id) {
+                                    long id) {
                 if (mListener != null) {
                     mListener.onItemSelected(mItems.get(position));
                 }
@@ -143,7 +145,7 @@ public class PopupMenu {
         });
 
         if (anchor == null) {
-            View parent = ((Activity)mContext).getWindow().getDecorView();
+            View parent = ((Activity) mContext).getWindow().getDecorView();
             mPopupWindow.showAtLocation(parent, Gravity.CENTER, 0, 0);
             return;
         }
@@ -216,9 +218,9 @@ public class PopupMenu {
         mHeaderTitleView.requestFocus();
         mHeaderTitleView.setBackgroundResource(R.drawable.lib_title_unselected);
     }
-    
-    public void setColorTitle(int color){
-    	mHeaderTitleView.setTextColor(color);
+
+    public void setColorTitle(int color) {
+        mHeaderTitleView.setTextColor(color);
     }
 
     /**
@@ -253,7 +255,7 @@ public class PopupMenu {
         TextView title;
     }
 
-    private class MenuItemAdapter extends ArrayAdapter<MenuItem> {
+    public class MenuItemAdapter extends ArrayAdapter<MenuItem> {
 
         public MenuItemAdapter(Context context, List<MenuItem> objects) {
             super(context, 0, objects);
@@ -285,8 +287,11 @@ public class PopupMenu {
 //            } else {
 //                convertView.setBackgroundColor(Color.WHITE);
 //            }
-
             return convertView;
         }
+    }
+
+    public MenuItemAdapter getAdapter() {
+        return adapter;
     }
 }

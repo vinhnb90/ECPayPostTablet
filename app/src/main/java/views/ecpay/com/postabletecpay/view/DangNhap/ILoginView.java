@@ -14,4 +14,8 @@ public interface ILoginView extends ICommonView{
     void hideTextMessage();
 
     void showMainScreen();
+
+    void showTextUserPass(String userName, String pass);
+
+    void showTickCheckbox(boolean isSaveLogin);
 }

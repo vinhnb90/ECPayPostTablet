@@ -3,7 +3,9 @@ package views.ecpay.com.postabletecpay.view.DangNhap;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -16,6 +18,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.ILoginPresenter;
@@ -24,6 +27,8 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection;
 import views.ecpay.com.postabletecpay.view.BaseActivity;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
+
+import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;
 
 /**
  * Created by macbook on 4/28/17.
@@ -69,7 +74,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         if (message == null || message.isEmpty())
             return;
 
-        super.runAnimationClickViewScale(tvMessage, R.anim.scale_view_pull);
+        Common.runAnimationClickViewScale(tvMessage, R.anim.scale_view_pull, Common.TIME_DELAY_ANIM);
 
         tvMessage.setVisibility(View.VISIBLE);
         tvMessage.setText(message);
@@ -87,6 +92,22 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
         startActivity(new Intent(LoginActivity.this, MainActivity.class));
         this.finish();
+    }
+
+    @Override
+    public void showTextUserPass(String userName, String pass) {
+        if (userName == null)
+            return;
+        if (pass == null)
+            return;
+
+        etUsername.setText(userName);
+        etPass.setText(pass);
+    }
+
+    @Override
+    public void showTickCheckbox(boolean isSaveLogin) {
+        cbRememberLogin.setChecked(isSaveLogin);
     }
     //endregion
 
@@ -116,19 +137,38 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
         Common.loadFolder(this);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mILoginPresenter.showInfoSharePrefLogin();
+    }
+
     //endregion
 
     //region onClick
     @OnClick(R.id.btLogin)
     public void clickLogin(View view) {
-        super.runAnimationClickViewScale(view, R.anim.scale_view_push);
-        showPbarLogin();
+        Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
 
-        String userName = etUsername.getText().toString();
-        String pass = etPass.getText().toString();
+        final String userName = etUsername.getText().toString();
+        final String pass = etPass.getText().toString();
 
-        mILoginPresenter.validateInput(userName, pass);
+        if (cbRememberLogin.isChecked()) {
+            mILoginPresenter.writeSharedPrefLogin(userName, pass);
+        } else
+            mILoginPresenter.clearSharedPrefLogin();
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                showPbarLogin();
+                mILoginPresenter.validateInput(userName, pass);
+            }
+        }, TIME_DELAY_ANIM);
     }
+
     //endregion
 
     //region private param
@@ -136,7 +176,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
     EditText etUsername;
     @BindView(R.id.etMatKhau)
     EditText etPass;
-    @BindView(R.id.cbNhoMatKhau)
+    @BindView(R.id.cb_ac_login_save_info_login)
     CheckBox cbRememberLogin;
     @BindView(R.id.btLogin)
     Button btLogin;

@@ -2,10 +2,13 @@ package views.ecpay.com.postabletecpay.util.commons;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -19,6 +22,12 @@ import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Xml;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.TextView;
 
 import org.ecpay.client.Partner;
 import org.ecpay.client.Utils;
@@ -35,6 +44,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,7 +55,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.AlgorithmRSA.AsymmetricCryptography;
+import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 
 /**
@@ -68,7 +80,13 @@ public class Common {
 
         ERR_CALL_SOAP_EMPTY,
         ERR_CALL_SOAP_TIME_OUT,
-        ERR_CALL_SOAP_LOGIN;
+        ERR_CALL_SOAP_LOGIN,
+
+        CHANGE_PASS_ERR_PASS_OLD,
+        CHANGE_PASS_ERR_PASS_NEW,
+        CHANGE_PASS_ERR_PASS_NEW_NOT_EQUAL_PASS_OLD,
+        CHANGE_PASS_ERR_PASS_RETYPE,
+        CHANGE_PASS_ERR_PASS_RETYPE_NOT_EQUAL_PASS_RETYPE;
 
         @Override
         public String toString() {
@@ -102,6 +120,20 @@ public class Common {
             if (ERR_CALL_SOAP_TIME_OUT == this)
                 return "Quá thời gian kết nối cho phép tới máy chủ " + TIME_OUT_CONNECT / 1000 + " s";
 
+            if (CHANGE_PASS_ERR_PASS_OLD == this)
+                return "Mật khẩu cũ không được để trống, tối đa 8 kí tự!";
+
+            if (CHANGE_PASS_ERR_PASS_NEW == this)
+                return "Mật khẩu mới không được để trống, tối đa 8 kí tự!";
+
+            if (CHANGE_PASS_ERR_PASS_RETYPE == this)
+                return "Mật khẩu mới nhập lại không được để trống, tối đa 8 kí tự!";
+
+            if (CHANGE_PASS_ERR_PASS_NEW_NOT_EQUAL_PASS_OLD == this)
+                return "Mật khẩu mới không trùng với mật khẩu cũ!";
+
+            if (CHANGE_PASS_ERR_PASS_RETYPE_NOT_EQUAL_PASS_RETYPE == this)
+                return "Mật khẩu mới nhập lại không chính xác!";
 
             return super.toString();
         }
@@ -139,7 +171,7 @@ public class Common {
 
         public static CODE_REPONSE_LOGIN findCodeMessage(String code) {
             for (CODE_REPONSE_LOGIN v : values()) {
-                if (v.getCode() == code) {
+                if (v.getCode().equals(code)) {
                     return v;
                 }
             }
@@ -153,8 +185,19 @@ public class Common {
     public static long TIME_OUT_CONNECT = 50000;
 
     public enum COMMAND_ID {
-        LOGIN;
+        LOGIN,
+        CHANGE_PIN;
 
+        @Override
+        public String toString() {
+            if (this == LOGIN)
+                return "LOGIN";
+
+            if (this == CHANGE_PIN)
+                return "CHANGE-PIN";
+
+            return super.toString();
+        }
     }
 
     public enum SYMBOL {
@@ -431,6 +474,13 @@ public class Common {
     }
     //endregion
 
+    //region config share references
+    public static String SHARE_REF_FILE_LOGIN = "LOGIN";
+    public static String SHARE_REF_FILE_LOGIN_USER_NAME = "USERNAME";
+    public static String SHARE_REF_FILE_LOGIN_PASS = "PASS";
+    public static String SHARE_REF_FILE_LOGIN_IS_SAVE = "CHECKBOX";
+    //endregion
+
     //region method process ecrypt and decrypt data
     public static int LENGTH_USER_NAME = 20;
     public static int LENGTH_PASS = 8;
@@ -575,9 +625,126 @@ public class Common {
         return passEncrypted;
     }
 
+    public static ConfigInfo setupInfoRequest(Context context, String userName, String pass, String commandId) throws Exception {
+        //setup info login
+        ConfigInfo configInfo = Common.getDataFileConfig();
+
+        //create auditNumber
+        String timeNow = Common.getDateTimeNow6Digit();
+        Long auditNumber = Common.createAuditNumber(timeNow);
+        configInfo.setAuditNumber(auditNumber);
+
+        //create macAdressHexValue
+        String macAdressHexValue;
+        try {
+            //get and convert mac adress to hex
+            macAdressHexValue = Common.getMacAddress(context);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+        configInfo.setMacAdressHexValue(macAdressHexValue);
+
+        //create diskDriver
+        String diskDriver = Common.getIMEIAddress(context);
+        configInfo.setDiskDriver(diskDriver);
+
+        //create diskDriver
+        String accountId = userName.toString().trim();
+        configInfo.setAccountId(accountId);
+
+        //create agentEncypted by RSA
+        String passwordAgent, passwordAgentEcrypted;
+        String agent = configInfo.getAGENT();
+        passwordAgent = configInfo.getPASS_WORD();
+        String pcCode = configInfo.getPC_CODE();
+        String privateKeyRSA = configInfo.getPRIVATE_KEY();
+        String publicKeyRSA = configInfo.getPRIVATE_KEY();
+
+        if (privateKeyRSA == null || privateKeyRSA.isEmpty() || privateKeyRSA.trim().isEmpty()) {
+            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+        }
+        if (publicKeyRSA == null || publicKeyRSA.isEmpty() || publicKeyRSA.trim().isEmpty()) {
+            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+        }
+        if (passwordAgent == null || passwordAgent.isEmpty() || passwordAgent.trim().isEmpty()) {
+            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+        }
+
+        try {
+            passwordAgentEcrypted = Common.encryptPasswordAgentByRSA(passwordAgent.trim(), privateKeyRSA);
+        } catch (Exception e) {
+            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+        }
+        configInfo.setAgentEncypted(passwordAgentEcrypted);
+
+        //test
+//        String passDecypted = "";
+//        try {
+//            AsymmetricCryptography ac = new AsymmetricCryptography();
+//            PublicKey publicKey = ac.getPublic(publicKeyRSA);
+//            passDecypted = ac.decryptText(passwordAgentEcrypted, publicKey);
+//        } catch (Exception e) {
+//            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+//        }
+        //end test
+
+        //set command id
+        //encrypt signature by RSA
+        String signatureEncrypted;
+        try {
+            signatureEncrypted = Common.encryptSignatureByRSA(agent, commandId, auditNumber, macAdressHexValue, diskDriver, pcCode, accountId, privateKeyRSA);
+        } catch (Exception e) {
+            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+        }
+        configInfo.setSignatureEncrypted(signatureEncrypted);
+
+        //set command id
+        //encrypt pinLogin by Triple DES CBC
+        String pinLoginEncrypted;
+        try {
+            pinLoginEncrypted = Common.encryptPassByTripleDsCbc(pass.trim(), publicKeyRSA, privateKeyRSA);
+        } catch (Exception e) {
+            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+        }
+        configInfo.setPinLoginEncrypted(pinLoginEncrypted);
+
+        //set command id
+        configInfo.setCommandId(commandId);
+
+        return configInfo;
+    }
+
     //endregion
 
     //region method utils
+    //delay animations when view is clicked
+    public static final int TIME_DELAY_ANIM = 250;
+
+    public enum TEXT_DIALOG {
+        OK,
+        CANCLE,
+        TITLE_DEFAULT,
+        MESSAGE_DEFAULT,
+        MESSAGE_CLICK_YES_DEFAULT,
+        MESSAGE_EXIT;
+
+        @Override
+        public String toString() {
+            if (this == OK)
+                return "Chấp nhận";
+            if (this == CANCLE)
+                return "Không";
+            if (this == TITLE_DEFAULT)
+                return "Thông báo";
+            if (this == MESSAGE_DEFAULT)
+                return "Chưa có nội dung";
+            if (this == MESSAGE_CLICK_YES_DEFAULT)
+                return "Bạn đã chấp nhận";
+            if (this == MESSAGE_EXIT)
+                return "Bạn có chắc chắn muốn thoát không?";
+            return "";
+        }
+    }
 
     public enum DATE_TIME_TYPE {
         HHmmss,
@@ -641,5 +808,55 @@ public class Common {
         byte[] dataEncoded = Base64.encode(dataToEncode, Base64.DEFAULT);
         return dataEncoded;
     }
+
+    public static void runAnimationClickViewScale(final View view, int idAnimation, int timeDelayAnim) {
+        if (view == null)
+            return;
+        if (idAnimation <= 0)
+            return;
+
+        Animation animation = AnimationUtils.loadAnimation(view.getContext(), idAnimation);
+        if (timeDelayAnim > 0)
+            animation.setDuration(timeDelayAnim);
+
+        view.startAnimation(animation);
+    }
+
+
+    public static void showDialog(Context context, final IActionClickYesNoDialog clickYesNoDialog, String title, String message) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        View view = inflater.inflate(R.layout.diaglog_layout_button_ok, null);
+        final TextView titleView = (TextView) view.findViewById(R.id.tv_dialog_layout_title);
+        final TextView messageView = (TextView) view.findViewById(R.id.tv_dialog_layout_message);
+        final Button buttonOK = (Button) view.findViewById(R.id.btn_dialog_layout_button_ok);
+        final Button buttonCancle = (Button) view.findViewById(R.id.btn_dialog_layout_button_cancel);
+
+        builder.setView(view);
+
+        titleView.setText(title);
+        messageView.setText(message);
+
+        final AlertDialog alertDialog = builder.show();
+
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        buttonOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickYesNoDialog.doClickYes();
+                alertDialog.dismiss();
+            }
+        });
+
+        buttonCancle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clickYesNoDialog.doClickNo();
+                alertDialog.dismiss();
+            }
+        });
+    }
+
     //endregion
 }

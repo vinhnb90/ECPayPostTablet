@@ -1,9 +1,9 @@
-package views.ecpay.com.postabletecpay.util.entities.response.EntityLogin;
+package views.ecpay.com.postabletecpay.util.entities.request.EntityLogin;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Body {
+public class BodyLogin {
 
 @SerializedName("audit-number")
 @Expose
@@ -20,9 +20,6 @@ private String signature;
 @SerializedName("pin-login")
 @Expose
 private String pinLogin;
-@SerializedName("response-login")
-@Expose
-private String responseLogin;
 
 public Long getAuditNumber() {
 return auditNumber;
@@ -62,14 +59,6 @@ return pinLogin;
 
 public void setPinLogin(String pinLogin) {
 this.pinLogin = pinLogin;
-}
-
-public String getResponseLogin() {
-return responseLogin;
-}
-
-public void setResponseLogin(String responseLogin) {
-this.responseLogin = responseLogin;
 }
 
 }

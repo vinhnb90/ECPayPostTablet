@@ -3,7 +3,6 @@ package views.ecpay.com.postabletecpay.view.TaiKhoan;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,13 +14,13 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import views.ecpay.com.postabletecpay.R;
-import views.ecpay.com.postabletecpay.view.DoiMatKhau.DoiMatKhauActivity;
+import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
 
 /**
  * Created by macbook on 4/28/17.
  */
 
-public class TaiKhoanFragment extends Fragment implements View.OnClickListener {
+public class UserInfoFragment extends Fragment implements View.OnClickListener {
 
     @BindView(R.id.ibBack) ImageButton ibBack;
     @BindView(R.id.tvTaiKhoan) TextView tvTaiKhoan;
@@ -39,8 +38,8 @@ public class TaiKhoanFragment extends Fragment implements View.OnClickListener {
 
     private OnFragmentInteractionListener listener;
 
-    public static TaiKhoanFragment newInstance() {
-        return new TaiKhoanFragment();
+    public static UserInfoFragment newInstance() {
+        return new UserInfoFragment();
     }
 
     @Override
@@ -78,7 +77,7 @@ public class TaiKhoanFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btDoiMatKhau:
-                startActivity(new Intent(TaiKhoanFragment.this.getActivity(), DoiMatKhauActivity.class));
+                startActivity(new Intent(UserInfoFragment.this.getActivity(), ChangePassActivity.class));
                 break;
             case  R.id.btDangXuat:
                 break;
@@ -87,5 +86,4 @@ public class TaiKhoanFragment extends Fragment implements View.OnClickListener {
 
     public interface OnFragmentInteractionListener {
     }
-
 }

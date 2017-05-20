@@ -41,16 +41,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         return super.getApplicationContext();
     }
 
-    protected void runAnimationClickViewScale(final View view, int idAnimation)
-    {
-        if(view == null)
-            return;
-        if(idAnimation<=0)
-            return;
-
-        view.startAnimation(AnimationUtils.loadAnimation(this, idAnimation));
-    }
-
     protected abstract void initView();
 
     protected abstract void initSource();

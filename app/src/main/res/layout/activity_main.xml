@@ -9,7 +9,7 @@
     tools:context="views.ecpay.com.postabletecpay.view.Main.MainActivity">
 
     <android.support.design.widget.BottomNavigationView
-        android:id="@+id/navigation"
+        android:id="@+id/navigation_ac_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -20,7 +20,7 @@
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/navigation"
+        android:layout_above="@+id/navigation_ac_main"
         android:layout_alignParentTop="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 

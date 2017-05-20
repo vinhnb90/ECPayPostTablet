@@ -15,13 +15,13 @@ import android.widget.Toast;
 
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
-import views.ecpay.com.postabletecpay.view.TaiKhoan.TaiKhoanFragment;
+import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.ThanhToanFragment;
-import views.ecpay.com.postabletecpay.view.TrangChu.TrangChuFragment;
+import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
-public class MainActivity extends AppCompatActivity implements TrangChuFragment.OnFragmentInteractionListener,
+public class MainActivity extends AppCompatActivity implements MainPageFragment.OnFragmentInteractionListener,
         ThanhToanFragment.OnFragmentInteractionListener, BaoCaoFragment.OnFragmentInteractionListener,
-        TaiKhoanFragment.OnFragmentInteractionListener {
+        UserInfoFragment.OnFragmentInteractionListener {
 
     public static BottomNavigationView navigation;
 
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements TrangChuFragment.
             Fragment fragment = null;
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    fragment = TrangChuFragment.newInstance();
+                    fragment = MainPageFragment.newInstance();
                     break;
                 case R.id.navigation_pay:
                     fragment = ThanhToanFragment.newInstance();
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements TrangChuFragment.
                     fragment = BaoCaoFragment.newInstance();
                     break;
                 case R.id.navigation_accout:
-                    fragment = TaiKhoanFragment.newInstance();
+                    fragment = UserInfoFragment.newInstance();
                     break;
             }
             if (fragment != null) {
@@ -69,20 +69,20 @@ public class MainActivity extends AppCompatActivity implements TrangChuFragment.
                 int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
                 decorView.setSystemUiVisibility(uiOptions);
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             Toast.makeText(this, ex.getMessage(), Toast.LENGTH_LONG).show();
         }
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout, TrangChuFragment.newInstance());
+        fragmentTransaction.replace(R.id.frameLayout, MainPageFragment.newInstance());
         fragmentTransaction.commit();
 
-        navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation = (BottomNavigationView) findViewById(R.id.navigation_ac_main);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
     }
 
-    public static void updateNavigationBarState(int actionId){
+    public static void updateNavigationBarState(int actionId) {
         Menu menu = navigation.getMenu();
         for (int i = 0, size = menu.size(); i < size; i++) {
             MenuItem menuItem = menu.getItem(i);

@@ -4,14 +4,17 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import views.ecpay.com.postabletecpay.model.LoginModel;
+import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.commons.Common.CODE_REPONSE_LOGIN;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.EntityLogin.LoginResponseLogin;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI.AsyncSoapLogin.AsyncSoapLoginCallBack;
 import views.ecpay.com.postabletecpay.view.DangNhap.ILoginView;
 import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by VinhNB on 5/11/2017.
@@ -25,6 +28,9 @@ public class LoginPresenter implements ILoginPresenter {
             return;
         this.mILoginView = mILoginView;
         mLoginModel = new LoginModel();
+
+        mSharedPrefLogin = mLoginModel.initialManagerSharedPref(mILoginView.getContextView());
+        mSharedPrefLogin.addSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE);
     }
 
     @Override
@@ -34,11 +40,11 @@ public class LoginPresenter implements ILoginPresenter {
         Boolean isErr = false;
 
         mILoginView.hidePbarLogin();
-        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || pass.length()> Common.LENGTH_USER_NAME) && !isErr) {
+        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.LENGTH_USER_NAME) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_USER.toString();
             isErr = true;
         }
-        if ((pass == null || pass.isEmpty() || pass.trim().equals("") || pass.length()> Common.LENGTH_PASS) && !isErr) {
+        if ((pass == null || pass.isEmpty() || pass.trim().equals("") || pass.length() > Common.LENGTH_PASS) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_PASS.toString();
             isErr = true;
         }
@@ -60,99 +66,24 @@ public class LoginPresenter implements ILoginPresenter {
         }
 
         //setup info login
-        long auditNumber;
-
-        String agent, commandId, macAdressHexValue, diskDriver, pcCode, accountId, privateKeyRSA = "";
         ConfigInfo configInfo;
-
-        configInfo = Common.getDataFileConfig();
-
-        String timeNow = Common.getDateTimeNow6Digit();
-        auditNumber = Common.createAuditNumber(timeNow);
-        commandId = Common.COMMAND_ID.LOGIN.name();
-
         try {
-            //get and convert mac adress to hex
-            macAdressHexValue = Common.getMacAddress(context);
+            configInfo = Common.setupInfoRequest(context, userName, pass, Common.COMMAND_ID.LOGIN.toString());
         } catch (Exception e) {
-            textMessage = e.getMessage();
-            mILoginView.showTextMessage(textMessage);
-            return;
-        }
-
-        diskDriver = Common.getIMEIAddress(context);
-        pcCode = configInfo.getPC_CODE();
-        accountId = userName.toString().trim();
-        agent = configInfo.getAGENT();
-        privateKeyRSA = configInfo.getPRIVATE_KEY();
-
-        if (privateKeyRSA == null || privateKeyRSA.isEmpty() || privateKeyRSA.trim().isEmpty()) {
-            textMessage = Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString();
-            mILoginView.showTextMessage(textMessage);
-            return;
-        }
-
-        //encrypt password of agent by RSA
-        String passwordAgent, passwordAgentEcrypted;
-
-        passwordAgent = configInfo.getPASS_WORD();
-        if (passwordAgent == null || passwordAgent.isEmpty() || passwordAgent.trim().isEmpty()) {
-            textMessage = Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString();
-            mILoginView.showTextMessage(textMessage);
-            return;
-        }
-
-        try {
-            passwordAgentEcrypted = Common.encryptPasswordAgentByRSA(passwordAgent.trim(), privateKeyRSA);
-        } catch (Exception e) {
-            textMessage = Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString();
-            mILoginView.showTextMessage(textMessage);
-            return;
-        }
-
-       /* //test
-        String passDecypted = "";
-        try {
-            AsymmetricCryptography ac = new AsymmetricCryptography();
-            PublicKey publicKey = ac.getPublic(publicKeyRSA);
-            passDecypted = ac.decryptText(passEncrypted, publicKey);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        //end test*/
-
-        //encrypt signature by RSA
-        String signatureEncrypted;
-
-        try {
-            signatureEncrypted = Common.encryptSignatureByRSA(agent, commandId, auditNumber, macAdressHexValue, diskDriver, pcCode, accountId, privateKeyRSA);
-        } catch (Exception e) {
-            textMessage = Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString();
-            mILoginView.showTextMessage(textMessage);
-            return;
-        }
-
-        //encrypt pinLogin by Triple DES CBC
-        String publicKeyRSA, pinLoginEncrypted;
-
-        publicKeyRSA = configInfo.getPUBLIC_KEY();
-
-        if (privateKeyRSA == null || privateKeyRSA.isEmpty() || privateKeyRSA.trim().isEmpty()) {
-            textMessage = Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString();
-            mILoginView.showTextMessage(textMessage);
-            return;
-        }
-
-//        pinLogin = Common.encryptPassByTripleDsCbc(pass.trim(), keyTripleDsCbc, initializationVector, padding);
-        try {
-            pinLoginEncrypted = Common.encryptPassByTripleDsCbc(pass.trim(), publicKeyRSA, privateKeyRSA);
-        } catch (Exception e) {
-            mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString());
+            mILoginView.showTextMessage(e.getMessage());
             return;
         }
 
         //create request to server
-        String jsonRequestLogin = SoapAPI.getJsonRequestLogin(agent, passwordAgentEcrypted, commandId, auditNumber, macAdressHexValue, diskDriver, signatureEncrypted, pinLoginEncrypted, accountId);
+        String jsonRequestLogin = SoapAPI.getJsonRequestLogin(configInfo.getAGENT(),
+                configInfo.getAgentEncypted(),
+                configInfo.getCommandId(),
+                configInfo.getAuditNumber(),
+                configInfo.getMacAdressHexValue(),
+                configInfo.getDiskDriver(),
+                configInfo.getSignatureEncrypted(),
+                configInfo.getPinLoginEncrypted(),
+                configInfo.getAccountId());
 
         if (jsonRequestLogin != null) {
             try {
@@ -167,7 +98,7 @@ public class LoginPresenter implements ILoginPresenter {
                     Thread soapLoginThread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            LoginResponse loginResponse = null;
+                            LoginResponseLogin loginResponseLogin = null;
 
                             //call time out
                             try {
@@ -175,7 +106,7 @@ public class LoginPresenter implements ILoginPresenter {
                             } catch (InterruptedException e) {
                                 mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
                             } finally {
-                                if (loginResponse == null) {
+                                if (loginResponseLogin == null) {
                                     soapLogin.callCountdown(soapLogin);
                                 }
                             }
@@ -184,12 +115,53 @@ public class LoginPresenter implements ILoginPresenter {
 
                     soapLoginThread.start();
                 }
-
             } catch (Exception e) {
                 mILoginView.showTextMessage(e.getMessage());
                 return;
             }
 
+        }
+    }
+
+    @Override
+    public void writeSharedPrefLogin(String userName, String pass) {
+        if (userName == null || userName.isEmpty()) {
+            return;
+        }
+        if (pass == null || pass.isEmpty()) {
+            return;
+        }
+
+        mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE).
+                edit().
+                putString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, userName).
+                putString(Common.SHARE_REF_FILE_LOGIN_PASS, pass).
+                putBoolean(Common.SHARE_REF_FILE_LOGIN_IS_SAVE, true).
+                commit();
+    }
+
+    @Override
+    public void clearSharedPrefLogin() {
+        if (mSharedPrefLogin != null) {
+            mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE).
+                    edit().
+                    clear().
+                    commit();
+        }
+    }
+
+    @Override
+    public void showInfoSharePrefLogin() {
+        if (mSharedPrefLogin != null) {
+            String userName = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE).
+                    getString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, "");
+            String pass = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE).
+                    getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
+            boolean isSaveLogin = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE).
+                    getBoolean(Common.SHARE_REF_FILE_LOGIN_IS_SAVE, false);
+
+            mILoginView.showTextUserPass(userName, pass);
+            mILoginView.showTickCheckbox(isSaveLogin);
         }
     }
 
@@ -233,7 +205,7 @@ public class LoginPresenter implements ILoginPresenter {
         }
 
         @Override
-        public void onPost(LoginResponse response) {
+        public void onPost(LoginResponseLogin response) {
             mILoginView.hidePbarLogin();
 
             if (response == null) {
@@ -241,9 +213,8 @@ public class LoginPresenter implements ILoginPresenter {
                 return;
             }
 
-            CODE_REPONSE_LOGIN codeResponse= CODE_REPONSE_LOGIN.findCodeMessage(response.getFooter().getResponseCode());
-            if(codeResponse != CODE_REPONSE_LOGIN.e000)
-            {
+            CODE_REPONSE_LOGIN codeResponse = CODE_REPONSE_LOGIN.findCodeMessage(response.getFooterLogin().getResponseCode());
+            if (codeResponse != CODE_REPONSE_LOGIN.e000) {
                 mILoginView.showTextMessage(codeResponse.getMessage());
                 return;
             }
@@ -267,4 +238,6 @@ public class LoginPresenter implements ILoginPresenter {
             });
         }
     };
+
+    private SharePrefManager mSharedPrefLogin;
 }

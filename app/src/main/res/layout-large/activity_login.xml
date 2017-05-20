@@ -61,6 +61,7 @@
         android:layout_marginRight="20dp"
         android:drawableLeft="@mipmap/ic_taikhoan"
         android:hint="Số tài khoản"
+        android:maxLength="20"
         android:inputType="textNoSuggestions|textVisiblePassword"
         android:padding="5dp" />
 
@@ -76,10 +77,11 @@
         android:drawableLeft="@mipmap/ic_matkhau"
         android:hint="Mật khẩu"
         android:inputType="textPassword"
+        android:maxLength="8"
         android:padding="5dp" />
 
     <CheckBox
-        android:id="@+id/cbNhoMatKhau"
+        android:id="@+id/cb_ac_login_save_info_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/etMatKhau"
@@ -92,7 +94,7 @@
         android:id="@+id/ll_ac_dangnhap_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/cbNhoMatKhau"
+        android:layout_below="@id/cb_ac_login_save_info_login"
         android:layout_marginBottom="80dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"

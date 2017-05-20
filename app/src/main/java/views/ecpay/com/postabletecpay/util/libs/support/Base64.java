@@ -939,7 +939,7 @@ public class Base64
 
             //int    len43   = len * 4 / 3;
             //byte[] outBuff = new byte[   ( len43 )                      // Main 4:3
-            //                           + ( (len % 3) > 0 ? 4 : 0 )      // Account for padding
+            //                           + ( (len % 3) > 0 ? 4 : 0 )      // AccountLogin for padding
             //                           + (breakLines ? ( len43 / MAX_LINE_LENGTH ) : 0) ]; // New lines
             // Try to determine more precisely how big the array needs to be.
             // If we get it right, we don't have to do an array copy, and
