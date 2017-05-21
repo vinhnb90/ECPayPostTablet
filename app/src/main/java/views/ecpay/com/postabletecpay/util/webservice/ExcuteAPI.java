@@ -3,7 +3,7 @@ package views.ecpay.com.postabletecpay.util.webservice;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.POST;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.EntityLogin.LoginResponseLogin;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
 
 /**
  * Created by VinhNB on 5/16/2017.
@@ -11,5 +11,5 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.EntityL
 
 public interface ExcuteAPI {
     @POST("/execute")
-    Call<LoginResponseLogin> execute(@Field("message") String message);
+    Call<LoginResponseReponse> execute(@Field("message") String message);
 }

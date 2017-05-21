@@ -1,10 +1,9 @@
-package views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass;
+package views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class BodyChangePass {
-
+public class BodyChangePassResponse {
     @SerializedName("audit-number")
     @Expose
     private Long auditNumber;
@@ -17,19 +16,6 @@ public class BodyChangePass {
     @SerializedName("signature")
     @Expose
     private String signature;
-    @SerializedName("pin-login")
-    @Expose
-    private String pinLogin;
-
-    @SerializedName("session")
-    @Expose
-    private String session;
-    @SerializedName("new-pin")
-    @Expose
-    private String newPin;
-    @SerializedName("retry-pin")
-    @Expose
-    private String retryPin;
 
     public Long getAuditNumber() {
         return auditNumber;
@@ -63,35 +49,4 @@ public class BodyChangePass {
         this.signature = signature;
     }
 
-    public String getPinLogin() {
-        return pinLogin;
-    }
-
-    public void setPinLogin(String pinLogin) {
-        this.pinLogin = pinLogin;
-    }
-
-    public String getSession() {
-        return session;
-    }
-
-    public void setSession(String session) {
-        this.session = session;
-    }
-
-    public String getNewPin() {
-        return newPin;
-    }
-
-    public void setNewPin(String newPin) {
-        this.newPin = newPin;
-    }
-
-    public String getRetryPin() {
-        return retryPin;
-    }
-
-    public void setRetryPin(String retryPin) {
-        this.retryPin = retryPin;
-    }
 }

@@ -15,11 +15,17 @@ import org.ksoap2.transport.HttpTransportSE;
 import views.ecpay.com.postabletecpay.model.adapter.LoginRequestAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.LoginResponseAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
-import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.BodyLogin;
-import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.FooterLogin;
-import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.HeaderLogin;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.BodyChangePassRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.ChangePassRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.FooterChangePassRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.HeaderChangePassRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.BodyLoginRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.FooterLoginRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.HeaderLoginRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.LoginRequest;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.EntityLogin.LoginResponseLogin;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.BodyChangePassResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
 
@@ -48,25 +54,25 @@ public class SoapAPI {
         if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
             return null;
 
-        HeaderLogin headerLogin = new HeaderLogin();
-        headerLogin.setAgent(agent);
-        headerLogin.setPassword(agentEncypted);
-        headerLogin.setCommandId(commandId);
+        HeaderLoginRequest headerLoginRequest = new HeaderLoginRequest();
+        headerLoginRequest.setAgent(agent);
+        headerLoginRequest.setPassword(agentEncypted);
+        headerLoginRequest.setCommandId(commandId);
 
-        BodyLogin bodyLogin = new BodyLogin();
-        bodyLogin.setAuditNumber(auditNumber);
-        bodyLogin.setMac(mac);
-        bodyLogin.setDiskDrive(diskDriver);
-        bodyLogin.setSignature(signatureEncrypted);
-        bodyLogin.setPinLogin(pinLogin);
+        BodyLoginRequest bodyLoginRequest = new BodyLoginRequest();
+        bodyLoginRequest.setAuditNumber(auditNumber);
+        bodyLoginRequest.setMac(mac);
+        bodyLoginRequest.setDiskDrive(diskDriver);
+        bodyLoginRequest.setSignature(signatureEncrypted);
+        bodyLoginRequest.setPinLogin(pinLogin);
 
-        FooterLogin footerLogin = new FooterLogin();
-        footerLogin.setAccountIdt(accountId);
+        FooterLoginRequest footerLoginRequest = new FooterLoginRequest();
+        footerLoginRequest.setAccountIdt(accountId);
 
         final LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setHeaderLogin(headerLogin);
-        loginRequest.setBodyLogin(bodyLogin);
-        loginRequest.setFooterLogin(footerLogin);
+        loginRequest.setHeaderLoginRequest(headerLoginRequest);
+        loginRequest.setBodyLoginRequest(bodyLoginRequest);
+        loginRequest.setFooterLoginRequest(footerLoginRequest);
 
 
         final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -107,25 +113,24 @@ public class SoapAPI {
         if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
             return null;
 
-        HeaderLogin headerLogin = new HeaderLogin();
-        headerLogin.setAgent(agent);
-        headerLogin.setPassword(agentEncypted);
-        headerLogin.setCommandId(commandId);
+        HeaderChangePassRequest headerChangePassRequest = new HeaderChangePassRequest();
+        headerChangePassRequest.setAgent(agent);
+        headerChangePassRequest.setPassword(agentEncypted);
+        headerChangePassRequest.setCommandId(commandId);
 
-        BodyLogin bodyLogin = new BodyLogin();
-        bodyLogin.setAuditNumber(auditNumber);
-        bodyLogin.setMac(mac);
-        bodyLogin.setDiskDrive(diskDriver);
-        bodyLogin.setSignature(signatureEncrypted);
-        bodyLogin.setPinLogin(pinLogin);
+        BodyChangePassRequest bodyChangePassRequest = new BodyChangePassRequest();
+        bodyChangePassRequest.setAuditNumber(auditNumber);
+        bodyChangePassRequest.setMac(mac);
+        bodyChangePassRequest.setDiskDrive(diskDriver);
+        bodyChangePassRequest.setSignature(signatureEncrypted);
 
-        FooterLogin footerLogin = new FooterLogin();
-        footerLogin.setAccountIdt(accountId);
+        FooterChangePassRequest footerChangePassRequest = new FooterChangePassRequest();
+        footerChangePassRequest.setAccountIdt(accountId);
 
-        final LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setHeaderLogin(headerLogin);
-        loginRequest.setBodyLogin(bodyLogin);
-        loginRequest.setFooterLogin(footerLogin);
+        final ChangePassRequest changePassRequest = new ChangePassRequest();
+        changePassRequest.setHeaderChangePassRequest(headerChangePassRequest);
+        changePassRequest.setBodyChangePassRequest(bodyChangePassRequest);
+        changePassRequest.setFooterChangePassRequest(footerChangePassRequest);
 
 
         final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -134,10 +139,10 @@ public class SoapAPI {
         final Gson gson = gsonBuilder.create();
 
         //Serialised
-        final String jsonResult = gson.toJson(loginRequest);
+        final String jsonResult = gson.toJson(changePassRequest);
 
         //Test Deserialised
-        final LoginRequest parsedRequest = gson.fromJson(jsonResult, LoginRequest.class);
+        final ChangePassRequest parsedRequest = gson.fromJson(jsonResult, ChangePassRequest.class);
 
         return jsonResult;
 
@@ -145,7 +150,7 @@ public class SoapAPI {
     //endregion
 
     //region class api soap
-    public static class AsyncSoapLogin extends AsyncTask<String, String, LoginResponseLogin> {
+    public static class AsyncSoapLogin extends AsyncTask<String, String, LoginResponseReponse> {
 
         //request action to eStore
         private static final String METHOD_NAME = "execute";
@@ -167,7 +172,7 @@ public class SoapAPI {
         }
 
         @Override
-        protected LoginResponseLogin doInBackground(String... jsons) {
+        protected LoginResponseReponse doInBackground(String... jsons) {
             String json = jsons[0];
 
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
@@ -196,7 +201,7 @@ public class SoapAPI {
             if (data.isEmpty())
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
 
-            LoginResponseLogin loginResponseLogin = null;
+            LoginResponseReponse loginResponseReponse = null;
 
             final GsonBuilder gsonBuilder = new GsonBuilder();
             gsonBuilder.registerTypeAdapter(LoginRequest.class, new LoginResponseAdapter());
@@ -325,9 +330,9 @@ public class SoapAPI {
             data = dataTest;
             //end Tests
 
-            loginResponseLogin = gson.fromJson(data, LoginResponseLogin.class);
+            loginResponseReponse = gson.fromJson(data, LoginResponseReponse.class);
 
-           return loginResponseLogin;
+           return loginResponseReponse;
         }
 
         @Override
@@ -339,10 +344,10 @@ public class SoapAPI {
         }
 
         @Override
-        protected void onPostExecute(LoginResponseLogin loginResponseLogin) {
-            super.onPostExecute(loginResponseLogin);
+        protected void onPostExecute(LoginResponseReponse loginResponseReponse) {
+            super.onPostExecute(loginResponseReponse);
             if (!isEndCallSoap)
-                callBack.onPost(loginResponseLogin);
+                callBack.onPost(loginResponseReponse);
         }
 
         public static abstract class AsyncSoapLoginCallBack {
@@ -350,7 +355,7 @@ public class SoapAPI {
 
             public abstract void onUpdate(String message);
 
-            public abstract void onPost(LoginResponseLogin response);
+            public abstract void onPost(LoginResponseReponse response);
 
             public abstract void onTimeOut(final AsyncSoapLogin soapLogin);
         }
@@ -360,6 +365,112 @@ public class SoapAPI {
                 return;
 
             callBack.onTimeOut(soapLogin);
+        }
+
+        public boolean isEndCallSoap() {
+            return isEndCallSoap;
+        }
+
+        public void setEndCallSoap(boolean endCallSoap) {
+            isEndCallSoap = endCallSoap;
+        }
+    }
+
+    public static class AsyncSoapChangePass extends AsyncTask<String, String, ChangePassResponse> {
+
+        //request action to eStore
+        private static final String METHOD_NAME = "execute";
+        private static final String NAMESPACE = "http://services.ecpay.org/";
+        private static final String URL = ENDPOINT_URL;
+        private static final String SOAP_ACTION = "request action to eStore";
+        private static final String METHOD_PARAM = "message";
+        private AsyncSoapChangePassCallBack callBack;
+        private boolean isEndCallSoap = false;
+
+        public AsyncSoapChangePass(AsyncSoapChangePassCallBack callBack) throws Exception {
+            this.callBack = callBack;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            callBack.onPre(this);
+        }
+
+        @Override
+        protected ChangePassResponse doInBackground(String... jsons) {
+            String json = jsons[0];
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            request.addProperty(METHOD_PARAM, json);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE ht;
+            SoapPrimitive response = null;
+
+            try {
+                ht = new HttpTransportSE(URL);
+                ht.call(SOAP_ACTION, envelope);
+                response = (SoapPrimitive) envelope.getResponse();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (response == null) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+            }
+
+            String data = response.toString();
+            if (data.isEmpty())
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+
+            ChangePassResponse changePassResponse = null;
+
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter(ChangePassRequest.class, new ChangePassResponse());
+            gsonBuilder.setPrettyPrinting();
+            final Gson gson = gsonBuilder.create();
+
+            //end Tests
+
+            changePassResponse = gson.fromJson(data, ChangePassResponse.class);
+
+            return changePassResponse;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            String message = values[0];
+            if (isEndCallSoap)
+                callBack.onUpdate(message);
+        }
+
+        @Override
+        protected void onPostExecute(ChangePassResponse changePassResponse) {
+            super.onPostExecute(changePassResponse);
+            if (!isEndCallSoap)
+                callBack.onPost(changePassResponse);
+        }
+
+        public static abstract class AsyncSoapChangePassCallBack {
+            public abstract void onPre(final AsyncSoapChangePass soapChangePass);
+
+            public abstract void onUpdate(String message);
+
+            public abstract void onPost(ChangePassResponse response);
+
+            public abstract void onTimeOut(final AsyncSoapChangePass soapChangePass);
+        }
+
+        public void callCountdown(final AsyncSoapChangePass soapChangePass) {
+            if (soapChangePass == null)
+                return;
+
+            callBack.onTimeOut(soapChangePass);
         }
 
         public boolean isEndCallSoap() {

@@ -5,5 +5,5 @@ package views.ecpay.com.postabletecpay.presenter;
  */
 
 public interface IChangePassPresenter {
-    void validateInput(String passOld, String passNew, String passRetype);
+    void validateInputChangePass(String passOld, String passNew, String passRetype);
 }

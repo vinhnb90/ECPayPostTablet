@@ -101,7 +101,7 @@ public class ChangePassActivity extends ActionBarActivity implements IChangePass
                 String passOld = etPassOld.getText().toString();
                 String passNew = etPassNew.getText().toString();
                 String passRetype = etPassRetype.getText().toString();
-                mIChangePassPresenter.validateInput(passOld, passNew, passRetype);
+                mIChangePassPresenter.validateInputChangePass(passOld, passNew, passRetype);
             }
         }, TIME_DELAY_ANIM);
     }

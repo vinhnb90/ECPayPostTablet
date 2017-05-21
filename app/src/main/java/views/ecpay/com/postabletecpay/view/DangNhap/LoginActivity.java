@@ -168,7 +168,6 @@ public class LoginActivity extends BaseActivity implements ILoginView {
             }
         }, TIME_DELAY_ANIM);
     }
-
     //endregion
 
     //region private param

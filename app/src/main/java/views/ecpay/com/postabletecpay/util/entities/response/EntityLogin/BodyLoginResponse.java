@@ -1,9 +1,9 @@
-package views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.EntityLogin;
+package views.ecpay.com.postabletecpay.util.entities.response.EntityLogin;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class BodyLogin {
+public class BodyLoginResponse {
     @SerializedName("audit-number")
     @Expose
     private Long auditNumber;
@@ -21,7 +21,7 @@ public class BodyLogin {
     private String pinLogin;
     @SerializedName("response-login")
     @Expose
-    private ResponseLogin responseLogin;
+    private ResponseLoginResponse responseLoginResponse;
 
     public Long getAuditNumber() {
         return auditNumber;
@@ -63,12 +63,12 @@ public class BodyLogin {
         this.pinLogin = pinLogin;
     }
 
-    public ResponseLogin getResponseLogin() {
-        return responseLogin;
+    public ResponseLoginResponse getResponseLoginResponse() {
+        return responseLoginResponse;
     }
 
-    public void setResponseLogin(ResponseLogin responseLogin) {
-        this.responseLogin = responseLogin;
+    public void setResponseLoginResponse(ResponseLoginResponse responseLoginResponse) {
+        this.responseLoginResponse = responseLoginResponse;
     }
 
 }

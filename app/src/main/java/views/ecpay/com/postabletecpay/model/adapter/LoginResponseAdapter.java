@@ -6,49 +6,49 @@ import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
 
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.EntityLogin.BodyLogin;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.EntityLogin.FooterLogin;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.EntityLogin.HeaderLogin;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.EntityLogin.LoginResponseLogin;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.BodyLoginResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.FooterLoginResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.HeaderLoginResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
 
 /**
  * Created by VinhNB on 5/19/2017.
  */
 
-public class LoginResponseAdapter extends TypeAdapter<LoginResponseLogin> {
+public class LoginResponseAdapter extends TypeAdapter<LoginResponseReponse> {
     @Override
-    public void write(JsonWriter out, LoginResponseLogin value) throws IOException {
-        HeaderLogin headerLogin = value.getHeaderLogin();
-        BodyLogin bodyLogin = value.getBodyLogin();
-        FooterLogin footerLogin = value.getFooterLogin();
+    public void write(JsonWriter out, LoginResponseReponse value) throws IOException {
+        HeaderLoginResponse headerLoginResponse = value.getHeaderLoginResponse();
+        BodyLoginResponse bodyLoginResponse = value.getBodyLoginResponse();
+        FooterLoginResponse footerLoginResponse = value.getFooterLoginResponse();
 
         out.beginObject();
-        //write headerLogin
-        if (headerLogin != null) {
+        //write headerLoginResponse
+        if (headerLoginResponse != null) {
             out.name("header").beginObject();
-            out.name("agent").value(headerLogin.getAgent());
-            out.name("password").value(headerLogin.getPassword());
-            out.name("command-id").value(headerLogin.getCommandId());
+            out.name("agent").value(headerLoginResponse.getAgent());
+            out.name("password").value(headerLoginResponse.getPassword());
+            out.name("command-id").value(headerLoginResponse.getCommandId());
             out.endObject();
         }
 
-        //write bodyLogin
-        if (bodyLogin != null) {
+        //write bodyLoginResponse
+        if (bodyLoginResponse != null) {
             out.name("body").beginObject();
-            out.name("audit-number").value(bodyLogin.getAuditNumber());
-            out.name("mac").value(bodyLogin.getMac());
-            out.name("disk-drive").value(bodyLogin.getDiskDrive());
-            out.name("signature").value(bodyLogin.getSignature());
-            out.name("pin-login").value(bodyLogin.getPinLogin());
+            out.name("audit-number").value(bodyLoginResponse.getAuditNumber());
+            out.name("mac").value(bodyLoginResponse.getMac());
+            out.name("disk-drive").value(bodyLoginResponse.getDiskDrive());
+            out.name("signature").value(bodyLoginResponse.getSignature());
+            out.name("pin-login").value(bodyLoginResponse.getPinLogin());
             out.endObject();
         }
 
-        //write footerLogin
-        if (footerLogin != null) {
+        //write footerLoginResponse
+        if (footerLoginResponse != null) {
             out.name("footer").beginObject();
-            out.name("account-idt").value(footerLogin.getAccountIdt());
-            out.name("response-code").value(footerLogin.getResponseCode());
-            out.name("description").value(footerLogin.getDescription());
+            out.name("account-idt").value(footerLoginResponse.getAccountIdt());
+            out.name("response-code").value(footerLoginResponse.getResponseCode());
+            out.name("description").value(footerLoginResponse.getDescription());
             out.endObject();
         }
 
@@ -56,82 +56,82 @@ public class LoginResponseAdapter extends TypeAdapter<LoginResponseLogin> {
     }
 
     @Override
-    public LoginResponseLogin read(JsonReader in) throws IOException {
-        final LoginResponseLogin loginRequest = new LoginResponseLogin();
+    public LoginResponseReponse read(JsonReader in) throws IOException {
+        final LoginResponseReponse loginRequest = new LoginResponseReponse();
 
         in.beginObject();
         while (in.hasNext()) {
             switch (in.nextName()) {
                 case "header":
-                    final HeaderLogin headerLogin = new HeaderLogin();
+                    final HeaderLoginResponse headerLoginResponse = new HeaderLoginResponse();
 
                     in.beginObject();
                     while (in.hasNext()) {
                         switch (in.nextName()) {
                             case "agent":
-                                headerLogin.setAgent(in.nextString());
+                                headerLoginResponse.setAgent(in.nextString());
                                 break;
                             case "password":
-                                headerLogin.setPassword(in.nextString());
+                                headerLoginResponse.setPassword(in.nextString());
                                 break;
                             case "command-id":
-                                headerLogin.setCommandId(in.nextString());
+                                headerLoginResponse.setCommandId(in.nextString());
                                 break;
                         }
                     }
                     in.endObject();
 
-                    loginRequest.setHeaderLogin(headerLogin);
+                    loginRequest.setHeaderLoginResponse(headerLoginResponse);
                     break;
 
                 case "body":
-                    final BodyLogin bodyLogin = new BodyLogin();
+                    final BodyLoginResponse bodyLoginResponse = new BodyLoginResponse();
 
                     in.beginObject();
                     while (in.hasNext()) {
                         switch (in.nextName()) {
                             case "audit-number":
-                                bodyLogin.setAuditNumber(in.nextLong());
+                                bodyLoginResponse.setAuditNumber(in.nextLong());
                                 break;
                             case "mac":
-                                bodyLogin.setMac(in.nextString());
+                                bodyLoginResponse.setMac(in.nextString());
                                 break;
                             case "disk-drive":
-                                bodyLogin.setDiskDrive(in.nextString());
+                                bodyLoginResponse.setDiskDrive(in.nextString());
                                 break;
                             case "signature":
-                                bodyLogin.setSignature(in.nextString());
+                                bodyLoginResponse.setSignature(in.nextString());
                                 break;
                             case "pin-login":
-                                bodyLogin.setPinLogin(in.nextString());
+                                bodyLoginResponse.setPinLogin(in.nextString());
                                 break;
                         }
                     }
                     in.endObject();
 
-                    loginRequest.setBodyLogin(bodyLogin);
+                    loginRequest.setBodyLoginResponse(bodyLoginResponse);
                     break;
 
                 case "footer":
-                    final FooterLogin footerLogin = new FooterLogin();
+                    final FooterLoginResponse footerLoginResponse = new FooterLoginResponse();
 
                     in.beginObject();
                     while (in.hasNext()) {
                         switch (in.nextName()) {
                             case "account-idt":
-                                footerLogin.setAccountIdt(in.nextString());
+                                footerLoginResponse.setAccountIdt(in.nextString());
                                 break;
                             case "response-code":
-                                footerLogin.setResponseCode(in.nextString());
+                                footerLoginResponse.setResponseCode(in.nextString());
                                 break;
                             case "description":
-                                footerLogin.setDescription(in.nextString());
+                                footerLoginResponse.setDescription(in.nextString());
                                 break;
                         }
                     }
                     in.endObject();
 
-                    loginRequest.setFooterLogin(footerLogin);
+                    loginRequest.setFooterLoginResponse(footerLoginResponse);
                     break;
             }
         }

@@ -1,9 +1,9 @@
-package views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.EntityLogin;
+package views.ecpay.com.postabletecpay.util.entities.response.EntityLogin;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class FooterLogin {
+public class FooterLoginResponse {
 
     @SerializedName("account-idt")
     @Expose

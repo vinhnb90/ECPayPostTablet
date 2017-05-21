@@ -9,35 +9,35 @@ public class LoginRequest {
 
     @SerializedName("header")
     @Expose
-    private HeaderLogin headerLogin;
+    private HeaderLoginRequest headerLoginRequest;
     @SerializedName("body")
     @Expose
-    private BodyLogin bodyLogin;
+    private BodyLoginRequest bodyLoginRequest;
     @SerializedName("footer")
     @Expose
-    private FooterLogin footerLogin;
+    private FooterLoginRequest footerLoginRequest;
 
-    public HeaderLogin getHeaderLogin() {
-        return headerLogin;
+    public HeaderLoginRequest getHeaderLoginRequest() {
+        return headerLoginRequest;
     }
 
-    public void setHeaderLogin(HeaderLogin headerLogin) {
-        this.headerLogin = headerLogin;
+    public void setHeaderLoginRequest(HeaderLoginRequest headerLoginRequest) {
+        this.headerLoginRequest = headerLoginRequest;
     }
 
-    public BodyLogin getBodyLogin() {
-        return bodyLogin;
+    public BodyLoginRequest getBodyLoginRequest() {
+        return bodyLoginRequest;
     }
 
-    public void setBodyLogin(BodyLogin bodyLogin) {
-        this.bodyLogin = bodyLogin;
+    public void setBodyLoginRequest(BodyLoginRequest bodyLoginRequest) {
+        this.bodyLoginRequest = bodyLoginRequest;
     }
 
-    public FooterLogin getFooterLogin() {
-        return footerLogin;
+    public FooterLoginRequest getFooterLoginRequest() {
+        return footerLoginRequest;
     }
 
-    public void setFooterLogin(FooterLogin footerLogin) {
-        this.footerLogin = footerLogin;
+    public void setFooterLoginRequest(FooterLoginRequest footerLoginRequest) {
+        this.footerLoginRequest = footerLoginRequest;
     }
 }

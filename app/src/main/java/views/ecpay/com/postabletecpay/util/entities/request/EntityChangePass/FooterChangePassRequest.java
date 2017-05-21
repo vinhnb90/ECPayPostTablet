@@ -3,7 +3,7 @@ package views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class FooterChangePass {
+public class FooterChangePassRequest {
 
 @SerializedName("account-idt")
 @Expose

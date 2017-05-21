@@ -33,6 +33,7 @@ import org.ecpay.client.Partner;
 import org.ecpay.client.Utils;
 import org.ecpay.client.jce.Crypto;
 import org.ecpay.client.jce.TripleDesCBC;
+import org.ecpay.client.rsa.RSA;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -44,7 +45,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -139,6 +139,22 @@ public class Common {
         }
     }
 
+    public enum MESSAGE {
+        CHANGE_PASS_SUCSSES("Đổi mật khẩu thành công"),
+        ;
+
+
+        MESSAGE(String message) {
+            this.message = message;
+        }
+
+        private String message;
+
+        public String getMessage() {
+            return message;
+        }
+    }
+
     public enum CODE_REPONSE_LOGIN {
         e000("000", "Tài khoản ví chưa đăng ký dịch vụ"),
         e034("034", "Không giải mã được mã PIN"),
@@ -176,6 +192,47 @@ public class Common {
                 }
             }
             return CODE_REPONSE_LOGIN.e9999;
+        }
+    }
+
+    public enum CODE_REPONSE_CHANGE_PASS {
+        e000("000", "Tài khoản ví chưa đăng ký dịch vụ"),
+        e031("031", "Tài khoản ví đã bị hủy"),
+        e030("030", "Tài khoản ví chưa đăng ký dịch vụ"),
+        e032("032", "Tài khoản bị khóa"),
+        e033("033", "Tài khoản ví chưa được duyệt"),
+        e037("037", "Session không tồn tại"),
+        e038("038", "Session không hợp lệ"),
+        e039("039", "Session hết thời gian hiệu lực"),
+        e999("999", "Có lỗi xảy ra trong code"),
+        e024("024", "Mã pin xác nhận không đúng"),
+        e034("034", "Không giải mã được pin"),
+        e035("035", "Mã PIN không đúng"),
+        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ");
+
+        CODE_REPONSE_CHANGE_PASS(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+        private String message;
+
+        public static CODE_REPONSE_CHANGE_PASS findCodeMessage(String code) {
+            for (CODE_REPONSE_CHANGE_PASS v : values()) {
+                if (v.getCode().equals(code)) {
+                    return v;
+                }
+            }
+            return CODE_REPONSE_CHANGE_PASS.e9999;
         }
     }
     //endregion
@@ -510,7 +567,7 @@ public class Common {
      * @param privateKeyRSA
      * @return
      */
-    public static String encryptSignatureByRSA(String agent, String commandId, Long auditNumber, String mac, String diskDriver, String pcCode, String accountId, String privateKeyRSA) throws Exception {
+    public static String getDataSignRSA(String agent, String commandId, Long auditNumber, String mac, String diskDriver, String pcCode, String accountId, String privateKeyRSA) throws Exception {
         if (agent == null || agent.isEmpty() || agent.trim().equals(""))
             return null;
         if (commandId == null || commandId.isEmpty() || commandId.trim().equals(""))
@@ -530,11 +587,11 @@ public class Common {
 
         String dataSign = agent.concat(commandId).concat(String.valueOf(auditNumber)).concat(mac).concat(diskDriver).concat(pcCode).concat(accountId);
 
-        AsymmetricCryptography ac = new AsymmetricCryptography();
-        PrivateKey privateKey = ac.getPrivate(privateKeyRSA);
-        String encryptSignature = ac.encryptText(dataSign, privateKey);
+//        AsymmetricCryptography ac = new AsymmetricCryptography();
+//        PrivateKey privateKey = ac.getPrivate(privateKeyRSA);
+//        String encryptSignature = ac.encryptText(dataSign, privateKey);
 
-        return encryptSignature;
+        return dataSign;
     }
 
     public static String encryptPasswordAgentByRSA(String passwordAgent, String privateKeyRSA) throws Exception {
@@ -671,7 +728,8 @@ public class Common {
         }
 
         try {
-            passwordAgentEcrypted = Common.encryptPasswordAgentByRSA(passwordAgent.trim(), privateKeyRSA);
+//            passwordAgentEcrypted = Common.encryptPasswordAgentByRSA(passwordAgent.trim(), privateKeyRSA);
+            passwordAgentEcrypted = RSA.encryptPassFromPrivateKey(passwordAgent, privateKeyRSA);
         } catch (Exception e) {
             throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
         }
@@ -692,7 +750,8 @@ public class Common {
         //encrypt signature by RSA
         String signatureEncrypted;
         try {
-            signatureEncrypted = Common.encryptSignatureByRSA(agent, commandId, auditNumber, macAdressHexValue, diskDriver, pcCode, accountId, privateKeyRSA);
+            String dataSign = Common.getDataSignRSA(agent, commandId, auditNumber, macAdressHexValue, diskDriver, pcCode, accountId, privateKeyRSA);
+            signatureEncrypted = RSA.getSignatureFromPrivateKey(dataSign, privateKeyRSA);
         } catch (Exception e) {
             throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
         }

@@ -1,9 +1,9 @@
-package views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.EntityLogin;
+package views.ecpay.com.postabletecpay.util.entities.request.EntityLogin;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class HeaderLogin {
+public class HeaderLoginRequest {
 
 @SerializedName("agent")
 @Expose

@@ -1,17 +1,17 @@
-package views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.EntityLogin;
+package views.ecpay.com.postabletecpay.util.entities.response.EntityLogin;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ResponseLogin {
+public class ResponseLoginResponse {
 
 @SerializedName("account")
 @Expose
-private AccountLogin accountLogin;
+private AccountLoginResponse accountLoginResponse;
 @SerializedName("listEvnPC")
 @Expose
-private List<ListEvnPCLogin> listEvnPCLogin = null;
+private List<ListEvnPCLoginResponse> listEvnPCLoginResponse = null;
 @SerializedName("reponseCode")
 @Expose
 private String reponseCode;
@@ -22,20 +22,20 @@ private String description;
 @Expose
 private String response;
 
-public AccountLogin getAccountLogin() {
-return accountLogin;
+public AccountLoginResponse getAccountLoginResponse() {
+return accountLoginResponse;
 }
 
-public void setAccountLogin(AccountLogin accountLogin) {
-this.accountLogin = accountLogin;
+public void setAccountLoginResponse(AccountLoginResponse accountLoginResponse) {
+this.accountLoginResponse = accountLoginResponse;
 }
 
-public List<ListEvnPCLogin> getListEvnPCLogin() {
-return listEvnPCLogin;
+public List<ListEvnPCLoginResponse> getListEvnPCLoginResponse() {
+return listEvnPCLoginResponse;
 }
 
-public void setListEvnPCLogin(List<ListEvnPCLogin> listEvnPCLogin) {
-this.listEvnPCLogin = listEvnPCLogin;
+public void setListEvnPCLoginResponse(List<ListEvnPCLoginResponse> listEvnPCLoginResponse) {
+this.listEvnPCLoginResponse = listEvnPCLoginResponse;
 }
 
 public String getReponseCode() {

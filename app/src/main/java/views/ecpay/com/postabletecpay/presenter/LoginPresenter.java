@@ -8,7 +8,7 @@ import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.commons.Common.CODE_REPONSE_LOGIN;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.EntityLogin.LoginResponseLogin;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI.AsyncSoapLogin.AsyncSoapLoginCallBack;
 import views.ecpay.com.postabletecpay.view.DangNhap.ILoginView;
@@ -98,7 +98,7 @@ public class LoginPresenter implements ILoginPresenter {
                     Thread soapLoginThread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            LoginResponseLogin loginResponseLogin = null;
+                            LoginResponseReponse loginResponseReponse = null;
 
                             //call time out
                             try {
@@ -106,7 +106,7 @@ public class LoginPresenter implements ILoginPresenter {
                             } catch (InterruptedException e) {
                                 mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
                             } finally {
-                                if (loginResponseLogin == null) {
+                                if (loginResponseReponse == null) {
                                     soapLogin.callCountdown(soapLogin);
                                 }
                             }
@@ -192,7 +192,6 @@ public class LoginPresenter implements ILoginPresenter {
                 soapLogin.setEndCallSoap(true);
                 soapLogin.cancel(true);
             }
-
         }
 
         @Override
@@ -205,7 +204,7 @@ public class LoginPresenter implements ILoginPresenter {
         }
 
         @Override
-        public void onPost(LoginResponseLogin response) {
+        public void onPost(LoginResponseReponse response) {
             mILoginView.hidePbarLogin();
 
             if (response == null) {
@@ -213,7 +212,7 @@ public class LoginPresenter implements ILoginPresenter {
                 return;
             }
 
-            CODE_REPONSE_LOGIN codeResponse = CODE_REPONSE_LOGIN.findCodeMessage(response.getFooterLogin().getResponseCode());
+            CODE_REPONSE_LOGIN codeResponse = CODE_REPONSE_LOGIN.findCodeMessage(response.getFooterLoginResponse().getResponseCode());
             if (codeResponse != CODE_REPONSE_LOGIN.e000) {
                 mILoginView.showTextMessage(codeResponse.getMessage());
                 return;
