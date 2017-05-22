@@ -8,7 +8,9 @@ import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.commons.Common.CODE_REPONSE_LOGIN;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.AccountLoginResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI.AsyncSoapLogin.AsyncSoapLoginCallBack;
 import views.ecpay.com.postabletecpay.view.DangNhap.ILoginView;
@@ -27,9 +29,9 @@ public class LoginPresenter implements ILoginPresenter {
         if (mILoginView == null)
             return;
         this.mILoginView = mILoginView;
-        mLoginModel = new LoginModel();
+        mLoginModel = new LoginModel(mILoginView.getContextView());
 
-        mSharedPrefLogin = mLoginModel.initialManagerSharedPref(mILoginView.getContextView());
+        mSharedPrefLogin = mLoginModel.getManagerSharedPref();
         mSharedPrefLogin.addSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE);
     }
 
@@ -173,7 +175,7 @@ public class LoginPresenter implements ILoginPresenter {
             mILoginView.hideTextMessage();
             mILoginView.showPbarLogin();
 
-            //check wifi
+           /* //check wifi
             boolean isHasWifi = Common.isConnectingWifi(mILoginView.getContextView());
             boolean isHasNetwork = Common.isNetworkConnected(mILoginView.getContextView());
 
@@ -191,7 +193,7 @@ public class LoginPresenter implements ILoginPresenter {
 
                 soapLogin.setEndCallSoap(true);
                 soapLogin.cancel(true);
-            }
+            }*/
         }
 
         @Override
@@ -218,6 +220,38 @@ public class LoginPresenter implements ILoginPresenter {
                 return;
             }
 
+
+            //get AccountLoginResponse from body response
+            AccountLoginResponse accountLoginResponse = response.getBodyLoginResponse().getResponseLoginResponse().getAccountLoginResponse();
+
+            //get account
+            Account account = Account.setAccount(
+                    accountLoginResponse.getEdong(),
+                    accountLoginResponse.getName(),
+                    accountLoginResponse.getAddress(),
+                    accountLoginResponse.getEmail(),
+                    accountLoginResponse.getBirthday(),
+                    accountLoginResponse.getSession(),
+                    accountLoginResponse.getBalance(),
+                    accountLoginResponse.getLockMoney(),
+                    accountLoginResponse.getChangedPIN(),
+                    accountLoginResponse.getVerified(),
+                    accountLoginResponse.getMac(),
+                    accountLoginResponse.getIp(),
+                    (String) accountLoginResponse.getStrLoginTime(),
+                    (String) accountLoginResponse.getStrLogoutTime(),
+                    accountLoginResponse.getType(),
+                    accountLoginResponse.getStatus(),
+                    accountLoginResponse.getIdNumber(),
+                    accountLoginResponse.getIdNumberDate(),
+                    accountLoginResponse.getIdNumberPlace(),
+                    accountLoginResponse.getParentEdong()
+            );
+
+            //write database
+            mLoginModel.writeSqliteAccountTable(account);
+
+            //show main
             mILoginView.showMainScreen();
         }
 

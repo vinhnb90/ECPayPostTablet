@@ -2,26 +2,37 @@ package views.ecpay.com.postabletecpay.model;
 
 import android.content.Context;
 
-import retrofit2.Retrofit;
 import views.ecpay.com.postabletecpay.model.sharedPreference.ICommonSharedReference;
 import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
 import views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 
 /**
  * Created by VinhNB on 5/15/2017.
  */
 
 public class LoginModel implements ICommonSharedReference {
-    private SQLiteConnection db;
+    private SQLiteConnection sqLiteConnection;
+    private SharePrefManager sharePrefManager;
 
-    public LoginModel() {
+    public LoginModel(Context context) {
+        sqLiteConnection = SQLiteConnection.getInstance(context);
+        sharePrefManager = SharePrefManager.getInstance(context);
     }
 
     @Override
-    public SharePrefManager initialManagerSharedPref(Context context) {
-        if (context == null)
-            return null;
-
-        return SharePrefManager.getInstance(context);
+    public SharePrefManager getManagerSharedPref() {
+        return sharePrefManager;
     }
+
+    //region call SQLite
+    public void writeSqliteAccountTable(Account account) {
+        if (account == null)
+            return;
+
+        sqLiteConnection.getWritableDatabase();
+        sqLiteConnection.
+
+    }
+    //endregion
 }

@@ -140,8 +140,7 @@ public class Common {
     }
 
     public enum MESSAGE {
-        CHANGE_PASS_SUCSSES("Đổi mật khẩu thành công"),
-        ;
+        CHANGE_PASS_SUCSSES("Đổi mật khẩu thành công"),;
 
 
         MESSAGE(String message) {
@@ -257,23 +256,17 @@ public class Common {
         }
     }
 
-    public enum SYMBOL {
-        SPACE;
-
-        @Override
-        public String toString() {
-            if (SPACE == this)
-                return " ";
-
-            return super.toString();
-        }
-    }
+    //define symbol
+    public static final String SPACE_TEXT = " ";
+    public static final String EMPTY_TEXT = " ";
+    public static final int ZERO = 0;
+    public static final boolean BOOL_DEFAULT = false;
     //endregion
 
     //region info path folder
     public static final String PATH_FOLDER_ROOT = Environment.getExternalStorageDirectory() + File.separator + "PosTablet" + File.separator;
-    public static final String PATH_FOLDER_DB = Environment.getExternalStorageDirectory() + File.separator + "PosTablet" + File.separator + "DB" + File.separator;
-    public static final String PATH_FOLDER_CONFIG = Environment.getExternalStorageDirectory() + File.separator + "PosTablet" + File.separator + "Config" + File.separator;
+    public static final String PATH_FOLDER_DB = PATH_FOLDER_ROOT + "DB" + File.separator;
+    public static final String PATH_FOLDER_CONFIG = PATH_FOLDER_ROOT + "Config" + File.separator;
     //endregion
 
     //region info connect API SOAP
@@ -640,7 +633,7 @@ public class Common {
         //check pass: if pass length < 8 insert space
         pass = pass.trim();
         while (pass.length() < 8) {
-            pass = SYMBOL.SPACE.toString() + pass;
+            pass = SPACE_TEXT + pass;
         }
 
         //Create partner with code is null because login not request partner code
@@ -880,7 +873,6 @@ public class Common {
 
         view.startAnimation(animation);
     }
-
 
     public static void showDialog(Context context, final IActionClickYesNoDialog clickYesNoDialog, String title, String message) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);

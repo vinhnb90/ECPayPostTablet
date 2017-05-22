@@ -6,7 +6,6 @@ import views.ecpay.com.postabletecpay.model.ChangePassModel;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
 import views.ecpay.com.postabletecpay.view.DoiMatKhau.IChangePassView;
@@ -20,7 +19,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class ChangePassPresenter implements IChangePassPresenter {
     public ChangePassPresenter(IChangePassView mIChangePassView) {
         this.mIChangePassView = mIChangePassView;
-        mChangePassModel = new ChangePassModel();
+        mChangePassModel = new ChangePassModel(mIChangePassView.getContextView());
     }
 
     @Override
@@ -42,11 +41,11 @@ public class ChangePassPresenter implements IChangePassPresenter {
             return;
         }
 
-        String userName = mChangePassModel.initialManagerSharedPref(mIChangePassView.getContextView())
+        String userName = mChangePassModel.getManagerSharedPref()
                 .getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
                 .getString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, "");
 
-        String pass = mChangePassModel.initialManagerSharedPref(mIChangePassView.getContextView())
+        String pass = mChangePassModel.getManagerSharedPref()
                 .getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
                 .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
 
@@ -119,7 +118,7 @@ public class ChangePassPresenter implements IChangePassPresenter {
             if (soapChangePass == null)
                 return;
 
-            //check wifi
+           /* //check wifi
             boolean isHasWifi = Common.isConnectingWifi(mIChangePassView.getContextView());
             boolean isHasNetwork = Common.isNetworkConnected(mIChangePassView.getContextView());
 
@@ -137,7 +136,7 @@ public class ChangePassPresenter implements IChangePassPresenter {
 
                 soapChangePass.setEndCallSoap(true);
                 soapChangePass.cancel(true);
-            }
+            }*/
         }
 
         @Override

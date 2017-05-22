@@ -133,7 +133,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
             showTextMessage(e.getMessage());
             return;
         }
-        SQLiteConnection.getInstance(this);
+        SQLiteConnection.getInstance(this).getWritableDatabase();
 
         Common.loadFolder(this);
     }

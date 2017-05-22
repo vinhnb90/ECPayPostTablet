@@ -184,7 +184,7 @@ public class SoapAPI {
             HttpTransportSE ht;
             SoapPrimitive response = null;
 
-            try {
+            /*try {
                 ht = new HttpTransportSE(URL);
                 ht.call(SOAP_ACTION, envelope);
                 response = (SoapPrimitive) envelope.getResponse();
@@ -195,11 +195,14 @@ public class SoapAPI {
             if (response == null) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                return null;
             }
 
             String data = response.toString();
-            if (data.isEmpty())
+            if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return null;
+            }*/
 
             LoginResponseReponse loginResponseReponse = null;
 
@@ -327,12 +330,12 @@ public class SoapAPI {
                     "\t}\n" +
                     "}\n";
 
-            data = dataTest;
+           String data = dataTest;
             //end Tests
 
             loginResponseReponse = gson.fromJson(data, LoginResponseReponse.class);
 
-           return loginResponseReponse;
+            return loginResponseReponse;
         }
 
         @Override

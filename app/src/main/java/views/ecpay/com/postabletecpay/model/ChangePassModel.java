@@ -10,12 +10,14 @@ import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
  */
 
 public class ChangePassModel implements ICommonSharedReference {
+    private SharePrefManager sharePrefManager;
+
+    public ChangePassModel(Context context) {
+        sharePrefManager = SharePrefManager.getInstance(context);
+    }
 
     @Override
-    public SharePrefManager initialManagerSharedPref(Context context) {
-        if (context == null)
-            return null;
-
-        return SharePrefManager.getInstance(context);
+    public SharePrefManager getManagerSharedPref() {
+        return sharePrefManager;
     }
 }
