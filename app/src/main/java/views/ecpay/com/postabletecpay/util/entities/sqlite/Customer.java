@@ -5,7 +5,6 @@ package views.ecpay.com.postabletecpay.util.entities.sqlite;
  */
 
 public class Customer {
-    private int id_custormer;
     private String code;
     private String name;
     private String address;
@@ -20,14 +19,6 @@ public class Customer {
     private String bankAccount;
     private String idNumber;
     private String bankName;
-
-    public int getId_custormer() {
-        return id_custormer;
-    }
-
-    public void setId_custormer(int id_custormer) {
-        this.id_custormer = id_custormer;
-    }
 
     public String getCode() {
         return code;

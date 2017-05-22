@@ -5,7 +5,6 @@ package views.ecpay.com.postabletecpay.util.entities.sqlite;
  */
 
 public class Account {
-    private int id_account;
     private String edong;
     private String name;
     private String address;
@@ -27,14 +26,6 @@ public class Account {
     private String idNumberDate;
     private String idNumberPlace;
     private String parentEdong;
-
-    public int getId_account() {
-        return id_account;
-    }
-
-    public void setId_account(int id_account) {
-        this.id_account = id_account;
-    }
 
     public String getEdong() {
         return edong;

@@ -3,14 +3,18 @@ package views.ecpay.com.postabletecpay.presenter;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import java.util.List;
+
 import views.ecpay.com.postabletecpay.model.LoginModel;
 import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.commons.Common.CODE_REPONSE_LOGIN;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.AccountLoginResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ListEvnPCLoginResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI.AsyncSoapLogin.AsyncSoapLoginCallBack;
 import views.ecpay.com.postabletecpay.view.DangNhap.ILoginView;
@@ -225,31 +229,58 @@ public class LoginPresenter implements ILoginPresenter {
             AccountLoginResponse accountLoginResponse = response.getBodyLoginResponse().getResponseLoginResponse().getAccountLoginResponse();
 
             //get account
-            Account account = Account.setAccount(
-                    accountLoginResponse.getEdong(),
-                    accountLoginResponse.getName(),
-                    accountLoginResponse.getAddress(),
-                    accountLoginResponse.getEmail(),
-                    accountLoginResponse.getBirthday(),
-                    accountLoginResponse.getSession(),
-                    accountLoginResponse.getBalance(),
-                    accountLoginResponse.getLockMoney(),
-                    accountLoginResponse.getChangedPIN(),
-                    accountLoginResponse.getVerified(),
-                    accountLoginResponse.getMac(),
-                    accountLoginResponse.getIp(),
-                    (String) accountLoginResponse.getStrLoginTime(),
-                    (String) accountLoginResponse.getStrLogoutTime(),
-                    accountLoginResponse.getType(),
-                    accountLoginResponse.getStatus(),
-                    accountLoginResponse.getIdNumber(),
-                    accountLoginResponse.getIdNumberDate(),
-                    accountLoginResponse.getIdNumberPlace(),
-                    accountLoginResponse.getParentEdong()
-            );
+            if (accountLoginResponse != null) {
+                Account account = Account.setAccount(
+                        accountLoginResponse.getEdong(),
+                        accountLoginResponse.getName(),
+                        accountLoginResponse.getAddress(),
+                        accountLoginResponse.getEmail(),
+                        accountLoginResponse.getBirthday(),
+                        accountLoginResponse.getSession(),
+                        accountLoginResponse.getBalance(),
+                        accountLoginResponse.getLockMoney(),
+                        accountLoginResponse.getChangedPIN(),
+                        accountLoginResponse.getVerified(),
+                        accountLoginResponse.getMac(),
+                        accountLoginResponse.getIp(),
+                        (String) accountLoginResponse.getStrLoginTime(),
+                        (String) accountLoginResponse.getStrLogoutTime(),
+                        accountLoginResponse.getType(),
+                        accountLoginResponse.getStatus(),
+                        accountLoginResponse.getIdNumber(),
+                        accountLoginResponse.getIdNumberDate(),
+                        accountLoginResponse.getIdNumberPlace(),
+                        accountLoginResponse.getParentEdong()
+                );
 
-            //write database
-            mLoginModel.writeSqliteAccountTable(account);
+                //write database
+                mLoginModel.writeSqliteAccountTable(account);
+            }
+
+            //get List<ListEvnPCLoginResponse> from body response
+            List<ListEvnPCLoginResponse> evnPCList = response.getBodyLoginResponse().getResponseLoginResponse().getListEvnPCLoginResponse();
+
+            if (evnPCList != null) {
+                for (ListEvnPCLoginResponse pc :
+                        evnPCList) {
+                    EvnPC evnPC = new EvnPC();
+                    evnPC.setParentId(pc.getParentId());
+                    evnPC.setPcId(pc.getPcId());
+                    evnPC.setCode(pc.getCode());
+                    evnPC.setExt(pc.getExt());
+                    evnPC.setFullName(pc.getFullName());
+                    evnPC.setShortName(pc.getShortName());
+                    evnPC.setAddress((String) pc.getAddress());
+                    evnPC.setTaxCode((String) pc.getTaxCode());
+                    evnPC.setPhone1((String) pc.getPhone1());
+                    evnPC.setPhone2((String) pc.getPhone2());
+                    evnPC.setFax((String) pc.getFax());
+                    evnPC.setLevel(pc.getLevel());
+
+                    //write database
+                    mLoginModel.writeSqliteEvnPcTable(evnPC);
+                }
+            }
 
             //show main
             mILoginView.showMainScreen();

@@ -5,7 +5,6 @@ package views.ecpay.com.postabletecpay.util.entities.sqlite;
  */
 
 public class EvnPC {
-    private int id_evn_pc;
     private int pcId;
     private int parentId;
     private String code;
@@ -18,14 +17,6 @@ public class EvnPC {
     private String phone2;
     private String fax;
     private int level;
-
-    public int getId_evn_pc() {
-        return id_evn_pc;
-    }
-
-    public void setId_evn_pc(int id_evn_pc) {
-        this.id_evn_pc = id_evn_pc;
-    }
 
     public int getPcId() {
         return pcId;

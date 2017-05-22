@@ -6,6 +6,7 @@ import views.ecpay.com.postabletecpay.model.sharedPreference.ICommonSharedRefere
 import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
 import views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
 
 /**
  * Created by VinhNB on 5/15/2017.
@@ -30,9 +31,13 @@ public class LoginModel implements ICommonSharedReference {
         if (account == null)
             return;
 
-        sqLiteConnection.getWritableDatabase();
-        sqLiteConnection.
+        sqLiteConnection.insertOrUpdateAccount(account);
+    }
 
+    public void writeSqliteEvnPcTable(EvnPC evnPC) {
+        if (evnPC == null)
+            return;
+        sqLiteConnection.insertOrUpdateEvnPc(evnPC);
     }
     //endregion
 }

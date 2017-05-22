@@ -5,7 +5,6 @@ package views.ecpay.com.postabletecpay.util.entities.sqlite;
  */
 
 public class Bill {
-    private int id_bill;
     private String customerCode;
     private String customerPayCode;
     private String billId;
@@ -65,14 +64,6 @@ public class Bill {
     private String billingType;
     private String billingBy;
     private String cashierPay;
-
-    public int getId_bill() {
-        return id_bill;
-    }
-
-    public void setId_bill(int id_bill) {
-        this.id_bill = id_bill;
-    }
 
     public String getCustomerCode() {
         return customerCode;
