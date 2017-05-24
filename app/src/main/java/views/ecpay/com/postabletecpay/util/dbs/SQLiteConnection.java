@@ -2,7 +2,9 @@ package views.ecpay.com.postabletecpay.util.dbs;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.io.File;
@@ -99,7 +101,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-
     @Override
     public synchronized void close() {
         if (database != null) {
@@ -110,7 +111,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
     //region sqlite
-    public void insertOrUpdateAccount(Account account){
+    public void insertOrUpdateAccount(Account account) {
         if (account == null)
             return;
 
@@ -123,7 +124,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("session", account.getSession());
         initialValues.put("balance", account.getBalance());
         initialValues.put("lockMoney", account.getLockMoney());
-        initialValues.put("changePIN", account.isChangePIN());
+        initialValues.put("changePIN", (account.isChangePIN() == true) ? "1" : "0");
         initialValues.put("verified", account.getVerified());
         initialValues.put("mac", account.getMac());
         initialValues.put("ip", account.getIp());
@@ -141,6 +142,70 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (id == -1) {
             database.update(TABLE_NAME_ACCOUNT, initialValues, "edong=?", new String[]{account.getEdong()});  // number 1 is the _id here, update to variable for your code
         }
+    }
+
+    public Account selectAccount(String edong) throws SQLiteException {
+        if (edong == null)
+            return null;
+
+        database = getReadableDatabase();
+        Cursor mCursor =
+                database.query(true, TABLE_NAME_ACCOUNT, new String[]{
+                                "edong",
+                                "name",
+                                "address",
+                                "email",
+                                "birthday",
+                                "session",
+                                "balance",
+                                "lockMoney",
+                                "changePIN",
+                                "verified",
+                                "mac",
+                                "ip",
+                                "strLoginTime",
+                                "strLogoutTime",
+                                "type",
+                                "status",
+                                "idNumber",
+                                "idNumberDate",
+                                "idNumberPlace",
+                                "parentEdong",
+                        },
+                        "edong" + "=?",
+                        new String[]{edong},
+                        null, null, null, null);
+
+        Account account = null;
+        if (mCursor.moveToFirst()) {
+            account = new Account(
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("edong")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("name")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("address")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("email")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("birthday")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("session")),
+                    mCursor.getLong(mCursor.getColumnIndexOrThrow("balance")),
+                    mCursor.getInt(mCursor.getColumnIndexOrThrow("lockMoney")),
+                    (mCursor.getInt(mCursor.getColumnIndexOrThrow("changePIN")) == 1) ? true : false,
+                    mCursor.getInt(mCursor.getColumnIndexOrThrow("verified")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("mac")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("ip")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("strLoginTime")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("strLogoutTime")),
+                    mCursor.getInt(mCursor.getColumnIndexOrThrow("type")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("status")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("idNumber")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("idNumberDate")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("idNumberPlace")),
+                    mCursor.getString(mCursor.getColumnIndexOrThrow("parentEdong"))
+            );
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return account;
     }
 
     public void insertOrUpdateEvnPc(EvnPC evnPC) {
@@ -167,5 +232,39 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             database.update(TABLE_NAME_EVN_PC, initialValues, "pcId=?", new String[]{String.valueOf(evnPC.getPcId())});
         }
     }
+
+    public int countBill(String edong) {
+        if (edong == null)
+            return 0;
+
+        database = this.getReadableDatabase();
+
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+        int count = mCursor.getCount();
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return count;
+    }
+
+    public int countMoneyAllBill(String edong) {
+        if (edong == null)
+            return 0;
+
+        database = this.getReadableDatabase();
+
+        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+        int count = mCursor.getCount();
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return count;
+    }
+
+
     //endregion
 }

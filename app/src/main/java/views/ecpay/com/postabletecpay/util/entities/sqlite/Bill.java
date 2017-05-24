@@ -65,6 +65,68 @@ public class Bill {
     private String billingBy;
     private String cashierPay;
 
+    public Bill(String customerCode, String customerPayCode, String billId, String term, int amount, String period, String issueDate, String strIssueDate, int status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate, String strToDate, String home, String tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex, String newIndex, String nume, int amountNotTax, int amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex, String createdDate, int idChanged, String dateChanged, String edong, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp, String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, int type, String lastQuery, int groupType, String billingChannel, String billingType, String billingBy, String cashierPay) {
+        this.customerCode = customerCode;
+        this.customerPayCode = customerPayCode;
+        this.billId = billId;
+        this.term = term;
+        this.amount = amount;
+        this.period = period;
+        this.issueDate = issueDate;
+        this.strIssueDate = strIssueDate;
+        this.status = status;
+        this.seri = seri;
+        this.pcCode = pcCode;
+        this.handoverCode = handoverCode;
+        this.cashierCode = cashierCode;
+        this.bookCmis = bookCmis;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+        this.strFromDate = strFromDate;
+        this.strToDate = strToDate;
+        this.home = home;
+        this.tax = tax;
+        this.billNum = billNum;
+        this.currency = currency;
+        this.priceDetails = priceDetails;
+        this.numeDetails = numeDetails;
+        this.amountDetails = amountDetails;
+        this.oldIndex = oldIndex;
+        this.newIndex = newIndex;
+        this.nume = nume;
+        this.amountNotTax = amountNotTax;
+        this.amountTax = amountTax;
+        this.multiple = multiple;
+        this.billType = billType;
+        this.typeIndex = typeIndex;
+        this.groupTypeIndex = groupTypeIndex;
+        this.createdDate = createdDate;
+        this.idChanged = idChanged;
+        this.dateChanged = dateChanged;
+        this.edong = edong;
+        this.pcCodeExt = pcCodeExt;
+        this.code = code;
+        this.name = name;
+        this.nameNosign = nameNosign;
+        this.phoneByevn = phoneByevn;
+        this.phoneByecp = phoneByecp;
+        this.electricityMeter = electricityMeter;
+        this.inning = inning;
+        this.road = road;
+        this.station = station;
+        this.taxCode = taxCode;
+        this.trade = trade;
+        this.countPeriod = countPeriod;
+        this.team = team;
+        this.type = type;
+        this.lastQuery = lastQuery;
+        this.groupType = groupType;
+        this.billingChannel = billingChannel;
+        this.billingType = billingType;
+        this.billingBy = billingBy;
+        this.cashierPay = cashierPay;
+    }
+
     public String getCustomerCode() {
         return customerCode;
     }
@@ -537,129 +599,4 @@ public class Bill {
         this.cashierPay = cashierPay;
     }
 
-    public static Bill setBill(
-            String customerCode,
-            String customerPayCode,
-            String billId,
-            String term,
-            int amount,
-            String period,
-            String issueDate,
-            String strIssueDate,
-            int status,
-            String seri,
-            String pcCode,
-            String handoverCode,
-            String cashierCode,
-            String bookCmis,
-            String fromDate,
-            String toDate,
-            String strFromDate,
-            String strToDate,
-            String home,
-            String tax,
-            String billNum,
-            String currency,
-            String priceDetails,
-            String numeDetails,
-            String amountDetails,
-            String oldIndex,
-            String newIndex,
-            String nume,
-            int amountNotTax,
-            int amountTax,
-            String multiple,
-            String billType,
-            String typeIndex,
-            String groupTypeIndex,
-            String createdDate,
-            int idChanged,
-            String dateChanged,
-            String edong,
-            String pcCodeExt,
-            String code,
-            String name,
-            String nameNosign,
-            String phoneByevn,
-            String phoneByecp,
-            String electricityMeter,
-            String inning,
-            String road,
-            String station,
-            String taxCode,
-            String trade,
-            String countPeriod,
-            String team,
-            int type,
-            String lastQuery,
-            int groupType,
-            String billingChannel,
-            String billingType,
-            String billingBy,
-            String cashierPay
-    ) {
-
-        Bill bill = new Bill();
-        bill.setCustomerCode(customerCode);
-        bill.setCustomerPayCode(customerPayCode);
-        bill.setBillId(billId);
-        bill.setTerm(term);
-        bill.setAmount(amount);
-        bill.setPeriod(period);
-        bill.setIssueDate(issueDate);
-        bill.setStrIssueDate(strIssueDate);
-        bill.setStatus(status);
-        bill.setSeri(seri);
-        bill.setPcCode(pcCode);
-        bill.setHandoverCode(handoverCode);
-        bill.setCashierCode(cashierCode);
-        bill.setBookCmis(bookCmis);
-        bill.setFromDate(fromDate);
-        bill.setToDate(toDate);
-        bill.setStrFromDate(strFromDate);
-        bill.setStrToDate(strToDate);
-        bill.setHome(home);
-        bill.setTax(tax);
-        bill.setBillNum(billNum);
-        bill.setCurrency(currency);
-        bill.setPriceDetails(priceDetails);
-        bill.setNumeDetails(numeDetails);
-        bill.setAmountDetails(amountDetails);
-        bill.setOldIndex(oldIndex);
-        bill.setNewIndex(newIndex);
-        bill.setNume(nume);
-        bill.setAmountNotTax(amountNotTax);
-        bill.setAmountTax(amountTax);
-        bill.setMultiple(multiple);
-        bill.setBillType(billType);
-        bill.setTypeIndex(typeIndex);
-        bill.setGroupTypeIndex(groupTypeIndex);
-        bill.setCreatedDate(createdDate);
-        bill.setIdChanged(idChanged);
-        bill.setDateChanged(dateChanged);
-        bill.setEdong(edong);
-        bill.setPcCodeExt(pcCodeExt);
-        bill.setCode(code);
-        bill.setName(name);
-        bill.setNameNosign(nameNosign);
-        bill.setPhoneByevn(phoneByevn);
-        bill.setPhoneByecp(phoneByecp);
-        bill.setElectricityMeter(electricityMeter);
-        bill.setInning(inning);
-        bill.setRoad(road);
-        bill.setStation(station);
-        bill.setTaxCode(taxCode);
-        bill.setTrade(trade);
-        bill.setCountPeriod(countPeriod);
-        bill.setTeam(team);
-        bill.setType(type);
-        bill.setLastQuery(lastQuery);
-        bill.setGroupType(groupType);
-        bill.setBillingChannel(billingChannel);
-        bill.setBillingType(billingType);
-        bill.setBillingBy(billingBy);
-        bill.setCashierPay(cashierPay);
-
-        return bill;
-    }
 }

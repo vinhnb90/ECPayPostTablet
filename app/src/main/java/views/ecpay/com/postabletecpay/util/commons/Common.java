@@ -66,6 +66,46 @@ import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 
 public class Common {
 
+    //region param account
+    public enum TYPE_ACCOUNT {
+        ADMIN_IT(1, "Admin IT"),
+        ADMIN_KD(0, "Admin Kinh Doanh"),
+        TNV_THUONG(0, "Thu nhân viên thường"),
+        TNV_DA_NANG(0, "Thu nhân viên đa năng"),
+        NV_QLY(0, "Nhân viên quản lý");
+
+        private final int type;
+        private String typeString;
+
+        TYPE_ACCOUNT(int type, String typeString) {
+            this.type = type;
+            this.typeString = typeString;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public String getTypeString() {
+            return typeString;
+        }
+
+        public static TYPE_ACCOUNT findCodeMessage(int type) {
+            for (TYPE_ACCOUNT v : values()) {
+                if (v.getType() == type) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
+    //endregion
+
+    //region Description key
+    public static final String TAG = "TAG";
+    public static final String KEY_EDONG = "EDONG";
+    //endregion
+
     //region info error message android
     public enum MESSAGE_NOTIFY {
         ERR_WIFI,
@@ -73,6 +113,7 @@ public class Common {
 
         LOGIN_ERR_USER,
         LOGIN_ERR_PASS,
+        LOGIN_ERR_EDONG,
 
         ERR_CREATE_FOLDER,
         ERR_ENCRYPT_AGENT,
@@ -110,6 +151,9 @@ public class Common {
 
             if (ERR_ENCRYPT_PASS == this)
                 return "Xảy ra vấn đề khi mã hóa dữ liệu!";
+
+            if (LOGIN_ERR_EDONG == this)
+                return "Xảy ra vấn đề nhận dữ liệu về không xác định được thông tin ví edong!";
 
             if (ERR_CALL_SOAP_LOGIN == this)
                 return "Xảy ra vấn đề với chức năng đăng nhập khi kết nối tới máy chủ!";
@@ -258,7 +302,7 @@ public class Common {
 
     //define symbol
     public static final String SPACE_TEXT = " ";
-    public static final String EMPTY_TEXT = " ";
+    public static final String EMPTY_TEXT = "";
     public static final int ZERO = 0;
     public static final boolean BOOL_DEFAULT = false;
     //endregion
@@ -910,4 +954,5 @@ public class Common {
     }
 
     //endregion
+
 }

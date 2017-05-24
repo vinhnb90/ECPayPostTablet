@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -18,16 +17,15 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
-import views.ecpay.com.postabletecpay.presenter.ILoginPresenter;
 import views.ecpay.com.postabletecpay.presenter.LoginPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection;
 import views.ecpay.com.postabletecpay.view.BaseActivity;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
+import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;
 
 /**
@@ -86,11 +84,18 @@ public class LoginActivity extends BaseActivity implements ILoginView {
     }
 
     @Override
-    public void showMainScreen() {
+    public void showMainScreen(String edong) {
         hidePbarLogin();
         hideTextMessage();
 
-        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+        if (edong == null || edong.isEmpty() || edong.trim().equals("")) {
+            showTextMessage(Common.MESSAGE_NOTIFY.LOGIN_ERR_EDONG.toString());
+            return;
+        }
+
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.putExtra(KEY_EDONG, edong);
+        startActivity(intent);
         this.finish();
     }
 

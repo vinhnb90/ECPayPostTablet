@@ -54,7 +54,7 @@ public class LoginPresenter implements ILoginPresenter {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_PASS.toString();
             isErr = true;
         }
-/*
+
         //check wifi and network
         if (!Common.isConnectingWifi(context) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
@@ -63,7 +63,7 @@ public class LoginPresenter implements ILoginPresenter {
         if (!Common.isNetworkConnected(context) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
             isErr = true;
-        }*/
+        }
 
         if (isErr) {
             mILoginView.showTextMessage(textMessage);
@@ -179,7 +179,7 @@ public class LoginPresenter implements ILoginPresenter {
             mILoginView.hideTextMessage();
             mILoginView.showPbarLogin();
 
-           /* //check wifi
+            //check wifi
             boolean isHasWifi = Common.isConnectingWifi(mILoginView.getContextView());
             boolean isHasNetwork = Common.isNetworkConnected(mILoginView.getContextView());
 
@@ -197,7 +197,7 @@ public class LoginPresenter implements ILoginPresenter {
 
                 soapLogin.setEndCallSoap(true);
                 soapLogin.cancel(true);
-            }*/
+            }
         }
 
         @Override
@@ -224,13 +224,13 @@ public class LoginPresenter implements ILoginPresenter {
                 return;
             }
 
-
             //get AccountLoginResponse from body response
             AccountLoginResponse accountLoginResponse = response.getBodyLoginResponse().getResponseLoginResponse().getAccountLoginResponse();
 
             //get account
+            Account account = null;
             if (accountLoginResponse != null) {
-                Account account = Account.setAccount(
+                account = new Account(
                         accountLoginResponse.getEdong(),
                         accountLoginResponse.getName(),
                         accountLoginResponse.getAddress(),
@@ -264,6 +264,7 @@ public class LoginPresenter implements ILoginPresenter {
                 for (ListEvnPCLoginResponse pc :
                         evnPCList) {
                     EvnPC evnPC = new EvnPC();
+
                     evnPC.setParentId(pc.getParentId());
                     evnPC.setPcId(pc.getPcId());
                     evnPC.setCode(pc.getCode());
@@ -283,7 +284,7 @@ public class LoginPresenter implements ILoginPresenter {
             }
 
             //show main
-            mILoginView.showMainScreen();
+            mILoginView.showMainScreen(account.getEdong());
         }
 
         @Override
@@ -304,4 +305,14 @@ public class LoginPresenter implements ILoginPresenter {
     };
 
     private SharePrefManager mSharedPrefLogin;
+}
+
+interface ILoginPresenter {
+    void validateInput(String userName, String pass);
+
+    void writeSharedPrefLogin(String userName, String pass);
+
+    void clearSharedPrefLogin();
+
+    void showInfoSharePrefLogin();
 }

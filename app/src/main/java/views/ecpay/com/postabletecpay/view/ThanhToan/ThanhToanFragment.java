@@ -29,7 +29,7 @@ import views.ecpay.com.postabletecpay.R;
 
 public class ThanhToanFragment extends Fragment implements View.OnClickListener {
 
-    @BindView(R.id.ibBack) ImageButton ibBack;
+    @BindView(R.id.ibtn_frag_user_info_back) ImageButton ibBack;
     @BindView(R.id.ibScaner) ImageButton ibScaner;
     @BindView(R.id.ibAdd) ImageButton ibAdd;
     @BindView(R.id.etSearch) EditText etSearch;
@@ -98,7 +98,7 @@ public class ThanhToanFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.ibBack:
+            case R.id.ibtn_frag_user_info_back:
                 break;
             case R.id.ibScaner:
                 break;

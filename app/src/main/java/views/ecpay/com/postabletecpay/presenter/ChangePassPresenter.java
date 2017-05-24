@@ -118,7 +118,7 @@ public class ChangePassPresenter implements IChangePassPresenter {
             if (soapChangePass == null)
                 return;
 
-           /* //check wifi
+            //check wifi
             boolean isHasWifi = Common.isConnectingWifi(mIChangePassView.getContextView());
             boolean isHasNetwork = Common.isNetworkConnected(mIChangePassView.getContextView());
 
@@ -136,7 +136,7 @@ public class ChangePassPresenter implements IChangePassPresenter {
 
                 soapChangePass.setEndCallSoap(true);
                 soapChangePass.cancel(true);
-            }*/
+            }
         }
 
         @Override
@@ -182,4 +182,9 @@ public class ChangePassPresenter implements IChangePassPresenter {
             });
         }
     };
+}
+
+
+interface IChangePassPresenter {
+    void validateInputChangePass(String passOld, String passNew, String passRetype);
 }

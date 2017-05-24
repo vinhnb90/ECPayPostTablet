@@ -12,18 +12,9 @@ import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
  * Created by VinhNB on 5/15/2017.
  */
 
-public class LoginModel implements ICommonSharedReference {
-    private SQLiteConnection sqLiteConnection;
-    private SharePrefManager sharePrefManager;
-
+public class LoginModel extends CommonModel {
     public LoginModel(Context context) {
-        sqLiteConnection = SQLiteConnection.getInstance(context);
-        sharePrefManager = SharePrefManager.getInstance(context);
-    }
-
-    @Override
-    public SharePrefManager getManagerSharedPref() {
-        return sharePrefManager;
+        super(context);
     }
 
     //region call SQLite

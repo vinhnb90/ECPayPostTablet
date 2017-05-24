@@ -20,6 +20,23 @@ public class Customer {
     private String idNumber;
     private String bankName;
 
+    public Customer(String code, String name, String address, String pcCode, String pcCodeExt, String phoneByevn, String phoneByecp, String bookCmis, String electricityMeter, String inning, String status, String bankAccount, String idNumber, String bankName) {
+        this.code = code;
+        this.name = name;
+        this.address = address;
+        this.pcCode = pcCode;
+        this.pcCodeExt = pcCodeExt;
+        this.phoneByevn = phoneByevn;
+        this.phoneByecp = phoneByecp;
+        this.bookCmis = bookCmis;
+        this.electricityMeter = electricityMeter;
+        this.inning = inning;
+        this.status = status;
+        this.bankAccount = bankAccount;
+        this.idNumber = idNumber;
+        this.bankName = bankName;
+    }
+
     public String getCode() {
         return code;
     }
@@ -130,41 +147,5 @@ public class Customer {
 
     public void setBankName(String bankName) {
         this.bankName = bankName;
-    }
-
-    public static Customer setCustomer(
-            String code,
-            String name,
-            String address,
-            String pcCode,
-            String pcCodeExt,
-            String phoneByevn,
-            String phoneByecp,
-            String bookCmis,
-            String electricityMeter,
-            String inning,
-            String status,
-            String bankAccount,
-            String idNumber,
-            String bankName
-
-    ) {
-        Customer customer = new Customer();
-        customer.setCode(code);
-        customer.setName(name);
-        customer.setAddress(address);
-        customer.setPcCode(pcCode);
-        customer.setPcCodeExt(pcCodeExt);
-        customer.setPhoneByevn(phoneByevn);
-        customer.setPhoneByecp(phoneByecp);
-        customer.setBookCmis(bookCmis);
-        customer.setElectricityMeter(electricityMeter);
-        customer.setInning(inning);
-        customer.setStatus(status);
-        customer.setBankAccount(bankAccount);
-        customer.setIdNumber(idNumber);
-        customer.setBankName(bankName);
-
-        return customer;
     }
 }

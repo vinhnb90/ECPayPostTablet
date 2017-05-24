@@ -13,7 +13,7 @@ public interface ILoginView extends ICommonView{
     void showTextMessage(String message);
     void hideTextMessage();
 
-    void showMainScreen();
+    void showMainScreen(String edong);
 
     void showTextUserPass(String userName, String pass);
 

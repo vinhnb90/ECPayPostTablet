@@ -27,6 +27,29 @@ public class Account {
     private String idNumberPlace;
     private String parentEdong;
 
+    public Account(String edong, String name, String address, String email, String birthday, String session, long balance, int lockMoney, boolean changePIN, int verified, String mac, String ip, String strLoginTime, String strLogoutTime, int type, String status, String idNumber, String idNumberDate, String idNumberPlace, String parentEdong) {
+        this.edong = edong;
+        this.name = name;
+        this.address = address;
+        this.email = email;
+        this.birthday = birthday;
+        this.session = session;
+        this.balance = balance;
+        this.lockMoney = lockMoney;
+        this.changePIN = changePIN;
+        this.verified = verified;
+        this.mac = mac;
+        this.ip = ip;
+        this.strLoginTime = strLoginTime;
+        this.strLogoutTime = strLogoutTime;
+        this.type = type;
+        this.status = status;
+        this.idNumber = idNumber;
+        this.idNumberDate = idNumberDate;
+        this.idNumberPlace = idNumberPlace;
+        this.parentEdong = parentEdong;
+    }
+
     public String getEdong() {
         return edong;
     }
@@ -185,51 +208,5 @@ public class Account {
 
     public void setParentEdong(String parentEdong) {
         this.parentEdong = parentEdong;
-    }
-
-    public static Account setAccount(String edong,
-                                     String name,
-                                     String address,
-                                     String email,
-                                     String birthday,
-                                     String session,
-                                     long balance,
-                                     int lockMoney,
-                                     boolean changePIN,
-                                     int verified,
-                                     String mac,
-                                     String ip,
-                                     String strLoginTime,
-                                     String strLogoutTime,
-                                     int type,
-                                     String status,
-                                     String idNumber,
-                                     String idNumberDate,
-                                     String idNumberPlace,
-                                     String parentEdong) {
-        Account account = new Account();
-
-        account.setEdong(edong);
-        account.setName(name);
-        account.setAddress(address);
-        account.setEmail(email);
-        account.setBirthday(birthday);
-        account.setSession(session);
-        account.setBalance(balance);
-        account.setLockMoney(lockMoney);
-        account.setChangePIN(changePIN);
-        account.setVerified(verified);
-        account.setMac(mac);
-        account.setIp(ip);
-        account.setStrLoginTime(strLoginTime);
-        account.setStrLogoutTime(strLogoutTime);
-        account.setType(type);
-        account.setStatus(status);
-        account.setIdNumber(idNumber);
-        account.setIdNumberDate(idNumberDate);
-        account.setIdNumberPlace(idNumberPlace);
-        account.setEdong(parentEdong);
-
-        return account;
     }
 }

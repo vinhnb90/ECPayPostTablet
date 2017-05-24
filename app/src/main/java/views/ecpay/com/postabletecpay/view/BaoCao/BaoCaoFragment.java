@@ -22,7 +22,7 @@ public class BaoCaoFragment extends Fragment implements View.OnClickListener {
 
     @BindView(R.id.tabs) TabLayout tabLayout;
     @BindView(R.id.view_pager) ViewPager viewPager;
-    @BindView(R.id.ibBack) ImageButton ibBack;
+    @BindView(R.id.ibtn_frag_user_info_back) ImageButton ibBack;
 
     public BaoCaoFragment() {
 

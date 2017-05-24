@@ -17,7 +17,7 @@
             android:adjustViewBounds="true"/>
 
         <ImageButton
-            android:id="@+id/ibBack"
+            android:id="@+id/ibtn_frag_user_info_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@mipmap/ic_back"

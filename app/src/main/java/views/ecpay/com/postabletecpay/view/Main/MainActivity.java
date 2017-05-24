@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.view.Main;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,11 +20,14 @@ import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.ThanhToanFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
+import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
+
 public class MainActivity extends AppCompatActivity implements MainPageFragment.OnFragmentInteractionListener,
         ThanhToanFragment.OnFragmentInteractionListener, BaoCaoFragment.OnFragmentInteractionListener,
         UserInfoFragment.OnFragmentInteractionListener {
 
     public static BottomNavigationView navigation;
+    private String mEdong;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -33,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements MainPageFragment.
             Fragment fragment = null;
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    fragment = MainPageFragment.newInstance();
+                    fragment = MainPageFragment.newInstance(mEdong);
                     break;
                 case R.id.navigation_pay:
                     fragment = ThanhToanFragment.newInstance();
@@ -42,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements MainPageFragment.
                     fragment = BaoCaoFragment.newInstance();
                     break;
                 case R.id.navigation_accout:
-                    fragment = UserInfoFragment.newInstance();
+                    fragment = UserInfoFragment.newInstance(mEdong);
                     break;
             }
             if (fragment != null) {
@@ -73,13 +77,18 @@ public class MainActivity extends AppCompatActivity implements MainPageFragment.
             Toast.makeText(this, ex.getMessage(), Toast.LENGTH_LONG).show();
         }
 
+        getBundle();
+
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout, MainPageFragment.newInstance());
+        fragmentTransaction.replace(R.id.frameLayout, MainPageFragment.newInstance(mEdong));
         fragmentTransaction.commit();
 
         navigation = (BottomNavigationView) findViewById(R.id.navigation_ac_main);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+    }
 
+    private void getBundle() {
+        mEdong = getIntent().getExtras().getString(KEY_EDONG, "");
     }
 
     public static void updateNavigationBarState(int actionId) {

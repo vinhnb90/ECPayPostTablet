@@ -34,16 +34,18 @@ import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.ThanhToanFragment;
 
+import static views.ecpay.com.postabletecpay.util.commons.Common.EMPTY_TEXT;
+import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;
 
 /**
  * Created by macbook on 4/28/17.
  */
 
-public class MainPageFragment extends Fragment implements View.OnClickListener, PopupMenu.OnItemSelectedListener {
+public class MainPageFragment extends Fragment implements IMainPageView, View.OnClickListener, PopupMenu.OnItemSelectedListener {
 
     private OnFragmentInteractionListener listener;
-
+    private String mEdong;
     @BindView(R.id.iv_frag_main_avatar)
     ImageView ivAvatar;
     @BindView(R.id.tvUsername)
@@ -72,8 +74,14 @@ public class MainPageFragment extends Fragment implements View.OnClickListener, 
     private final static int HELP = 2;
     private final static int EXIT = 3;
 
-    public static MainPageFragment newInstance() {
-        return new MainPageFragment();
+    public static MainPageFragment newInstance(String edong) {
+        Bundle bundle = new Bundle();
+        bundle.putString(KEY_EDONG, edong);
+
+        MainPageFragment mainPageFragment = new MainPageFragment();
+        mainPageFragment.setArguments(bundle);
+
+        return mainPageFragment;
     }
 
     @Override
@@ -84,8 +92,12 @@ public class MainPageFragment extends Fragment implements View.OnClickListener, 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trang_chu, container, false);
-
         ButterKnife.bind(this, view);
+
+        mEdong = getArguments().getString(KEY_EDONG, Common.EMPTY_TEXT);
+
+
+
         ibTroGiup.setOnClickListener(this);
         btXoaDuLieu.setOnClickListener(this);
         btThanhToan.setOnClickListener(this);
@@ -146,7 +158,7 @@ public class MainPageFragment extends Fragment implements View.OnClickListener, 
                     case INFO_USER:
 //                                MainActivity.updateNavigationBarState(R.id.navigation_accout);
                         Fragment fragment = null;
-                        fragment = UserInfoFragment.newInstance();
+                        fragment = UserInfoFragment.newInstance(mEdong);
                         if (fragment != null) {
                             FragmentTransaction fragmentTransaction = MainPageFragment.this.getActivity().getSupportFragmentManager().beginTransaction();
                             fragmentTransaction.replace(R.id.frameLayout, fragment);
@@ -210,6 +222,20 @@ public class MainPageFragment extends Fragment implements View.OnClickListener, 
     public void onItemSelected(MenuItem item) {
 
     }
+
+    //region IMainPageView
+    @Override
+    public void showMainPageInfo(String userName, long balance, int totalBills, int totalMoney) {
+        if(userName == null)
+            userName = EMPTY_TEXT;
+
+        tvUsername.setText(userName);
+        tvSoDuKhaDung.setText(String.valueOf(balance));
+        tvSoHoaDon.setText(String.valueOf(totalBills));
+        tvTongTien.setText(String.valueOf(totalMoney));
+
+    }
+    //endregion
 
     public interface OnFragmentInteractionListener {
     }

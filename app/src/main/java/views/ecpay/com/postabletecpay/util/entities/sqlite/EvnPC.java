@@ -18,6 +18,24 @@ public class EvnPC {
     private String fax;
     private int level;
 
+    public EvnPC() {
+    }
+
+    public EvnPC(int pcId, int parentId, String code, String ext, String fullName, String shortName, String address, String taxCode, String phone1, String phone2, String fax, int level) {
+        this.pcId = pcId;
+        this.parentId = parentId;
+        this.code = code;
+        this.ext = ext;
+        this.fullName = fullName;
+        this.shortName = shortName;
+        this.address = address;
+        this.taxCode = taxCode;
+        this.phone1 = phone1;
+        this.phone2 = phone2;
+        this.fax = fax;
+        this.level = level;
+    }
+
     public int getPcId() {
         return pcId;
     }
@@ -112,38 +130,6 @@ public class EvnPC {
 
     public void setLevel(int level) {
         this.level = level;
-    }
-
-    public static EvnPC setEvnPC(
-            int pcId,
-            int parentId,
-            String code,
-            String ext,
-            String fullName,
-            String shortName,
-            String address,
-            String taxCode,
-            String phone1,
-            String phone2,
-            String fax,
-            int level
-    ) {
-        EvnPC evnPC = new EvnPC();
-
-        evnPC.setPcId(pcId);
-        evnPC.setParentId(parentId);
-        evnPC.setCode(code);
-        evnPC.setExt(ext);
-        evnPC.setFullName(fullName);
-        evnPC.setShortName(shortName);
-        evnPC.setAddress(address);
-        evnPC.setTaxCode(taxCode);
-        evnPC.setPhone1(phone1);
-        evnPC.setPhone2(phone2);
-        evnPC.setFax(fax);
-        evnPC.setLevel(level);
-
-        return evnPC;
     }
 
 }

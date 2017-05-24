@@ -16,7 +16,7 @@
     </LinearLayout>
 
     <ImageButton
-        android:id="@+id/ibBack"
+        android:id="@+id/ibtn_frag_user_info_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
@@ -36,229 +36,247 @@
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <RelativeLayout
-            android:id="@+id/rlMain"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvTitle"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="80dp"
-            android:background="@android:drawable/dialog_holo_light_frame"
-            android:padding="20dp">
-
-            <ImageView
-                android:id="@+id/iv_frag_main_avatar"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:padding="10dp"
-                android:src="@drawable/avatar" />
-
-            <LinearLayout
-                android:id="@+id/llText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/iv_frag_main_avatar"
-                android:layout_alignTop="@+id/iv_frag_main_avatar"
-                android:layout_marginLeft="20dp"
-                android:layout_toRightOf="@+id/iv_frag_main_avatar"
-                android:gravity="center_vertical"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tvTaiKhoan"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="4"
-                    android:scrollbars="vertical"
-                    android:text="Chủ tài khoản: usernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusername"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvNgayDangKy"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Ngày đăng ký: 10/03/2017"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvTitleTenTaiKhoan"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/llText"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="10dp"
-                android:text="Tên tài khoản:"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/tvTenTaiKhoan"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/llText"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="10dp"
-                android:layout_toRightOf="@+id/tvTitleTenTaiKhoan"
-                android:gravity="right"
-                android:maxLines="4"
-                android:scrollbars="vertical"
-                android:text="Username"
-                android:textSize="16sp" />
-
-            <View
-                android:id="@+id/view1"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@+id/tvTenTaiKhoan"
-                android:layout_marginTop="10dp"
-                android:background="@color/colorLightGray" />
-
-            <TextView
-                android:id="@+id/tvTitleCMND"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/view1"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="10dp"
-                android:text="CMND:"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/tvCMND"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/view1"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="10dp"
-                android:layout_toRightOf="@+id/tvTitleCMND"
-                android:gravity="right"
-                android:maxLines="4"
-                android:scrollbars="vertical"
-                android:text="031731743"
-                android:textSize="16sp" />
-
-            <View
-                android:id="@+id/view2"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@+id/tvCMND"
-                android:layout_marginTop="10dp"
-                android:background="@color/colorLightGray" />
-
-            <TextView
-                android:id="@+id/tvTitleDienThoai"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/view2"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="10dp"
-                android:text="Điện thoại:"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/tvDienThoai"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/view2"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="10dp"
-                android:layout_toRightOf="@+id/tvTitleDienThoai"
-                android:gravity="right"
-                android:maxLines="4"
-                android:scrollbars="vertical"
-                android:text="01656248372"
-                android:textSize="16sp" />
-
-            <View
-                android:id="@+id/view3"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@+id/tvDienThoai"
-                android:layout_marginTop="10dp"
-                android:background="@color/colorLightGray" />
-
-            <TextView
-                android:id="@+id/tvTitleEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/view3"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="10dp"
-                android:text="Email:"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/tvEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/view3"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="10dp"
-                android:layout_toRightOf="@+id/tvTitleEmail"
-                android:gravity="right"
-                android:maxLines="4"
-                android:scrollbars="vertical"
-                android:text="email@gmail.com"
-                android:textSize="16sp" />
-
-            <View
-                android:id="@+id/view4"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@+id/tvEmail"
-                android:layout_marginTop="10dp"
-                android:background="@color/colorLightGray" />
-
-            <TextView
-                android:id="@+id/tvTitleDiaChi"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/view4"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="10dp"
-                android:text="Địa chỉ:"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/tvDiaChi"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/view4"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="10dp"
-                android:layout_toRightOf="@+id/tvTitleDiaChi"
-                android:gravity="right"
-                android:maxLines="4"
-                android:scrollbars="vertical"
-                android:text="25 Vũ Phạm Hàm, Yên Hoà, Cầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà Nội"
-                android:textSize="16sp" />
-
-        </RelativeLayout>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="6">
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="4">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="80dp">
+
+                <RelativeLayout
+                    android:id="@+id/rlMain"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/tvTitle"
+                    android:background="@android:drawable/dialog_holo_light_frame"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:padding="20dp">
+
+                    <ImageView
+                        android:id="@+id/iv_frag_main_avatar"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:padding="10dp"
+                        android:src="@drawable/avatar" />
+
+                    <LinearLayout
+                        android:id="@+id/llText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/iv_frag_main_avatar"
+                        android:layout_alignTop="@+id/iv_frag_main_avatar"
+                        android:layout_marginLeft="20dp"
+                        android:layout_toRightOf="@+id/iv_frag_main_avatar"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvTaiKhoan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="3"
+                            android:scrollbars="vertical"
+                            android:text="Chủ tài khoản: usernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusername"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvNgayDangKy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:maxLines="1"
+                            android:text="Ngày đăng ký: 10/03/2017"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvTitleTenTaiKhoan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/llText"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Tên tài khoản:"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvTenTaiKhoan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/llText"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_toRightOf="@+id/tvTitleTenTaiKhoan"
+                        android:gravity="right"
+                        android:maxLines="1"
+                        android:scrollbars="vertical"
+                        android:text="Username"
+                        android:textSize="16sp" />
+
+                    <View
+                        android:id="@+id/view1"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@+id/tvTenTaiKhoan"
+                        android:layout_marginTop="10dp"
+                        android:background="@color/colorLightGray" />
+
+                    <TextView
+                        android:id="@+id/tvTitleCMND"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/view1"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="10dp"
+                        android:text="CMND:"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvCMND"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/view1"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_toRightOf="@+id/tvTitleCMND"
+                        android:gravity="right"
+                        android:maxLines="1"
+                        android:scrollbars="vertical"
+                        android:text="031731743"
+                        android:textSize="16sp" />
+
+                    <View
+                        android:id="@+id/view2"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@+id/tvCMND"
+                        android:layout_marginTop="10dp"
+                        android:background="@color/colorLightGray" />
+
+                    <TextView
+                        android:id="@+id/tvTitleDienThoai"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/view2"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Điện thoại:"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvDienThoai"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/view2"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_toRightOf="@+id/tvTitleDienThoai"
+                        android:gravity="right"
+                        android:maxLines="1"
+                        android:scrollbars="vertical"
+                        android:text="01656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372"
+                        android:textSize="16sp" />
+
+                    <View
+                        android:id="@+id/view3"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@+id/tvDienThoai"
+                        android:layout_marginTop="10dp"
+                        android:background="@color/colorLightGray" />
+
+                    <TextView
+                        android:id="@+id/tvTitleEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/view3"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Email:"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/view3"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_toRightOf="@+id/tvTitleEmail"
+                        android:gravity="right"
+                        android:maxLines="2"
+                        android:scrollbars="vertical"
+                        android:text="email@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.com"
+                        android:textSize="16sp" />
+
+                    <View
+                        android:id="@+id/view4"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@+id/tvEmail"
+                        android:layout_marginTop="10dp"
+                        android:background="@color/colorLightGray" />
+
+                    <TextView
+                        android:id="@+id/tvTitleDiaChi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/view4"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Địa chỉ:"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvDiaChi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/view4"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_toRightOf="@+id/tvTitleDiaChi"
+                        android:gravity="right"
+                        android:maxLines="3"
+                        android:scrollbars="vertical"
+                        android:text="25 Vũ Phạm Hàm, Yên Hoà, Cầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà Nội"
+                        android:textSize="16sp" />
+
+                </RelativeLayout>
+            </ScrollView>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+
             android:id="@+id/llInfo"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_below="@+id/rlMain"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
+            android:layout_weight="1"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -310,7 +328,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-
                 android:orientation="vertical">
 
                 <TextView
@@ -379,30 +396,33 @@
         <LinearLayout
             android:id="@+id/llButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
+            android:layout_marginTop="25dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:visibility="visible">
 
             <Button
-                android:padding="20dp"
-                android:id="@+id/btDoiMatKhau"
+                android:id="@+id/btn_ac_frag_user_info_change_pass"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_orange"
+                android:padding="20dp"
                 android:text="Đổi mật khẩu"
                 android:textColor="@color/colorTextWhite" />
 
             <Button
-                android:layout_marginLeft="20dp"
-                android:padding="20dp"
-                android:id="@+id/btDangXuat"
+                android:id="@+id/btn_frag_user_info_logout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button"
+                android:padding="20dp"
                 android:text="Đăng xuất"
                 android:textColor="@color/colorTextWhite" />
 
