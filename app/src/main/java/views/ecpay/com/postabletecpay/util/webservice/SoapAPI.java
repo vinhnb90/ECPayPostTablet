@@ -36,7 +36,7 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
 public class SoapAPI {
 
     //region create JSON Request service
-    public static String getJsonRequestLogin(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver, String signatureEncrypted, String pinLogin, String accountId) {
+    public static String getJsonRequestLogin(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver, String signatureEncrypted, String pinLogin, String accountId, String versionApp) {
         if (agent == null || agent.isEmpty() || agent.trim().equals(""))
             return null;
         if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
@@ -53,6 +53,8 @@ public class SoapAPI {
             return null;
         if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
             return null;
+        if (versionApp == null || versionApp.isEmpty() || versionApp.trim().equals(""))
+            return null;
 
         HeaderLoginRequest headerLoginRequest = new HeaderLoginRequest();
         headerLoginRequest.setAgent(agent);
@@ -65,6 +67,7 @@ public class SoapAPI {
         bodyLoginRequest.setDiskDrive(diskDriver);
         bodyLoginRequest.setSignature(signatureEncrypted);
         bodyLoginRequest.setPinLogin(pinLogin);
+        bodyLoginRequest.setVersionApp(versionApp);
 
         FooterLoginRequest footerLoginRequest = new FooterLoginRequest();
         footerLoginRequest.setAccountIdt(accountId);
@@ -174,7 +177,7 @@ public class SoapAPI {
         @Override
         protected LoginResponseReponse doInBackground(String... jsons) {
             String json = jsons[0];
-
+            Log.d("here", "doInBackground: " + json);
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
 
@@ -184,7 +187,7 @@ public class SoapAPI {
             HttpTransportSE ht;
             SoapPrimitive response = null;
 
-            /*try {
+            try {
                 ht = new HttpTransportSE(URL);
                 ht.call(SOAP_ACTION, envelope);
                 response = (SoapPrimitive) envelope.getResponse();
@@ -202,7 +205,7 @@ public class SoapAPI {
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
-            }*/
+            }
 
             LoginResponseReponse loginResponseReponse = null;
 
@@ -210,128 +213,6 @@ public class SoapAPI {
             gsonBuilder.registerTypeAdapter(LoginRequest.class, new LoginResponseAdapter());
             gsonBuilder.setPrettyPrinting();
             final Gson gson = gsonBuilder.create();
-
-//            test
-            String dataTest = "{\n" +
-                    "\t\"header\": {\n" +
-                    "\t\t\"agent\": \"EPOS\",\n" +
-                    "\t\t\"password\": \"gWt+ybGFHpIIc5wIXwh2KTKLm4gbwLbvM3friK89Jv4aSXTwZZ/SjLewqUO2nudGqIA6tspYzgEaIbINarzqNZKQ1fq9w84533hVVtglctf2jYMdHdHbSV38ItvnH+zK+zj6romUip3D2TtHt6AQvT/SiqaEK11y6zfIy6mIKA0=\",\n" +
-                    "\t\t\"command-id\": \"LOGIN\"\n" +
-                    "\t},\n" +
-                    "\t\"body\": {\n" +
-                    "\t\t\"audit-number\": 80906783874,\n" +
-                    "\t\t\"mac\": \"F48E38AC06E300000000000000E0\",\n" +
-                    "\t\t\"disk-drive\": \"BFEBFBFF000506E3\",\n" +
-                    "\t\t\"signature\": \"Ks/5QN2v/GjT1w+uvYKJqT0YYz3Tk4IlASoO3WQ/I+F0TbVAtKID+wcoUmSDN9gKfaLmFJv3TNgbkkl10pZYBpnF9iNO8zsJgTuF57Ehf38JB+XVtUxltTC9s2X6LCvkvqA3UG5+ew3zFvzkd00uLrAcpzPkYbRrMzeSsm0S26U=\",\n" +
-                    "\t\t\"pin-login\": \"5DF1037BAACA9DF7\",\n" +
-                    "\t\t\"response-login\":\n" +
-                    "\t\t{\n" +
-                    "\t\t\t\"account\": {\n" +
-                    "\t\t\t\t\"status\": \"1\",\n" +
-                    "\t\t\t\t\"idNumber\": \"091503361\",\n" +
-                    "\t\t\t\t\"idNumberDate\": \"12-07-2012\",\n" +
-                    "\t\t\t\t\"idNumberPlace\": \"CA Thai nguyen\",\n" +
-                    "\t\t\t\t\"name\": \"Nguyễn Thị Thủy\",\n" +
-                    "\t\t\t\t\"address\": \"Thai Nguyen\",\n" +
-                    "\t\t\t\t\"email\": \"ntthuy07@ecpay.vn\",\n" +
-                    "\t\t\t\t\"birthday\": \"20-08-1989\",\n" +
-                    "\t\t\t\t\"idAccount\": 7782,\n" +
-                    "\t\t\t\t\"edong\": \"0917932663\",\n" +
-                    "\t\t\t\t\"parentId\": 2675,\n" +
-                    "\t\t\t\t\"parentEdong\": \"0973968290\",\n" +
-                    "\t\t\t\t\"pin\": null,\n" +
-                    "\t\t\t\t\"type\": 1,\n" +
-                    "\t\t\t\t\"balance\": 815941478,\n" +
-                    "\t\t\t\t\"lockMoney\": 0,\n" +
-                    "\t\t\t\t\"changedPIN\": true,\n" +
-                    "\t\t\t\t\"session\": \"6dbabff2-67a1-4145-a8be-b9385e96ab3a\",\n" +
-                    "\t\t\t\t\"verified\": 0,\n" +
-                    "\t\t\t\t\"mac\": \"F48E38AC06E300000000000000E0\",\n" +
-                    "\t\t\t\t\"ip\": \"192.168.120.170\",\n" +
-                    "\t\t\t\t\"loginTime\": 1494464998473,\n" +
-                    "\t\t\t\t\"logoutTime\": null,\n" +
-                    "\t\t\t\t\"strLoginTime\": null,\n" +
-                    "\t\t\t\t\"strLogoutTime\": null,\n" +
-                    "\t\t\t\t\"strType\": null\n" +
-                    "\t\t\t},\n" +
-                    "\t\t\t\"listEvnPC\": [{\n" +
-                    "\t\t\t\t\t\"parentId\": 0,\n" +
-                    "\t\t\t\t\t\"pcId\": 1,\n" +
-                    "\t\t\t\t\t\"code\": \"PD\",\n" +
-                    "\t\t\t\t\t\"ext\": \"PD\",\n" +
-                    "\t\t\t\t\t\"fullName\": \"Tổng Công Ty Điện Lực Thành Phố Hà Nội\",\n" +
-                    "\t\t\t\t\t\"shortName\": \"HN-VietNam\",\n" +
-                    "\t\t\t\t\t\"address\": \"35 Lê Đức Thọ-My Đình- Hà Nội\",\n" +
-                    "\t\t\t\t\t\"taxCode\": null,\n" +
-                    "\t\t\t\t\t\"phone1\": \"84422200898\",\n" +
-                    "\t\t\t\t\t\"phone2\": null,\n" +
-                    "\t\t\t\t\t\"fax\": \"84422200899\",\n" +
-                    "\t\t\t\t\t\"level\": 1,\n" +
-                    "\t\t\t\t\t\"mailTo\": null,\n" +
-                    "\t\t\t\t\t\"mailCc\": null,\n" +
-                    "\t\t\t\t\t\"status\": 1,\n" +
-                    "\t\t\t\t\t\"dateCreated\": \"2016-11-18\",\n" +
-                    "\t\t\t\t\t\"idChanged\": 26412281,\n" +
-                    "\t\t\t\t\t\"dateChanged\": \"2017-04-25\",\n" +
-                    "\t\t\t\t\t\"regionId\": 0\n" +
-                    "\t\t\t\t}, {\n" +
-                    "\t\t\t\t\t\"parentId\": 1,\n" +
-                    "\t\t\t\t\t\"pcId\": 16,\n" +
-                    "\t\t\t\t\t\"code\": \"PD1100\",\n" +
-                    "\t\t\t\t\t\"ext\": \"PD11\",\n" +
-                    "\t\t\t\t\t\"fullName\": \"Công Ty Điện Lực Thanh Xuân\",\n" +
-                    "\t\t\t\t\t\"shortName\": \"Thanh Xuân\",\n" +
-                    "\t\t\t\t\t\"address\": \"35 Lê Đức Thọ-My Đình- Hà Nội\",\n" +
-                    "\t\t\t\t\t\"taxCode\": null,\n" +
-                    "\t\t\t\t\t\"phone1\": \"84422200898\",\n" +
-                    "\t\t\t\t\t\"phone2\": null,\n" +
-                    "\t\t\t\t\t\"fax\": null,\n" +
-                    "\t\t\t\t\t\"level\": 2,\n" +
-                    "\t\t\t\t\t\"mailTo\": null,\n" +
-                    "\t\t\t\t\t\"mailCc\": null,\n" +
-                    "\t\t\t\t\t\"status\": 1,\n" +
-                    "\t\t\t\t\t\"dateCreated\": \"2016-11-18\",\n" +
-                    "\t\t\t\t\t\"idChanged\": 26412296,\n" +
-                    "\t\t\t\t\t\"dateChanged\": \"2017-04-25\",\n" +
-                    "\t\t\t\t\t\"regionId\": 0\n" +
-                    "\t\t\t\t}, {\n" +
-                    "\t\t\t\t\t\"parentId\": 1,\n" +
-                    "\t\t\t\t\t\"pcId\": 24,\n" +
-                    "\t\t\t\t\t\"code\": \"PD1700\",\n" +
-                    "\t\t\t\t\t\"ext\": \"PD17\",\n" +
-                    "\t\t\t\t\t\"fullName\": \"Công Ty Điện Lực Sơn Tây\",\n" +
-                    "\t\t\t\t\t\"shortName\": \"Sơn Tây\",\n" +
-                    "\t\t\t\t\t\"address\": null,\n" +
-                    "\t\t\t\t\t\"taxCode\": null,\n" +
-                    "\t\t\t\t\t\"phone1\": null,\n" +
-                    "\t\t\t\t\t\"phone2\": null,\n" +
-                    "\t\t\t\t\t\"fax\": null,\n" +
-                    "\t\t\t\t\t\"level\": 2,\n" +
-                    "\t\t\t\t\t\"mailTo\": null,\n" +
-                    "\t\t\t\t\t\"mailCc\": null,\n" +
-                    "\t\t\t\t\t\"status\": 1,\n" +
-                    "\t\t\t\t\t\"dateCreated\": \"2016-11-18\",\n" +
-                    "\t\t\t\t\t\"idChanged\": 26412302,\n" +
-                    "\t\t\t\t\t\"dateChanged\": \"2017-04-25\",\n" +
-                    "\t\t\t\t\t\"regionId\": 0\n" +
-                    "\t\t\t\t}\n" +
-                    "\t\t\t],\n" +
-                    "\t\t\t\"reponseCode\": \"000\",\n" +
-                    "\t\t\t\"description\": \"Xac thuc thanh cong\",\n" +
-                    "\t\t\t\"response\": \"SUCCESS\"\n" +
-                    "\t\t}\n" +
-                    "\t\t\n" +
-                    "\t},\n" +
-                    "\t\"footer\": {\n" +
-                    "\t\t\"account-idt\": \"0917932663\",\n" +
-                    "\t\t\"response-code\": \"000\",\n" +
-                    "\t\t\"description\": \"Xac thuc thanh cong\",\n" +
-                    "\t\t\"source-address\": \"192.168.120.170\"\n" +
-                    "\t}\n" +
-                    "}\n";
-
-           String data = dataTest;
-            //end Tests
 
             loginResponseReponse = gson.fromJson(data, LoginResponseReponse.class);
 

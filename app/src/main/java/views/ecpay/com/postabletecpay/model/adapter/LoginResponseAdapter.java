@@ -10,6 +10,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.BodyLog
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.FooterLoginResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.HeaderLoginResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ResponseLoginResponse;
 
 /**
  * Created by VinhNB on 5/19/2017.
@@ -40,6 +41,14 @@ public class LoginResponseAdapter extends TypeAdapter<LoginResponseReponse> {
             out.name("disk-drive").value(bodyLoginResponse.getDiskDrive());
             out.name("signature").value(bodyLoginResponse.getSignature());
             out.name("pin-login").value(bodyLoginResponse.getPinLogin());
+            out.name("version-app").value(bodyLoginResponse.getVersionApp());
+
+            for (final ResponseLoginResponse responseLoginResponse : value.getBodyLoginResponse().getResponseLoginResponse()) {
+                out.value(responseLoginResponse.getId());
+                out.endArray();
+            }
+            out.name("response-login").value(bodyLoginResponse.getResponseLoginResponse());
+
             out.endObject();
         }
 

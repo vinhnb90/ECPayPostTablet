@@ -1,5 +1,7 @@
 package org.ecpay.client.rsa;
 
+import android.util.Base64;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +17,7 @@ import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.apache.log4j.Logger;
 
 import Decoder.BASE64Decoder;
@@ -23,7 +26,7 @@ import Decoder.BASE64Encoder;
 /**
  * Created by Joe on 8/7/2016.
  */
-public class Utils {
+public class UtilsRSA {
 
     private static final Logger LOGGER = Logger.getLogger("eStoreCashierLogger");
 
@@ -57,11 +60,13 @@ public class Utils {
     }
 
     public static String toStringBase64(byte[] byteArray) {
-        return (new BASE64Encoder().encodeBuffer(byteArray)).replaceAll(String.valueOf((char) 0xd), "");
+//        return (new BASE64Encoder().encodeBuffer(byteArray)).replaceAll(String.valueOf((char) 0xd), "");
+        return Base64.encodeToString(byteArray, Base64.NO_WRAP).replaceAll("\u003d", "=");
     }
 
     public static byte[] toByteArrayBase64(String string) throws IOException {
-        return new BASE64Decoder().decodeBuffer(string);
+        return Base64.decode(string, Base64.NO_WRAP);
+//        return new BASE64Decoder().decodeBuffer(string);
     }
 
     public static String stringArray2Json(String[] arr) {

@@ -28,7 +28,3 @@ public class UserInfoPresenter implements IUserInfoPresenter {
         iUserInfoView.showInfoUser(account.getEdong(), account.getBirthday(), account.getName(), account.getIdNumber(), phone, account.getEmail(), account.getAddress(), account.getEdong(), account.getBalance(),account.getType());
     }
 }
-
-interface IUserInfoPresenter {
-    void getInfoUser(String edong);
-}

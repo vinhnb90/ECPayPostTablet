@@ -1,7 +1,10 @@
 package views.ecpay.com.postabletecpay.presenter;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 
 import java.util.List;
 
@@ -39,6 +42,7 @@ public class LoginPresenter implements ILoginPresenter {
         mSharedPrefLogin.addSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void validateInput(String userName, String pass) {
         String textMessage = "";
@@ -64,7 +68,6 @@ public class LoginPresenter implements ILoginPresenter {
             textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
             isErr = true;
         }
-
         if (isErr) {
             mILoginView.showTextMessage(textMessage);
             mILoginView.hidePbarLogin();
@@ -73,15 +76,25 @@ public class LoginPresenter implements ILoginPresenter {
 
         //setup info login
         ConfigInfo configInfo;
+        String versionApp = "";
         try {
-            configInfo = Common.setupInfoRequest(context, userName, pass, Common.COMMAND_ID.LOGIN.toString());
+            versionApp = mILoginView.getContextView().getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            configInfo = Common.setupInfoRequest(context, userName, pass, Common.COMMAND_ID.LOGIN.toString(), versionApp);
         } catch (Exception e) {
             mILoginView.showTextMessage(e.getMessage());
             return;
         }
 
+
         //create request to server
-        String jsonRequestLogin = SoapAPI.getJsonRequestLogin(configInfo.getAGENT(),
+        String jsonRequestLogin = SoapAPI.getJsonRequestLogin(
+                configInfo.getAGENT(),
                 configInfo.getAgentEncypted(),
                 configInfo.getCommandId(),
                 configInfo.getAuditNumber(),
@@ -89,7 +102,8 @@ public class LoginPresenter implements ILoginPresenter {
                 configInfo.getDiskDriver(),
                 configInfo.getSignatureEncrypted(),
                 configInfo.getPinLoginEncrypted(),
-                configInfo.getAccountId());
+                configInfo.getAccountId(),
+                configInfo.getVersionApp());
 
         if (jsonRequestLogin != null) {
             try {
@@ -305,14 +319,5 @@ public class LoginPresenter implements ILoginPresenter {
     };
 
     private SharePrefManager mSharedPrefLogin;
-}
 
-interface ILoginPresenter {
-    void validateInput(String userName, String pass);
-
-    void writeSharedPrefLogin(String userName, String pass);
-
-    void clearSharedPrefLogin();
-
-    void showInfoSharePrefLogin();
 }

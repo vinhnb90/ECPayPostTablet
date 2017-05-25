@@ -20,6 +20,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.ChangePassPresenter;
+import views.ecpay.com.postabletecpay.presenter.IChangePassPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;

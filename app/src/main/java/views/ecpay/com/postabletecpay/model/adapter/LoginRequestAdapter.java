@@ -40,6 +40,7 @@ public class LoginRequestAdapter extends TypeAdapter<LoginRequest> {
             out.name("disk-drive").value(bodyLoginRequest.getDiskDrive());
             out.name("signature").value(bodyLoginRequest.getSignature());
             out.name("pin-login").value(bodyLoginRequest.getPinLogin());
+            out.name("version-app").value(bodyLoginRequest.getVersionApp());
             out.endObject();
         }
 
@@ -102,6 +103,9 @@ public class LoginRequestAdapter extends TypeAdapter<LoginRequest> {
                                 break;
                             case "pin-login":
                                 bodyLoginRequest.setPinLogin(in.nextString());
+                                break;
+                            case "version-app":
+                                bodyLoginRequest.setVersionApp(in.nextString());
                                 break;
                         }
                     }

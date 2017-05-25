@@ -1,11 +1,17 @@
 package org.ecpay.client.rsa;
 
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+import android.util.Base64;
+import android.util.Log;
+
 import java.io.IOException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
@@ -27,7 +33,7 @@ public class RSA {
     public static PrivateKey getPrivateKeyFromString(String key) {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(RSA);
-            EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(Utils.toByteArrayBase64(key));
+            EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(UtilsRSA.toByteArrayBase64(key));
 
             return keyFactory.generatePrivate(privateKeySpec);
         } catch (IOException ex) {
@@ -43,7 +49,7 @@ public class RSA {
     public static PublicKey getPublicKeyFromString(String key) {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(RSA);
-            EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(Utils.toByteArrayBase64(key));
+            EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(UtilsRSA.toByteArrayBase64(key));
 
             return keyFactory.generatePublic(publicKeySpec);
         } catch (IOException ex) {
@@ -63,6 +69,7 @@ public class RSA {
         return cipher.doFinal(msg.getBytes(UTF_8));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static byte[] encrypt(String msg, PublicKey publicKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException, BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance(RSA);
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
@@ -70,16 +77,18 @@ public class RSA {
         return cipher.doFinal(msg.getBytes(UTF_8));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static String encryptPassFromPublicKey(String pass, String publicKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException, BadPaddingException, IllegalBlockSizeException {
-        return Utils.toStringBase64(encrypt(pass, getPublicKeyFromString(publicKey)));
+        Log.d("TAG", "encryptPassFromPublicKey: ");
+        return UtilsRSA.toStringBase64(encrypt(pass, getPublicKeyFromString(publicKey)));
     }
 
     public static String encryptPassFromPrivateKey(String pass, String privateKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException, BadPaddingException, IllegalBlockSizeException {
-        return Utils.toStringBase64(encrypt(pass, getPrivateKeyFromString(privateKey)));
+        return UtilsRSA.toStringBase64(encrypt(pass, getPrivateKeyFromString(privateKey)));
     }
 
     public static String getSignatureFromPrivateKey(String dataSign, String privateKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException, BadPaddingException, IllegalBlockSizeException, SignatureException {
-        return Utils.toStringBase64(signData(dataSign.getBytes(Utils.UTF_8), getPrivateKeyFromString(privateKey)));
+        return UtilsRSA.toStringBase64(signData(dataSign.getBytes(UtilsRSA.UTF_8), getPrivateKeyFromString(privateKey)));
     }
 
     public static byte[] decrypt(byte[] msg, PublicKey publicKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {

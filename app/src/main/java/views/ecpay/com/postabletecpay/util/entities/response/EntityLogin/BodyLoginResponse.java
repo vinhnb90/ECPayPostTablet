@@ -19,8 +19,12 @@ public class BodyLoginResponse {
     @SerializedName("pin-login")
     @Expose
     private String pinLogin;
+    @SerializedName("version-app")
+    @Expose
+    private String versionApp;
     @SerializedName("response-login")
     @Expose
+//    private String responseLoginResponse;
     private ResponseLoginResponse responseLoginResponse;
 
     public Long getAuditNumber() {
@@ -63,6 +67,14 @@ public class BodyLoginResponse {
         this.pinLogin = pinLogin;
     }
 
+    public String getVersionApp() {
+        return versionApp;
+    }
+
+    public void setVersionApp(String versionApp) {
+        this.versionApp = versionApp;
+    }
+
     public ResponseLoginResponse getResponseLoginResponse() {
         return responseLoginResponse;
     }
@@ -71,4 +83,11 @@ public class BodyLoginResponse {
         this.responseLoginResponse = responseLoginResponse;
     }
 
+   /* public String getResponseLoginResponse() {
+        return responseLoginResponse;
+    }
+
+    public void setResponseLoginResponse(String responseLoginResponse) {
+        this.responseLoginResponse = responseLoginResponse;
+    }*/
 }

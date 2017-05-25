@@ -1,6 +1,9 @@
 package views.ecpay.com.postabletecpay.presenter;
 
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 
 import views.ecpay.com.postabletecpay.model.ChangePassModel;
 import views.ecpay.com.postabletecpay.util.commons.Common;
@@ -22,6 +25,7 @@ public class ChangePassPresenter implements IChangePassPresenter {
         mChangePassModel = new ChangePassModel(mIChangePassView.getContextView());
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void validateInputChangePass(String passOld, String passNew, String passRetype) {
         if (passOld == null || passOld.isEmpty() || passOld.trim().equals("")) {
@@ -50,14 +54,22 @@ public class ChangePassPresenter implements IChangePassPresenter {
                 .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
 
         ConfigInfo configInfo = null;
+        String versionApp = "";
         try {
-            configInfo = Common.setupInfoRequest(mIChangePassView.getContextView(), userName, pass, Common.COMMAND_ID.CHANGE_PIN.toString());
+            versionApp = mIChangePassView.getContextView().getPackageManager()
+                    .getPackageInfo(mIChangePassView.getContextView().getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            configInfo = Common.setupInfoRequest(mIChangePassView.getContextView(), userName, pass, Common.COMMAND_ID.CHANGE_PIN.toString(), versionApp);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         //create request to server
-        String session = "?";
+        String session = "";
         String jsonRequestChangePass = SoapAPI.getJsonRequestChangePass(
                 configInfo.getAGENT(),
                 configInfo.getAgentEncypted(),
@@ -182,9 +194,4 @@ public class ChangePassPresenter implements IChangePassPresenter {
             });
         }
     };
-}
-
-
-interface IChangePassPresenter {
-    void validateInputChangePass(String passOld, String passNew, String passRetype);
 }

@@ -15,7 +15,9 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
@@ -34,6 +36,7 @@ import org.ecpay.client.Utils;
 import org.ecpay.client.jce.Crypto;
 import org.ecpay.client.jce.TripleDesCBC;
 import org.ecpay.client.rsa.RSA;
+import org.ecpay.client.test.SecurityUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -45,6 +48,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -59,6 +63,8 @@ import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.AlgorithmRSA.AsymmetricCryptography;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+
+import org.ecpay.client.rsa.UtilsRSA;
 
 /**
  * Created by macbook on 5/5/17.
@@ -615,18 +621,13 @@ public class Common {
             return null;
         if (diskDriver == null || diskDriver.isEmpty() || diskDriver.trim().equals(""))
             return null;
-        if (pcCode == null || pcCode.isEmpty() || pcCode.trim().equals(""))
+        if (pcCode == null)
             return null;
         if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
             return null;
         if (privateKeyRSA == null || privateKeyRSA.isEmpty() || privateKeyRSA.trim().equals(""))
             return null;
-
-        String dataSign = agent.concat(commandId).concat(String.valueOf(auditNumber)).concat(mac).concat(diskDriver).concat(pcCode).concat(accountId);
-
-//        AsymmetricCryptography ac = new AsymmetricCryptography();
-//        PrivateKey privateKey = ac.getPrivate(privateKeyRSA);
-//        String encryptSignature = ac.encryptText(dataSign, privateKey);
+        String dataSign = agent.concat(commandId).concat(String.format("%d", auditNumber)).concat(mac).concat(diskDriver).concat(pcCode).concat(accountId);
 
         return dataSign;
     }
@@ -666,13 +667,19 @@ public class Common {
         return vectorResult;
     }*/
 
-    public static String encryptPassByTripleDsCbc(String pass, String publicKeyRSA, String privateKeyRSA) throws Exception {
+    public static String encryptPassByTripleDsCbc(Context context, String pass, String publicKeyRSA, String privateKeyRSA) throws Exception {
         if (pass == null || pass.isEmpty() || pass.trim().isEmpty())
             return null;
         if (publicKeyRSA == null || publicKeyRSA.isEmpty() || publicKeyRSA.trim().isEmpty())
             return null;
         if (privateKeyRSA == null || privateKeyRSA.isEmpty() || privateKeyRSA.trim().isEmpty())
             return null;
+
+        privateKeyRSA = context.getString(R.string.prvkey);
+        publicKeyRSA = context.getString(R.string.pblKey);
+        privateKeyRSA = privateKeyRSA.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "").trim().replace("\n", "").replace("\r", "");
+        publicKeyRSA = publicKeyRSA.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "").trim().replace("\n", "").replace("\r", "");
+
 
         //check pass: if pass length < 8 insert space
         pass = pass.trim();
@@ -697,29 +704,25 @@ public class Common {
             throw new Exception(MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString());
 
         byte[] passBytes = pass.getBytes();
-//        passEncrypted = Base64.encodeToString(crypto.encrypt(pass.getBytes()), Base64.DEFAULT);
         byte[] encryptBytes = crypto.encrypt(passBytes);
         passEncrypted = new String(Utils.encodeHex(encryptBytes));
-/*
-
-        //test to string
-        String a = "5DF1037BAACA9DF7";
-        byte[] decrypted = crypto.decrypt(Base64.decode(a.getBytes(), Base64.DEFAULT));
-        String passDecrypted = new String(decrypted);
-        //end test
-*/
-
-/*
-        //test to hex
-        String passDecrypted = new String(crypto.decrypt(Utils.decodeHex(passEncrypted
-                .toCharArray())));
-        //end test
-*/
 
         return passEncrypted;
     }
 
-    public static ConfigInfo setupInfoRequest(Context context, String userName, String pass, String commandId) throws Exception {
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public static ConfigInfo setupInfoRequest(Context context, String userName, String pass, String commandId, String versionApp) throws Exception {
+        if (context == null)
+            return null;
+        if (userName == null || userName.isEmpty() || userName.trim().isEmpty())
+            return null;
+        if (pass == null || pass.isEmpty() || pass.trim().isEmpty())
+            return null;
+        if (commandId == null || commandId.isEmpty() || commandId.trim().isEmpty())
+            return null;
+        if (versionApp == null || versionApp.isEmpty() || versionApp.trim().isEmpty())
+            return null;
+
         //setup info login
         ConfigInfo configInfo = Common.getDataFileConfig();
 
@@ -752,7 +755,7 @@ public class Common {
         passwordAgent = configInfo.getPASS_WORD();
         String pcCode = configInfo.getPC_CODE();
         String privateKeyRSA = configInfo.getPRIVATE_KEY();
-        String publicKeyRSA = configInfo.getPRIVATE_KEY();
+        String publicKeyRSA = configInfo.getPUBLIC_KEY();
 
         if (privateKeyRSA == null || privateKeyRSA.isEmpty() || privateKeyRSA.trim().isEmpty()) {
             throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
@@ -765,30 +768,20 @@ public class Common {
         }
 
         try {
-//            passwordAgentEcrypted = Common.encryptPasswordAgentByRSA(passwordAgent.trim(), privateKeyRSA);
-            passwordAgentEcrypted = RSA.encryptPassFromPrivateKey(passwordAgent, privateKeyRSA);
+            passwordAgentEcrypted = SecurityUtils.encryptRSAToString(passwordAgent, publicKeyRSA);
         } catch (Exception e) {
             throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
         }
         configInfo.setAgentEncypted(passwordAgentEcrypted);
-
-        //test
-//        String passDecypted = "";
-//        try {
-//            AsymmetricCryptography ac = new AsymmetricCryptography();
-//            PublicKey publicKey = ac.getPublic(publicKeyRSA);
-//            passDecypted = ac.decryptText(passwordAgentEcrypted, publicKey);
-//        } catch (Exception e) {
-//            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
-//        }
-        //end test
 
         //set command id
         //encrypt signature by RSA
         String signatureEncrypted;
         try {
             String dataSign = Common.getDataSignRSA(agent, commandId, auditNumber, macAdressHexValue, diskDriver, pcCode, accountId, privateKeyRSA);
-            signatureEncrypted = RSA.getSignatureFromPrivateKey(dataSign, privateKeyRSA);
+            Log.d(TAG, "setupInfoRequest: " + dataSign);
+            signatureEncrypted = SecurityUtils.sign(dataSign, privateKeyRSA);
+            Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
         } catch (Exception e) {
             throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
         }
@@ -798,7 +791,10 @@ public class Common {
         //encrypt pinLogin by Triple DES CBC
         String pinLoginEncrypted;
         try {
-            pinLoginEncrypted = Common.encryptPassByTripleDsCbc(pass.trim(), publicKeyRSA, privateKeyRSA);
+            pinLoginEncrypted =
+//                    Common.encryptPassByTripleDsCbc(context, pass.trim(), publicKeyRSA, privateKeyRSA);
+            SecurityUtils.tripleDesc(context, pass.trim(), privateKeyRSA.trim(), publicKeyRSA.trim());
+
         } catch (Exception e) {
             throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
         }
@@ -806,6 +802,9 @@ public class Common {
 
         //set command id
         configInfo.setCommandId(commandId);
+
+        //set version app
+        configInfo.setVersionApp(versionApp);
 
         return configInfo;
     }

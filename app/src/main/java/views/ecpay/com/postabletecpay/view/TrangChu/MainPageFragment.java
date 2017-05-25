@@ -235,6 +235,11 @@ public class MainPageFragment extends Fragment implements IMainPageView, View.On
         tvTongTien.setText(String.valueOf(totalMoney));
 
     }
+
+    @Override
+    public Context getContextView() {
+        return getContext();
+    }
     //endregion
 
     public interface OnFragmentInteractionListener {

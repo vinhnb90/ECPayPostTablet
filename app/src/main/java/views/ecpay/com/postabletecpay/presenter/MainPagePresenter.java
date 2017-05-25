@@ -28,7 +28,3 @@ public class MainPagePresenter implements IMainPagePresenter{
     }
     //endregion
 }
-
-interface IMainPagePresenter{
-    void getInfoMain(String edong);
-}

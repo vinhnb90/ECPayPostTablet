@@ -19,6 +19,7 @@ import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
+import views.ecpay.com.postabletecpay.presenter.ILoginPresenter;
 import views.ecpay.com.postabletecpay.presenter.LoginPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection;

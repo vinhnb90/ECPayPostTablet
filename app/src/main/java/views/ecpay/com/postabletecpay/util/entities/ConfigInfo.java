@@ -19,6 +19,7 @@ public class ConfigInfo {
     private String accountId;
     private String signatureEncrypted;
     private String pinLoginEncrypted;
+    private String versionApp;
 
     public ConfigInfo() {
         PRIVATE_KEY = "";
@@ -138,5 +139,13 @@ public class ConfigInfo {
 
     public void setPinLoginEncrypted(String pinLoginEncrypted) {
         this.pinLoginEncrypted = pinLoginEncrypted;
+    }
+
+    public String getVersionApp() {
+        return versionApp;
+    }
+
+    public void setVersionApp(String versionApp) {
+        this.versionApp = versionApp;
     }
 }
