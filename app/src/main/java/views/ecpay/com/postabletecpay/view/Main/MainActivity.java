@@ -1,6 +1,5 @@
 package views.ecpay.com.postabletecpay.view.Main;
 
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,13 +16,13 @@ import android.widget.Toast;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
-import views.ecpay.com.postabletecpay.view.ThanhToan.ThanhToanFragment;
+import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 
 public class MainActivity extends AppCompatActivity implements MainPageFragment.OnFragmentInteractionListener,
-        ThanhToanFragment.OnFragmentInteractionListener, BaoCaoFragment.OnFragmentInteractionListener,
+        PayFragment.OnFragmentInteractionListener, BaoCaoFragment.OnFragmentInteractionListener,
         UserInfoFragment.OnFragmentInteractionListener {
 
     public static BottomNavigationView navigation;
@@ -40,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements MainPageFragment.
                     fragment = MainPageFragment.newInstance(mEdong);
                     break;
                 case R.id.navigation_pay:
-                    fragment = ThanhToanFragment.newInstance();
+                    fragment = PayFragment.newInstance(mEdong);
                     break;
                 case R.id.navigation_report:
                     fragment = BaoCaoFragment.newInstance();

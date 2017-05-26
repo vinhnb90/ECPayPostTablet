@@ -6,6 +6,11 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.LoginModel;
@@ -16,6 +21,7 @@ import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.AccountLoginResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ListEvnPCLoginResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ResponseLoginResponse;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
@@ -238,8 +244,25 @@ public class LoginPresenter implements ILoginPresenter {
                 return;
             }
 
+            //get responseLoginResponse from body response
+            //because server return string not object
+            String responseLoginResponseData = response.getBodyLoginResponse().getResponseLoginResponse();
+            // định dạng kiểu Object JSON
+            Type type = new TypeToken<ResponseLoginResponse>() {
+            }.getType();
+            ResponseLoginResponse responseLoginResponse = null;
+            try {
+                responseLoginResponse = new Gson().fromJson(responseLoginResponseData, type);
+            } catch (JsonSyntaxException e) {
+                e.printStackTrace();
+            }
+
+            if (responseLoginResponse == null)
+                return;
+
             //get AccountLoginResponse from body response
-            AccountLoginResponse accountLoginResponse = response.getBodyLoginResponse().getResponseLoginResponse().getAccountLoginResponse();
+            AccountLoginResponse accountLoginResponse = responseLoginResponse.getAccountLoginResponse();
+//                    response.getBodyLoginResponse().getResponseLoginResponse().getAccountLoginResponse();
 
             //get account
             Account account = null;
@@ -272,7 +295,8 @@ public class LoginPresenter implements ILoginPresenter {
             }
 
             //get List<ListEvnPCLoginResponse> from body response
-            List<ListEvnPCLoginResponse> evnPCList = response.getBodyLoginResponse().getResponseLoginResponse().getListEvnPCLoginResponse();
+            List<ListEvnPCLoginResponse> evnPCList = responseLoginResponse.getListEvnPCLoginResponse();
+//                    response.getBodyLoginResponse().getResponseLoginResponse().getListEvnPCLoginResponse();
 
             if (evnPCList != null) {
                 for (ListEvnPCLoginResponse pc :
@@ -296,7 +320,6 @@ public class LoginPresenter implements ILoginPresenter {
                     mLoginModel.writeSqliteEvnPcTable(evnPC);
                 }
             }
-
             //show main
             mILoginView.showMainScreen(account.getEdong());
         }

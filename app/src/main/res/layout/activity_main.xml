@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="views.ecpay.com.postabletecpay.view.Main.MainActivity">
+    tools:mContext="views.ecpay.com.postabletecpay.view.Main.MainActivity">
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation_ac_main"

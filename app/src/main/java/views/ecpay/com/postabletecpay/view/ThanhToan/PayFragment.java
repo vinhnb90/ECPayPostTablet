@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,31 +20,64 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import views.ecpay.com.postabletecpay.R;
+import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
+import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
+import views.ecpay.com.postabletecpay.presenter.PayPresenter;
+import views.ecpay.com.postabletecpay.util.commons.Common;
+
+import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 
 /**
  * Created by macbook on 4/28/17.
  */
 
-public class ThanhToanFragment extends Fragment implements View.OnClickListener {
+public class PayFragment extends Fragment implements IPayView, View.OnClickListener {
+    public static final int FIRST_PAGE_INDEX = 0;
+    public static final int PAGE_INCREMENT = 1;
+    public static final int ROWS_ON_PAGE = 10;
 
-    @BindView(R.id.ibtn_frag_user_info_back) ImageButton ibBack;
-    @BindView(R.id.ibScaner) ImageButton ibScaner;
-    @BindView(R.id.ibAdd) ImageButton ibAdd;
-    @BindView(R.id.etSearch) EditText etSearch;
-    @BindView(R.id.tvHoaDon) TextView tvHoaDon;
-    @BindView(R.id.tvTongTien) TextView tvTongTien;
-    @BindView(R.id.btThanhToan) Button btThanhToan;
-    @BindView(R.id.rvHoaDon) RecyclerView rvHoaDon;
-    @BindView(R.id.tabs) TabLayout tabLayout;
-    @BindView(R.id.view_pager) ViewPager viewPager;
+    @BindView(R.id.ibtn_frag_user_info_back)
+    ImageButton ibBack;
+    @BindView(R.id.ibScaner)
+    ImageButton ibScaner;
+    @BindView(R.id.ibAdd)
+    ImageButton ibAdd;
+    @BindView(R.id.etSearch)
+    EditText etSearch;
+    @BindView(R.id.tvHoaDon)
+    TextView tvHoaDon;
+    @BindView(R.id.tvTongTien)
+    TextView tvTongTien;
+    @BindView(R.id.btThanhToan)
+    Button btThanhToan;
+    @BindView(R.id.rvHoaDon)
+    RecyclerView rvHoaDon;
+    @BindView(R.id.tabs)
+    TabLayout tabLayout;
+    @BindView(R.id.view_pager)
+    ViewPager viewPager;
 
     private OnFragmentInteractionListener listener;
+    private PayAdapter payAdapter;
+    private List<PayAdapter.PayEntityAdapter> mAdapterList = new ArrayList<>();
+    private IPayPresenter mIPayPresenter;
+    private String mEdong;
+    private int mPageIndex;
 
-    public static ThanhToanFragment newInstance() {
-        return new ThanhToanFragment();
+    public static PayFragment newInstance(String edong) {
+        Bundle bundle = new Bundle();
+        bundle.putString(KEY_EDONG, edong);
+
+        PayFragment payFragment = new PayFragment();
+        payFragment.setArguments(bundle);
+
+        return payFragment;
     }
 
     @Override
@@ -68,7 +102,7 @@ public class ThanhToanFragment extends Fragment implements View.OnClickListener 
         etSearch.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus) {
+                if (hasFocus) {
                     tabLayout.setVisibility(View.VISIBLE);
                 } else {
                     tabLayout.setVisibility(View.GONE);
@@ -76,7 +110,30 @@ public class ThanhToanFragment extends Fragment implements View.OnClickListener 
             }
         });
 
+        mIPayPresenter = new PayPresenter(this);
+        mEdong = getArguments().getString(KEY_EDONG, Common.EMPTY_TEXT);
+
+        setupPayRecyclerView();
+        //first page
+        mPageIndex = FIRST_PAGE_INDEX;
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex);
+
         return view;
+    }
+
+    private void fillDataRecyclerView() {
+        if (payAdapter == null) {
+            mAdapterList = mIPayMolder
+            payAdapter = new PayAdapter(getContext(), )
+        }
+    }
+
+    private void setupPayRecyclerView() {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        if (rvHoaDon != null)
+            rvHoaDon.setLayoutManager(linearLayoutManager);
     }
 
     @Override
@@ -140,6 +197,39 @@ public class ThanhToanFragment extends Fragment implements View.OnClickListener 
 
         dialog.show();
     }
+
+    //region IPayView
+    @Override
+    public Context getContextView() {
+        return getContext();
+    }
+
+    @Override
+    public void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList) {
+        if (adapterList == null)
+            return;
+
+        mAdapterList.clear();
+        mAdapterList.addAll(adapterList);
+
+        //get ROWS_ON_PAGE first
+        mPageIndex = FIRST_PAGE_INDEX;
+
+        List<PayAdapter.PayEntityAdapter> adapterListFirstPage = new ArrayList<>();
+        int index = ROWS_ON_PAGE * mPageIndex;
+
+        for (; index < ROWS_ON_PAGE; index++) {
+            adapterListFirstPage.add(adapterList.get(index));
+        }
+        ((PayAdapter)adapterList).refreshData(adapterListFirstPage);
+
+    }
+
+    @Override
+    public void showPayRecyclerOtherPage(int pageIndexNew) {
+        mPageIndex = pageIndexNew;
+    }
+    //endregion
 
     public interface OnFragmentInteractionListener {
     }

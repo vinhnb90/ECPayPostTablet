@@ -8,8 +8,11 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.http.Field;
+import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
@@ -263,6 +266,37 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             mCursor.close();
         }
         return count;
+    }
+
+    public List<PayAdapter.PayEntityAdapter> selectAllBill(String edong) throws SQLiteException {
+        if (edong == null)
+            return null;
+
+        List<PayAdapter.PayEntityAdapter> adapterList = new ArrayList<>();
+
+        database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+
+        mCursor.moveToFirst();
+
+        while (mCursor.moveToNext()) {
+            String billID = mCursor.getString(mCursor.getColumnIndexOrThrow("billId"));
+            String tenKH = mCursor.getString(mCursor.getColumnIndexOrThrow("name"));
+            String maKH = mCursor.getString(mCursor.getColumnIndexOrThrow("code"));
+            String loTrinh = mCursor.getString(mCursor.getColumnIndexOrThrow("road"));
+            int tongTien = mCursor.getInt(mCursor.getColumnIndexOrThrow("amount"));
+            String diaChi = mCursor.getString(mCursor.getColumnIndexOrThrow("address"));
+            int trangThaiNo = mCursor.getInt(mCursor.getColumnIndexOrThrow("status"));
+
+            PayAdapter.PayEntityAdapter entityAdapter = new PayAdapter.PayEntityAdapter(billID, tenKH, diaChi, loTrinh, maKH, tongTien, trangThaiNo);
+            adapterList.add(entityAdapter);
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return adapterList;
     }
 
 

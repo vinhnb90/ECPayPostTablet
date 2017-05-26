@@ -22,7 +22,15 @@ private String description;
 @Expose
 private String response;
 
-public AccountLoginResponse getAccountLoginResponse() {
+    public ResponseLoginResponse(AccountLoginResponse accountLoginResponse, List<ListEvnPCLoginResponse> listEvnPCLoginResponse, String reponseCode, String description, String response) {
+        this.accountLoginResponse = accountLoginResponse;
+        this.listEvnPCLoginResponse = listEvnPCLoginResponse;
+        this.reponseCode = reponseCode;
+        this.description = description;
+        this.response = response;
+    }
+
+    public AccountLoginResponse getAccountLoginResponse() {
 return accountLoginResponse;
 }
 

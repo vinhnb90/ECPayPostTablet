@@ -32,7 +32,7 @@ import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
 import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
 import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
-import views.ecpay.com.postabletecpay.view.ThanhToan.ThanhToanFragment;
+import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.EMPTY_TEXT;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
@@ -190,7 +190,7 @@ public class MainPageFragment extends Fragment implements IMainPageView, View.On
             case R.id.btXoaDuLieu:
                 break;
             case R.id.btThanhToan:
-                fragment = ThanhToanFragment.newInstance();
+                fragment = PayFragment.newInstance();
                 if (fragment != null) {
                     FragmentTransaction fragmentTransaction = MainPageFragment.this.getActivity().getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.frameLayout, fragment);

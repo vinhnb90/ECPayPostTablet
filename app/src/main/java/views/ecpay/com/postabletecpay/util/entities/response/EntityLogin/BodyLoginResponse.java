@@ -24,8 +24,8 @@ public class BodyLoginResponse {
     private String versionApp;
     @SerializedName("response-login")
     @Expose
-//    private String responseLoginResponse;
-    private ResponseLoginResponse responseLoginResponse;
+    private String responseLoginResponse;
+//    private ResponseLoginResponse responseLoginResponse;
 
     public Long getAuditNumber() {
         return auditNumber;
@@ -74,20 +74,20 @@ public class BodyLoginResponse {
     public void setVersionApp(String versionApp) {
         this.versionApp = versionApp;
     }
-
+/*
     public ResponseLoginResponse getResponseLoginResponse() {
         return responseLoginResponse;
     }
 
     public void setResponseLoginResponse(ResponseLoginResponse responseLoginResponse) {
         this.responseLoginResponse = responseLoginResponse;
-    }
+    }*/
 
-   /* public String getResponseLoginResponse() {
+    public String getResponseLoginResponse() {
         return responseLoginResponse;
     }
 
     public void setResponseLoginResponse(String responseLoginResponse) {
         this.responseLoginResponse = responseLoginResponse;
-    }*/
+    }
 }

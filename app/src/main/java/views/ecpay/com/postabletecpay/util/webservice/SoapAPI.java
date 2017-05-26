@@ -5,12 +5,16 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
+
+import java.lang.reflect.Type;
 
 import views.ecpay.com.postabletecpay.model.adapter.LoginRequestAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.LoginResponseAdapter;
@@ -26,6 +30,7 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.LoginReq
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.BodyChangePassResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ResponseLoginResponse;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
 
@@ -208,9 +213,9 @@ public class SoapAPI {
             }
 
             LoginResponseReponse loginResponseReponse = null;
-
             final GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder.registerTypeAdapter(LoginRequest.class, new LoginResponseAdapter());
+            gsonBuilder.registerTypeAdapter(LoginResponseReponse.class, new LoginResponseAdapter());
+//            gsonBuilder.registerTypeAdapter(ResponseLoginResponse.class, new )
             gsonBuilder.setPrettyPrinting();
             final Gson gson = gsonBuilder.create();
 

@@ -84,7 +84,36 @@ private Object strLogoutTime;
 @Expose
 private Object strType;
 
-public String getStatus() {
+    public AccountLoginResponse(String status, String idNumber, String idNumberDate, String idNumberPlace, String name, String address, String email, String birthday, Integer idAccount, String edong, Integer parentId, String parentEdong, Object pin, Integer type, Long balance, Integer lockMoney, Boolean changedPIN, String session, Integer verified, String mac, String ip, Long loginTime, Object logoutTime, Object strLoginTime, Object strLogoutTime, Object strType) {
+        this.status = status;
+        this.idNumber = idNumber;
+        this.idNumberDate = idNumberDate;
+        this.idNumberPlace = idNumberPlace;
+        this.name = name;
+        this.address = address;
+        this.email = email;
+        this.birthday = birthday;
+        this.idAccount = idAccount;
+        this.edong = edong;
+        this.parentId = parentId;
+        this.parentEdong = parentEdong;
+        this.pin = pin;
+        this.type = type;
+        this.balance = balance;
+        this.lockMoney = lockMoney;
+        this.changedPIN = changedPIN;
+        this.session = session;
+        this.verified = verified;
+        this.mac = mac;
+        this.ip = ip;
+        this.loginTime = loginTime;
+        this.logoutTime = logoutTime;
+        this.strLoginTime = strLoginTime;
+        this.strLogoutTime = strLogoutTime;
+        this.strType = strType;
+    }
+
+    public String getStatus() {
 return status;
 }
 
