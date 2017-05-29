@@ -107,6 +107,43 @@ public class Common {
     }
     //endregion
 
+    //region param search
+    public static enum TYPE_SEARCH {
+        ALL(0, "Tất cả"),
+        MA_KH_SO_THE(1, "Mã KH/Số thẻ"),
+        TEN_KH(2, "Tên KH"),
+        PHONE(3, "Số điện thoại"),
+        ADDRESS(4, "Địa chỉ"),
+        GCS(5, "Sổ Ghi chỉ số"),
+        LO_TRINH(6, "Lộ trình");
+
+        private int position;
+        private String type;
+
+        TYPE_SEARCH(int position, String type) {
+            this.position = position;
+            this.type = type;
+        }
+
+        public int getPosition() {
+            return position;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public static TYPE_SEARCH findCodeMessage(int position) {
+            for (TYPE_SEARCH v : values()) {
+                if (v.getPosition() == position) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
+    //endregion
+
     //region Description key
     public static final String TAG = "TAG";
     public static final String KEY_EDONG = "EDONG";
@@ -309,6 +346,7 @@ public class Common {
     //define symbol
     public static final String SPACE_TEXT = " ";
     public static final String EMPTY_TEXT = "";
+    public static final String SPLASH_TEXT = "/";
     public static final int ZERO = 0;
     public static final boolean BOOL_DEFAULT = false;
     //endregion
@@ -793,7 +831,7 @@ public class Common {
         try {
             pinLoginEncrypted =
 //                    Common.encryptPassByTripleDsCbc(context, pass.trim(), publicKeyRSA, privateKeyRSA);
-            SecurityUtils.tripleDesc(context, pass.trim(), privateKeyRSA.trim(), publicKeyRSA.trim());
+                    SecurityUtils.tripleDesc(context, pass.trim(), privateKeyRSA.trim(), publicKeyRSA.trim());
 
         } catch (Exception e) {
             throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());

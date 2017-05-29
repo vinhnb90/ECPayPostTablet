@@ -299,6 +299,5 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return adapterList;
     }
 
-
     //endregion
 }

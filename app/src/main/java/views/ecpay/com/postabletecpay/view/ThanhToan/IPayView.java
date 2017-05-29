@@ -3,6 +3,7 @@ package views.ecpay.com.postabletecpay.view.ThanhToan;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
+import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.ICommonView;
 
 /**
@@ -10,7 +11,9 @@ import views.ecpay.com.postabletecpay.view.ICommonView;
  */
 
 public interface IPayView extends ICommonView {
-    void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList);
+    void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage);
 
     void showPayRecyclerOtherPage(int pageIndexNew);
+
+    void showPayRecyclerSearch(int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch);
 }
