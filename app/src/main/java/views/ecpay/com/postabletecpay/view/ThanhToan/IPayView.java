@@ -13,7 +13,5 @@ import views.ecpay.com.postabletecpay.view.ICommonView;
 public interface IPayView extends ICommonView {
     void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage);
 
-    void showPayRecyclerOtherPage(int pageIndexNew);
-
-    void showPayRecyclerSearch(int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch);
+    void showPayRecyclerOtherPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndexNew, int totalPage);
 }

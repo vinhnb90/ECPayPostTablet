@@ -1,106 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_row_thanh_toan_recycler"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="15dp"
-    android:orientation="vertical"
-    app:cardBackgroundColor="@color/colorCyan"
-    app:cardCornerRadius="2dp"
-    app:cardElevation="5dp">
+    android:background="@android:color/transparent"
+    android:gravity="center_vertical|center_horizontal"
+    android:orientation="vertical">
 
-
-    <LinearLayout
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:weightSum="5">
+        android:layout_margin="10dp"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="5dp">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="4"
-            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tv_row_pay_recycler_customer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:scrollHorizontally="true"
-                android:text="Công ty TNHH ABC"
-                android:textColor="@color/colorTextBlack"
-                android:textStyle="bold" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="5dp"
+                android:background="@color/colorCyan"
                 android:orientation="horizontal"
-                android:weightSum="3">
+                android:padding="10dp"
+                android:weightSum="5">
 
-                <TextView
-                    android:id="@+id/tv_row_pay_recycler_maKhachHang"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:scrollHorizontally="true"
-                    android:text="PD00011" />
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="4"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tv_row_pay_recycler_loTrinh"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:maxLines="1"
-                    android:scrollHorizontally="true"
-                    android:text="D04059" />
+                    <TextView
+                        android:id="@+id/tv_row_pay_recycler_customer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:scrollHorizontally="true"
+                        android:text="Công ty TNHH ABC"
+                        android:textColor="@color/colorTextBlack"
+                        android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/tv_row_pay_recycler_tongTien"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal"
+                        android:weightSum="3">
+
+                        <TextView
+                            android:id="@+id/tv_row_pay_recycler_maKhachHang"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:maxLines="1"
+                            android:scrollHorizontally="true"
+                            android:text="PD00011" />
+
+                        <TextView
+                            android:id="@+id/tv_row_pay_recycler_loTrinh"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:maxLines="1"
+                            android:scrollHorizontally="true"
+                            android:text="D04059" />
+
+                        <TextView
+                            android:id="@+id/tv_row_pay_recycler_tongTien"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="right"
+                            android:maxLines="1"
+                            android:scrollHorizontally="true"
+                            android:text="20.989.909"
+                            android:textColor="@color/colorRed"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_row_pay_recycler_diaChi"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:scrollHorizontally="true"
+                        android:text="Công ty TNHH ABC" />
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="right"
-                    android:maxLines="1"
-                    android:scrollHorizontally="true"
-                    android:text="20.989.909"
-                    android:textColor="@color/colorRed"
-                    android:textStyle="bold" />
+                    android:gravity="center_horizontal|center_vertical"
+                    android:padding="10dp">
+
+                    <Button
+                        android:id="@+id/btn_row_pay_recycler_trangThaiNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_button_orange"
+                        android:clickable="false"
+                        android:text="Còn nợ"
+                        android:textColor="@android:color/white" />
+                </LinearLayout>
+
+
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/tv_row_pay_recycler_diaChi"
+            <android.support.v7.widget.RecyclerView
+                android:visibility="gone"
+                android:id="@+id/rvHoaDon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:scrollHorizontally="true"
-                android:text="Công ty TNHH ABC" />
+                android:background="@null">
 
-        </LinearLayout>
+            </android.support.v7.widget.RecyclerView>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center_horizontal|center_vertical"
-            android:padding="10dp">
-
-            <Button
-                android:id="@+id/btn_row_pay_recycler_trangThaiNo"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/ll_row_thanhtoan_recycler_print"
+                android:visibility="gone"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_button_orange"
-                android:clickable="false"
-                android:text="Còn nợ"
-                android:textColor="@android:color/white" />
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center_horizontal">
+
+                <Button
+                    android:id="@+id/btn_row_thanhtoan_recycler_print"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp"
+                    android:text="In thông báo"
+                    android:textAllCaps="false"
+                    android:textSize="16sp">
+
+                </Button>
+            </LinearLayout>
         </LinearLayout>
+    </android.support.v7.widget.CardView>
 
 
-    </LinearLayout>
-</android.support.v7.widget.CardView>
+</LinearLayout>

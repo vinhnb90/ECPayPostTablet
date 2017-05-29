@@ -63,14 +63,79 @@
             android:background="@null"
             android:src="@mipmap/ic_barcode" />
 
+        <LinearLayout
+            android:id="@+id/ll_frag_thanh_toan_page"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/etSearch"
+            android:layout_marginBottom="5dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:weightSum="5">
 
+
+            <Button
+                android:id="@+id/btn_frag_thanh_toan_pre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_button_orange"
+                android:clickable="false"
+                android:text="@string/pre"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Trang"
+                android:textColor="@color/colorTextWhite"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_frag_thanh_toan_page"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="1/24"
+                android:textColor="@color/colorTextWhite"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_frag_thanh_toan_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_button_orange"
+                android:clickable="false"
+                android:text="@string/next"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
     </RelativeLayout>
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabs"
+        style="@style/MyCustomTabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rlTop"
+        android:background="@color/colorTab"
+        android:padding="6dp"
+        android:visibility="gone" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
     <RelativeLayout
         android:id="@+id/rlBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:paddingTop="10dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -152,76 +217,13 @@
 
     </RelativeLayout>
 
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tabs"
-        style="@style/MyCustomTabLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/rlTop"
-        android:background="@color/colorTab"
-        android:padding="6dp"
-        android:visibility="gone" />
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/view_pager"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
-
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/rvHoaDon"
+        android:background="@android:color/transparent"
+        android:id="@+id/rvKhachHang"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/rlTop"
-        android:layout_toRightOf="@+id/tabs"
-        android:layout_toEndOf="@+id/tabs"></android.support.v7.widget.RecyclerView>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/rvHoaDon"
-        android:layout_marginBottom="5dp"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:weightSum="5">
+        android:layout_above="@+id/rlBottom"
+        android:layout_below="@+id/tabs"></android.support.v7.widget.RecyclerView>
 
 
-        <Button
-            android:id="@+id/btn_frag_thanh_toan_pre"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_button_orange"
-            android:clickable="false"
-            android:text="@string/pre"
-            android:textColor="@android:color/white" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="Trang"
-            android:textColor="@color/colorTextWhite"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tv_frag_thanh_toan_page"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="1/24"
-            android:textColor="@color/colorTextWhite"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/btn_frag_thanh_toan_next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_button_orange"
-            android:clickable="false"
-            android:text="@string/next"
-            android:textColor="@android:color/white" />
-
-    </LinearLayout>
 </RelativeLayout>

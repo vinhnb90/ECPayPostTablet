@@ -7,7 +7,5 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
  */
 
 public interface IPayPresenter {
-        void callPayRecycler(String mEdong, int pageIndex);
         void callPayRecycler(String mEdong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch);
-
 }

@@ -299,5 +299,56 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return adapterList;
     }
 
+    public List<PayAdapter.PayEntityAdapter> selectAllBillBy(String edong, Common.TYPE_SEARCH typeSearch, String infoSearch) {
+
+        String query = null;
+        switch (typeSearch.getPosition()) {
+            case 1:
+                query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and customerPayCode ='" + infoSearch + "' or customerCode = '" + infoSearch + "'";
+                break;
+            case 2:
+                query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and name ='" + infoSearch + "'";
+                break;
+            case 3:
+                query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and phoneByevn ='" + infoSearch + "'";
+                break;
+            case 4:
+                query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and name ='" + infoSearch + "'";
+                break;
+            case 5:
+                query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and bookCmis ='" + infoSearch + "'";
+                break;
+            case 6:
+                query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and road ='" + infoSearch + "'";
+                break;
+        }
+
+
+        List<PayAdapter.PayEntityAdapter> adapterList = new ArrayList<>();
+        database = this.getReadableDatabase();
+
+        Cursor mCursor = database.rawQuery(query, null);
+
+        mCursor.moveToFirst();
+
+        while (mCursor.moveToNext()) {
+            String billID = mCursor.getString(mCursor.getColumnIndexOrThrow("billId"));
+            String tenKH = mCursor.getString(mCursor.getColumnIndexOrThrow("name"));
+            String maKH = mCursor.getString(mCursor.getColumnIndexOrThrow("code"));
+            String loTrinh = mCursor.getString(mCursor.getColumnIndexOrThrow("road"));
+            int tongTien = mCursor.getInt(mCursor.getColumnIndexOrThrow("amount"));
+            String diaChi = mCursor.getString(mCursor.getColumnIndexOrThrow("address"));
+            int trangThaiNo = mCursor.getInt(mCursor.getColumnIndexOrThrow("status"));
+
+            PayAdapter.PayEntityAdapter entityAdapter = new PayAdapter.PayEntityAdapter(billID, tenKH, diaChi, loTrinh, maKH, tongTien, trangThaiNo);
+            adapterList.add(entityAdapter);
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return adapterList;
+    }
+
     //endregion
 }

@@ -18,9 +18,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -45,7 +45,8 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     public static final int FIRST_PAGE_INDEX = 1;
     public static final int PAGE_INCREMENT = 1;
     public static final int ROWS_ON_PAGE = 10;
-
+    //    private int heightRecycler, heightTabLayout;
+//    private int widthRecycler, widthTabLayout;
     @BindView(R.id.ibtn_frag_user_info_back)
     ImageButton ibBack;
     @BindView(R.id.ibScaner)
@@ -60,8 +61,8 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     TextView tvTongTien;
     @BindView(R.id.btThanhToan)
     Button btThanhToan;
-    @BindView(R.id.rvHoaDon)
-    RecyclerView rvHoaDon;
+    @BindView(R.id.rvKhachHang)
+    RecyclerView rvKH;
     @BindView(R.id.tabs)
     TabLayout tabLayout;
     @BindView(R.id.view_pager)
@@ -72,6 +73,8 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     Button btnNext;
     @BindView(R.id.tv_frag_thanh_toan_page)
     TextView tvPage;
+    @BindView(R.id.ll_frag_thanh_toan_page)
+    LinearLayout llCountPage;
 
     private OnFragmentInteractionListener listener;
     private PayAdapter payAdapter;
@@ -112,21 +115,50 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
         mIPayPresenter = new PayPresenter(this);
         mEdong = getArguments().getString(KEY_EDONG, Common.EMPTY_TEXT);
 
-        setupPayRecyclerView();
+        setupPayRecyclerView(view);
         //first page
         typeSearch = Common.TYPE_SEARCH.ALL;
         mPageIndex = FIRST_PAGE_INDEX;
         mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
-
         return view;
     }
 
-    private void setupPayRecyclerView() {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+   /* private void showRecyclerView() {
+        //reset visible rvKH to call OnGlobalLayoutListener
+        rvKH.setVisibility(View.GONE);
+        rvKH.setVisibility(View.VISIBLE);
+
+        //get size real recyclerview
+        ViewTreeObserver vto = rvKH.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (rvKH.getViewTreeObserver().isAlive()) {
+                    ViewTreeObserver obs = rvKH.getViewTreeObserver();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        obs.removeOnGlobalLayoutListener(this);
+                    } else {
+                        obs.removeGlobalOnLayoutListener(this);
+                    }
+
+                    widthRecycler = (rvKH.getWidth() == 0) ? widthRecycler : rvKH.getWidth();
+                    heightRecycler = (rvKH.getWidth() == 0) ? widthRecycler : rvKH.getHeight();
+
+                    //first page
+                    typeSearch = Common.TYPE_SEARCH.ALL;
+                    mPageIndex = FIRST_PAGE_INDEX;
+                    mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
+                }
+            }
+        });
+    }*/
+
+    private void setupPayRecyclerView(final View view) {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        if (rvHoaDon != null)
-            rvHoaDon.setLayoutManager(linearLayoutManager);
+        if (rvKH != null)
+            rvKH.setLayoutManager(linearLayoutManager);
     }
 
     @Override
@@ -167,9 +199,7 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
             return;
 
         mPageIndex += PAGE_INCREMENT;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex);
-
-
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
     }
 
     @OnClick(R.id.btn_frag_thanh_toan_pre)
@@ -178,7 +208,7 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
             return;
 
         mPageIndex -= PAGE_INCREMENT;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex);
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
     }
     //endregion
 
@@ -208,11 +238,18 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
         } else {
             tabLayout.setVisibility(View.GONE);
         }
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
+        //get size real tablayout
+//        showRecyclerViewWidthTabLayout();
     }
 
     @OnTextChanged(R.id.etSearch)
     public void onTextChanged(CharSequence s, int start, int before, int count) {
+//        showRecyclerView();
+        //first page
+        mPageIndex = FIRST_PAGE_INDEX;
         mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
+
     }
 
     @OnTextChanged(R.id.etSearch)
@@ -223,6 +260,42 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     public void afterTextChanged(CharSequence sequence, int i, int j, int k) {
 
     }
+
+    /*@OnClick(R.id.etSearch)
+    public void doClick(View view) {
+        mPageIndex = FIRST_PAGE_INDEX;
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
+        //get size real tablayout
+//        showRecyclerViewWidthTabLayout();
+    }*/
+
+   /* private void showRecyclerViewWidthTabLayout() {
+        tabLayout.setVisibility(View.GONE);
+        tabLayout.setVisibility(View.VISIBLE);
+
+        ViewTreeObserver vto = tabLayout.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (tabLayout.getViewTreeObserver().isAlive()) {
+                    ViewTreeObserver obs = tabLayout.getViewTreeObserver();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        obs.removeOnGlobalLayoutListener(this);
+                    } else {
+                        obs.removeGlobalOnLayoutListener(this);
+                    }
+
+                    widthTabLayout = (tabLayout.getWidth() == 0) ? widthRecycler : tabLayout.getWidth();
+                    heightTabLayout = (tabLayout.getWidth() == 0) ? widthRecycler : tabLayout.getHeight();
+
+                    //first page
+                    typeSearch = Common.TYPE_SEARCH.ALL;
+                    mPageIndex = FIRST_PAGE_INDEX;
+                    mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
+                }
+            }
+        });
+    }*/
     //endregion
 
     private void showDialogThanhToan() {
@@ -264,27 +337,30 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
 
     @Override
     public void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage) {
-        if (payAdapter == null)
-            payAdapter = new PayAdapter(getContext(), adapterList);
-        else
-            payAdapter.refreshData(adapterList);
-
         btnPre.setEnabled(false);
         btnNext.setEnabled(true);
         tvPage.setText(String.valueOf(mPageIndex).concat(Common.SPLASH_TEXT).concat(String.valueOf(totalPage == 0 ? FIRST_PAGE_INDEX : totalPage)));
 
+//        setNewAdapterRecycler(adapterList);
+        payAdapter = new PayAdapter(getContext(), adapterList);
 
+        rvKH.setAdapter(payAdapter);
+        rvKH.invalidate();
     }
 
+    /*private void setNewAdapterRecycler(List<PayAdapter.PayEntityAdapter> adapterList) {
+        int widthRecyclerReal, heightRecyclerReal;
+
+        widthRecyclerReal = (tabLayout.getVisibility() == View.VISIBLE) ? (widthRecycler - widthTabLayout) : widthRecycler;
+        heightRecyclerReal = (tabLayout.getVisibility() == View.VISIBLE) ? (heightRecycler - heightTabLayout) : heightRecycler;
+        payAdapter = new PayAdapter(getContext(), adapterList, widthRecyclerReal, heightRecyclerReal);
+
+        rvKH.setAdapter(payAdapter);
+        rvKH.invalidate();
+    }*/
+
     @Override
-    public void showPayRecyclerOtherPage(int pageIndexNew) {
-        int totalPage = Math.round(mAdapterList.size() / ROWS_ON_PAGE);
-        if (totalPage * ROWS_ON_PAGE != mAdapterList.size())
-            totalPage++;
-
-        if (pageIndexNew < FIRST_PAGE_INDEX || pageIndexNew > totalPage)
-            return;
-
+    public void showPayRecyclerOtherPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndexNew, int totalPage) {
         btnPre.setEnabled(true);
         btnNext.setEnabled(true);
         tvPage.setText(String.valueOf(mPageIndex).concat(Common.SPLASH_TEXT).concat(String.valueOf(totalPage)));
@@ -294,30 +370,10 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
         if (pageIndexNew == totalPage)
             btnNext.setEnabled(false);
 
-        mPageIndex = pageIndexNew;
-
-        int index = ROWS_ON_PAGE * (mPageIndex - PAGE_INCREMENT);
-        int maxIndex = ROWS_ON_PAGE * mPageIndex;
-        List<PayAdapter.PayEntityAdapter> adapterList = new ArrayList<>();
-
-        for (; index < maxIndex; index++) {
-            adapterList.add(adapterList.get(index));
-        }
-
         payAdapter.refreshData(adapterList);
+        rvKH.invalidate();
     }
 
-    @Override
-    public void showPayRecyclerSearch(int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch) {
-        if (infoSearch == null)
-            return;
-        if (typeSearch == null)
-            return;
-
-        //fitter list
-        List<PayAdapter.PayEntityAdapter> fitterList = new ArrayList<>();
-
-    }
     //endregion
 
     public interface OnFragmentInteractionListener {
