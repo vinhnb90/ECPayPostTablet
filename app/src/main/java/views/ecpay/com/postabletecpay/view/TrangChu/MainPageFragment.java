@@ -190,7 +190,7 @@ public class MainPageFragment extends Fragment implements IMainPageView, View.On
             case R.id.btXoaDuLieu:
                 break;
             case R.id.btThanhToan:
-                fragment = PayFragment.newInstance();
+                fragment = PayFragment.newInstance(mEdong);
                 if (fragment != null) {
                     FragmentTransaction fragmentTransaction = MainPageFragment.this.getActivity().getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.frameLayout, fragment);

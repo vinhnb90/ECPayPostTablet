@@ -4,4 +4,6 @@
     <string name="title_pay">Thanh toán</string>
     <string name="title_report">Báo cáo</string>
     <string name="title_accout">Tài khoản</string>
+    <string name="pre"><![CDATA[<<]]></string>
+    <string name="next"><![CDATA[>>]]></string>
 </resources>

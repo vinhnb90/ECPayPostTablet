@@ -25,6 +25,10 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnFocusChange;
+import butterknife.OnPageChange;
+import butterknife.OnTextChanged;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
@@ -38,7 +42,7 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
  */
 
 public class PayFragment extends Fragment implements IPayView, View.OnClickListener {
-    public static final int FIRST_PAGE_INDEX = 0;
+    public static final int FIRST_PAGE_INDEX = 1;
     public static final int PAGE_INCREMENT = 1;
     public static final int ROWS_ON_PAGE = 10;
 
@@ -62,13 +66,19 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     TabLayout tabLayout;
     @BindView(R.id.view_pager)
     ViewPager viewPager;
+    @BindView(R.id.btn_frag_thanh_toan_pre)
+    Button btnPre;
+    @BindView(R.id.btn_frag_thanh_toan_next)
+    Button btnNext;
+    @BindView(R.id.tv_frag_thanh_toan_page)
+    TextView tvPage;
 
     private OnFragmentInteractionListener listener;
     private PayAdapter payAdapter;
-    private List<PayAdapter.PayEntityAdapter> mAdapterList = new ArrayList<>();
     private IPayPresenter mIPayPresenter;
     private String mEdong;
     private int mPageIndex;
+    private Common.TYPE_SEARCH typeSearch;
 
     public static PayFragment newInstance(String edong) {
         Bundle bundle = new Bundle();
@@ -99,31 +109,20 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
         viewPager.setAdapter(new TimKiemAdapter(getChildFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
 
-        etSearch.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    tabLayout.setVisibility(View.VISIBLE);
-                } else {
-                    tabLayout.setVisibility(View.GONE);
-                }
-            }
-        });
-
         mIPayPresenter = new PayPresenter(this);
         mEdong = getArguments().getString(KEY_EDONG, Common.EMPTY_TEXT);
 
         setupPayRecyclerView();
         //first page
+        typeSearch = Common.TYPE_SEARCH.ALL;
         mPageIndex = FIRST_PAGE_INDEX;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex);
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
 
         return view;
     }
 
-
     private void setupPayRecyclerView() {
-        LinearL DayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
         if (rvHoaDon != null)
@@ -146,6 +145,7 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
         listener = null;
     }
 
+    //region onClick
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -160,6 +160,70 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
                 break;
         }
     }
+
+    @OnClick(R.id.btn_frag_thanh_toan_next)
+    public void clickNext(View view) {
+        if (payAdapter == null)
+            return;
+
+        mPageIndex += PAGE_INCREMENT;
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex);
+
+
+    }
+
+    @OnClick(R.id.btn_frag_thanh_toan_pre)
+    public void clickPre(View view) {
+        if (payAdapter == null)
+            return;
+
+        mPageIndex -= PAGE_INCREMENT;
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex);
+    }
+    //endregion
+
+    //region listener viewpage
+    @OnPageChange(R.id.view_pager)
+    public void onPageSelected(int position) {
+        mPageIndex = FIRST_PAGE_INDEX;
+        Common.TYPE_SEARCH typeSearch = Common.TYPE_SEARCH.findCodeMessage(position);
+        String type = viewPager.getAdapter().getPageTitle(position).toString();
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString().trim());
+    }
+
+    @OnPageChange(R.id.view_pager)
+    public void onPageScrolled(int position) {
+    }
+
+    @OnPageChange(R.id.view_pager)
+    public void onPageScrollStateChanged(int position) {
+    }
+    //endregion
+
+    //region listener et search
+    @OnFocusChange(R.id.etSearch)
+    public void OnFocusChangeListener(boolean hasFocus) {
+        if (hasFocus) {
+            tabLayout.setVisibility(View.VISIBLE);
+        } else {
+            tabLayout.setVisibility(View.GONE);
+        }
+    }
+
+    @OnTextChanged(R.id.etSearch)
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
+    }
+
+    @OnTextChanged(R.id.etSearch)
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
+
+    @OnTextChanged(R.id.etSearch)
+    public void afterTextChanged(CharSequence sequence, int i, int j, int k) {
+
+    }
+    //endregion
 
     private void showDialogThanhToan() {
         final Dialog dialog = new Dialog(this.getActivity());
@@ -199,29 +263,60 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     }
 
     @Override
-    public void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList) {
-        if (adapterList == null)
-            return;
+    public void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage) {
+        if (payAdapter == null)
+            payAdapter = new PayAdapter(getContext(), adapterList);
+        else
+            payAdapter.refreshData(adapterList);
 
-        mAdapterList.clear();
-        mAdapterList.addAll(adapterList);
+        btnPre.setEnabled(false);
+        btnNext.setEnabled(true);
+        tvPage.setText(String.valueOf(mPageIndex).concat(Common.SPLASH_TEXT).concat(String.valueOf(totalPage == 0 ? FIRST_PAGE_INDEX : totalPage)));
 
-        //get ROWS_ON_PAGE first
-        mPageIndex = FIRST_PAGE_INDEX;
-
-        List<PayAdapter.PayEntityAdapter> adapterListFirstPage = new ArrayList<>();
-        int index = ROWS_ON_PAGE * mPageIndex;
-
-        for (; index < ROWS_ON_PAGE; index++) {
-            adapterListFirstPage.add(adapterList.get(index));
-        }
-        ((PayAdapter)adapterList).refreshData(adapterListFirstPage);
 
     }
 
     @Override
     public void showPayRecyclerOtherPage(int pageIndexNew) {
+        int totalPage = Math.round(mAdapterList.size() / ROWS_ON_PAGE);
+        if (totalPage * ROWS_ON_PAGE != mAdapterList.size())
+            totalPage++;
+
+        if (pageIndexNew < FIRST_PAGE_INDEX || pageIndexNew > totalPage)
+            return;
+
+        btnPre.setEnabled(true);
+        btnNext.setEnabled(true);
+        tvPage.setText(String.valueOf(mPageIndex).concat(Common.SPLASH_TEXT).concat(String.valueOf(totalPage)));
+
+        if (pageIndexNew < FIRST_PAGE_INDEX)
+            btnPre.setEnabled(false);
+        if (pageIndexNew == totalPage)
+            btnNext.setEnabled(false);
+
         mPageIndex = pageIndexNew;
+
+        int index = ROWS_ON_PAGE * (mPageIndex - PAGE_INCREMENT);
+        int maxIndex = ROWS_ON_PAGE * mPageIndex;
+        List<PayAdapter.PayEntityAdapter> adapterList = new ArrayList<>();
+
+        for (; index < maxIndex; index++) {
+            adapterList.add(adapterList.get(index));
+        }
+
+        payAdapter.refreshData(adapterList);
+    }
+
+    @Override
+    public void showPayRecyclerSearch(int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch) {
+        if (infoSearch == null)
+            return;
+        if (typeSearch == null)
+            return;
+
+        //fitter list
+        List<PayAdapter.PayEntityAdapter> fitterList = new ArrayList<>();
+
     }
     //endregion
 

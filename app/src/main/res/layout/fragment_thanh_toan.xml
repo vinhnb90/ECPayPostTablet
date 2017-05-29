@@ -1,67 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/rlTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorBlue"
-        android:layout_alignParentTop="true">
+        android:layout_alignParentTop="true"
+        android:background="@color/colorBlue">
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/bg_bill"
-            android:adjustViewBounds="true"/>
+            android:adjustViewBounds="true"
+            android:src="@drawable/bg_bill" />
 
         <ImageButton
             android:id="@+id/ibtn_frag_user_info_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/ic_back"
             android:layout_margin="5dp"
-            android:background="@null"/>
+            android:background="@null"
+            android:src="@mipmap/ic_back" />
 
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="DANH SÁCH HOÁ ĐƠN"
-            android:layout_margin="15dp"
             android:layout_centerHorizontal="true"
-            android:textSize="20sp"
-            android:textColor="@color/colorTextWhite"/>
+            android:layout_margin="15dp"
+            android:text="DANH SÁCH HOÁ ĐƠN"
+            android:textColor="@color/colorTextWhite"
+            android:textSize="20sp" />
 
         <EditText
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/tvTitle"
+            android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingRight="50dp"
-            android:paddingLeft="10dp"
-            android:layout_below="@+id/tvTitle"
+            android:background="@drawable/bg_edittext"
+            android:drawableLeft="@drawable/ic_search_black_24dp"
             android:hint="Mã KH/Số thẻ"
             android:imeOptions="actionSearch"
             android:inputType="textNoSuggestions|textVisiblePassword"
-            android:drawableLeft="@drawable/ic_search_black_24dp"
-            android:background="@drawable/bg_edittext"/>
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="50dp"
+            android:paddingTop="10dp" />
 
         <ImageButton
             android:id="@+id/ibScaner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/ic_barcode"
-            android:background="@null"
+            android:layout_alignBottom="@+id/etSearch"
             android:layout_alignRight="@+id/etSearch"
             android:layout_alignTop="@+id/etSearch"
-            android:layout_alignBottom="@+id/etSearch" />
-        
+            android:background="@null"
+            android:src="@mipmap/ic_barcode" />
+
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -73,28 +75,28 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_alignTop="@+id/tvTitleTongTien"
             android:layout_alignBottom="@+id/tvTongTien"
-            android:layout_toLeftOf="@+id/tvTongTien"
             android:layout_alignParentLeft="true"
-            android:gravity="center_horizontal">
+            android:layout_alignTop="@+id/tvTitleTongTien"
+            android:layout_toLeftOf="@+id/tvTongTien"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
                 android:text="Hoá đơn"
-                android:textSize="14sp"
-                android:layout_marginBottom="5dp"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvHoaDon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
                 android:text="2"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="5dp"/>
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -102,39 +104,39 @@
             android:id="@+id/tvTitleTongTien"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
+            android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="5dp"
-            android:layout_alignParentTop="true"
-            android:text="Tổng tiền"/>
+            android:text="Tổng tiền"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tvTongTien"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorRed"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_centerHorizontal="true"
             android:layout_below="@+id/tvTitleTongTien"
-            android:text="400.000 đ"/>
+            android:layout_centerHorizontal="true"
+            android:text="400.000 đ"
+            android:textColor="@color/colorRed"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_alignTop="@+id/tvTitleTongTien"
             android:layout_alignBottom="@+id/tvTongTien"
-            android:layout_toRightOf="@+id/tvTongTien"
             android:layout_alignParentRight="true"
-            android:gravity="center">
+            android:layout_alignTop="@+id/tvTitleTongTien"
+            android:layout_toRightOf="@+id/tvTongTien"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <ImageButton
                 android:id="@+id/ibAdd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/ic_them"
-                android:background="@null"/>
+                android:background="@null"
+                android:src="@mipmap/ic_them" />
 
         </LinearLayout>
 
@@ -142,36 +144,84 @@
             android:id="@+id/btThanhToan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_button"
-            android:layout_margin="10dp"
-            android:text="THANH TOÁN"
             android:layout_below="@+id/tvTongTien"
-            android:textColor="@color/colorTextWhite"/>
+            android:layout_margin="10dp"
+            android:background="@drawable/bg_button"
+            android:text="THANH TOÁN"
+            android:textColor="@color/colorTextWhite" />
 
     </RelativeLayout>
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tabs"
-        android:padding="6dp"
+        style="@style/MyCustomTabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/MyCustomTabLayout"
-        android:visibility="gone"
+        android:layout_below="@+id/rlTop"
         android:background="@color/colorTab"
-        android:layout_below="@+id/rlTop" />
+        android:padding="6dp"
+        android:visibility="gone" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/view_pager"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvHoaDon"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/tabs"
-        android:layout_above="@+id/rlBottom">
+        android:layout_below="@+id/rlTop"
+        android:layout_toRightOf="@+id/tabs"
+        android:layout_toEndOf="@+id/tabs"></android.support.v7.widget.RecyclerView>
 
-    </android.support.v7.widget.RecyclerView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/rvHoaDon"
+        android:layout_marginBottom="5dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:weightSum="5">
+
+
+        <Button
+            android:id="@+id/btn_frag_thanh_toan_pre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_button_orange"
+            android:clickable="false"
+            android:text="@string/pre"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:text="Trang"
+            android:textColor="@color/colorTextWhite"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_frag_thanh_toan_page"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:text="1/24"
+            android:textColor="@color/colorTextWhite"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_frag_thanh_toan_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_button_orange"
+            android:clickable="false"
+            android:text="@string/next"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
 </RelativeLayout>
