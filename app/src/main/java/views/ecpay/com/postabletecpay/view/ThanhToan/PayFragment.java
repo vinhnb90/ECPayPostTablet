@@ -121,15 +121,9 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
         return view;
     }
 
-    private void fillDataRecyclerView() {
-        if (payAdapter == null) {
-            mAdapterList = mIPayMolder
-            payAdapter = new PayAdapter(getContext(), )
-        }
-    }
 
     private void setupPayRecyclerView() {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        LinearL DayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
         if (rvHoaDon != null)
