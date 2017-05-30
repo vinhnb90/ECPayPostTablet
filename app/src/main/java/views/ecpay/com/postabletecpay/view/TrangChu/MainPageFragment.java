@@ -34,7 +34,7 @@ import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
-import static views.ecpay.com.postabletecpay.util.commons.Common.EMPTY_TEXT;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_EMPTY;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;
 
@@ -94,7 +94,7 @@ public class MainPageFragment extends Fragment implements IMainPageView, View.On
         View view = inflater.inflate(R.layout.fragment_trang_chu, container, false);
         ButterKnife.bind(this, view);
 
-        mEdong = getArguments().getString(KEY_EDONG, Common.EMPTY_TEXT);
+        mEdong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
 
 
 
@@ -227,7 +227,7 @@ public class MainPageFragment extends Fragment implements IMainPageView, View.On
     @Override
     public void showMainPageInfo(String userName, long balance, int totalBills, int totalMoney) {
         if(userName == null)
-            userName = EMPTY_TEXT;
+            userName = TEXT_EMPTY;
 
         tvUsername.setText(userName);
         tvSoDuKhaDung.setText(String.valueOf(balance));

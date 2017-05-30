@@ -14,12 +14,10 @@ public class MainPageModel extends CommonModel {
 
     //region call SQLite
     public int getTotalBill(String edong) {
-        sqLiteConnection.getReadableDatabase();
         return sqLiteConnection.countBill(edong);
     }
 
     public int getTotalMoney(String edong) {
-        sqLiteConnection.getReadableDatabase();
         return sqLiteConnection.countMoneyAllBill(edong);
     }
     //endregion

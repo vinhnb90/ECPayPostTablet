@@ -35,33 +35,50 @@
             android:textColor="@color/colorTextWhite"
             android:textSize="20sp" />
 
+        <ImageButton
+            android:id="@+id/ibScaner"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/tvTitle"
+            android:background="@drawable/bg_edittext"
+            android:src="@mipmap/ic_barcode" />
+
         <EditText
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignBaseline="@+id/ibScaner"
+            android:layout_alignParentLeft="true"
             android:layout_below="@+id/tvTitle"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:layout_marginTop="2dp"
+            android:layout_toLeftOf="@+id/ibScaner"
             android:background="@drawable/bg_edittext"
             android:drawableLeft="@drawable/ic_search_black_24dp"
-            android:hint="Mã KH/Số thẻ"
             android:imeOptions="actionSearch"
             android:inputType="textNoSuggestions|textVisiblePassword"
             android:paddingBottom="10dp"
             android:paddingLeft="10dp"
             android:paddingRight="50dp"
-            android:paddingTop="10dp" />
+            android:paddingTop="10dp"
+            android:text="" />
 
         <ImageButton
-            android:id="@+id/ibScaner"
+            android:id="@+id/ibSearch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/etSearch"
             android:layout_alignRight="@+id/etSearch"
             android:layout_alignTop="@+id/etSearch"
+            android:layout_below="@+id/tvTitle"
+            android:layout_toLeftOf="@+id/ibScaner"
             android:background="@null"
-            android:src="@mipmap/ic_barcode" />
+            android:padding="10dp"
+            android:src="@drawable/ic_cancel" />
+
 
         <LinearLayout
             android:id="@+id/ll_frag_thanh_toan_page"
@@ -112,6 +129,8 @@
                 android:textColor="@android:color/white" />
 
         </LinearLayout>
+
+
     </RelativeLayout>
 
     <android.support.design.widget.TabLayout
@@ -218,12 +237,12 @@
     </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:background="@android:color/transparent"
         android:id="@+id/rvKhachHang"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/rlBottom"
-        android:layout_below="@+id/tabs"></android.support.v7.widget.RecyclerView>
+        android:layout_below="@+id/tabs"
+        android:background="@android:color/transparent"></android.support.v7.widget.RecyclerView>
 
 
 </RelativeLayout>

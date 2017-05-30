@@ -11,10 +11,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.http.Field;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_CONFIG;
@@ -44,7 +44,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     private String CREATE_TABLE_CUSTOMER = "CREATE TABLE `" + TABLE_NAME_CUSTOMER + "` ( `code` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `address` TEXT, `pcCode` TEXT, `pcCodeExt` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `bookCmis` TEXT, `electricityMeter` TEXT, `inning` TEXT, `status` TEXT, `bankAccount` TEXT, `idNumber` TEXT, `bankName` TEXT )";
 
-    private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `customerCode` TEXT, `customerPayCode` TEXT, `billId` TEXT NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, `strIssueDate` TEXT, `status` INTEGER, `seri` TEXT, `pcCode` TEXT, `handoverCode` TEXT, `cashierCode` TEXT, `bookCmis` TEXT, `fromDate` TEXT, `toDate` TEXT, `strFromDate` TEXT, `strToDate` TEXT, `home` TEXT, `tax` REAL, `billNum` TEXT, `currency` TEXT, `priceDetails` TEXT, `numeDetails` TEXT, `amountDetails` TEXT, `oldIndex` TEXT, `newIndex` TEXT, `nume` TEXT, `amountNotTax` INTEGER, `amountTax` INTEGER, `multiple` TEXT, `billType` TEXT, `typeIndex` TEXT, `groupTypeIndex` TEXT, `createdDate` TEXT, `idChanged` INTEGER, `dateChanged` TEXT, `edong` TEXT, `pcCodeExt` TEXT, `code` TEXT, `name` TEXT, `nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, `taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, `billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT )";
+    private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `customerCode` TEXT, `customerPayCode` TEXT, `billId` INTEGER NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, `strIssueDate` TEXT, `status` INTEGER, `seri` TEXT, `pcCode` TEXT, `handoverCode` TEXT, `cashierCode` TEXT, `bookCmis` TEXT, `fromDate` TEXT, `toDate` TEXT, `strFromDate` TEXT, `strToDate` TEXT, `home` TEXT, `tax` REAL, `billNum` TEXT, `currency` TEXT, `priceDetails` TEXT, `numeDetails` TEXT, `amountDetails` TEXT, `oldIndex` TEXT, `newIndex` TEXT, `nume` TEXT, `amountNotTax` INTEGER, `amountTax` INTEGER, `multiple` TEXT, `billType` TEXT, `typeIndex` TEXT, `groupTypeIndex` TEXT, `createdDate` TEXT, `idChanged` INTEGER, `dateChanged` TEXT, `edong` TEXT, `pcCodeExt` TEXT, `code` TEXT, `name` TEXT, `nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, `taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, `billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT )";
 
     private String CREATE_TABLE_LICH_SU_TTOAN = "CREATE TABLE " + TABLE_NAME_LICH_SU_TTOAN + "(ID INTEGER AUTOINCREMENT, " +
             "SERI_HDON INTEGER, " + "MA_KHANG TEXT, " + "MA_THE TEXT, " + "TEN_KHANG TEXT, " + "DIA_CHI TEXT, " + "THANG_TTOAN DATE, " +
@@ -252,13 +252,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return count;
     }
 
-    public int countMoneyAllBill(String edong) {
+    public long countMoneyAllBillOfCustomer(String edong, String customerCode) {
         if (edong == null)
             return 0;
 
         database = this.getReadableDatabase();
-
-        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "'";
+        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and customerCode ='" + customerCode + "'";
         Cursor mCursor = database.rawQuery(query, null);
         int count = mCursor.getCount();
 
@@ -268,38 +267,38 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return count;
     }
 
-    public List<PayAdapter.PayEntityAdapter> selectAllBill(String edong) throws SQLiteException {
-        if (edong == null)
-            return null;
+    /* public List<PayAdapter.PayEntityAdapter> selectAllBill(String edong) throws SQLiteException {
+         if (edong == null)
+             return null;
 
-        List<PayAdapter.PayEntityAdapter> adapterList = new ArrayList<>();
+         List<PayAdapter.PayEntityAdapter> adapterList = new ArrayList<>();
 
-        database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "'";
-        Cursor mCursor = database.rawQuery(query, null);
+         database = this.getReadableDatabase();
+         String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "'";
+         Cursor mCursor = database.rawQuery(query, null);
 
-        mCursor.moveToFirst();
+         mCursor.moveToFirst();
 
-        while (mCursor.moveToNext()) {
-            String billID = mCursor.getString(mCursor.getColumnIndexOrThrow("billId"));
-            String tenKH = mCursor.getString(mCursor.getColumnIndexOrThrow("name"));
-            String maKH = mCursor.getString(mCursor.getColumnIndexOrThrow("code"));
-            String loTrinh = mCursor.getString(mCursor.getColumnIndexOrThrow("road"));
-            int tongTien = mCursor.getInt(mCursor.getColumnIndexOrThrow("amount"));
-            String diaChi = mCursor.getString(mCursor.getColumnIndexOrThrow("address"));
-            int trangThaiNo = mCursor.getInt(mCursor.getColumnIndexOrThrow("status"));
+         while (mCursor.moveToNext()) {
+             String billID = mCursor.getString(mCursor.getColumnIndexOrThrow("billId"));
+             String tenKH = mCursor.getString(mCursor.getColumnIndexOrThrow("name"));
+             String maKH = mCursor.getString(mCursor.getColumnIndexOrThrow("code"));
+             String loTrinh = mCursor.getString(mCursor.getColumnIndexOrThrow("road"));
+             int tongTien = mCursor.getInt(mCursor.getColumnIndexOrThrow("amount"));
+             String diaChi = mCursor.getString(mCursor.getColumnIndexOrThrow("address"));
+             int trangThaiNo = mCursor.getInt(mCursor.getColumnIndexOrThrow("status"));
 
-            PayAdapter.PayEntityAdapter entityAdapter = new PayAdapter.PayEntityAdapter(billID, tenKH, diaChi, loTrinh, maKH, tongTien, trangThaiNo);
-            adapterList.add(entityAdapter);
-        }
+             PayAdapter.PayEntityAdapter entityAdapter = new PayAdapter.PayEntityAdapter(billID, tenKH, diaChi, loTrinh, maKH, tongTien, trangThaiNo);
+             adapterList.add(entityAdapter);
+         }
 
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
-        return adapterList;
-    }
-
-    public List<PayAdapter.PayEntityAdapter> selectAllBillBy(String edong, Common.TYPE_SEARCH typeSearch, String infoSearch) {
+         if (mCursor != null && !mCursor.isClosed()) {
+             mCursor.close();
+         }
+         return adapterList;
+     }
+ */
+    /*public List<PayAdapter.PayEntityAdapter> selectAllBillBy(String edong, Common.TYPE_SEARCH typeSearch, String infoSearch) {
 
         String query = null;
         switch (typeSearch.getPosition()) {
@@ -326,9 +325,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         List<PayAdapter.PayEntityAdapter> adapterList = new ArrayList<>();
         database = this.getReadableDatabase();
-
         Cursor mCursor = database.rawQuery(query, null);
-
         mCursor.moveToFirst();
 
         while (mCursor.moveToNext()) {
@@ -348,6 +345,146 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             mCursor.close();
         }
         return adapterList;
+    }
+*/
+    public List<Customer> selectAllCustomer(String edong) {
+        return null;
+    }
+
+    public String selectRoadFirstInBill(String edong, String code) {
+        String query = "SELECT TOP 1 FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and customerCode ='" + code + "' and road is not null and road <> ''";
+        String road = "";
+        database = this.getReadableDatabase();
+        Cursor mCursor = database.rawQuery(query, null);
+        mCursor.moveToFirst();
+        while (mCursor.moveToNext()) {
+            road = mCursor.getString(mCursor.getColumnIndex("road"));
+        }
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return road;
+    }
+
+    public boolean checkStatusPayedOfCustormer(String edong, String code) {
+        String query = "SELECT status FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and customerCode ='" + code + "' and status = 0";
+        boolean isPayed = false;
+        database = this.getReadableDatabase();
+        Cursor mCursor = database.rawQuery(query, null);
+        isPayed = (mCursor.getCount() == 0) ? false : true;
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return isPayed;
+    }
+
+    public List<Customer> selectAllCustomerFitterBy(String edong, Common.TYPE_SEARCH typeSearch, String infoSearch) {
+        String query = null;
+        switch (typeSearch.getPosition()) {
+            case 1:
+                query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and customerPayCode ='" + infoSearch + "' or customerCode = '" + infoSearch + "'";
+                break;
+            case 2:
+                query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and name ='" + infoSearch + "'";
+                break;
+            case 3:
+                query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and phoneByevn ='" + infoSearch + "'";
+                break;
+            case 4:
+                query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and name ='" + infoSearch + "'";
+                break;
+            case 5:
+                query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and bookCmis ='" + infoSearch + "'";
+                break;
+            case 6:
+                query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and road ='" + infoSearch + "'";
+                break;
+        }
+
+        List<Customer> customerList = new ArrayList<>();
+        database = this.getReadableDatabase();
+        Cursor mCursor = database.rawQuery(query, null);
+        mCursor.moveToFirst();
+
+        while (mCursor.moveToNext()) {
+            String code = mCursor.getString(mCursor.getColumnIndexOrThrow("code"));
+            String name = mCursor.getString(mCursor.getColumnIndexOrThrow("name"));
+            String address = mCursor.getString(mCursor.getColumnIndexOrThrow("address"));
+            String pcCode = mCursor.getString(mCursor.getColumnIndexOrThrow("pcCode"));
+            String pcCodeExt = mCursor.getString(mCursor.getColumnIndexOrThrow("pcCodeExt"));
+            String phoneByevn = mCursor.getString(mCursor.getColumnIndexOrThrow("phoneByevn"));
+            String phoneByecp = mCursor.getString(mCursor.getColumnIndexOrThrow("phoneByecp"));
+            String bookCmis = mCursor.getString(mCursor.getColumnIndexOrThrow("bookCmis"));
+            String electricityMeter = mCursor.getString(mCursor.getColumnIndexOrThrow("electricityMeter"));
+            String inning = mCursor.getString(mCursor.getColumnIndexOrThrow("inning"));
+            String status = mCursor.getString(mCursor.getColumnIndexOrThrow("status"));
+            String bankAccount = mCursor.getString(mCursor.getColumnIndexOrThrow("bankAccount"));
+            String idNumber = mCursor.getString(mCursor.getColumnIndexOrThrow("idNumber"));
+            String bankName = mCursor.getString(mCursor.getColumnIndexOrThrow("bankName"));
+
+            Customer customer = new Customer(code, name, address, pcCode, pcCodeExt, phoneByevn, phoneByecp, bookCmis, electricityMeter, inning, status, bankAccount, idNumber, bankName);
+            customerList.add(customer);
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return customerList;
+    }
+
+    public List<PayAdapter.BillEntityAdapter> selectInfoBillOfCustomer(String edong, String code) {
+        List<PayAdapter.BillEntityAdapter> billList = new ArrayList<>();
+
+        database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "' and customerCode ='" + code + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+
+        mCursor.moveToFirst();
+        while (mCursor.moveToNext()) {
+            String customerPayCode = mCursor.getString(mCursor.getColumnIndexOrThrow("customerPayCode"));
+            int billId = mCursor.getInt(mCursor.getColumnIndexOrThrow("billId"));
+            String term = mCursor.getString(mCursor.getColumnIndexOrThrow("term"));
+            int amount = mCursor.getInt(mCursor.getColumnIndexOrThrow("amount"));
+            int status = mCursor.getInt(mCursor.getColumnIndexOrThrow("status"));
+            String billingBy = mCursor.getString(mCursor.getColumnIndexOrThrow("billingBy"));
+
+            PayAdapter.BillEntityAdapter bill = new PayAdapter.BillEntityAdapter();
+            bill.setBillId(billId);
+            bill.setBillingBy(billingBy);
+            bill.setCustomerPayCode(customerPayCode);
+
+            bill.setMoneyBill(amount);
+            bill.setMonthBill(term);
+            bill.setPayed(status == 0 ? false : true);
+            bill.setChecked(!bill.isPayed());
+            if (billingBy.equals(edong) || bill.isPayed())
+                bill.setPrint(true);
+            else bill.setPrint(false);
+
+            billList.add(bill);
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return billList;
+    }
+
+    public int countMoneyAllBill(String edong) {
+        database = this.getReadableDatabase();
+        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+        int totalMoney = -1;
+        if (mCursor.moveToFirst())
+            totalMoney = mCursor.getInt(0);
+        else
+            totalMoney = -1;
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return totalMoney;
     }
 
     //endregion

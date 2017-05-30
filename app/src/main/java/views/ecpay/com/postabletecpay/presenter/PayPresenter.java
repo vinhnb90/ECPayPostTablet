@@ -5,13 +5,11 @@ import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
-import views.ecpay.com.postabletecpay.model.adapter.PayAdapter.PayEntityAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.FIRST_PAGE_INDEX;
-import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.PAGE_INCREMENT;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.ROWS_ON_PAGE;
 
 /**
@@ -31,7 +29,7 @@ public class PayPresenter implements IPayPresenter {
     }
 
     @Override
-    public void callPayRecycler(String mEdong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch) {
+    public void callPayRecycler(String mEdong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch, boolean isSeachOnline) {
         if (mEdong == null)
             return;
         if (infoSearch == null)
@@ -42,16 +40,22 @@ public class PayPresenter implements IPayPresenter {
         if (typeSearch == Common.TYPE_SEARCH.ALL) {
             callPayRecyclerAll(mEdong, pageIndex);
         } else {
-            callPayRecyclerSearch(mEdong, pageIndex, typeSearch, infoSearch);
+            callPayRecyclerSearch(mEdong, pageIndex, typeSearch, infoSearch, isSeachOnline);
         }
     }
 
-    private void callPayRecyclerSearch(String mEdong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch) {
+    @Override
+    public boolean checkUserNeedSearchOnline(String infoSearch) {
+        if ((infoSearch.length() == Common.LENGTH_MIN && String.valueOf(infoSearch.charAt(Common.ZERO)).equalsIgnoreCase(Common.SYMBOL_FIRST)) || infoSearch.length() == Common.LENGTH_MAX) {
+            return true;
+        }
+        return false;
+    }
 
+    private void callPayRecyclerSearch(String mEdong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch, boolean isSeachOnline) {
         if (pageIndex == PayFragment.FIRST_PAGE_INDEX) {
             mAdapterList.clear();
-            mAdapterList = mPayModel.getAllBillFitterBy(mEdong, typeSearch, infoSearch);
-
+            mAdapterList = mPayModel.getInforRowCustomerFitterBy(mEdong, typeSearch, infoSearch);
             totalPage = mAdapterList.size() / ROWS_ON_PAGE;
             if (totalPage * ROWS_ON_PAGE != mAdapterList.size() || (totalPage == 0))
                 totalPage++;
@@ -65,7 +69,7 @@ public class PayPresenter implements IPayPresenter {
             for (; index < maxIndex; index++)
                 fitter.add(mAdapterList.get(index));
 
-            mIPayView.showPayRecyclerFirstPage(fitter, pageIndex, totalPage);
+            mIPayView.showPayRecyclerFirstPage(fitter, pageIndex, totalPage, isSeachOnline);
         } else {
             if (pageIndex > totalPage)
                 return;
@@ -80,15 +84,14 @@ public class PayPresenter implements IPayPresenter {
                 adapterListSearch.add(mAdapterList.get(index));
             }
 
-            mIPayView.showPayRecyclerOtherPage(adapterListSearch, pageIndex, totalPage);
+            mIPayView.showPayRecyclerOtherPage(adapterListSearch, pageIndex, totalPage, isSeachOnline);
         }
     }
 
     private void callPayRecyclerAll(String mEdong, int pageIndex) {
         if (pageIndex == PayFragment.FIRST_PAGE_INDEX) {
             mAdapterList.clear();
-            mAdapterList = mPayModel.getAllBill(mEdong);
-
+            mAdapterList = mPayModel.getInforRowCustomer(mEdong);
             totalPage = mAdapterList.size() / ROWS_ON_PAGE;
             if (totalPage * ROWS_ON_PAGE != mAdapterList.size() || (totalPage == 0))
                 totalPage++;
@@ -102,7 +105,7 @@ public class PayPresenter implements IPayPresenter {
             for (; index < maxIndex; index++)
                 fitter.add(mAdapterList.get(index));
 
-            mIPayView.showPayRecyclerFirstPage(fitter, pageIndex, totalPage);
+            mIPayView.showPayRecyclerFirstPage(fitter, pageIndex, totalPage, false);
         } else {
             if (pageIndex > totalPage)
                 return;
@@ -118,7 +121,7 @@ public class PayPresenter implements IPayPresenter {
                 adapterListSearch.add(mAdapterList.get(index));
             }
 
-            mIPayView.showPayRecyclerOtherPage(adapterListSearch, pageIndex, totalPage);
+            mIPayView.showPayRecyclerOtherPage(adapterListSearch, pageIndex, totalPage, false);
         }
     }
 }

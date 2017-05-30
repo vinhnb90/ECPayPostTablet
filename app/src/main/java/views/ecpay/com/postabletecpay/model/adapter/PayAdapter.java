@@ -21,7 +21,9 @@ import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import views.ecpay.com.postabletecpay.R;
+import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
 
 import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.PayEntityAdapter.TT_CON_NO;
 import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.PayEntityAdapter.TT_HET_NO;
@@ -32,30 +34,22 @@ import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.PayEntityA
 
 public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     private static Context sContext;
-    private List<PayEntityAdapter> mAdapterList = new ArrayList<>();
-
-    final int sdk = android.os.Build.VERSION.SDK_INT;
+    private static IPayView sIPayView;
+    private PayModel payModel;
+    private static List<PayEntityAdapter> mAdapterList = new ArrayList<>();
     @BindDrawable(R.drawable.bg_button_orange)
     Drawable green;
     @BindDrawable(R.drawable.bg_button)
     Drawable violet;
-    @BindView(R.id.rvHoaDon)
-    RecyclerView rvBill;
     @BindView(R.id.btn_row_thanhtoan_recycler_print)
     Button btnPrintBill;
 
-//    private int width, height;
+    public PayAdapter(Context sContext, IPayView sIPayView, List<PayEntityAdapter> mAdapterList) {
+        this.sContext = sContext;
+        this.sIPayView = sIPayView;
+        this.mAdapterList = mAdapterList;
 
-    /*public PayAdapter(Context sContext, List<PayEntityAdapter> mAdapterList, int width, int height) {
-        this.sContext = sContext;
-        this.mAdapterList = mAdapterList;
-        this.height = height;
-        this.width = width;
-    }
-*/
-    public PayAdapter(Context sContext, List<PayEntityAdapter> mAdapterList) {
-        this.sContext = sContext;
-        this.mAdapterList = mAdapterList;
+        payModel = new PayModel(sIPayView.getContextView());
     }
 
     @Override
@@ -67,26 +61,40 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(PayViewHolder holder, int position) {
+    public void onBindViewHolder(final PayViewHolder holder, final int position) {
         PayEntityAdapter entityAdapter = mAdapterList.get(position);
+        String code = entityAdapter.getMaKH();
+        String edong = entityAdapter.getEdong();
+        boolean isConNo = entityAdapter.isConNo();
 
         holder.tvTenKH.setText(entityAdapter.getTenKH());
         holder.tvDiaChi.setText(entityAdapter.getDiaChi());
         holder.tvLoTrinh.setText(entityAdapter.getLoTrinh());
-        holder.tvMaKH.setText(entityAdapter.getMaKH());
         holder.tvTongTien.setText(entityAdapter.getTongTien() + "");
-
-        boolean isNo = (entityAdapter.getTrangThaiNo() == 0) ? true : false;
-
-        holder.btnTrangThaiNo.setText(isNo ? TT_CON_NO : TT_HET_NO);
-
+        holder.tvMaKH.setText(code);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            holder.btnTrangThaiNo.setBackground(isNo ? green : violet);
+            holder.btnTrangThaiNo.setBackground(isConNo ? green : violet);
         } else {
-            holder.btnTrangThaiNo.setBackgroundDrawable(isNo ? green : violet);
+            holder.btnTrangThaiNo.setBackgroundDrawable(isConNo ? green : violet);
         }
-
         Common.runAnimationClickViewScale(holder.cardView, R.anim.twinking_view, Common.TIME_DELAY_ANIM);
+
+        List<PayAdapter.BillEntityAdapter> listBill = new ArrayList<>();
+        listBill = payModel.getAllBillOfCustomer(edong, code);
+        holder.insideTodayAdapter.setBillList(listBill);
+
+        boolean isShowBill = mAdapterList.get(position).isShowBill();
+        holder.rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
+
+        holder.getItemView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isShowBill = mAdapterList.get(position).isShowBill();
+
+                mAdapterList.get(position).setShowBill(isShowBill = !isShowBill);
+                holder.rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     @Override
@@ -118,17 +126,28 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         Button btnTrangThaiNo;
         @BindView(R.id.card_row_thanh_toan_recycler)
         LinearLayout cardView;
-//        CardView cardView;
-
-        private BillInsidePayAdapter insideTodayAdapter;
+        @BindView(R.id.rvHoaDon)
+        RecyclerView rvBill;
+        //        CardView cardView;
+        public View itemView;
 
         public PayViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            this.itemView = itemView;
+
+            insideTodayAdapter = new BillInsidePayAdapter();
             rvBill.setLayoutManager(new LinearLayoutManager(sContext, LinearLayoutManager.VERTICAL, false));
+            rvBill.setAdapter(insideTodayAdapter);
+
             //set 10 rows and a page
 //            cardView.getLayoutParams().height = (int) (height / PayFragment.ROWS_ON_PAGE);
+        }
 
+        private BillInsidePayAdapter insideTodayAdapter;
+
+        public View getItemView() {
+            return itemView;
         }
     }
 
@@ -136,131 +155,205 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         public final static String TT_HET_NO = "Hết nợ";
         public final static String TT_CON_NO = "Còn nợ";
 
-        private String billID;
+        private String edong;
         private String tenKH;
         private String diaChi;
         private String loTrinh;
         private String maKH;
         private long tongTien;
-        private int trangThaiNo;
+        private boolean isConNo;
 
-        public PayEntityAdapter(String billID, String tenKH, String diaChi, String loTrinh, String maKH, long tongTien, int trangThaiNo) {
-            this.billID = billID;
+        //param extension
+        private boolean isShowBill;
+
+        public PayEntityAdapter() {
+        }
+
+
+        public PayEntityAdapter(String edong, String tenKH, String diaChi, String loTrinh, String maKH, long tongTien, boolean isConNo, boolean isShowBill) {
+            this.edong = edong;
             this.tenKH = tenKH;
             this.diaChi = diaChi;
             this.loTrinh = loTrinh;
             this.maKH = maKH;
             this.tongTien = tongTien;
-            this.trangThaiNo = trangThaiNo;
+            this.isConNo = isConNo;
+            this.isShowBill = isShowBill;
         }
 
-        public static String getTtHetNo() {
-            return TT_HET_NO;
-        }
-
-        public static String getTtConNo() {
-            return TT_CON_NO;
-        }
-
-        public String getBillID() {
-            return billID;
-        }
-
-        public void setBillID(String billID) {
-            this.billID = billID;
+        public String getEdong() {
+            return edong;
         }
 
         public String getTenKH() {
             return tenKH;
         }
 
-        public void setTenKH(String tenKH) {
-            this.tenKH = tenKH;
-        }
-
         public String getDiaChi() {
             return diaChi;
-        }
-
-        public void setDiaChi(String diaChi) {
-            this.diaChi = diaChi;
         }
 
         public String getLoTrinh() {
             return loTrinh;
         }
 
-        public void setLoTrinh(String loTrinh) {
-            this.loTrinh = loTrinh;
-        }
-
         public String getMaKH() {
             return maKH;
-        }
-
-        public void setMaKH(String maKH) {
-            this.maKH = maKH;
         }
 
         public long getTongTien() {
             return tongTien;
         }
 
+        public boolean isConNo() {
+            return isConNo;
+        }
+
+        public void setConNo(boolean conNo) {
+            this.isConNo = conNo;
+        }
+
+        public void setEdong(String edong) {
+            this.edong = edong;
+        }
+
+        public void setTenKH(String tenKH) {
+            this.tenKH = tenKH;
+        }
+
+        public void setDiaChi(String diaChi) {
+            this.diaChi = diaChi;
+        }
+
+        public void setLoTrinh(String loTrinh) {
+            this.loTrinh = loTrinh;
+        }
+
+        public void setMaKH(String maKH) {
+            this.maKH = maKH;
+        }
+
         public void setTongTien(long tongTien) {
             this.tongTien = tongTien;
         }
 
-        public int getTrangThaiNo() {
-            return trangThaiNo;
+
+        public boolean isShowBill() {
+            return isShowBill;
         }
 
-        public void setTrangThaiNo(int trangThaiNo) {
-            this.trangThaiNo = trangThaiNo;
+        public void setShowBill(boolean showBill) {
+            isShowBill = showBill;
         }
     }
 
     public static class BillEntityAdapter {
+
         private String monthBill;
         private double moneyBill;
         private boolean isPrint;
-        private boolean isPay;
+        private boolean isPayed;
+        private boolean isChecked;
 
-        public BillEntityAdapter(String monthBill, double moneyBill, boolean isPrint, boolean isPay) {
+        //info extension
+        private int billId;
+        private String customerPayCode;
+        private String billingBy;
+
+        public BillEntityAdapter(String monthBill, double moneyBill, boolean isPrint, boolean isPayed, boolean isChecked, int billId, String customerPayCode, String billingBy) {
             this.monthBill = monthBill;
             this.moneyBill = moneyBill;
             this.isPrint = isPrint;
-            this.isPay = isPay;
+            this.isPayed = isPayed;
+            this.isChecked = isChecked;
+            this.billId = billId;
+            this.customerPayCode = customerPayCode;
+            this.billingBy = billingBy;
+        }
+
+        public BillEntityAdapter() {
         }
 
         public String getMonthBill() {
             return monthBill;
         }
 
+        public void setMonthBill(String monthBill) {
+            this.monthBill = monthBill;
+        }
+
         public double getMoneyBill() {
             return moneyBill;
+        }
+
+        public void setMoneyBill(double moneyBill) {
+            this.moneyBill = moneyBill;
         }
 
         public boolean isPrint() {
             return isPrint;
         }
 
-        public boolean isPay() {
-            return isPay;
+        public void setPrint(boolean print) {
+            isPrint = print;
+        }
+
+        public boolean isPayed() {
+            return isPayed;
+        }
+
+        public void setPayed(boolean payed) {
+            isPayed = payed;
+        }
+
+        public boolean isChecked() {
+            return isChecked;
+        }
+
+        public void setChecked(boolean checked) {
+            isChecked = checked;
+        }
+
+        public int getBillId() {
+            return billId;
+        }
+
+        public void setBillId(int billId) {
+            this.billId = billId;
+        }
+
+        public String getCustomerPayCode() {
+            return customerPayCode;
+        }
+
+        public void setCustomerPayCode(String customerPayCode) {
+            this.customerPayCode = customerPayCode;
+        }
+
+        public String getBillingBy() {
+            return billingBy;
+        }
+
+        public void setBillingBy(String billingBy) {
+            this.billingBy = billingBy;
         }
     }
 
-    public static class BillInsidePayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public static class BillInsidePayAdapter extends RecyclerView.Adapter<BillInsidePayAdapter.BillInsidePayViewHolder> {
+        public static final String IS_PAY = "Đã thanh toán";
+        public static final String NOT_PAY_YET = "Chưa thanh toán";
+
         private List<BillEntityAdapter> billList;
 
-        public BillInsidePayAdapter(List<BillEntityAdapter> billList) {
-            if (billList == null)
-                return;
-            this.billList = new ArrayList<>();
-            this.billList.addAll(billList);
+        public BillInsidePayAdapter() {
+        }
+
+        public void setBillList(List<BillEntityAdapter> billList) {
+            this.billList = billList;
         }
 
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public BillInsidePayAdapter.BillInsidePayViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View v1 = inflater.inflate(R.layout.row_bill_inside_pay, parent, false);
             BillInsidePayViewHolder viewHolder = new BillInsidePayViewHolder(v1);
@@ -268,8 +361,14 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
+        public void onBindViewHolder(BillInsidePayAdapter.BillInsidePayViewHolder holder, int position) {
+            BillEntityAdapter entity = billList.get(position);
+            holder.cb.setChecked(entity.isChecked());
+            holder.tvDate.setText(entity.getMonthBill());
+            holder.tvMoneyBill.setText(String.valueOf(entity.getMoneyBill()));
+            holder.tvStatusBill.setText(entity.isPayed ? IS_PAY : NOT_PAY_YET);
+            holder.ibtnPrintInside.setVisibility(entity.isPrint ? View.VISIBLE : View.INVISIBLE);
+            holder.ibtnDelete.setVisibility(entity.isPayed ? View.VISIBLE : View.INVISIBLE);
         }
 
         @Override
@@ -294,6 +393,31 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
             public BillInsidePayViewHolder(View itemView) {
                 super(itemView);
+                ButterKnife.bind(this, itemView);
+            }
+
+            public CheckBox getCb() {
+                return cb;
+            }
+
+            public TextView getTvDate() {
+                return tvDate;
+            }
+
+            public TextView getTvMoneyBill() {
+                return tvMoneyBill;
+            }
+
+            public TextView getTvStatusBill() {
+                return tvStatusBill;
+            }
+
+            public ImageButton getIbtnPrintInside() {
+                return ibtnPrintInside;
+            }
+
+            public ImageButton getIbtnDelete() {
+                return ibtnDelete;
             }
         }
     }

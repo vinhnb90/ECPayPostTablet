@@ -28,7 +28,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import views.ecpay.com.postabletecpay.R;
 
-import static views.ecpay.com.postabletecpay.util.commons.Common.SPACE_TEXT;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_SPACE;
 
 
 /**
@@ -104,7 +104,7 @@ public class SecurityUtils {
         //check pass: if pass length < 8 insert space
         password = password.trim();
         while (password.length() < 8) {
-            password = SPACE_TEXT + password;
+            password = TEXT_SPACE + password;
         }
 
         try {

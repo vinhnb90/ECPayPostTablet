@@ -85,7 +85,7 @@ public class UserInfoFragment extends Fragment implements IUserInfoView {
         View view = inflater.inflate(R.layout.fragment_tai_khoan, container, false);
         ButterKnife.bind(this, view);
 
-        mEdong = getArguments().getString(KEY_EDONG, Common.EMPTY_TEXT);
+        mEdong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
         iUserInfoPresenter.getInfoUser(mEdong);
         return view;
     }

@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -29,7 +28,6 @@ import android.util.Xml;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -40,7 +38,6 @@ import org.ecpay.client.Partner;
 import org.ecpay.client.Utils;
 import org.ecpay.client.jce.Crypto;
 import org.ecpay.client.jce.TripleDesCBC;
-import org.ecpay.client.rsa.RSA;
 import org.ecpay.client.test.SecurityUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -53,7 +50,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -68,8 +64,6 @@ import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.AlgorithmRSA.AsymmetricCryptography;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
-
-import org.ecpay.client.rsa.UtilsRSA;
 
 /**
  * Created by macbook on 5/5/17.
@@ -113,6 +107,11 @@ public class Common {
     //endregion
 
     //region param search
+    //condification search online
+    public static final int LENGTH_MIN = 13;
+    public static final String SYMBOL_FIRST = "P";
+    public static final int LENGTH_MAX = 16;
+
     public static enum TYPE_SEARCH {
         ALL(0, "Tất cả"),
         MA_KH_SO_THE(1, "Mã KH/Số thẻ"),
@@ -138,7 +137,7 @@ public class Common {
             return type;
         }
 
-        public static TYPE_SEARCH findCodeMessage(int position) {
+        public static TYPE_SEARCH findMessage(int position) {
             for (TYPE_SEARCH v : values()) {
                 if (v.getPosition() == position) {
                     return v;
@@ -146,6 +145,16 @@ public class Common {
             }
             return null;
         }
+
+        public static TYPE_SEARCH findCode(String message) {
+            for (TYPE_SEARCH v : values()) {
+                if (v.getType().equals(message)) {
+                    return v;
+                }
+            }
+            return null;
+        }
+
     }
     //endregion
 
@@ -349,9 +358,11 @@ public class Common {
     }
 
     //define symbol
-    public static final String SPACE_TEXT = " ";
-    public static final String EMPTY_TEXT = "";
-    public static final String SPLASH_TEXT = "/";
+    public static final String TEXT_SPACE = " ";
+    public static final String TEXT_EMPTY = "";
+    public static final String TEXT_SLASH = "/";
+    public static final String TEXT_MULTI_SPACE = TEXT_SPACE.concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE);
+    public static final String TEXT_SEARCHING = "Searching online....";
     public static final int ZERO = 0;
     public static final boolean BOOL_DEFAULT = false;
     //endregion
@@ -727,7 +738,7 @@ public class Common {
         //check pass: if pass length < 8 insert space
         pass = pass.trim();
         while (pass.length() < 8) {
-            pass = SPACE_TEXT + pass;
+            pass = TEXT_SPACE + pass;
         }
 
         //Create partner with code is null because login not request partner code

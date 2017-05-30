@@ -1,5 +1,7 @@
 package views.ecpay.com.postabletecpay.presenter;
 
+import android.support.v7.widget.RecyclerView;
+
 import views.ecpay.com.postabletecpay.util.commons.Common;
 
 /**
@@ -7,5 +9,7 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
  */
 
 public interface IPayPresenter {
-        void callPayRecycler(String mEdong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch);
+    void callPayRecycler(String mEdong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch, boolean isSeachOnline);
+
+    boolean checkUserNeedSearchOnline(String infoSearch);
 }

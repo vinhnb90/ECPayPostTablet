@@ -101,7 +101,6 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_thanh_toan, container, false);
-
         ButterKnife.bind(this, view);
 
         ibBack.setOnClickListener(this);
@@ -113,45 +112,15 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
         tabLayout.setupWithViewPager(viewPager);
 
         mIPayPresenter = new PayPresenter(this);
-        mEdong = getArguments().getString(KEY_EDONG, Common.EMPTY_TEXT);
+        mEdong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
 
         setupPayRecyclerView(view);
         //first page
         typeSearch = Common.TYPE_SEARCH.ALL;
         mPageIndex = FIRST_PAGE_INDEX;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
         return view;
     }
-
-   /* private void showRecyclerView() {
-        //reset visible rvKH to call OnGlobalLayoutListener
-        rvKH.setVisibility(View.GONE);
-        rvKH.setVisibility(View.VISIBLE);
-
-        //get size real recyclerview
-        ViewTreeObserver vto = rvKH.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (rvKH.getViewTreeObserver().isAlive()) {
-                    ViewTreeObserver obs = rvKH.getViewTreeObserver();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        obs.removeOnGlobalLayoutListener(this);
-                    } else {
-                        obs.removeGlobalOnLayoutListener(this);
-                    }
-
-                    widthRecycler = (rvKH.getWidth() == 0) ? widthRecycler : rvKH.getWidth();
-                    heightRecycler = (rvKH.getWidth() == 0) ? widthRecycler : rvKH.getHeight();
-
-                    //first page
-                    typeSearch = Common.TYPE_SEARCH.ALL;
-                    mPageIndex = FIRST_PAGE_INDEX;
-                    mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
-                }
-            }
-        });
-    }*/
 
     private void setupPayRecyclerView(final View view) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false);
@@ -199,7 +168,7 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
             return;
 
         mPageIndex += PAGE_INCREMENT;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
     }
 
     @OnClick(R.id.btn_frag_thanh_toan_pre)
@@ -208,7 +177,7 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
             return;
 
         mPageIndex -= PAGE_INCREMENT;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
     }
     //endregion
 
@@ -216,9 +185,11 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     @OnPageChange(R.id.view_pager)
     public void onPageSelected(int position) {
         mPageIndex = FIRST_PAGE_INDEX;
-        Common.TYPE_SEARCH typeSearch = Common.TYPE_SEARCH.findCodeMessage(position);
-        String type = viewPager.getAdapter().getPageTitle(position).toString();
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString().trim());
+        Common.TYPE_SEARCH typeSearch = Common.TYPE_SEARCH.findMessage(position);
+        boolean isSeachOnline = mIPayPresenter.checkUserNeedSearchOnline(etSearch.getText().toString());
+        if (isSeachOnline)
+            return;
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString().trim(), false);
     }
 
     @OnPageChange(R.id.view_pager)
@@ -238,27 +209,33 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
         } else {
             tabLayout.setVisibility(View.GONE);
         }
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
-        //get size real tablayout
-//        showRecyclerViewWidthTabLayout();
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
     }
 
     @OnTextChanged(R.id.etSearch)
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-//        showRecyclerView();
         //first page
         mPageIndex = FIRST_PAGE_INDEX;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
+        boolean isSeachOnline = mIPayPresenter.checkUserNeedSearchOnline(etSearch.getText().toString());
 
-    }
+        if (isSeachOnline) {
+            typeSearch = Common.TYPE_SEARCH.MA_KH_SO_THE;
+            mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), isSeachOnline);
+            this.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    viewPager.setCurrentItem(typeSearch.getPosition());
+                    tabLayout.setupWithViewPager(viewPager);
+                }
+            });
 
-    @OnTextChanged(R.id.etSearch)
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-    }
-
-    @OnTextChanged(R.id.etSearch)
-    public void afterTextChanged(CharSequence sequence, int i, int j, int k) {
-
+            etSearch.post(new Runnable() {
+                @Override
+                public void run() {
+                    etSearch.setHint(etSearch.getText().toString().concat(Common.TEXT_MULTI_SPACE).concat(Common.TEXT_SEARCHING));
+                }
+            });
+        }
     }
 
     /*@OnClick(R.id.etSearch)
@@ -269,33 +246,6 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
 //        showRecyclerViewWidthTabLayout();
     }*/
 
-   /* private void showRecyclerViewWidthTabLayout() {
-        tabLayout.setVisibility(View.GONE);
-        tabLayout.setVisibility(View.VISIBLE);
-
-        ViewTreeObserver vto = tabLayout.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (tabLayout.getViewTreeObserver().isAlive()) {
-                    ViewTreeObserver obs = tabLayout.getViewTreeObserver();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        obs.removeOnGlobalLayoutListener(this);
-                    } else {
-                        obs.removeGlobalOnLayoutListener(this);
-                    }
-
-                    widthTabLayout = (tabLayout.getWidth() == 0) ? widthRecycler : tabLayout.getWidth();
-                    heightTabLayout = (tabLayout.getWidth() == 0) ? widthRecycler : tabLayout.getHeight();
-
-                    //first page
-                    typeSearch = Common.TYPE_SEARCH.ALL;
-                    mPageIndex = FIRST_PAGE_INDEX;
-                    mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
-                }
-            }
-        });
-    }*/
     //endregion
 
     private void showDialogThanhToan() {
@@ -336,13 +286,13 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     }
 
     @Override
-    public void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage) {
+    public void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage, boolean isSeachOnline) {
         btnPre.setEnabled(false);
         btnNext.setEnabled(true);
-        tvPage.setText(String.valueOf(mPageIndex).concat(Common.SPLASH_TEXT).concat(String.valueOf(totalPage == 0 ? FIRST_PAGE_INDEX : totalPage)));
+        tvPage.setText(String.valueOf(mPageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage == 0 ? FIRST_PAGE_INDEX : totalPage)));
 
 //        setNewAdapterRecycler(adapterList);
-        payAdapter = new PayAdapter(getContext(), adapterList);
+        payAdapter = new PayAdapter(getContext(), this, adapterList);
 
         rvKH.setAdapter(payAdapter);
         rvKH.invalidate();
@@ -360,10 +310,10 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     }*/
 
     @Override
-    public void showPayRecyclerOtherPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndexNew, int totalPage) {
+    public void showPayRecyclerOtherPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndexNew, int totalPage, boolean isSeachOnline) {
         btnPre.setEnabled(true);
         btnNext.setEnabled(true);
-        tvPage.setText(String.valueOf(mPageIndex).concat(Common.SPLASH_TEXT).concat(String.valueOf(totalPage)));
+        tvPage.setText(String.valueOf(mPageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
 
         if (pageIndexNew < FIRST_PAGE_INDEX)
             btnPre.setEnabled(false);
@@ -373,7 +323,6 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
         payAdapter.refreshData(adapterList);
         rvKH.invalidate();
     }
-
     //endregion
 
     public interface OnFragmentInteractionListener {

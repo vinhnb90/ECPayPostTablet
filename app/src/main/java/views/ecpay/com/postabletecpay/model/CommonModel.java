@@ -4,6 +4,7 @@ import android.content.Context;
 
 import views.ecpay.com.postabletecpay.model.sharedPreference.ICommonSharedReference;
 import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
+import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 
@@ -34,4 +35,6 @@ public abstract class CommonModel implements ICommonSharedReference {
         Account account = sqLiteConnection.selectAccount(edong);
         return account;
     }
+
+
 }
