@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -8,19 +8,20 @@
         android:id="@+id/rlTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="@color/colorBlue">
+        android:layout_alignParentTop="true">
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:src="@drawable/bg_bill" />
+            android:layout_alignBottom="@+id/rv_frag_thanhtoan_search_online"
+            android:background="@drawable/bg_bill" />
 
         <ImageButton
             android:id="@+id/ibtn_frag_user_info_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
             android:layout_margin="5dp"
             android:background="@null"
             android:src="@mipmap/ic_back" />
@@ -29,68 +30,71 @@
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/ibtn_frag_user_info_back"
             android:layout_centerHorizontal="true"
             android:layout_margin="15dp"
             android:text="DANH SÁCH HOÁ ĐƠN"
             android:textColor="@color/colorTextWhite"
             android:textSize="20sp" />
 
-        <ImageButton
-            android:id="@+id/ibScaner"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/tvTitle"
-            android:background="@drawable/bg_edittext"
-            android:src="@mipmap/ic_barcode" />
-
-        <EditText
-            android:id="@+id/etSearch"
+        <RelativeLayout
+            android:id="@+id/rvSearch"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_alignBaseline="@+id/ibScaner"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/tvTitle"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="2dp"
-            android:layout_toLeftOf="@+id/ibScaner"
-            android:background="@drawable/bg_edittext"
-            android:drawableLeft="@drawable/ic_search_black_24dp"
-            android:imeOptions="actionSearch"
-            android:inputType="textNoSuggestions|textVisiblePassword"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="50dp"
-            android:paddingTop="10dp"
-            android:text="" />
-
-        <ImageButton
-            android:id="@+id/ibSearch"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/etSearch"
-            android:layout_alignRight="@+id/etSearch"
-            android:layout_alignTop="@+id/etSearch"
-            android:layout_below="@+id/tvTitle"
-            android:layout_toLeftOf="@+id/ibScaner"
-            android:background="@null"
-            android:padding="10dp"
-            android:src="@drawable/ic_cancel" />
+            android:layout_below="@+id/tvTitle">
 
+            <ImageButton
+                android:id="@+id/ibScaner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/bg_edittext"
+                android:src="@mipmap/ic_barcode" />
+
+            <EditText
+                android:id="@+id/etSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/ibScaner"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toLeftOf="@+id/ibScaner"
+                android:background="@drawable/bg_edittext"
+                android:drawableLeft="@drawable/ic_search_black_24dp"
+                android:imeOptions="actionSearch"
+                android:inputType="textNoSuggestions|textVisiblePassword"
+                android:paddingBottom="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="50dp"
+                android:paddingTop="10dp"
+                android:text="" />
+
+            <ImageButton
+                android:id="@+id/ibSearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/etSearch"
+                android:layout_alignRight="@+id/etSearch"
+                android:layout_alignTop="@+id/etSearch"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/ibScaner"
+                android:background="@null"
+                android:padding="10dp"
+                android:src="@drawable/ic_cancel" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/ll_frag_thanh_toan_page"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/etSearch"
-            android:layout_marginBottom="5dp"
+            android:layout_below="@+id/rvSearch"
             android:gravity="center_horizontal"
             android:orientation="horizontal"
             android:weightSum="5">
-
-
             <Button
                 android:id="@+id/btn_frag_thanh_toan_pre"
                 android:layout_width="wrap_content"
@@ -130,6 +134,96 @@
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:id="@+id/rv_frag_thanhtoan_search_online"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ll_frag_thanh_toan_page"
+            android:padding="5dp">
+
+            <RelativeLayout
+                android:id="@+id/rv_frag_thanhtoan_search_online_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/tv_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:text="Search Online..."
+                    android:textColor="@color/colorTextWhite" />
+
+                <LinearLayout
+                    android:id="@+id/ll_frag_thanh_toan_action_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/ibtn_frag_thanhtoan_action_cancel_search_online"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/bg_circle_gray"
+                        android:src="@drawable/ic_cancel_white"
+                        android:visibility="gone" />
+
+                    <ImageButton
+                        android:id="@+id/ibtn_frag_thanhtoan_action_research_online"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/bg_circle_green"
+                        android:src="@drawable/ic_refresh"
+                        android:visibility="visible" />
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/pbar_frag_thanhtoan_search_online"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/ll_frag_thanh_toan_action_search"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@+id/ll_frag_thanh_toan_action_search"
+                    android:layout_toRightOf="@+id/tv_search"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/colorTextWhite"
+                    android:indeterminateTintMode="src_atop"
+                    android:visibility="gone" />
+
+
+                <TextView
+                    android:id="@+id/tv_frag_thanh_toan_search_online_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/ll_frag_thanh_toan_action_search"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@+id/ll_frag_thanh_toan_action_search"
+                    android:layout_toRightOf="@+id/tv_search"
+                    android:gravity="right"
+
+                    android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:text="Disconnect"
+                    android:textColor="@color/colorTextWhite"
+                    android:visibility="visible" />
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
 
     </RelativeLayout>
 
@@ -150,99 +244,105 @@
         android:visibility="gone" />
 
     <RelativeLayout
-        android:id="@+id/rlBottom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:paddingTop="10dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvKhachHang"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/rlTop"
+            android:layout_toEndOf="@+id/tabs"
+            android:layout_toRightOf="@+id/tabs"
+            android:background="@android:color/transparent"></android.support.v7.widget.RecyclerView>
+
+        <RelativeLayout
+            android:id="@+id/rlBottom"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/tvTongTien"
-            android:layout_alignParentLeft="true"
-            android:layout_alignTop="@+id/tvTitleTongTien"
-            android:layout_toLeftOf="@+id/tvTongTien"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:layout_alignParentBottom="true"
+            android:paddingTop="10dp">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/tvTongTien"
+                android:layout_alignParentLeft="true"
+                android:layout_alignTop="@+id/tvTitleTongTien"
+                android:layout_toLeftOf="@+id/tvTongTien"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="Hoá đơn"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvHoaDon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="2"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvTitleTongTien"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
                 android:layout_marginBottom="5dp"
-                android:text="Hoá đơn"
+                android:text="Tổng tiền"
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/tvHoaDon"
+                android:id="@+id/tvTongTien"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:text="2"
+                android:layout_below="@+id/tvTitleTongTien"
+                android:layout_centerHorizontal="true"
+                android:text="400.000 đ"
+                android:textColor="@color/colorRed"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tvTitleTongTien"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="5dp"
-            android:text="Tổng tiền"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/tvTongTien"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvTitleTongTien"
-            android:layout_centerHorizontal="true"
-            android:text="400.000 đ"
-            android:textColor="@color/colorRed"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/tvTongTien"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/tvTitleTongTien"
-            android:layout_toRightOf="@+id/tvTongTien"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageButton
-                android:id="@+id/ibAdd"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@null"
-                android:src="@mipmap/ic_them" />
+                android:layout_alignBottom="@+id/tvTongTien"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@+id/tvTitleTongTien"
+                android:layout_toRightOf="@+id/tvTongTien"
+                android:gravity="center"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <ImageButton
+                    android:id="@+id/ibAdd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:src="@mipmap/ic_them" />
 
-        <Button
-            android:id="@+id/btThanhToan"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvTongTien"
-            android:layout_margin="10dp"
-            android:background="@drawable/bg_button"
-            android:text="THANH TOÁN"
-            android:textColor="@color/colorTextWhite" />
+            </LinearLayout>
 
+            <Button
+                android:id="@+id/btThanhToan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvTongTien"
+                android:layout_margin="10dp"
+                android:background="@drawable/bg_button"
+                android:text="THANH TOÁN"
+                android:textColor="@color/colorTextWhite" />
+
+        </RelativeLayout>
     </RelativeLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rvKhachHang"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/rlBottom"
-        android:layout_below="@+id/tabs"
-        android:background="@android:color/transparent"></android.support.v7.widget.RecyclerView>
-
-
-</RelativeLayout>
+</LinearLayout>

@@ -13,6 +13,9 @@ import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
@@ -31,6 +34,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     private static String databaseName = "PosTablet.s3db";
     private static int DATABASE_VERSION = 1;
+    public static int ERROR_OCCUR = -1;
 
     private String TABLE_NAME_ACCOUNT = "TBL_ACCOUNT";
     private String TABLE_NAME_EVN_PC = "TBL_EVN_PC";
@@ -142,7 +146,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         database = getWritableDatabase();
         int id = (int) database.insertWithOnConflict(TABLE_NAME_ACCOUNT, null, initialValues, SQLiteDatabase.CONFLICT_IGNORE);
-        if (id == -1) {
+        if (id == ERROR_OCCUR) {
             database.update(TABLE_NAME_ACCOUNT, initialValues, "edong=?", new String[]{account.getEdong()});  // number 1 is the _id here, update to variable for your code
         }
     }
@@ -475,16 +479,112 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         database = this.getReadableDatabase();
         String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edong = '" + edong + "'";
         Cursor mCursor = database.rawQuery(query, null);
-        int totalMoney = -1;
+        int totalMoney = ERROR_OCCUR;
         if (mCursor.moveToFirst())
             totalMoney = mCursor.getInt(0);
         else
-            totalMoney = -1;
+            totalMoney = ERROR_OCCUR;
 
         if (mCursor != null && !mCursor.isClosed()) {
             mCursor.close();
         }
         return totalMoney;
+    }
+
+    public int insertNotUpdateCustomer(CustomerResponse customerResponse) {
+        if (customerResponse == null)
+            return ERROR_OCCUR;
+        CustomerInsideBody customer = customerResponse.getCustomer();
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("code", customer.getCode());
+        initialValues.put("name", customer.getName());
+        initialValues.put("address", customer.getAddress());
+        initialValues.put("pcCode", customer.getPcCode());
+        initialValues.put("pcCodeExt", customer.getPcCodeExt());
+        initialValues.put("phoneByevn", customer.getPhoneByevn());
+        initialValues.put("phoneByecp", customer.getPhoneByecp());
+        initialValues.put("bookCmis", customer.getBookCmis());
+        initialValues.put("electricityMeter", customer.getElectricityMeter());
+        initialValues.put("inning", customer.getInning());
+        initialValues.put("status", customer.getStatus());
+        initialValues.put("bankAccount", customer.getBankAccount());
+        initialValues.put("idNumber", customer.getIdNumber());
+        initialValues.put("bankName", customer.getBankName());
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.insert(TABLE_NAME_CUSTOMER, null, initialValues);
+        return rowAffect;
+    }
+
+    public int insertNotUpdateBillOfCustomer(BillInsideCustomer billInsideCustomer) {
+        if (billInsideCustomer == null)
+            return SQLiteConnection.ERROR_OCCUR;
+
+        ContentValues initialValues = new ContentValues();
+        initialValues.put("customerCode", billInsideCustomer.getCustomerCode());
+        initialValues.put("customerPayCode", billInsideCustomer.getCustomerCode());
+        initialValues.put("billId", billInsideCustomer.getCustomerCode());
+        initialValues.put("term", billInsideCustomer.getCustomerCode());
+        initialValues.put("amount", billInsideCustomer.getCustomerCode());
+        initialValues.put("period", billInsideCustomer.getCustomerCode());
+        initialValues.put("issueDate", billInsideCustomer.getCustomerCode());
+        initialValues.put("strIssueDate", billInsideCustomer.getCustomerCode());
+        initialValues.put("status", billInsideCustomer.getCustomerCode());
+        initialValues.put("seri", billInsideCustomer.getCustomerCode());
+        initialValues.put("pcCode", billInsideCustomer.getCustomerCode());
+        initialValues.put("handoverCode", billInsideCustomer.getCustomerCode());
+        initialValues.put("cashierCode", billInsideCustomer.getCustomerCode());
+        initialValues.put("bookCmis", billInsideCustomer.getCustomerCode());
+        initialValues.put("fromDate", billInsideCustomer.getCustomerCode());
+        initialValues.put("toDate", billInsideCustomer.getCustomerCode());
+        initialValues.put("strFromDate", billInsideCustomer.getCustomerCode());
+        initialValues.put("strToDate", billInsideCustomer.getCustomerCode());
+        initialValues.put("home", billInsideCustomer.getCustomerCode());
+        initialValues.put("tax", billInsideCustomer.getCustomerCode());
+        initialValues.put("billNum", billInsideCustomer.getCustomerCode());
+        initialValues.put("currency", billInsideCustomer.getCustomerCode());
+        initialValues.put("priceDetails", billInsideCustomer.getCustomerCode());
+        initialValues.put("numeDetails", billInsideCustomer.getCustomerCode());
+        initialValues.put("amountDetails", billInsideCustomer.getCustomerCode());
+        initialValues.put("oldIndex", billInsideCustomer.getCustomerCode());
+        initialValues.put("newIndex", billInsideCustomer.getCustomerCode());
+        initialValues.put("nume", billInsideCustomer.getCustomerCode());
+        initialValues.put("amountNotTax", billInsideCustomer.getCustomerCode());
+        initialValues.put("amountTax", billInsideCustomer.getCustomerCode());
+        initialValues.put("multiple", billInsideCustomer.getCustomerCode());
+        initialValues.put("billType", billInsideCustomer.getCustomerCode());
+        initialValues.put("typeIndex", billInsideCustomer.getCustomerCode());
+        initialValues.put("groupTypeIndex", billInsideCustomer.getCustomerCode());
+        initialValues.put("createdDate", billInsideCustomer.getCustomerCode());
+        initialValues.put("idChanged", billInsideCustomer.getCustomerCode());
+        initialValues.put("dateChanged", billInsideCustomer.getCustomerCode());
+        initialValues.put("edong", billInsideCustomer.getCustomerCode());
+        initialValues.put("pcCodeExt", billInsideCustomer.getCustomerCode());
+        initialValues.put("code", billInsideCustomer.getCustomerCode());
+        initialValues.put("name", billInsideCustomer.getCustomerCode());
+        initialValues.put("nameNosign", billInsideCustomer.getCustomerCode());
+        initialValues.put("phoneByevn", billInsideCustomer.getCustomerCode());
+        initialValues.put("phoneByecp", billInsideCustomer.getCustomerCode());
+        initialValues.put("electricityMeter", billInsideCustomer.getCustomerCode());
+        initialValues.put("inning", billInsideCustomer.getCustomerCode());
+        initialValues.put("road", billInsideCustomer.getCustomerCode());
+        initialValues.put("station", billInsideCustomer.getCustomerCode());
+        initialValues.put("taxCode", billInsideCustomer.getCustomerCode());
+        initialValues.put("trade", billInsideCustomer.getCustomerCode());
+        initialValues.put("countPeriod", billInsideCustomer.getCustomerCode());
+        initialValues.put("team", billInsideCustomer.getCustomerCode());
+        initialValues.put("type", billInsideCustomer.getCustomerCode());
+        initialValues.put("lastQuery", billInsideCustomer.getCustomerCode());
+        initialValues.put("groupType", billInsideCustomer.getCustomerCode());
+        initialValues.put("billingChannel", billInsideCustomer.getCustomerCode());
+        initialValues.put("billingType", billInsideCustomer.getCustomerCode());
+        initialValues.put("billingBy", billInsideCustomer.getCustomerCode());
+        initialValues.put("cashierPay", billInsideCustomer.getCustomerCode());
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
+        return rowAffect;
     }
 
     //endregion

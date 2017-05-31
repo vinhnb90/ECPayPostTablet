@@ -10,6 +10,5 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
 
 public interface IPayPresenter {
     void callPayRecycler(String mEdong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch, boolean isSeachOnline);
-
-    boolean checkUserNeedSearchOnline(String infoSearch);
+    void callSearchOnline(String mEdong, String infoSearch);
 }

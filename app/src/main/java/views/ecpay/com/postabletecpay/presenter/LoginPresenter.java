@@ -10,6 +10,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import org.ecpay.client.test.SecurityUtils;
+
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -55,7 +57,6 @@ public class LoginPresenter implements ILoginPresenter {
         Context context = mILoginView.getContextView();
         Boolean isErr = false;
 
-        mILoginView.hidePbarLogin();
         if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.LENGTH_USER_NAME) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_USER.toString();
             isErr = true;
@@ -91,12 +92,20 @@ public class LoginPresenter implements ILoginPresenter {
         }
 
         try {
-            configInfo = Common.setupInfoRequest(context, userName, pass, Common.COMMAND_ID.LOGIN.toString(), versionApp);
+            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.LOGIN.toString(), versionApp);
         } catch (Exception e) {
             mILoginView.showTextMessage(e.getMessage());
             return;
         }
 
+        //encrypt pinLogin by Triple DES CBC
+        String pinLoginEncrypted;
+        try {
+            pinLoginEncrypted = SecurityUtils.tripleDesc(context, pass.trim(), configInfo.getPRIVATE_KEY().trim(), configInfo.getPUBLIC_KEY().trim());
+        } catch (Exception e) {
+            mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+            return;
+        }
 
         //create request to server
         String jsonRequestLogin = SoapAPI.getJsonRequestLogin(
@@ -107,7 +116,7 @@ public class LoginPresenter implements ILoginPresenter {
                 configInfo.getMacAdressHexValue(),
                 configInfo.getDiskDriver(),
                 configInfo.getSignatureEncrypted(),
-                configInfo.getPinLoginEncrypted(),
+                pinLoginEncrypted,
                 configInfo.getAccountId(),
                 configInfo.getVersionApp());
 
@@ -145,7 +154,6 @@ public class LoginPresenter implements ILoginPresenter {
                 mILoginView.showTextMessage(e.getMessage());
                 return;
             }
-
         }
     }
 

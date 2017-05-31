@@ -112,6 +112,7 @@ public class Common {
     public static final String SYMBOL_FIRST = "P";
     public static final int LENGTH_MAX = 16;
 
+    public static final String DIRECT_EVN = "0";
     public static enum TYPE_SEARCH {
         ALL(0, "Tất cả"),
         MA_KH_SO_THE(1, "Mã KH/Số thẻ"),
@@ -333,6 +334,39 @@ public class Common {
                 }
             }
             return CODE_REPONSE_CHANGE_PASS.e9999;
+        }
+    }
+
+    public enum CODE_REPONSE_SEARCH_ONLINE {
+        e000("000", "Khách hàng còn nợ"),
+        e2013("2013", "Mã KH không thuộc đơn vị nào đã khai báo trong hệ thống"),
+        e0017("0017", "Không tồn tại KH nào thỏa mãn điều kiện tra cứu"),
+        e0025("0025", "KH không còn nợ hóa đơn nào tại thời điểm hiện tại."),
+        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ");
+
+        CODE_REPONSE_SEARCH_ONLINE(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+        private String message;
+
+        public static CODE_REPONSE_SEARCH_ONLINE findCodeMessage(String code) {
+            for (CODE_REPONSE_SEARCH_ONLINE v : values()) {
+                if (v.getCode().equals(code)) {
+                    return v;
+                }
+            }
+            return CODE_REPONSE_SEARCH_ONLINE.e9999;
         }
     }
     //endregion
@@ -765,12 +799,10 @@ public class Common {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public static ConfigInfo setupInfoRequest(Context context, String userName, String pass, String commandId, String versionApp) throws Exception {
+    public static ConfigInfo setupInfoRequest(Context context, String userName, String commandId, String versionApp) throws Exception {
         if (context == null)
             return null;
         if (userName == null || userName.isEmpty() || userName.trim().isEmpty())
-            return null;
-        if (pass == null || pass.isEmpty() || pass.trim().isEmpty())
             return null;
         if (commandId == null || commandId.isEmpty() || commandId.trim().isEmpty())
             return null;
@@ -820,7 +852,6 @@ public class Common {
         if (passwordAgent == null || passwordAgent.isEmpty() || passwordAgent.trim().isEmpty()) {
             throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
         }
-
         try {
             passwordAgentEcrypted = SecurityUtils.encryptRSAToString(passwordAgent, publicKeyRSA);
         } catch (Exception e) {
@@ -841,24 +872,11 @@ public class Common {
         }
         configInfo.setSignatureEncrypted(signatureEncrypted);
 
-        //set command id
-        //encrypt pinLogin by Triple DES CBC
-        String pinLoginEncrypted;
-        try {
-            pinLoginEncrypted =
-//                    Common.encryptPassByTripleDsCbc(context, pass.trim(), publicKeyRSA, privateKeyRSA);
-                    SecurityUtils.tripleDesc(context, pass.trim(), privateKeyRSA.trim(), publicKeyRSA.trim());
-
-        } catch (Exception e) {
-            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
-        }
-        configInfo.setPinLoginEncrypted(pinLoginEncrypted);
+        //set version app
+        configInfo.setVersionApp(versionApp);
 
         //set command id
         configInfo.setCommandId(commandId);
-
-        //set version app
-        configInfo.setVersionApp(versionApp);
 
         return configInfo;
     }
@@ -1018,5 +1036,4 @@ public class Common {
     }
 
     //endregion
-
 }

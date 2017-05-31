@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -75,6 +77,18 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     TextView tvPage;
     @BindView(R.id.ll_frag_thanh_toan_page)
     LinearLayout llCountPage;
+
+    //Search online
+    @BindView(R.id.rv_frag_thanhtoan_search_online_progress)
+    RelativeLayout rvProgressSearchOnline;
+    @BindView(R.id.tv_frag_thanh_toan_search_online_message)
+    TextView tvMessageNotifySearchOnlne;
+    @BindView(R.id.pbar_frag_thanhtoan_search_online)
+    ProgressBar pbarSearchOnline;
+    @BindView(R.id.ibtn_frag_thanhtoan_action_research_online)
+    ImageButton ibtnResearchOnline;
+    @BindView(R.id.ibtn_frag_thanhtoan_action_cancel_search_online)
+    ImageButton ibtnCancelSearchOnline;
 
     private OnFragmentInteractionListener listener;
     private PayAdapter payAdapter;
@@ -186,11 +200,19 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     public void onPageSelected(int position) {
         mPageIndex = FIRST_PAGE_INDEX;
         Common.TYPE_SEARCH typeSearch = Common.TYPE_SEARCH.findMessage(position);
-        boolean isSeachOnline = mIPayPresenter.checkUserNeedSearchOnline(etSearch.getText().toString());
+        boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
         if (isSeachOnline)
             return;
         mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString().trim(), false);
     }
+
+    private boolean checkUserNeedSearchOnline(String infoSearch) {
+        if ((infoSearch.length() == Common.LENGTH_MIN && String.valueOf(infoSearch.charAt(Common.ZERO)).equalsIgnoreCase(Common.SYMBOL_FIRST)) || infoSearch.length() == Common.LENGTH_MAX) {
+            return true;
+        }
+        return false;
+    }
+
 
     @OnPageChange(R.id.view_pager)
     public void onPageScrolled(int position) {
@@ -216,7 +238,7 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         //first page
         mPageIndex = FIRST_PAGE_INDEX;
-        boolean isSeachOnline = mIPayPresenter.checkUserNeedSearchOnline(etSearch.getText().toString());
+        boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
 
         if (isSeachOnline) {
             typeSearch = Common.TYPE_SEARCH.MA_KH_SO_THE;
@@ -284,9 +306,9 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     public Context getContextView() {
         return getContext();
     }
-
+/*
     @Override
-    public void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage, boolean isSeachOnline) {
+    public void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) {
         btnPre.setEnabled(false);
         btnNext.setEnabled(true);
         tvPage.setText(String.valueOf(mPageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage == 0 ? FIRST_PAGE_INDEX : totalPage)));
@@ -296,7 +318,12 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
 
         rvKH.setAdapter(payAdapter);
         rvKH.invalidate();
-    }
+
+        //if isSeachOnline
+        if (isSeachOnline == true && infoSearch == null)
+            return;
+        mIPayPresenter.callSearchOnline(mEdong, infoSearch);
+    }*/
 
     /*private void setNewAdapterRecycler(List<PayAdapter.PayEntityAdapter> adapterList) {
         int widthRecyclerReal, heightRecyclerReal;
@@ -310,18 +337,86 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     }*/
 
     @Override
-    public void showPayRecyclerOtherPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndexNew, int totalPage, boolean isSeachOnline) {
+    public void showPayRecyclerPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) {
         btnPre.setEnabled(true);
         btnNext.setEnabled(true);
-        tvPage.setText(String.valueOf(mPageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
+        tvPage.setText(String.valueOf(pageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
 
-        if (pageIndexNew < FIRST_PAGE_INDEX)
-            btnPre.setEnabled(false);
-        if (pageIndexNew == totalPage)
-            btnNext.setEnabled(false);
+        //enable disable button pre next
+        if (pageIndex == FIRST_PAGE_INDEX) {
+            setEnablePreNext(1);
+            if (FIRST_PAGE_INDEX == totalPage)
+                setEnablePreNext(0);
+            else
+                setEnablePreNext(1);
+        } else if (pageIndex == totalPage) {
+            if (totalPage == FIRST_PAGE_INDEX)
+                setEnablePreNext(0);
+            else
+                setEnablePreNext(2);
+        } else
+            setEnablePreNext(3);
 
-        payAdapter.refreshData(adapterList);
+        //set adapter
+        if (pageIndex == FIRST_PAGE_INDEX) {
+            payAdapter = new PayAdapter(getContext(), this, adapterList);
+            rvKH.setAdapter(payAdapter);
+        } else
+            payAdapter.refreshData(adapterList);
         rvKH.invalidate();
+
+        //if isSeachOnline
+        if (isSeachOnline == true && infoSearch == null)
+            return;
+        mIPayPresenter.callSearchOnline(mEdong, infoSearch);
+    }
+
+    @Override
+    public void showSearchOnlineProcess() {
+        if (rvProgressSearchOnline.getVisibility() == View.GONE)
+            rvProgressSearchOnline.setVisibility(View.VISIBLE);
+
+        pbarSearchOnline.setVisibility(View.VISIBLE);
+        ibtnResearchOnline.setVisibility(View.GONE);
+        ibtnCancelSearchOnline.setVisibility(View.VISIBLE);
+        tvMessageNotifySearchOnlne.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void hideSearchOnlineProcess() {
+        if (rvProgressSearchOnline.getVisibility() == View.VISIBLE)
+            rvProgressSearchOnline.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showMessageNotifySearchOnline(String message) {
+        if (message == null || message.isEmpty() || message.trim().equals(Common.TEXT_EMPTY))
+            return;
+
+        pbarSearchOnline.setVisibility(View.GONE);
+        ibtnResearchOnline.setVisibility(View.VISIBLE);
+        ibtnCancelSearchOnline.setVisibility(View.GONE);
+        tvMessageNotifySearchOnlne.setVisibility(View.VISIBLE);
+        tvMessageNotifySearchOnlne.setText(message);
+    }
+
+    private void setEnablePreNext(int i) {
+        if (i == 0) {
+            btnPre.setEnabled(false);
+            btnNext.setEnabled(false);
+        }
+        if (i == 1) {
+            btnPre.setEnabled(false);
+            btnNext.setEnabled(true);
+        }
+        if (i == 2) {
+            btnPre.setEnabled(true);
+            btnNext.setEnabled(false);
+        }
+        if (i == 3) {
+            btnPre.setEnabled(true);
+            btnNext.setEnabled(true);
+        }
     }
     //endregion
 

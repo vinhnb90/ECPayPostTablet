@@ -18,7 +18,6 @@ public class ConfigInfo {
     private String diskDriver;
     private String accountId;
     private String signatureEncrypted;
-    private String pinLoginEncrypted;
     private String versionApp;
 
     public ConfigInfo() {
@@ -131,14 +130,6 @@ public class ConfigInfo {
 
     public void setSignatureEncrypted(String signatureEncrypted) {
         this.signatureEncrypted = signatureEncrypted;
-    }
-
-    public String getPinLoginEncrypted() {
-        return pinLoginEncrypted;
-    }
-
-    public void setPinLoginEncrypted(String pinLoginEncrypted) {
-        this.pinLoginEncrypted = pinLoginEncrypted;
     }
 
     public String getVersionApp() {

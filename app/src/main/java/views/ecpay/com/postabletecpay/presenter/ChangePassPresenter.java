@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
+import org.ecpay.client.test.SecurityUtils;
+
 import views.ecpay.com.postabletecpay.model.ChangePassModel;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
@@ -63,9 +65,18 @@ public class ChangePassPresenter implements IChangePassPresenter {
         }
 
         try {
-            configInfo = Common.setupInfoRequest(mIChangePassView.getContextView(), userName, pass, Common.COMMAND_ID.CHANGE_PIN.toString(), versionApp);
+            configInfo = Common.setupInfoRequest(mIChangePassView.getContextView(), userName, pass, Common.COMMAND_ID.CHANGE_PIN.toString());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        //encrypt pinLogin by Triple DES CBC
+        String pinLoginEncrypted;
+        try {
+            pinLoginEncrypted = SecurityUtils.tripleDesc(mIChangePassView.getContextView(), pass.trim(), configInfo.getPRIVATE_KEY().trim(), configInfo.getPUBLIC_KEY().trim());
+        } catch (Exception e) {
+            mIChangePassView.showText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+            return;
         }
 
         //create request to server
@@ -78,7 +89,7 @@ public class ChangePassPresenter implements IChangePassPresenter {
                 configInfo.getMacAdressHexValue(),
                 configInfo.getDiskDriver(),
                 configInfo.getSignatureEncrypted(),
-                configInfo.getPinLoginEncrypted(),
+                pinLoginEncrypted,
 
                 session,
                 passNew.trim(),

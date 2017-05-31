@@ -1,11 +1,12 @@
 package views.ecpay.com.postabletecpay.util.webservice;
 
+import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import org.ksoap2.SoapEnvelope;
@@ -27,10 +28,11 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.BodyLogi
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.FooterLoginRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.HeaderLoginRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.LoginRequest;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.BodyChangePassResponse;
+import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.BodySearchOnlineRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.SearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ResponseLoginResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
 
@@ -155,6 +157,63 @@ public class SoapAPI {
         return jsonResult;
 
     }
+
+    public static String getJsonRequestSearchOnline(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver, String signatureEncrypted, String directEvn,
+                                                    String customerCode,
+                                                    String pcCode,
+                                                    String bookCmis,
+                                                    String accountId) {
+        if (agent == null || agent.isEmpty() || agent.trim().equals(""))
+            return null;
+        if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
+            return null;
+        if (commandId == null || commandId.isEmpty() || commandId.trim().equals(""))
+            return null;
+        if (mac == null || mac.isEmpty() || mac.trim().equals(""))
+            return null;
+        if (diskDriver == null || diskDriver.isEmpty() || diskDriver.trim().equals(""))
+            return null;
+        if (signatureEncrypted == null || signatureEncrypted.isEmpty() || signatureEncrypted.trim().equals(""))
+            return null;
+        if (customerCode == null || customerCode.isEmpty() || customerCode.trim().equals(""))
+            return null;
+        if (pcCode == null || pcCode.isEmpty())
+            return null;
+        if (bookCmis == null || bookCmis.isEmpty())
+            return null;
+        if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
+            return null;
+
+        HeaderLoginRequest headerLoginRequest = new HeaderLoginRequest();
+        headerLoginRequest.setAgent(agent);
+        headerLoginRequest.setPassword(agentEncypted);
+        headerLoginRequest.setCommandId(commandId);
+
+        BodySearchOnlineRequest bodySearchOnlineRequest = new BodySearchOnlineRequest();
+        bodySearchOnlineRequest.setAuditNumber(auditNumber);
+        bodySearchOnlineRequest.setMac(mac);
+        bodySearchOnlineRequest.setDiskDrive(diskDriver);
+        bodySearchOnlineRequest.setSignature(signatureEncrypted);
+        bodySearchOnlineRequest.setDirectEvn(directEvn);
+        bodySearchOnlineRequest.setCustomerCode(customerCode);
+        bodySearchOnlineRequest.setPcCode(pcCode);
+
+        FooterLoginRequest footerLoginRequest = new FooterLoginRequest();
+        footerLoginRequest.setAccountIdt(accountId);
+
+        final SearchOnlineRequest searchOnlineRequest = new SearchOnlineRequest();
+        searchOnlineRequest.setHeader(headerLoginRequest);
+        searchOnlineRequest.setBody(bodySearchOnlineRequest);
+        searchOnlineRequest.setFooter(footerLoginRequest);
+
+        Type type = new TypeToken<SearchOnlineRequest>() {
+        }.getType();
+
+        String jsonResult = new GsonBuilder().create().toJson(searchOnlineRequest, type);
+
+        return jsonResult;
+    }
+
     //endregion
 
     //region class api soap
@@ -368,6 +427,131 @@ public class SoapAPI {
 
         public void setEndCallSoap(boolean endCallSoap) {
             isEndCallSoap = endCallSoap;
+        }
+    }
+
+    public static class AsyncSoapSearchOnline extends AsyncTask<String, String, SearchOnlineResponse> {
+
+        //request action to eStore
+        private Common.TYPE_SEARCH typeSearch;
+        private String edong;
+        private String infoSearch;
+        private static final String METHOD_NAME = "execute";
+        private static final String NAMESPACE = "http://services.ecpay.org/";
+        private static final String URL = ENDPOINT_URL;
+        private static final String SOAP_ACTION = "request action to eStore";
+        private static final String METHOD_PARAM = "message";
+        private AsyncSoapSearchOnlineCallBack callBack;
+        private boolean isEndCallSoap = false;
+
+        public AsyncSoapSearchOnline(Common.TYPE_SEARCH typeSearch, String edong, String infoSearch, AsyncSoapSearchOnlineCallBack callBack) throws Exception {
+            this.callBack = callBack;
+            this.typeSearch = typeSearch;
+            this.edong = edong;
+            this.infoSearch = infoSearch;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            callBack.onPre(this);
+        }
+
+        @Override
+        protected SearchOnlineResponse doInBackground(String... jsons) {
+            String json = jsons[0];
+            Log.d("here", "doInBackground: " + json);
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            request.addProperty(METHOD_PARAM, json);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE ht;
+            SoapPrimitive response = null;
+
+            try {
+                ht = new HttpTransportSE(URL);
+                ht.call(SOAP_ACTION, envelope);
+                response = (SoapPrimitive) envelope.getResponse();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (response == null) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                return null;
+            }
+
+            String data = response.toString();
+            if (data.isEmpty()) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return null;
+            }
+
+            SearchOnlineResponse searchOnlineResponse = new Gson().fromJson(data, SearchOnlineResponse.class);
+           /* final GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter(LoginResponseReponse.class, new LoginResponseAdapter());
+//            gsonBuilder.registerTypeAdapter(ResponseLoginResponse.class, new )
+            gsonBuilder.setPrettyPrinting();
+            final Gson gson = gsonBuilder.create();
+
+            searchOnlineResponse = gson.fromJson(data, LoginResponseReponse.class);*/
+
+            return searchOnlineResponse;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            String message = values[0];
+            if (isEndCallSoap)
+                callBack.onUpdate(message);
+        }
+
+        @Override
+        protected void onPostExecute(SearchOnlineResponse searchOnlineResponse) {
+            super.onPostExecute(searchOnlineResponse);
+            if (!isEndCallSoap)
+                callBack.onPost(searchOnlineResponse);
+        }
+
+        public static abstract class AsyncSoapSearchOnlineCallBack {
+            public abstract void onPre(final AsyncSoapSearchOnline soapSearchOnline);
+
+            public abstract void onUpdate(String message);
+
+            public abstract void onPost(SearchOnlineResponse response);
+
+            public abstract void onTimeOut(final AsyncSoapSearchOnline soapSearchOnline);
+        }
+
+        public void callCountdown(final AsyncSoapSearchOnline soapSearchOnline) {
+            if (soapSearchOnline == null)
+                return;
+
+            callBack.onTimeOut(soapSearchOnline);
+        }
+
+        public boolean isEndCallSoap() {
+            return isEndCallSoap;
+        }
+
+        public void setEndCallSoap(boolean endCallSoap) {
+            isEndCallSoap = endCallSoap;
+        }
+
+        public Common.TYPE_SEARCH getTypeSearch() {
+            return typeSearch;
+        }
+
+        public String getEdong() {
+            return edong;
+        }
+
+        public String getInfoSearch() {
+            return infoSearch;
         }
     }
     //endregion

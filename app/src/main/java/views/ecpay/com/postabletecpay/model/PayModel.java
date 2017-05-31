@@ -7,7 +7,9 @@ import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
-import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
+import views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerResponse;
 
 /**
  * Created by VinhNB on 5/26/2017.
@@ -104,23 +106,23 @@ public class PayModel extends CommonModel {
 
     public List<PayAdapter.PayEntityAdapter> getInforRowCustomer(String mEdong) {
 
-        PayAdapter.PayEntityAdapter a1 = new PayAdapter.PayEntityAdapter("billID 12", "S1", "diaChi1", "loTrinh 1", "ma KH 1", 100000,true, false);
-        PayAdapter.PayEntityAdapter a2 = new PayAdapter.PayEntityAdapter("billID 23", "S2", "diaChi1", "loTrinh 2", "ma KH 2", 100000,true, false);
-        PayAdapter.PayEntityAdapter a3 = new PayAdapter.PayEntityAdapter("billID 33", "S 3", "diaChi1", "loTrinh 3", "ma KH 3", 100000,true, false);
+        PayAdapter.PayEntityAdapter a1 = new PayAdapter.PayEntityAdapter("billID 12", "S1", "diaChi1", "loTrinh 1", "ma KH 1", 100000, true, false);
+        PayAdapter.PayEntityAdapter a2 = new PayAdapter.PayEntityAdapter("billID 23", "S2", "diaChi1", "loTrinh 2", "ma KH 2", 100000, true, false);
+        PayAdapter.PayEntityAdapter a3 = new PayAdapter.PayEntityAdapter("billID 33", "S 3", "diaChi1", "loTrinh 3", "ma KH 3", 100000, true, false);
         PayAdapter.PayEntityAdapter a4 = new PayAdapter.PayEntityAdapter("billID 44", "S 4", "diaChi1", "loTrinh 4", "ma KH 4", 100000, true, false);
         PayAdapter.PayEntityAdapter a5 = new PayAdapter.PayEntityAdapter("billID 122", "S5 ", "diaChi1", "loTrinh 1", "ma KH 1", 100000, true, false);
-        PayAdapter.PayEntityAdapter a6 = new PayAdapter.PayEntityAdapter("billID 232", "S 6", "diaChi1", "loTrinh 2", "ma KH 2", 100000,true, false);
+        PayAdapter.PayEntityAdapter a6 = new PayAdapter.PayEntityAdapter("billID 232", "S 6", "diaChi1", "loTrinh 2", "ma KH 2", 100000, true, false);
         PayAdapter.PayEntityAdapter a7 = new PayAdapter.PayEntityAdapter("billID 332", "S 7", "diaChi1", "loTrinh 3", "ma KH 3", 100000, true, false);
-        PayAdapter.PayEntityAdapter a8 = new PayAdapter.PayEntityAdapter("billID 442", "S8 ", "diaChi1", "loTrinh 4", "ma KH 4", 100000,true, false);
+        PayAdapter.PayEntityAdapter a8 = new PayAdapter.PayEntityAdapter("billID 442", "S8 ", "diaChi1", "loTrinh 4", "ma KH 4", 100000, true, false);
 
         PayAdapter.PayEntityAdapter a11 = new PayAdapter.PayEntityAdapter("billID 121", "S 9", "diaChi1", "loTrinh 1", "ma KH 1", 100000, true, false);
-        PayAdapter.PayEntityAdapter a21 = new PayAdapter.PayEntityAdapter("billID 231", "S a", "diaChi1", "loTrinh 2", "ma KH 2", 100000,true, false);
-        PayAdapter.PayEntityAdapter a31 = new PayAdapter.PayEntityAdapter("billID 331", "S b", "diaChi1", "loTrinh 3", "ma KH 3", 100000,true, false);
+        PayAdapter.PayEntityAdapter a21 = new PayAdapter.PayEntityAdapter("billID 231", "S a", "diaChi1", "loTrinh 2", "ma KH 2", 100000, true, false);
+        PayAdapter.PayEntityAdapter a31 = new PayAdapter.PayEntityAdapter("billID 331", "S b", "diaChi1", "loTrinh 3", "ma KH 3", 100000, true, false);
         PayAdapter.PayEntityAdapter a41 = new PayAdapter.PayEntityAdapter("billID 441", "S c", "diaChi1", "loTrinh 4", "ma KH 4", 100000, true, false);
         PayAdapter.PayEntityAdapter a51 = new PayAdapter.PayEntityAdapter("billID 1221", "S d", "diaChi1", "loTrinh 1", "ma KH 1", 100000, true, false);
         PayAdapter.PayEntityAdapter a61 = new PayAdapter.PayEntityAdapter("billID 2321", "S e", "diaChi1", "loTrinh 2", "ma KH 2", 100000, true, false);
         PayAdapter.PayEntityAdapter a71 = new PayAdapter.PayEntityAdapter("billID 3321", "S g", "diaChi1", "loTrinh 3", "ma KH 3", 100000, true, false);
-        PayAdapter.PayEntityAdapter a81 = new PayAdapter.PayEntityAdapter("billID 4421", "S h", "diaChi1", "loTrinh 4", "ma KH 4", 100000,true, false);
+        PayAdapter.PayEntityAdapter a81 = new PayAdapter.PayEntityAdapter("billID 4421", "S h", "diaChi1", "loTrinh 4", "ma KH 4", 100000, true, false);
 
         PayAdapter.PayEntityAdapter a112 = new PayAdapter.PayEntityAdapter("billID 1212", "K 1", "diaChi1", "loTrinh 1", "ma KH 1", 100000, true, false);
         PayAdapter.PayEntityAdapter a212 = new PayAdapter.PayEntityAdapter("billID 2312", "K 2", "diaChi1", "loTrinh 2", "ma KH 2", 100000, true, false);
@@ -132,13 +134,13 @@ public class PayModel extends CommonModel {
         PayAdapter.PayEntityAdapter a812 = new PayAdapter.PayEntityAdapter("billID 44212", "K 8", "diaChi1", "loTrinh 4", "ma KH 4", 100000, true, false);
 
         PayAdapter.PayEntityAdapter a111 = new PayAdapter.PayEntityAdapter("billID 1211", "K a", "diaChi1", "loTrinh 1", "ma KH 1", 100000, true, false);
-        PayAdapter.PayEntityAdapter a211 = new PayAdapter.PayEntityAdapter("billID 2311", "K b", "diaChi1", "loTrinh 2", "ma KH 2", 100000,true, false);
+        PayAdapter.PayEntityAdapter a211 = new PayAdapter.PayEntityAdapter("billID 2311", "K b", "diaChi1", "loTrinh 2", "ma KH 2", 100000, true, false);
         PayAdapter.PayEntityAdapter a311 = new PayAdapter.PayEntityAdapter("billID 3311", "K c", "diaChi1", "loTrinh 3", "ma KH 3", 100000, true, false);
         PayAdapter.PayEntityAdapter a411 = new PayAdapter.PayEntityAdapter("billID 4411", "K d", "diaChi1", "loTrinh 4", "ma KH 4", 100000, true, false);
-        PayAdapter.PayEntityAdapter a511 = new PayAdapter.PayEntityAdapter("billID 12121", "K e", "diaChi1", "loTrinh 1", "ma KH 1", 100000,true, false);
-        PayAdapter.PayEntityAdapter a611 = new PayAdapter.PayEntityAdapter("billID 23121", "K f", "diaChi1", "loTrinh 2", "ma KH 2", 100000,true, false);
+        PayAdapter.PayEntityAdapter a511 = new PayAdapter.PayEntityAdapter("billID 12121", "K e", "diaChi1", "loTrinh 1", "ma KH 1", 100000, true, false);
+        PayAdapter.PayEntityAdapter a611 = new PayAdapter.PayEntityAdapter("billID 23121", "K f", "diaChi1", "loTrinh 2", "ma KH 2", 100000, true, false);
         PayAdapter.PayEntityAdapter a711 = new PayAdapter.PayEntityAdapter("billID 33121", "K g", "diaChi1", "loTrinh 3", "ma KH 3", 100000, true, false);
-        PayAdapter.PayEntityAdapter a811 = new PayAdapter.PayEntityAdapter("billID 44121", "K h", "diaChi1", "loTrinh 4", "ma KH 4", 100000,true, false);
+        PayAdapter.PayEntityAdapter a811 = new PayAdapter.PayEntityAdapter("billID 44121", "K h", "diaChi1", "loTrinh 4", "ma KH 4", 100000, true, false);
 
 
         List<PayAdapter.PayEntityAdapter> listPay = new ArrayList<>();
@@ -305,5 +307,19 @@ public class PayModel extends CommonModel {
 
         return list;
 //        return sqLiteConnection.selectInfoBillOfCustomer(edong, code);
+    }
+
+    public int writeSQLiteCustomerTable(CustomerResponse customerResponse) {
+        if (customerResponse == null)
+            return SQLiteConnection.ERROR_OCCUR;
+
+        return sqLiteConnection.insertNotUpdateCustomer(customerResponse);
+    }
+
+    public int writeSQliteBillTableOfCustomer(BillInsideCustomer billInsideCustomer) {
+        if (billInsideCustomer == null)
+            return SQLiteConnection.ERROR_OCCUR;
+
+        return sqLiteConnection.insertNotUpdateBillOfCustomer(billInsideCustomer);
     }
 }
