@@ -65,7 +65,7 @@ public class ChangePassPresenter implements IChangePassPresenter {
         }
 
         try {
-            configInfo = Common.setupInfoRequest(mIChangePassView.getContextView(), userName, pass, Common.COMMAND_ID.CHANGE_PIN.toString());
+            configInfo = Common.setupInfoRequest(mIChangePassView.getContextView(), userName, pass, Common.COMMAND_ID.CHANGE_PIN.toString(), versionApp);
         } catch (Exception e) {
             e.printStackTrace();
         }
