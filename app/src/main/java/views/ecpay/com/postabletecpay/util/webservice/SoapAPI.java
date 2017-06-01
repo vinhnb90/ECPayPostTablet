@@ -31,6 +31,7 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.LoginReq
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.BodySearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.SearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEVNReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
 
@@ -214,6 +215,10 @@ public class SoapAPI {
 //        String jsonResult = new GsonBuilder().create().toJson(searchOnlineRequest, type);
         String jsonResult = new GsonBuilder().setPrettyPrinting().create().toJson(searchOnlineRequest);
         return jsonResult;
+    }
+
+    public static String getJsonRequestSynchronizePC() {
+        return null;
     }
 
     //endregion
@@ -558,4 +563,111 @@ public class SoapAPI {
     }
     //endregion
 
+    //region đồng bộ
+    public static class AsyncSoapSynchronizePC extends AsyncTask<String, String, ListEVNReponse> {
+
+        //request action to eStore
+        private static final String METHOD_NAME = "execute";
+        private static final String NAMESPACE = "http://services.ecpay.org/";
+        private static final String URL = ENDPOINT_URL;
+        private static final String SOAP_ACTION = "request action to eStore";
+        private static final String METHOD_PARAM = "message";
+        private AsyncSoapSynchronizePCCallBack callBack;
+        private boolean isEndCallSoap = false;
+
+        public AsyncSoapSynchronizePC(AsyncSoapSynchronizePCCallBack callBack) throws Exception {
+            this.callBack = callBack;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            callBack.onPre(this);
+        }
+
+        @Override
+        protected ListEVNReponse doInBackground(String... jsons) {
+            String json = jsons[0];
+            Log.d("here", "doInBackground: " + json);
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            request.addProperty(METHOD_PARAM, json);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE ht;
+            SoapPrimitive response = null;
+
+            try {
+                ht = new HttpTransportSE(URL);
+                ht.call(SOAP_ACTION, envelope);
+                response = (SoapPrimitive) envelope.getResponse();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (response == null) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                return null;
+            }
+
+            String data = response.toString();
+            if (data.isEmpty()) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return null;
+            }
+
+            ListEVNReponse listEVNReponse = null;
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+//            gsonBuilder.registerTypeAdapter(ListEVNReponse.class, new LoginResponseAdapter());
+//            gsonBuilder.setPrettyPrinting();
+            final Gson gson = gsonBuilder.create();
+
+            listEVNReponse = gson.fromJson(data, ListEVNReponse.class);
+
+            return listEVNReponse;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            String message = values[0];
+            if (isEndCallSoap)
+                callBack.onUpdate(message);
+        }
+
+        @Override
+        protected void onPostExecute(ListEVNReponse listEVNReponse) {
+            super.onPostExecute(listEVNReponse);
+            if (!isEndCallSoap)
+                callBack.onPost(listEVNReponse);
+        }
+
+        public static abstract class AsyncSoapSynchronizePCCallBack {
+            public abstract void onPre(final AsyncSoapSynchronizePC soapSynchronizePC);
+
+            public abstract void onUpdate(String message);
+
+            public abstract void onPost(ListEVNReponse response);
+
+            public abstract void onTimeOut(final AsyncSoapSynchronizePC soapSynchronizePC);
+        }
+
+        public void callCountdown(final AsyncSoapSynchronizePC soapSynchronizePC) {
+            if (soapSynchronizePC == null)
+                return;
+
+            callBack.onTimeOut(soapSynchronizePC);
+        }
+
+        public boolean isEndCallSoap() {
+            return isEndCallSoap;
+        }
+
+        public void setEndCallSoap(boolean endCallSoap) {
+            isEndCallSoap = endCallSoap;
+        }
+    }
+    //endregion
 }

@@ -8,4 +8,5 @@ import views.ecpay.com.postabletecpay.view.ICommonView;
 
 public interface IMainPageView extends ICommonView{
     void showMainPageInfo(String userName, long balance, int totalBills, int totalMoney);
+    void showTextMessage(String message);
 }

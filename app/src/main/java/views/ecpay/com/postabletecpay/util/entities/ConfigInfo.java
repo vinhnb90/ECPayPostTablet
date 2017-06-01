@@ -139,4 +139,5 @@ public class ConfigInfo {
     public void setVersionApp(String versionApp) {
         this.versionApp = versionApp;
     }
+
 }

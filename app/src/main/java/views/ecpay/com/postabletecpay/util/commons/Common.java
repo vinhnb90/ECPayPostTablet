@@ -379,7 +379,8 @@ public class Common {
     public enum COMMAND_ID {
         LOGIN,
         CHANGE_PIN,
-        CUSTOMER_BILL;
+        CUSTOMER_BILL,
+        GET_BOOK_CMIS_BY_CASHIER;
 
         @Override
         public String toString() {
@@ -389,6 +390,8 @@ public class Common {
                 return "CHANGE-PIN";
             if (this == CUSTOMER_BILL)
                 return "CUSTOMER-BILL";
+            if (this == GET_BOOK_CMIS_BY_CASHIER)
+                return "GET-BOOK-CMIS-BY-CASHIER";
             return super.toString();
         }
     }
@@ -801,6 +804,88 @@ public class Common {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+//    public static ConfigInfo setupInfoRequest(Context context, String userName, String commandId, String versionApp) throws Exception {
+//        if (context == null)
+//            return null;
+//        if (userName == null || userName.isEmpty() || userName.trim().isEmpty())
+//            return null;
+//        if (commandId == null || commandId.isEmpty() || commandId.trim().isEmpty())
+//            return null;
+//        if (versionApp == null || versionApp.isEmpty() || versionApp.trim().isEmpty())
+//            return null;
+//
+//        //setup info login
+//        ConfigInfo configInfo = Common.getDataFileConfig();
+//
+//        //create auditNumber
+//        String timeNow = Common.getDateTimeNow6Digit();
+//        Long auditNumber = Common.createAuditNumber(timeNow);
+//        configInfo.setAuditNumber(auditNumber);
+//
+//        //create macAdressHexValue
+//        String macAdressHexValue;
+//        try {
+//            //get and convert mac adress to hex
+//            macAdressHexValue = Common.getMacAddress(context);
+//        } catch (Exception e) {
+//            throw new Exception(e.getMessage());
+//        }
+//        configInfo.setMacAdressHexValue(macAdressHexValue);
+//
+//        //create diskDriver
+//        String diskDriver = Common.getIMEIAddress(context);
+//        configInfo.setDiskDriver(diskDriver);
+//
+//        //create diskDriver
+//        String accountId = userName.toString().trim();
+//        configInfo.setAccountId(accountId);
+//
+//        //create agentEncypted by RSA
+//        String passwordAgent, passwordAgentEcrypted;
+//        String agent = configInfo.getAGENT();
+//        passwordAgent = configInfo.getPASS_WORD();
+//        String pcCode = configInfo.getPC_CODE();
+//        String privateKeyRSA = configInfo.getPRIVATE_KEY();
+//        String publicKeyRSA = configInfo.getPUBLIC_KEY();
+//
+//        if (privateKeyRSA == null || privateKeyRSA.isEmpty() || privateKeyRSA.trim().isEmpty()) {
+//            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+//        }
+//        if (publicKeyRSA == null || publicKeyRSA.isEmpty() || publicKeyRSA.trim().isEmpty()) {
+//            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+//        }
+//        if (passwordAgent == null || passwordAgent.isEmpty() || passwordAgent.trim().isEmpty()) {
+//            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+//        }
+//        try {
+//            passwordAgentEcrypted = SecurityUtils.encryptRSAToString(passwordAgent, publicKeyRSA);
+//        } catch (Exception e) {
+//            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+//        }
+//        configInfo.setAgentEncypted(passwordAgentEcrypted);
+//
+//        //set command id
+//        //encrypt signature by RSA
+//        String signatureEncrypted;
+//        try {
+//            String dataSign = Common.getDataSignRSA(agent, commandId, auditNumber, macAdressHexValue, diskDriver, pcCode, accountId, privateKeyRSA);
+//            Log.d(TAG, "setupInfoRequest: " + dataSign);
+//            signatureEncrypted = SecurityUtils.sign(dataSign, privateKeyRSA);
+//            Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
+//        } catch (Exception e) {
+//            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+//        }
+//        configInfo.setSignatureEncrypted(signatureEncrypted);
+//
+//        //set version app
+//        configInfo.setVersionApp(versionApp);
+//
+//        //set command id
+//        configInfo.setCommandId(commandId);
+//
+//        return configInfo;
+//    }
+
     public static ConfigInfo setupInfoRequest(Context context, String userName, String commandId, String versionApp) throws Exception {
         if (context == null)
             return null;
@@ -854,6 +939,7 @@ public class Common {
         if (passwordAgent == null || passwordAgent.isEmpty() || passwordAgent.trim().isEmpty()) {
             throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
         }
+
         try {
             passwordAgentEcrypted = SecurityUtils.encryptRSAToString(passwordAgent, publicKeyRSA);
         } catch (Exception e) {
@@ -874,11 +960,11 @@ public class Common {
         }
         configInfo.setSignatureEncrypted(signatureEncrypted);
 
-        //set version app
-        configInfo.setVersionApp(versionApp);
-
         //set command id
         configInfo.setCommandId(commandId);
+
+        //set version app
+        configInfo.setVersionApp(versionApp);
 
         return configInfo;
     }
