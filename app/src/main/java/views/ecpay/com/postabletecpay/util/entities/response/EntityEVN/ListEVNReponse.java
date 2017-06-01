@@ -3,10 +3,6 @@ package views.ecpay.com.postabletecpay.util.entities.response.EntityEVN;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.BodyLoginResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.FooterLoginResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.HeaderLoginResponse;
-
 public class ListEVNReponse {
 
 @SerializedName("header")

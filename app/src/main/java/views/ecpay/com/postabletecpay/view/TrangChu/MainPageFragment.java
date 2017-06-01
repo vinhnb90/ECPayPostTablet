@@ -18,11 +18,14 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
+import views.ecpay.com.postabletecpay.presenter.IMainPagePresenter;
+import views.ecpay.com.postabletecpay.presenter.MainPagePresenter;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.commons.Common.TEXT_DIALOG;
@@ -74,6 +77,8 @@ public class MainPageFragment extends Fragment implements IMainPageView, View.On
     private final static int HELP = 2;
     private final static int EXIT = 3;
 
+    private IMainPagePresenter iMainPagePresenter;
+
     public static MainPageFragment newInstance(String edong) {
         Bundle bundle = new Bundle();
         bundle.putString(KEY_EDONG, edong);
@@ -87,6 +92,8 @@ public class MainPageFragment extends Fragment implements IMainPageView, View.On
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        iMainPagePresenter = new MainPagePresenter(this);
+        iMainPagePresenter.synchronizePC();
     }
 
     @Override
@@ -234,6 +241,11 @@ public class MainPageFragment extends Fragment implements IMainPageView, View.On
         tvSoHoaDon.setText(String.valueOf(totalBills));
         tvTongTien.setText(String.valueOf(totalMoney));
 
+    }
+
+    @Override
+    public void showTextMessage(String message) {
+        Toast.makeText(this.getActivity(), message, Toast.LENGTH_LONG).show();
     }
 
     @Override

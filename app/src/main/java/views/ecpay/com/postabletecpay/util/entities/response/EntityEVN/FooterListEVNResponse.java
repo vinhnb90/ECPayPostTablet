@@ -14,6 +14,9 @@ public class FooterListEVNResponse {
     @SerializedName("description")
     @Expose
     private String description;
+    @SerializedName("source-address")
+    @Expose
+    private String sourceAddress;
 
     public String getAccountIdt() {
         return accountIdt;
@@ -39,4 +42,11 @@ public class FooterListEVNResponse {
         this.description = description;
     }
 
+    public String getSourceAddress() {
+        return sourceAddress;
+    }
+
+    public void setSourceAddress(String sourceAddress) {
+        this.sourceAddress = sourceAddress;
+    }
 }

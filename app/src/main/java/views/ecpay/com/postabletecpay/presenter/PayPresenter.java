@@ -137,7 +137,7 @@ public class PayPresenter implements IPayPresenter {
         }
 
         try {
-            configInfo = Common.setupInfoRequest(context, mEdong, Common.COMMAND_ID.LOGIN.toString(), versionApp);
+            configInfo = Common.setupInfoRequest(context, mEdong, "", Common.COMMAND_ID.LOGIN.toString(), versionApp);
         } catch (Exception e) {
             mIPayView.showMessageNotifySearchOnline(textMessage);
             return;
