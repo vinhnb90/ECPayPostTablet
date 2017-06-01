@@ -74,7 +74,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
             return;
 
         Common.runAnimationClickViewScale(tvMessage, R.anim.scale_view_pull, Common.TIME_DELAY_ANIM);
-
+        hidePbarLogin();
         tvMessage.setVisibility(View.VISIBLE);
         tvMessage.setText(message);
     }

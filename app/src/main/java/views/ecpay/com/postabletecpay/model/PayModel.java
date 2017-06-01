@@ -9,7 +9,10 @@ import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
-import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
+
+import static views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection.ERROR_OCCUR;
 
 /**
  * Created by VinhNB on 5/26/2017.
@@ -106,7 +109,7 @@ public class PayModel extends CommonModel {
 
     public List<PayAdapter.PayEntityAdapter> getInforRowCustomer(String mEdong) {
 
-        PayAdapter.PayEntityAdapter a1 = new PayAdapter.PayEntityAdapter("billID 12", "S1", "diaChi1", "loTrinh 1", "ma KH 1", 100000, true, false);
+       /* PayAdapter.PayEntityAdapter a1 = new PayAdapter.PayEntityAdapter("billID 12", "S1", "diaChi1", "loTrinh 1", "ma KH 1", 100000, true, false);
         PayAdapter.PayEntityAdapter a2 = new PayAdapter.PayEntityAdapter("billID 23", "S2", "diaChi1", "loTrinh 2", "ma KH 2", 100000, true, false);
         PayAdapter.PayEntityAdapter a3 = new PayAdapter.PayEntityAdapter("billID 33", "S 3", "diaChi1", "loTrinh 3", "ma KH 3", 100000, true, false);
         PayAdapter.PayEntityAdapter a4 = new PayAdapter.PayEntityAdapter("billID 44", "S 4", "diaChi1", "loTrinh 4", "ma KH 4", 100000, true, false);
@@ -179,8 +182,8 @@ public class PayModel extends CommonModel {
         listPay.add(a612);
         listPay.add(a712);
         listPay.add(a812);
-
-       /* List<PayAdapter.PayEntityAdapter> listPay = new ArrayList<>();
+*/
+        List<PayAdapter.PayEntityAdapter> listPay = new ArrayList<>();
 
         //get List Customer
         List<Customer> listCustomer = new ArrayList<>();
@@ -210,12 +213,12 @@ public class PayModel extends CommonModel {
             boolean isPayed = sqLiteConnection.checkStatusPayedOfCustormer(mEdong, customer.getCode());
 
             listPay.add(pay);
-        }*/
+        }
         return listPay;
     }
 
     public List<PayAdapter.PayEntityAdapter> getInforRowCustomerFitterBy(String mEdong, Common.TYPE_SEARCH typeSearch, String infoSearch) {
-        PayAdapter.PayEntityAdapter a1 = new PayAdapter.PayEntityAdapter("billID 12", "tenKH 123", "diaChi1", "loTrinh 1", "ma KH 1", 100000, true, false);
+       /* PayAdapter.PayEntityAdapter a1 = new PayAdapter.PayEntityAdapter("billID 12", "tenKH 123", "diaChi1", "loTrinh 1", "ma KH 1", 100000, true, false);
         PayAdapter.PayEntityAdapter a2 = new PayAdapter.PayEntityAdapter("billID 23", "tenKH 2321", "diaChi1", "loTrinh 2", "ma KH 2", 100000, true, false);
         PayAdapter.PayEntityAdapter a3 = new PayAdapter.PayEntityAdapter("billID 33", "tenKH 33213", "diaChi1", "loTrinh 3", "ma KH 3", 100000, true, false);
         PayAdapter.PayEntityAdapter a4 = new PayAdapter.PayEntityAdapter("billID 44", "tenKH 4321", "diaChi1", "loTrinh 4", "ma KH 4", 100000, true, false);
@@ -252,8 +255,8 @@ public class PayModel extends CommonModel {
         listPay.add(a61);
         listPay.add(a71);
         listPay.add(a81);
-
-       /* List<PayAdapter.PayEntityAdapter> listPay = new ArrayList<>();
+*/
+        List<PayAdapter.PayEntityAdapter> listPay = new ArrayList<>();
 
         //get List Customer
         List<Customer> listCustomer = new ArrayList<>();
@@ -283,14 +286,15 @@ public class PayModel extends CommonModel {
             boolean isPayed = sqLiteConnection.checkStatusPayedOfCustormer(mEdong, customer.getCode());
             pay.setConNo(isPayed);
             listPay.add(pay);
-        }*/
+        }
+
         return listPay;
 
     }
 
     public List<PayAdapter.BillEntityAdapter> getAllBillOfCustomer(String edong, String code) {
 
-        List<PayAdapter.BillEntityAdapter> list = new ArrayList<>();
+       /* List<PayAdapter.BillEntityAdapter> list = new ArrayList<>();
         PayAdapter.BillEntityAdapter v1 = new PayAdapter.BillEntityAdapter("1/2017", 3400000, true, true, false, 1, code, "01214500702");
         PayAdapter.BillEntityAdapter v2 = new PayAdapter.BillEntityAdapter("2/2017", 1400000, true, true, false, 2, code, "01214500702");
         PayAdapter.BillEntityAdapter v3 = new PayAdapter.BillEntityAdapter("3/2017", 1400000, false, false, false, 3, code, "01214500702");
@@ -305,21 +309,21 @@ public class PayModel extends CommonModel {
         list.add(v5);
         list.add(v6);
 
-        return list;
-//        return sqLiteConnection.selectInfoBillOfCustomer(edong, code);
+        return list;*/
+        return sqLiteConnection.selectInfoBillOfCustomer(edong, code);
     }
 
-    public int writeSQLiteCustomerTable(CustomerResponse customerResponse) {
-        if (customerResponse == null)
-            return SQLiteConnection.ERROR_OCCUR;
+    public int writeSQLiteCustomerTable(String edong, CustomerInsideBody customerResponse) {
+        if (edong == null || edong.trim().isEmpty() ||customerResponse == null)
+            return ERROR_OCCUR;
 
-        return sqLiteConnection.insertNotUpdateCustomer(customerResponse);
+        return sqLiteConnection.insertNotUpdateCustomer(edong, customerResponse);
     }
 
-    public int writeSQliteBillTableOfCustomer(BillInsideCustomer billInsideCustomer) {
-        if (billInsideCustomer == null)
-            return SQLiteConnection.ERROR_OCCUR;
+    public int writeSQliteBillTableOfCustomer(String edong, BillInsideCustomer billInsideCustomer) {
+        if (edong == null || edong.trim().isEmpty() || billInsideCustomer == null)
+            return ERROR_OCCUR;
 
-        return sqLiteConnection.insertNotUpdateBillOfCustomer(billInsideCustomer);
+        return sqLiteConnection.insertNotUpdateBillOfCustomer(edong, billInsideCustomer);
     }
 }

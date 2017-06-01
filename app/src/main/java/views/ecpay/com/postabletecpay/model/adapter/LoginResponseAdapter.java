@@ -69,7 +69,7 @@ public class LoginResponseAdapter extends TypeAdapter<LoginResponseReponse> {
             out.name("email").name(accountLoginResponse.getEmail());
             out.name("birthday").name(accountLoginResponse.getBirthday());
             out.name("idAccount").name(accountLoginResponse.getIdAccount() + "");
-            out.name("edong").name(accountLoginResponse.getEdong());
+            out.name("edong").name(accountLoginResponse.getEdongKey());
             out.name("parentId").name(accountLoginResponse.getParentId() + "");
             out.name("parentEdong").name(accountLoginResponse.getParentEdong() + "");
             out.name("pin").name(accountLoginResponse.getPin() + "");

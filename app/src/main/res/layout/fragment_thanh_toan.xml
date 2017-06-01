@@ -95,6 +95,7 @@
             android:gravity="center_horizontal"
             android:orientation="horizontal"
             android:weightSum="5">
+
             <Button
                 android:id="@+id/btn_frag_thanh_toan_pre"
                 android:layout_width="wrap_content"
@@ -145,7 +146,7 @@
                 android:id="@+id/rv_frag_thanhtoan_search_online_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/tv_search"
@@ -248,14 +249,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rvKhachHang"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/rlTop"
-            android:layout_toEndOf="@+id/tabs"
-            android:layout_toRightOf="@+id/tabs"
-            android:background="@android:color/transparent"></android.support.v7.widget.RecyclerView>
 
         <RelativeLayout
             android:id="@+id/rlBottom"
@@ -343,6 +336,14 @@
                 android:textColor="@color/colorTextWhite" />
 
         </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvKhachHang"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/rlBottom"
+            android:background="@android:color/transparent"></android.support.v7.widget.RecyclerView>
+
     </RelativeLayout>
 
 </LinearLayout>

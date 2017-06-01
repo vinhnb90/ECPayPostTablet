@@ -9,9 +9,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,11 +19,11 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
-import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
@@ -58,6 +56,7 @@ public class PayPresenter implements IPayPresenter {
         if (typeSearch == null)
             return;
 
+        this.mTypeSearch = typeSearch;
         List<PayAdapter.PayEntityAdapter> fitter = new ArrayList<>();
         int indexBegin = 0;
         int indexEnd = 0;
@@ -137,7 +136,7 @@ public class PayPresenter implements IPayPresenter {
         }
 
         try {
-            configInfo = Common.setupInfoRequest(context, mEdong, Common.COMMAND_ID.LOGIN.toString(), versionApp);
+            configInfo = Common.setupInfoRequest(context, mEdong, Common.COMMAND_ID.CUSTOMER_BILL.toString(), versionApp);
         } catch (Exception e) {
             mIPayView.showMessageNotifySearchOnline(textMessage);
             return;
@@ -293,23 +292,24 @@ public class PayPresenter implements IPayPresenter {
             //get responseLoginResponse from body response
             //because server return string not object
             String customerData = response.getBodySearchOnlineResponse().getCustomer();
+
             // định dạng kiểu Object JSON
-            Type type = new TypeToken<CustomerResponse>() {
-            }.getType();
-            CustomerResponse customerResponse = null;
+            CustomerInsideBody customerResponse = null;
             try {
-                customerResponse = new Gson().fromJson(customerData, type);
+                customerResponse = new Gson().fromJson(customerData, CustomerInsideBody.class);
             } catch (JsonSyntaxException e) {
                 e.printStackTrace();
             }
 
-            int rowEffect = mPayModel.writeSQLiteCustomerTable(customerResponse);
+            if (customerResponse == null)
+                return;
+
+            int rowEffect = mPayModel.writeSQLiteCustomerTable(edong,customerResponse);
             if (rowEffect == SQLiteConnection.ERROR_OCCUR) {
-                mIPayView.showMessageNotifySearchOnline(Common.CODE_REPONSE_SEARCH_ONLINE.e9999.getMessage());
                 Log.d(TAG, "Cannot insert customer to database.");
             }
 
-            List<BillInsideCustomer> listBill = customerResponse.getCustomer().getListBill();
+            List<BillInsideCustomer> listBill = customerResponse.getListBill();
             if (listBill == null)
                 return;
             int index = 0;
@@ -317,7 +317,7 @@ public class PayPresenter implements IPayPresenter {
             boolean isOccurInsertBill = false;
 
             for (; index < indexMax; index++) {
-                rowEffect = mPayModel.writeSQliteBillTableOfCustomer(listBill.get(index));
+                rowEffect = mPayModel.writeSQliteBillTableOfCustomer(edong, listBill.get(index));
 
                 if (rowEffect == SQLiteConnection.ERROR_OCCUR) {
                     isOccurInsertBill = true;
@@ -325,10 +325,10 @@ public class PayPresenter implements IPayPresenter {
             }
 
             if (isOccurInsertBill) {
-                mIPayView.showMessageNotifySearchOnline(Common.CODE_REPONSE_SEARCH_ONLINE.e9999.getMessage());
                 Log.d(TAG, "Has several bill of customer cannot insert to database.");
             }
 
+            mIPayView.hideSearchOnlineProcess();
             callPayRecycler(edong, PayFragment.FIRST_PAGE_INDEX, mTypeSearch, infoSearch, false);
         }
 
@@ -337,7 +337,7 @@ public class PayPresenter implements IPayPresenter {
             soapSearchOnlineCallBack.cancel(true);
 
             //thread call asyntask is running. must call in other thread to update UI
-            ((LoginActivity) mIPayView).runOnUiThread(new Runnable() {
+            ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (!soapSearchOnlineCallBack.isEndCallSoap()) {

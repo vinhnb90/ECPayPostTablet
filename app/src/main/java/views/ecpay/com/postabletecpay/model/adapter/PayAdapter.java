@@ -364,6 +364,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         public void onBindViewHolder(BillInsidePayAdapter.BillInsidePayViewHolder holder, int position) {
             BillEntityAdapter entity = billList.get(position);
             holder.cb.setChecked(entity.isChecked());
+            holder.cb.setEnabled(!entity.isPayed);
             holder.tvDate.setText(entity.getMonthBill());
             holder.tvMoneyBill.setText(String.valueOf(entity.getMoneyBill()));
             holder.tvStatusBill.setText(entity.isPayed ? IS_PAY : NOT_PAY_YET);

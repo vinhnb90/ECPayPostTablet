@@ -116,7 +116,7 @@ public class BillInsideCustomer implements Serializable {
     private String createdDate;
     @SerializedName("idChanged")
     @Expose
-    private Integer idChanged;
+    private Long idChanged;
     @SerializedName("dateChanged")
     @Expose
     private String dateChanged;
@@ -488,11 +488,11 @@ public class BillInsideCustomer implements Serializable {
         this.createdDate = createdDate;
     }
 
-    public Integer getIdChanged() {
+    public Long getIdChanged() {
         return idChanged;
     }
 
-    public void setIdChanged(Integer idChanged) {
+    public void setIdChanged(Long idChanged) {
         this.idChanged = idChanged;
     }
 
