@@ -26,16 +26,16 @@ public class BodyListEVNResponse {
     private String versionApp;
     @SerializedName("list-book-cmis")
     @Expose
-    private ListBookCmissResponse listBookCmissResponse;
+    private String listBookCmissResponse;
     @SerializedName("list-pc")
     @Expose
-    private ListEvnPCLoginResponse listEvnPCLoginResponse;
+    private String listEvnPCLoginResponse;
 
     public BodyListEVNResponse(){
 
     }
 
-    public BodyListEVNResponse(Long auditNumber, String mac, String diskDrive, String signature, String pinLogin, String versionApp, ListBookCmissResponse listBookCmissResponse, ListEvnPCLoginResponse listEvnPCLoginResponse) {
+    public BodyListEVNResponse(Long auditNumber, String mac, String diskDrive, String signature, String pinLogin, String versionApp, String listBookCmissResponse, String listEvnPCLoginResponse) {
         this.auditNumber = auditNumber;
         this.mac = mac;
         this.diskDrive = diskDrive;
@@ -94,19 +94,19 @@ public class BodyListEVNResponse {
         this.versionApp = versionApp;
     }
 
-    public ListBookCmissResponse getListBookCmissResponse() {
+    public String getListBookCmissResponse() {
         return listBookCmissResponse;
     }
 
-    public void setListBookCmissResponse(ListBookCmissResponse listBookCmissResponse) {
+    public void setListBookCmissResponse(String listBookCmissResponse) {
         this.listBookCmissResponse = listBookCmissResponse;
     }
 
-    public ListEvnPCLoginResponse getListEvnPCLoginResponse() {
+    public String getListEvnPCLoginResponse() {
         return listEvnPCLoginResponse;
     }
 
-    public void setListEvnPCLoginResponse(ListEvnPCLoginResponse listEvnPCLoginResponse) {
+    public void setListEvnPCLoginResponse(String listEvnPCLoginResponse) {
         this.listEvnPCLoginResponse = listEvnPCLoginResponse;
     }
 }

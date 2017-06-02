@@ -93,6 +93,7 @@ public class MainPageFragment extends Fragment implements IMainPageView, View.On
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         iMainPagePresenter = new MainPagePresenter(this);
+//        iMainPagePresenter.synchronizeData();
         iMainPagePresenter.synchronizePC();
     }
 
