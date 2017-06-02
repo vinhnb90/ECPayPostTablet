@@ -326,4 +326,24 @@ public class PayModel extends CommonModel {
 
         return sqLiteConnection.insertNotUpdateBillOfCustomer(edong, billInsideCustomer);
     }
+
+    public void updateBillIsChecked(String edong, String code, int billId, boolean checked) {
+
+        sqLiteConnection.updateBillOfCustomerIsChecked(edong, code, billId, checked);
+
+    }
+
+    public int countMoneyAllBillsIsChecked(String edong) {
+        if (edong == null || edong.trim().isEmpty())
+            return ERROR_OCCUR;
+
+        return sqLiteConnection.countMoneyAllBillIsChecked(edong);
+    }
+
+    public int countAllBillsIsChecked(String edong) {
+        if (edong == null || edong.trim().isEmpty())
+            return ERROR_OCCUR;
+
+        return sqLiteConnection.countAllBillsIsChecked(edong);
+    }
 }

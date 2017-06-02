@@ -57,7 +57,7 @@ public class MainPageFragment extends Fragment implements IMainPageView, View.On
     TextView tvSoDuKhaDung;
     @BindView(R.id.tvSoHoaDon)
     TextView tvSoHoaDon;
-    @BindView(R.id.tvTongTien)
+    @BindView(R.id.tv_fragment_thanh_toan_total_bills_money)
     TextView tvTongTien;
     @BindView(R.id.ibtn_frag_main_exit)
     ImageButton ibtnExit;

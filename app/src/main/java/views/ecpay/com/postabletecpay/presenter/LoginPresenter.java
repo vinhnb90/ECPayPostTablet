@@ -93,6 +93,7 @@ public class LoginPresenter implements ILoginPresenter {
 
         try {
             configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.LOGIN.toString(), versionApp);
+//            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER.toString(), versionApp);
         } catch (Exception e) {
             mILoginView.showTextMessage(e.getMessage());
             return;

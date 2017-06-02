@@ -20,6 +20,8 @@ import java.util.List;
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.util.commons.Common;
@@ -81,7 +83,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         List<PayAdapter.BillEntityAdapter> listBill = new ArrayList<>();
         listBill = payModel.getAllBillOfCustomer(edong, code);
-        holder.insideTodayAdapter.setBillList(listBill);
+        holder.insideTodayAdapter.setBillList(edong, code, listBill);
 
         boolean isShowBill = mAdapterList.get(position).isShowBill();
         holder.rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
@@ -136,7 +138,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             ButterKnife.bind(this, itemView);
             this.itemView = itemView;
 
-            insideTodayAdapter = new BillInsidePayAdapter();
+            insideTodayAdapter = new BillInsidePayAdapter(sContext);
             rvBill.setLayoutManager(new LinearLayoutManager(sContext, LinearLayoutManager.VERTICAL, false));
             rvBill.setAdapter(insideTodayAdapter);
 
@@ -168,7 +170,6 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         public PayEntityAdapter() {
         }
-
 
         public PayEntityAdapter(String edong, String tenKH, String diaChi, String loTrinh, String maKH, long tongTien, boolean isConNo, boolean isShowBill) {
             this.edong = edong;
@@ -236,7 +237,6 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         public void setTongTien(long tongTien) {
             this.tongTien = tongTien;
         }
-
 
         public boolean isShowBill() {
             return isShowBill;
@@ -343,13 +343,22 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         public static final String IS_PAY = "Đã thanh toán";
         public static final String NOT_PAY_YET = "Chưa thanh toán";
 
-        private List<BillEntityAdapter> billList;
+        private static List<BillEntityAdapter> billList;
+        private static String code;
+        private static String edong;
+        private static BillInsidePayViewHolder.OnInterationBillInsidePayAdapter interaction;
 
-        public BillInsidePayAdapter() {
+        public BillInsidePayAdapter(Context context) {
+            if (context instanceof BillInsidePayViewHolder.OnInterationBillInsidePayAdapter) {
+                interaction = (BillInsidePayViewHolder.OnInterationBillInsidePayAdapter) context;
+            } else
+                throw new ClassCastException("Context must be implement BillInsidePayViewHolder.OnInterationBillInsidePayAdapter!");
         }
 
-        public void setBillList(List<BillEntityAdapter> billList) {
+        public void setBillList(String edong, String code, List<BillEntityAdapter> billList) {
             this.billList = billList;
+            this.code = code;
+            this.edong = edong;
         }
 
         @Override
@@ -397,6 +406,16 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                 ButterKnife.bind(this, itemView);
             }
 
+            @OnCheckedChanged(R.id.cb_row_bill_inside_pay)
+            public void onCheckedChanged(CheckBox checkBox, boolean checked) {
+                int position = getAdapterPosition();
+                BillEntityAdapter bill = billList.get(position);
+                bill.setChecked(checked);
+
+                interaction.processCheckedBill(edong, code, bill);
+
+            }
+
             public CheckBox getCb() {
                 return cb;
             }
@@ -419,6 +438,10 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
             public ImageButton getIbtnDelete() {
                 return ibtnDelete;
+            }
+
+            public interface OnInterationBillInsidePayAdapter {
+                void processCheckedBill(String edong, String code, BillEntityAdapter bill);
             }
         }
     }

@@ -9,11 +9,11 @@ public class Bill {
     private String customerPayCode;
     private String billId;
     private String term;
-    private int amount;
+    private Integer amount;
     private String period;
     private String issueDate;
     private String strIssueDate;
-    private int status;
+    private Integer status;
     private String seri;
     private String pcCode;
     private String handoverCode;
@@ -33,14 +33,14 @@ public class Bill {
     private String oldIndex;
     private String newIndex;
     private String nume;
-    private int amountNotTax;
-    private int amountTax;
+    private Integer amountNotTax;
+    private Integer amountTax;
     private String multiple;
     private String billType;
     private String typeIndex;
     private String groupTypeIndex;
     private String createdDate;
-    private int idChanged;
+    private Integer idChanged;
     private String dateChanged;
     private String edong;
     private String pcCodeExt;
@@ -57,16 +57,17 @@ public class Bill {
     private String trade;
     private String countPeriod;
     private String team;
-    private int type;
+    private Integer type;
     private String lastQuery;
-    private int groupType;
+    private Integer groupType;
     private String billingChannel;
     private String billingType;
     private String billingBy;
     private String cashierPay;
     private String edongKey;
+    private int isChecked;
 
-    public Bill(String customerCode, String customerPayCode, String billId, String term, int amount, String period, String issueDate, String strIssueDate, int status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate, String strToDate, String home, String tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex, String newIndex, String nume, int amountNotTax, int amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex, String createdDate, int idChanged, String dateChanged, String edong, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp, String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, int type, String lastQuery, int groupType, String billingChannel, String billingType, String billingBy, String cashierPay, String edongKey) {
+    public Bill(String customerCode, String customerPayCode, String billId, String term, Integer amount, String period, String issueDate, String strIssueDate, Integer status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate, String strToDate, String home, String tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex, String newIndex, String nume, Integer amountNotTax, Integer amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex, String createdDate, Integer idChanged, String dateChanged, String edong, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp, String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, Integer type, String lastQuery, Integer groupType, String billingChannel, String billingType, String billingBy, String cashierPay, String edongKey, int isChecked) {
         this.customerCode = customerCode;
         this.customerPayCode = customerPayCode;
         this.billId = billId;
@@ -127,6 +128,7 @@ public class Bill {
         this.billingBy = billingBy;
         this.cashierPay = cashierPay;
         this.edongKey = edongKey;
+        this.isChecked = isChecked;
     }
 
     public String getCustomerCode() {
@@ -161,11 +163,11 @@ public class Bill {
         this.term = term;
     }
 
-    public int getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(Integer amount) {
         this.amount = amount;
     }
 
@@ -193,11 +195,11 @@ public class Bill {
         this.strIssueDate = strIssueDate;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -353,19 +355,19 @@ public class Bill {
         this.nume = nume;
     }
 
-    public int getAmountNotTax() {
+    public Integer getAmountNotTax() {
         return amountNotTax;
     }
 
-    public void setAmountNotTax(int amountNotTax) {
+    public void setAmountNotTax(Integer amountNotTax) {
         this.amountNotTax = amountNotTax;
     }
 
-    public int getAmountTax() {
+    public Integer getAmountTax() {
         return amountTax;
     }
 
-    public void setAmountTax(int amountTax) {
+    public void setAmountTax(Integer amountTax) {
         this.amountTax = amountTax;
     }
 
@@ -409,11 +411,11 @@ public class Bill {
         this.createdDate = createdDate;
     }
 
-    public int getIdChanged() {
+    public Integer getIdChanged() {
         return idChanged;
     }
 
-    public void setIdChanged(int idChanged) {
+    public void setIdChanged(Integer idChanged) {
         this.idChanged = idChanged;
     }
 
@@ -545,11 +547,11 @@ public class Bill {
         this.team = team;
     }
 
-    public int getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
@@ -561,11 +563,11 @@ public class Bill {
         this.lastQuery = lastQuery;
     }
 
-    public int getGroupType() {
+    public Integer getGroupType() {
         return groupType;
     }
 
-    public void setGroupType(int groupType) {
+    public void setGroupType(Integer groupType) {
         this.groupType = groupType;
     }
 
@@ -607,5 +609,13 @@ public class Bill {
 
     public void setEdongKey(String edongKey) {
         this.edongKey = edongKey;
+    }
+
+    public int getIsChecked() {
+        return isChecked;
+    }
+
+    public void setIsChecked(int isChecked) {
+        this.isChecked = isChecked;
     }
 }

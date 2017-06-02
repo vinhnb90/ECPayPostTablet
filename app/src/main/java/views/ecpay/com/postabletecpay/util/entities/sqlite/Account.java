@@ -11,8 +11,8 @@ public class Account {
     private String email;
     private String birthday;
     private String session;
-    private long balance;
-    private int lockMoney;
+    private Long balance;
+    private Integer lockMoney;
     private boolean changePIN;
     private int verified;
 
@@ -20,14 +20,14 @@ public class Account {
     private String ip;
     private String strLoginTime;
     private String strLogoutTime;
-    private int type;
+    private Integer type;
     private String status;
     private String idNumber;
     private String idNumberDate;
     private String idNumberPlace;
     private String parentEdong;
 
-    public Account(String edong, String name, String address, String email, String birthday, String session, long balance, int lockMoney, boolean changePIN, int verified, String mac, String ip, String strLoginTime, String strLogoutTime, int type, String status, String idNumber, String idNumberDate, String idNumberPlace, String parentEdong) {
+    public Account(String edong, String name, String address, String email, String birthday, String session, Long balance, Integer lockMoney, boolean changePIN, int verified, String mac, String ip, String strLoginTime, String strLogoutTime, Integer type, String status, String idNumber, String idNumberDate, String idNumberPlace, String parentEdong) {
         this.edong = edong;
         this.name = name;
         this.address = address;
@@ -98,19 +98,19 @@ public class Account {
         this.session = session;
     }
 
-    public long getBalance() {
+    public Long getBalance() {
         return balance;
     }
 
-    public void setBalance(long balance) {
+    public void setBalance(Long balance) {
         this.balance = balance;
     }
 
-    public int getLockMoney() {
+    public Integer getLockMoney() {
         return lockMoney;
     }
 
-    public void setLockMoney(int lockMoney) {
+    public void setLockMoney(Integer lockMoney) {
         this.lockMoney = lockMoney;
     }
 
@@ -162,11 +162,11 @@ public class Account {
         this.strLogoutTime = strLogoutTime;
     }
 
-    public int getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 

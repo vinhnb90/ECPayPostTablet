@@ -23,5 +23,7 @@ public interface IPayView extends ICommonView {
 
     void showMessageNotifySearchOnline(String message);
 
+    void showEditTextSearch(String value);
 
+    void showCountBillsAndCountTotalMoney(int size, int totalMoneyAllBills);
 }

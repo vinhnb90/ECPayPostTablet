@@ -4,16 +4,18 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
+import org.apache.log4j.chainsaw.Main;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
@@ -30,6 +32,7 @@ import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
 import static android.content.ContentValues.TAG;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.FIRST_PAGE_INDEX;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.ROWS_ON_PAGE;
 
@@ -43,6 +46,8 @@ public class PayPresenter implements IPayPresenter {
     private List<PayAdapter.PayEntityAdapter> mAdapterList = new ArrayList<>();
     private int totalPage;
     private Common.TYPE_SEARCH mTypeSearch;
+    private SoapAPI.AsyncSoapSearchOnline soapSearchOnline;
+    private Handler handlerDelay = new Handler();
 
     public PayPresenter(IPayView mIPayView) {
         this.mIPayView = mIPayView;
@@ -98,7 +103,7 @@ public class PayPresenter implements IPayPresenter {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void callSearchOnline(String mEdong, String infoSearch) {
+    public void callSearchOnline(String mEdong, String infoSearch, boolean isReseach) {
 
         String textMessage = "";
         Context context = mIPayView.getContextView();
@@ -138,7 +143,7 @@ public class PayPresenter implements IPayPresenter {
         }
 
         try {
-            configInfo = Common.setupInfoRequest(context, mEdong, Common.COMMAND_ID.LOGIN.toString(), versionApp);
+            configInfo = Common.setupInfoRequest(context, mEdong, Common.COMMAND_ID.CUSTOMER_BILL.toString(), versionApp);
         } catch (Exception e) {
             mIPayView.showMessageNotifySearchOnline(textMessage);
             return;
@@ -169,75 +174,78 @@ public class PayPresenter implements IPayPresenter {
 
         if (jsonRequestSearchOnline == null)
             return;
+
         try {
-            final SoapAPI.AsyncSoapSearchOnline soapSearchOnline;
-            soapSearchOnline = new SoapAPI.AsyncSoapSearchOnline(mTypeSearch, mEdong, infoSearch, soapSearchOnlineCallBack);
+            if (soapSearchOnline == null) {
+                //if null then create new
+                soapSearchOnline = new SoapAPI.AsyncSoapSearchOnline(mTypeSearch, mEdong, infoSearch, soapSearchOnlineCallBack);
+            } else if (soapSearchOnline.getStatus() == AsyncTask.Status.PENDING) {
+                //if running not yet then run
 
-            if (soapSearchOnline.getStatus() != AsyncTask.Status.RUNNING) {
-                soapSearchOnline.execute(jsonRequestSearchOnline);
+            } else if (soapSearchOnline.getStatus() == AsyncTask.Status.RUNNING) {
+                //if is running
+                soapSearchOnline.setEndCallSoap(true);
+                soapSearchOnline.cancel(true);
 
-                //thread time out
-                Thread soapLoginThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        LoginResponseReponse loginResponseReponse = null;
-                        //call time out
-                        try {
-                            Thread.sleep(Common.TIME_OUT_CONNECT);
-                        } catch (InterruptedException e) {
-                            mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
-                        } finally {
-                            if (loginResponseReponse == null) {
-                                soapSearchOnline.callCountdown(soapSearchOnline);
-                            }
-                        }
-                    }
-                });
+//                soapSearchOnlineThread.interrupt();
+                handlerDelay.removeCallbacks(runnableCountTime);
+                soapSearchOnline = new SoapAPI.AsyncSoapSearchOnline(mTypeSearch, mEdong, infoSearch, soapSearchOnlineCallBack);
+            } else {
+                //if running or finish
+                handlerDelay.removeCallbacks(runnableCountTime);
 
-                soapLoginThread.start();
+//                soapSearchOnlineThread.interrupt();
+                soapSearchOnline = new SoapAPI.AsyncSoapSearchOnline(mTypeSearch, mEdong, infoSearch, soapSearchOnlineCallBack);
             }
+
+            soapSearchOnline.execute(jsonRequestSearchOnline);
+
+            //thread time out
+            //sleep
+            handlerDelay.postDelayed(runnableCountTime, TIME_OUT_CONNECT);
+
         } catch (Exception e) {
             mIPayView.showMessageNotifySearchOnline(e.getMessage());
             return;
         }
     }
 
-    /*private void callPayRecyclerAll(String mEdong, int pageIndex) {
-        if (pageIndex == PayFragment.FIRST_PAGE_INDEX) {
-            mAdapterList.clear();
-
-            totalPage = mAdapterList.size() / ROWS_ON_PAGE;
-            if (totalPage * ROWS_ON_PAGE != mAdapterList.size() || (totalPage == 0))
-                totalPage++;
-
-            int index = 0;
-            int maxIndex = pageIndex * ROWS_ON_PAGE;
-            if (maxIndex > mAdapterList.size())
-                maxIndex = mAdapterList.size();
-
-            List<PayAdapter.PayEntityAdapter> fitter = new ArrayList<>();
-            for (; index < maxIndex; index++)
-                fitter.add(mAdapterList.get(index));
-
-            mIPayView.showPayRecyclerFirstPage(fitter, pageIndex, totalPage, , false);
-        } else {
-            if (pageIndex > totalPage)
-                return;
-
-            int index = ROWS_ON_PAGE * (pageIndex - FIRST_PAGE_INDEX);
-            int maxIndex = ROWS_ON_PAGE * (pageIndex);
-
-            if (maxIndex > mAdapterList.size())
-                maxIndex = mAdapterList.size();
-
-            List<PayAdapter.PayEntityAdapter> adapterListSearch = new ArrayList<>();
-            for (; index < maxIndex; index++) {
-                adapterListSearch.add(mAdapterList.get(index));
-            }
-
-            mIPayView.showPayRecyclerPage(adapterListSearch, pageIndex, totalPage, infoSearch, false);
+    @Override
+    public void cancelSeachOnline() {
+        if (soapSearchOnline != null && !soapSearchOnline.isEndCallSoap()) {
+            soapSearchOnline.setEndCallSoap(true);
         }
-    }*/
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void reseachOnline(String edong) {
+        cancelSeachOnline();
+        if (soapSearchOnline != null) {
+            mIPayView.showEditTextSearch(soapSearchOnline.getInfoSearch());
+            callSearchOnline(edong, soapSearchOnline.getInfoSearch(), true);
+        }
+    }
+
+    @Override
+    public void callProcessDataBillChecked(String edong, String code, PayAdapter.BillEntityAdapter bill) {
+        if (edong == null || edong.trim().isEmpty())
+            return;
+        if (code == null || code.trim().isEmpty())
+            return;
+        if (bill == null)
+            return;
+
+            mPayModel.updateBillIsChecked(edong, code, bill.getBillId(), bill.isChecked());
+
+        int totalBills = mPayModel.countAllBillsIsChecked(edong);
+
+        //show total bills and total money of all bills is checked
+        int totalMoneyAllBills = mPayModel.countMoneyAllBillsIsChecked(edong);
+
+
+        mIPayView.showCountBillsAndCountTotalMoney(totalBills, totalMoneyAllBills);
+    }
 
     private SoapAPI.AsyncSoapSearchOnline.AsyncSoapSearchOnlineCallBack soapSearchOnlineCallBack = new SoapAPI.AsyncSoapSearchOnline.AsyncSoapSearchOnlineCallBack() {
         private Common.TYPE_SEARCH typeSearch;
@@ -271,11 +279,16 @@ public class PayPresenter implements IPayPresenter {
         }
 
         @Override
-        public void onUpdate(String message) {
+        public void onUpdate(final String message) {
             if (message == null || message.isEmpty() || message.trim().equals(""))
                 return;
 
-            mIPayView.showMessageNotifySearchOnline(message);
+            ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mIPayView.showMessageNotifySearchOnline(message);
+                }
+            });
         }
 
         @Override
@@ -306,7 +319,7 @@ public class PayPresenter implements IPayPresenter {
             if (customerResponse == null)
                 return;
 
-            int rowEffect = mPayModel.writeSQLiteCustomerTable(edong,customerResponse);
+            int rowEffect = mPayModel.writeSQLiteCustomerTable(edong, customerResponse);
             if (rowEffect == SQLiteConnection.ERROR_OCCUR) {
                 Log.d(TAG, "Cannot insert customer to database.");
             }
@@ -347,6 +360,21 @@ public class PayPresenter implements IPayPresenter {
                     }
                 }
             });
+        }
+    };
+
+    private Runnable runnableCountTime = new Runnable() {
+        @Override
+        public void run() {
+            if (soapSearchOnline != null && soapSearchOnline.isEndCallSoap())
+                return;
+            //Do something after 100ms
+            SearchOnlineResponse searchOnlineResponse = soapSearchOnline.getSearchOnlineResponse();
+
+            if (searchOnlineResponse == null && !soapSearchOnline.isEndCallSoap()) {
+                //call time out
+                soapSearchOnline.callCountdown(soapSearchOnline);
+            }
         }
     };
 }

@@ -403,6 +403,7 @@ public class Common {
     public static final String TEXT_MULTI_SPACE = TEXT_SPACE.concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE);
     public static final String TEXT_SEARCHING = "Searching online....";
     public static final int ZERO = 0;
+    public static final int ONE = 1;
     public static final boolean BOOL_DEFAULT = false;
     //endregion
 
@@ -973,6 +974,8 @@ public class Common {
 
     //region method utils
     //delay animations when view is clicked
+    public static final String UNIT_MONEY = "đ";
+
     public static final int TIME_DELAY_ANIM = 250;
 
     public enum TEXT_DIALOG {

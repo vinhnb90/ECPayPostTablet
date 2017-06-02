@@ -207,7 +207,6 @@ public class SoapAPI {
         searchOnlineRequest.setBody(bodySearchOnlineRequest);
         searchOnlineRequest.setFooter(footerLoginRequest);
 
-
 //        Type type = new TypeToken<SearchOnlineRequest>() {
 //        }.getType();
 //        Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -450,6 +449,7 @@ public class SoapAPI {
         private static final String METHOD_PARAM = "message";
         private AsyncSoapSearchOnlineCallBack callBack;
         private boolean isEndCallSoap = false;
+        private SearchOnlineResponse searchOnlineResponse;
 
         public AsyncSoapSearchOnline(Common.TYPE_SEARCH typeSearch, String edong, String infoSearch, AsyncSoapSearchOnlineCallBack callBack) throws Exception {
             this.callBack = callBack;
@@ -461,6 +461,7 @@ public class SoapAPI {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            searchOnlineResponse = null;
             callBack.onPre(this);
         }
 
@@ -497,7 +498,7 @@ public class SoapAPI {
                 return null;
             }
 
-            SearchOnlineResponse searchOnlineResponse = new Gson().fromJson(data, SearchOnlineResponse.class);
+            searchOnlineResponse = new Gson().fromJson(data, SearchOnlineResponse.class);
            /* final GsonBuilder gsonBuilder = new GsonBuilder();
             gsonBuilder.registerTypeAdapter(LoginResponseReponse.class, new LoginResponseAdapter());
 //            gsonBuilder.registerTypeAdapter(ResponseLoginResponse.class, new )
@@ -513,8 +514,8 @@ public class SoapAPI {
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             String message = values[0];
-            if (isEndCallSoap)
-                callBack.onUpdate(message);
+            isEndCallSoap = true;
+            callBack.onUpdate(message);
         }
 
         @Override
@@ -559,6 +560,10 @@ public class SoapAPI {
 
         public String getInfoSearch() {
             return infoSearch;
+        }
+
+        public SearchOnlineResponse getSearchOnlineResponse() {
+            return searchOnlineResponse;
         }
     }
     //endregion

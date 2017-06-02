@@ -37,7 +37,7 @@
             android:layout_centerVertical="true"/>
 
         <TextView
-            android:id="@+id/tvTongTien"
+            android:id="@+id/tv_fragment_thanh_toan_total_bills_money"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1.000.000 đ"
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tổng tiền: "
-            android:layout_toLeftOf="@+id/tvTongTien"
+            android:layout_toLeftOf="@+id/tv_fragment_thanh_toan_total_bills_money"
             android:textColor="@color/colorTextBlack"
             android:layout_centerVertical="true"/>
 

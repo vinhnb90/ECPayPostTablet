@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import butterknife.BindInt;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -43,12 +44,14 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
  * Created by macbook on 4/28/17.
  */
 
-public class PayFragment extends Fragment implements IPayView, View.OnClickListener {
+public class PayFragment extends Fragment implements
+        IPayView,
+        PayAdapter.BillInsidePayAdapter.BillInsidePayViewHolder.OnInterationBillInsidePayAdapter,
+        View.OnClickListener {
     public static final int FIRST_PAGE_INDEX = 1;
     public static final int PAGE_INCREMENT = 1;
     public static final int ROWS_ON_PAGE = 10;
-    //    private int heightRecycler, heightTabLayout;
-//    private int widthRecycler, widthTabLayout;
+
     @BindView(R.id.ibtn_frag_user_info_back)
     ImageButton ibBack;
     @BindView(R.id.ibScaner)
@@ -57,10 +60,6 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     ImageButton ibAdd;
     @BindView(R.id.etSearch)
     EditText etSearch;
-    @BindView(R.id.tvHoaDon)
-    TextView tvHoaDon;
-    @BindView(R.id.tvTongTien)
-    TextView tvTongTien;
     @BindView(R.id.btThanhToan)
     Button btThanhToan;
     @BindView(R.id.rvKhachHang)
@@ -77,6 +76,12 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     TextView tvPage;
     @BindView(R.id.ll_frag_thanh_toan_page)
     LinearLayout llCountPage;
+    @BindView(R.id.ibtn_frag_thanhtoan_clear_text_search)
+    ImageButton ibtnClearSearch;
+    @BindView(R.id.tv_fragment_thanh_toan_total_bills_checked)
+    TextView tvTotalBills;
+    @BindView(R.id.tv_fragment_thanh_toan_total_bills_money)
+    TextView tvTotalBillsMoney;
 
     //Search online
     @BindView(R.id.rv_frag_thanhtoan_search_online_progress)
@@ -193,6 +198,26 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
         mPageIndex -= PAGE_INCREMENT;
         mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
     }
+
+    @OnClick(R.id.ibtn_frag_thanhtoan_action_cancel_search_online)
+    public void clickCancelSearchOnline(View view) {
+        Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
+        hideSearchOnlineProcess();
+        mIPayPresenter.cancelSeachOnline();
+    }
+
+    @OnClick(R.id.ibtn_frag_thanhtoan_action_research_online)
+    public void clickResearchOnline(View view) {
+        Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
+        showSearchOnlineProcess();
+        mIPayPresenter.reseachOnline(mEdong);
+    }
+
+    @OnClick(R.id.ibtn_frag_thanhtoan_clear_text_search)
+    public void clickClearTextSearch(View view) {
+        Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
+        etSearch.setText("");
+    }
     //endregion
 
     //region listener tablayout
@@ -242,12 +267,14 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
                 }
             });
 
-            etSearch.post(new Runnable() {
-                @Override
-                public void run() {
-                    etSearch.setHint(etSearch.getText().toString().concat(Common.TEXT_MULTI_SPACE).concat(Common.TEXT_SEARCHING));
-                }
-            });
+//            etSearch.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    etSearch.setHint(etSearch.getText().toString().concat(Common.TEXT_MULTI_SPACE).concat(Common.TEXT_SEARCHING));
+//                }
+//            });
+        } else {
+            hideSearchOnlineProcess();
         }
     }
 
@@ -293,12 +320,12 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
             payAdapter = new PayAdapter(getContext(), this, adapterList);
             rvKH.setAdapter(payAdapter);
         } else
-        rvKH.invalidate();
+            rvKH.invalidate();
 
         //if isSeachOnline
         if (isSeachOnline == false || infoSearch == null)
             return;
-        mIPayPresenter.callSearchOnline(mEdong, infoSearch);
+        mIPayPresenter.callSearchOnline(mEdong, infoSearch, true);
     }
 
     @Override
@@ -330,6 +357,20 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
         tvMessageNotifySearchOnlne.setText(message);
     }
 
+    @Override
+    public void showEditTextSearch(String value) {
+        if (value == null)
+            return;
+
+        etSearch.setText(value);
+    }
+
+    @Override
+    public void showCountBillsAndCountTotalMoney(int size, int totalMoneyAllBills) {
+        tvTotalBills.setText(String.valueOf(size));
+        tvTotalBillsMoney.setText(String.valueOf(totalMoneyAllBills) + Common.UNIT_MONEY);
+    }
+
     private void setEnablePreNext(int i) {
         if (i == 0) {
             btnPre.setEnabled(false);
@@ -350,6 +391,20 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     }
     //endregion
 
+    //region PayAdapter.BillInsidePayAdapter.BillInsidePayViewHolder.OnInterationBillInsidePayAdapter
+    @Override
+    public void processCheckedBill(String edong, String code, PayAdapter.BillEntityAdapter bill) {
+        if (edong == null || edong.trim().isEmpty())
+            return;
+        if (code == null || code.trim().isEmpty())
+            return;
+        if (bill == null)
+            return;
+
+        mIPayPresenter.callProcessDataBillChecked(edong, code, bill);
+    }
+    //endregion
+
     public interface OnFragmentInteractionListener {
     }
 
@@ -362,7 +417,7 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
         TextView tvSoHoaDon = (TextView) dialog.findViewById(R.id.tvSoHoaDon);
-        TextView tvTongTien = (TextView) dialog.findViewById(R.id.tvTongTien);
+        TextView tvTongTien = (TextView) dialog.findViewById(R.id.tv_fragment_thanh_toan_total_bills_money);
         RecyclerView rvDanhSach = (RecyclerView) dialog.findViewById(R.id.rvDanhSach);
         Button btHuy = (Button) dialog.findViewById(R.id.btHuy);
         Button btThanhToan = (Button) dialog.findViewById(R.id.btThanhToan);
