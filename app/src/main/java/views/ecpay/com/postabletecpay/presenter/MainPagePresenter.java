@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
+import org.ecpay.client.test.SecurityUtils;
+
 import views.ecpay.com.postabletecpay.model.MainPageModel;
 import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
 import views.ecpay.com.postabletecpay.util.commons.Common;
@@ -89,7 +91,7 @@ public class MainPagePresenter implements IMainPagePresenter{
         }
 
         try {
-            configInfo = Common.setupInfoRequest(context, userName, pass, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER.toString(), versionApp);
+            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER.toString(), versionApp);
         } catch (Exception e) {
             iMainPageView.showTextMessage(e.getMessage());
             return;
@@ -116,10 +118,10 @@ public class MainPagePresenter implements IMainPagePresenter{
                     soapSynchronizePC.execute(jsonRequestEVN);
 
                     //thread time out
-                    Thread soapLoginThread = new Thread(new Runnable() {
+                    Thread soapevnThread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            ListEvnPCLoginResponse listEvnPCLoginResponse = null;
+                            ListEVNReponse listEVNReponse = null;
 
                             //call time out
                             try {
@@ -127,14 +129,14 @@ public class MainPagePresenter implements IMainPagePresenter{
                             } catch (InterruptedException e) {
                                 iMainPageView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
                             } finally {
-                                if (listEvnPCLoginResponse == null) {
+                                if (listEVNReponse == null) {
                                     soapSynchronizePC.callCountdown(soapSynchronizePC);
                                 }
                             }
                         }
                     });
 
-                    soapLoginThread.start();
+                    soapevnThread.start();
                 }
             } catch (Exception e) {
                 iMainPageView.showTextMessage(e.getMessage());
@@ -212,7 +214,7 @@ public class MainPagePresenter implements IMainPagePresenter{
         }
 
         try {
-            configInfo = Common.setupInfoRequest(context, userName, pass, Common.COMMAND_ID.SYNC_DATA.toString(), versionApp);
+            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.SYNC_DATA.toString(), versionApp);
         } catch (Exception e) {
             iMainPageView.showTextMessage(e.getMessage());
             return;

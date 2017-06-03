@@ -12,10 +12,10 @@ public class SearchOnlineResponse implements Serializable {
     @SerializedName("header")
     @Expose
     private HeaderLoginResponse header;
-    @SerializedName("bodySearchOnlineResponse")
+    @SerializedName("body")
     @Expose
     private BodySearchOnlineResponse bodySearchOnlineResponse;
-    @SerializedName("footerSearchOnlineResponse")
+    @SerializedName("footer")
     @Expose
     private FooterSearchOnlineResponse footerSearchOnlineResponse;
     private final static long serialVersionUID = 6743274675011955698L;

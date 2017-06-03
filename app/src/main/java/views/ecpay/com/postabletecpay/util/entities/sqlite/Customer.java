@@ -19,8 +19,9 @@ public class Customer {
     private String bankAccount;
     private String idNumber;
     private String bankName;
+    private String edongKey;
 
-    public Customer(String code, String name, String address, String pcCode, String pcCodeExt, String phoneByevn, String phoneByecp, String bookCmis, String electricityMeter, String inning, String status, String bankAccount, String idNumber, String bankName) {
+    public Customer(String code, String name, String address, String pcCode, String pcCodeExt, String phoneByevn, String phoneByecp, String bookCmis, String electricityMeter, String inning, String status, String bankAccount, String idNumber, String bankName, String edongKey) {
         this.code = code;
         this.name = name;
         this.address = address;
@@ -35,6 +36,7 @@ public class Customer {
         this.bankAccount = bankAccount;
         this.idNumber = idNumber;
         this.bankName = bankName;
+        this.edongKey = edongKey;
     }
 
     public String getCode() {
@@ -147,5 +149,13 @@ public class Customer {
 
     public void setBankName(String bankName) {
         this.bankName = bankName;
+    }
+
+    public String getEdongKey() {
+        return edongKey;
+    }
+
+    public void setEdongKey(String edongKey) {
+        this.edongKey = edongKey;
     }
 }

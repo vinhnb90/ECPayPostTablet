@@ -18,33 +18,12 @@ public class BodyListEVNResponse {
     @SerializedName("signature")
     @Expose
     private String signature;
-    @SerializedName("pin-login")
-    @Expose
-    private String pinLogin;
-    @SerializedName("version-app")
-    @Expose
-    private String versionApp;
     @SerializedName("list-book-cmis")
     @Expose
     private String listBookCmissResponse;
     @SerializedName("list-pc")
     @Expose
     private String listEvnPCLoginResponse;
-
-    public BodyListEVNResponse(){
-
-    }
-
-    public BodyListEVNResponse(Long auditNumber, String mac, String diskDrive, String signature, String pinLogin, String versionApp, String listBookCmissResponse, String listEvnPCLoginResponse) {
-        this.auditNumber = auditNumber;
-        this.mac = mac;
-        this.diskDrive = diskDrive;
-        this.signature = signature;
-        this.pinLogin = pinLogin;
-        this.versionApp = versionApp;
-        this.listBookCmissResponse = listBookCmissResponse;
-        this.listEvnPCLoginResponse = listEvnPCLoginResponse;
-    }
 
     public Long getAuditNumber() {
         return auditNumber;
@@ -76,22 +55,6 @@ public class BodyListEVNResponse {
 
     public void setSignature(String signature) {
         this.signature = signature;
-    }
-
-    public String getPinLogin() {
-        return pinLogin;
-    }
-
-    public void setPinLogin(String pinLogin) {
-        this.pinLogin = pinLogin;
-    }
-
-    public String getVersionApp() {
-        return versionApp;
-    }
-
-    public void setVersionApp(String versionApp) {
-        this.versionApp = versionApp;
     }
 
     public String getListBookCmissResponse() {

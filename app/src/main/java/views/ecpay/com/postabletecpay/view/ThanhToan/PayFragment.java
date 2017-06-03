@@ -195,14 +195,14 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
     }
     //endregion
 
-    //region listener viewpage
+    //region listener tablayout
     @OnPageChange(R.id.view_pager)
     public void onPageSelected(int position) {
         mPageIndex = FIRST_PAGE_INDEX;
         Common.TYPE_SEARCH typeSearch = Common.TYPE_SEARCH.findMessage(position);
-        boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
-        if (isSeachOnline)
-            return;
+//        boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
+//        if (isSeachOnline)
+//            return;
         mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString().trim(), false);
     }
 
@@ -211,15 +211,6 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
             return true;
         }
         return false;
-    }
-
-
-    @OnPageChange(R.id.view_pager)
-    public void onPageScrolled(int position) {
-    }
-
-    @OnPageChange(R.id.view_pager)
-    public void onPageScrollStateChanged(int position) {
     }
     //endregion
 
@@ -270,71 +261,11 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
 
     //endregion
 
-    private void showDialogThanhToan() {
-        final Dialog dialog = new Dialog(this.getActivity());
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_thanhtoan);
-        dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-
-        TextView tvSoHoaDon = (TextView) dialog.findViewById(R.id.tvSoHoaDon);
-        TextView tvTongTien = (TextView) dialog.findViewById(R.id.tvTongTien);
-        RecyclerView rvDanhSach = (RecyclerView) dialog.findViewById(R.id.rvDanhSach);
-        Button btHuy = (Button) dialog.findViewById(R.id.btHuy);
-        Button btThanhToan = (Button) dialog.findViewById(R.id.btThanhToan);
-
-        btHuy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        btThanhToan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        dialog.show();
-    }
-
     //region IPayView
     @Override
     public Context getContextView() {
         return getContext();
     }
-/*
-    @Override
-    public void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) {
-        btnPre.setEnabled(false);
-        btnNext.setEnabled(true);
-        tvPage.setText(String.valueOf(mPageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage == 0 ? FIRST_PAGE_INDEX : totalPage)));
-
-//        setNewAdapterRecycler(adapterList);
-        payAdapter = new PayAdapter(getContext(), this, adapterList);
-
-        rvKH.setAdapter(payAdapter);
-        rvKH.invalidate();
-
-        //if isSeachOnline
-        if (isSeachOnline == true && infoSearch == null)
-            return;
-        mIPayPresenter.callSearchOnline(mEdong, infoSearch);
-    }*/
-
-    /*private void setNewAdapterRecycler(List<PayAdapter.PayEntityAdapter> adapterList) {
-        int widthRecyclerReal, heightRecyclerReal;
-
-        widthRecyclerReal = (tabLayout.getVisibility() == View.VISIBLE) ? (widthRecycler - widthTabLayout) : widthRecycler;
-        heightRecyclerReal = (tabLayout.getVisibility() == View.VISIBLE) ? (heightRecycler - heightTabLayout) : heightRecycler;
-        payAdapter = new PayAdapter(getContext(), adapterList, widthRecyclerReal, heightRecyclerReal);
-
-        rvKH.setAdapter(payAdapter);
-        rvKH.invalidate();
-    }*/
 
     @Override
     public void showPayRecyclerPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) {
@@ -362,11 +293,10 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
             payAdapter = new PayAdapter(getContext(), this, adapterList);
             rvKH.setAdapter(payAdapter);
         } else
-            payAdapter.refreshData(adapterList);
         rvKH.invalidate();
 
         //if isSeachOnline
-        if (isSeachOnline == true && infoSearch == null)
+        if (isSeachOnline == false || infoSearch == null)
             return;
         mIPayPresenter.callSearchOnline(mEdong, infoSearch);
     }
@@ -422,4 +352,36 @@ public class PayFragment extends Fragment implements IPayView, View.OnClickListe
 
     public interface OnFragmentInteractionListener {
     }
+
+    private void showDialogThanhToan() {
+        final Dialog dialog = new Dialog(this.getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_thanhtoan);
+        dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        TextView tvSoHoaDon = (TextView) dialog.findViewById(R.id.tvSoHoaDon);
+        TextView tvTongTien = (TextView) dialog.findViewById(R.id.tvTongTien);
+        RecyclerView rvDanhSach = (RecyclerView) dialog.findViewById(R.id.rvDanhSach);
+        Button btHuy = (Button) dialog.findViewById(R.id.btHuy);
+        Button btThanhToan = (Button) dialog.findViewById(R.id.btThanhToan);
+
+        btHuy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        btThanhToan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        dialog.show();
+    }
+
 }

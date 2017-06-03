@@ -300,9 +300,9 @@ public class SoapAPI {
             return null;
         if (customerCode == null || customerCode.isEmpty() || customerCode.trim().equals(""))
             return null;
-        if (pcCode == null || pcCode.isEmpty())
+        if (pcCode == null)
             return null;
-        if (bookCmis == null || bookCmis.isEmpty())
+        if (bookCmis == null)
             return null;
         if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
             return null;
@@ -329,12 +329,18 @@ public class SoapAPI {
         searchOnlineRequest.setBody(bodySearchOnlineRequest);
         searchOnlineRequest.setFooter(footerLoginRequest);
 
-        Type type = new TypeToken<SearchOnlineRequest>() {
-        }.getType();
 
-        String jsonResult = new GsonBuilder().create().toJson(searchOnlineRequest, type);
+//        Type type = new TypeToken<SearchOnlineRequest>() {
+//        }.getType();
+//        Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+//        String jsonResult = new GsonBuilder().create().toJson(searchOnlineRequest, type);
+        String jsonResult = new GsonBuilder().setPrettyPrinting().create().toJson(searchOnlineRequest);
         return jsonResult;
+    }
+
+    public static String getJsonRequestSynchronizePC() {
+        return null;
     }
 
     //endregion
@@ -736,7 +742,7 @@ public class SoapAPI {
 
             ListEVNReponse listEVNReponse = null;
             final GsonBuilder gsonBuilder = new GsonBuilder();
-//            gsonBuilder.registerTypeAdapter(ListEVNReponse.class, new LoginResponseAdapter());
+//            gsonBuilder.registerTypeAdapter(ListEVNReponse.class, new EVNRe());
 //            gsonBuilder.setPrettyPrinting();
             final Gson gson = gsonBuilder.create();
 

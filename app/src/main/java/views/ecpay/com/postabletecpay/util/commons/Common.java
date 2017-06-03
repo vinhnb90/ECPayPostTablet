@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.PrivateKey;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -70,8 +71,6 @@ import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
  */
 
 public class Common {
-
-
 
     //region param account
     public enum TYPE_ACCOUNT {
@@ -895,12 +894,10 @@ public class Common {
 //        return configInfo;
 //    }
 
-    public static ConfigInfo setupInfoRequest(Context context, String userName, String pass, String commandId, String versionApp) throws Exception {
+    public static ConfigInfo setupInfoRequest(Context context, String userName, String commandId, String versionApp) throws Exception {
         if (context == null)
             return null;
         if (userName == null || userName.isEmpty() || userName.trim().isEmpty())
-            return null;
-        if (pass == null || pass.isEmpty() || pass.trim().isEmpty())
             return null;
         if (commandId == null || commandId.isEmpty() || commandId.trim().isEmpty())
             return null;
@@ -972,19 +969,6 @@ public class Common {
         configInfo.setSignatureEncrypted(signatureEncrypted);
 
         //set command id
-        //encrypt pinLogin by Triple DES CBC
-        String pinLoginEncrypted;
-        try {
-            pinLoginEncrypted =
-//                    Common.encryptPassByTripleDsCbc(context, pass.trim(), publicKeyRSA, privateKeyRSA);
-                    SecurityUtils.tripleDesc(context, pass.trim(), privateKeyRSA.trim(), publicKeyRSA.trim());
-
-        } catch (Exception e) {
-            throw new Exception(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
-        }
-        configInfo.setPinLoginEncrypted(pinLoginEncrypted);
-
-        //set command id
         configInfo.setCommandId(commandId);
 
         //set version app
@@ -992,6 +976,8 @@ public class Common {
 
         return configInfo;
     }
+
+
 
     //endregion
 
@@ -1027,12 +1013,18 @@ public class Common {
 
     public enum DATE_TIME_TYPE {
         HHmmss,
+        yyyymmdd,
+        mmyyyy,
         FULL;
 
         @Override
         public String toString() {
             if (this == HHmmss)
                 return "HHmmss";
+            if (this == yyyymmdd)
+                return "yyyy-mm-dd";
+            if (this == mmyyyy)
+                return "mm/yyyy";
             if (this == FULL)
                 return "yyyy-MM-dd'T'HH:mm:ss";
             return super.toString();
@@ -1058,13 +1050,13 @@ public class Common {
         return hour.concat(minute).concat(second);
     }
 
-    public static String convertLongToDate(long time, String format) {
+    public static String convertLongToDate(long time, Common.DATE_TIME_TYPE format) {
         if (time < 0)
             return null;
-        if (format == null || format.isEmpty())
+        if (format == null)
             return null;
 
-        SimpleDateFormat df2 = new SimpleDateFormat(format);
+        SimpleDateFormat df2 = new SimpleDateFormat(format.toString());
         df2.setTimeZone(TimeZone.getTimeZone("GMT"));
         Date date = new Date(time);
         return df2.format(date);
@@ -1147,5 +1139,27 @@ public class Common {
         return screenWidth;
     }
 
+    public static String convertDateToDate(String time, DATE_TIME_TYPE typeDefault, DATE_TIME_TYPE typeConvert) {
+        if(time == null || time.trim().isEmpty())
+            return "";
+
+        long longDate = Common.convertDateToLong(time, typeDefault);
+
+        String dateByDefaultType = Common.convertLongToDate(longDate, typeConvert);
+        return dateByDefaultType;
+    }
+
+    public static long convertDateToLong(String date,  DATE_TIME_TYPE typeDefault) {
+        SimpleDateFormat formatter = new SimpleDateFormat(typeDefault.toString());
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+        Date dateParse;
+        try {
+            dateParse = (Date) formatter.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return dateParse.getTime();
+    }
     //endregion
 }

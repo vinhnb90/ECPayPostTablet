@@ -64,8 +64,9 @@ public class Bill {
     private String billingType;
     private String billingBy;
     private String cashierPay;
+    private String edongKey;
 
-    public Bill(String customerCode, String customerPayCode, String billId, String term, int amount, String period, String issueDate, String strIssueDate, int status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate, String strToDate, String home, String tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex, String newIndex, String nume, int amountNotTax, int amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex, String createdDate, int idChanged, String dateChanged, String edong, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp, String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, int type, String lastQuery, int groupType, String billingChannel, String billingType, String billingBy, String cashierPay) {
+    public Bill(String customerCode, String customerPayCode, String billId, String term, int amount, String period, String issueDate, String strIssueDate, int status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate, String strToDate, String home, String tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex, String newIndex, String nume, int amountNotTax, int amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex, String createdDate, int idChanged, String dateChanged, String edong, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp, String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, int type, String lastQuery, int groupType, String billingChannel, String billingType, String billingBy, String cashierPay, String edongKey) {
         this.customerCode = customerCode;
         this.customerPayCode = customerPayCode;
         this.billId = billId;
@@ -125,6 +126,7 @@ public class Bill {
         this.billingType = billingType;
         this.billingBy = billingBy;
         this.cashierPay = cashierPay;
+        this.edongKey = edongKey;
     }
 
     public String getCustomerCode() {
@@ -599,4 +601,11 @@ public class Bill {
         this.cashierPay = cashierPay;
     }
 
+    public String getEdongKey() {
+        return edongKey;
+    }
+
+    public void setEdongKey(String edongKey) {
+        this.edongKey = edongKey;
+    }
 }

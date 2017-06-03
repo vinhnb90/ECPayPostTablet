@@ -8,7 +8,7 @@ public class BodySearchOnlineResponse implements Serializable
 {
     @SerializedName("audit-number")
     @Expose
-    private Integer auditNumber;
+    private Long auditNumber;
     @SerializedName("mac")
     @Expose
     private String mac;
@@ -35,11 +35,11 @@ public class BodySearchOnlineResponse implements Serializable
     private String customer;
     private final static long serialVersionUID = -2620834768200595838L;
 
-    public Integer getAuditNumber() {
+    public Long getAuditNumber() {
         return auditNumber;
     }
 
-    public void setAuditNumber(Integer auditNumber) {
+    public void setAuditNumber(Long auditNumber) {
         this.auditNumber = auditNumber;
     }
 

@@ -15,6 +15,7 @@
         android:orientation="horizontal">
 
         <CheckBox
+            android:checked="false"
             android:id="@+id/cb_row_bill_inside_pay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

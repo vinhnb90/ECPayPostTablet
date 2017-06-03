@@ -82,10 +82,10 @@ public class CustomerInsideBody implements Serializable
     private String lastQuery;
     @SerializedName("idChanged")
     @Expose
-    private Integer idChanged;
+    private Long idChanged;
     @SerializedName("dateChanged")
     @Expose
-    private Integer dateChanged;
+    private Long dateChanged;
     @SerializedName("bankAccount")
     @Expose
     private String bankAccount;
@@ -103,7 +103,7 @@ public class CustomerInsideBody implements Serializable
     private String response;
     @SerializedName("listBill")
     @Expose
-    private List<BillInsideCustomer> listBill = null;
+    private List<BillInsideCustomer> listBill;
     @SerializedName("countBill")
     @Expose
     private Integer countBill;
@@ -301,19 +301,19 @@ public class CustomerInsideBody implements Serializable
         this.lastQuery = lastQuery;
     }
 
-    public Integer getIdChanged() {
+    public Long getIdChanged() {
         return idChanged;
     }
 
-    public void setIdChanged(Integer idChanged) {
+    public void setIdChanged(Long idChanged) {
         this.idChanged = idChanged;
     }
 
-    public Integer getDateChanged() {
+    public Long getDateChanged() {
         return dateChanged;
     }
 
-    public void setDateChanged(Integer dateChanged) {
+    public void setDateChanged(Long dateChanged) {
         this.dateChanged = dateChanged;
     }
 
