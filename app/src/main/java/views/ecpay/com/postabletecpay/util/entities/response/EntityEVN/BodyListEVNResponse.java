@@ -18,33 +18,12 @@ public class BodyListEVNResponse {
     @SerializedName("signature")
     @Expose
     private String signature;
-    @SerializedName("pin-login")
-    @Expose
-    private String pinLogin;
-    @SerializedName("version-app")
-    @Expose
-    private String versionApp;
     @SerializedName("list-book-cmis")
     @Expose
-    private ListBookCmissResponse listBookCmissResponse;
+    private String listBookCmissResponse;
     @SerializedName("list-pc")
     @Expose
-    private ListEvnPCLoginResponse listEvnPCLoginResponse;
-
-    public BodyListEVNResponse(){
-
-    }
-
-    public BodyListEVNResponse(Long auditNumber, String mac, String diskDrive, String signature, String pinLogin, String versionApp, ListBookCmissResponse listBookCmissResponse, ListEvnPCLoginResponse listEvnPCLoginResponse) {
-        this.auditNumber = auditNumber;
-        this.mac = mac;
-        this.diskDrive = diskDrive;
-        this.signature = signature;
-        this.pinLogin = pinLogin;
-        this.versionApp = versionApp;
-        this.listBookCmissResponse = listBookCmissResponse;
-        this.listEvnPCLoginResponse = listEvnPCLoginResponse;
-    }
+    private String listEvnPCLoginResponse;
 
     public Long getAuditNumber() {
         return auditNumber;
@@ -78,35 +57,19 @@ public class BodyListEVNResponse {
         this.signature = signature;
     }
 
-    public String getPinLogin() {
-        return pinLogin;
-    }
-
-    public void setPinLogin(String pinLogin) {
-        this.pinLogin = pinLogin;
-    }
-
-    public String getVersionApp() {
-        return versionApp;
-    }
-
-    public void setVersionApp(String versionApp) {
-        this.versionApp = versionApp;
-    }
-
-    public ListBookCmissResponse getListBookCmissResponse() {
+    public String getListBookCmissResponse() {
         return listBookCmissResponse;
     }
 
-    public void setListBookCmissResponse(ListBookCmissResponse listBookCmissResponse) {
+    public void setListBookCmissResponse(String listBookCmissResponse) {
         this.listBookCmissResponse = listBookCmissResponse;
     }
 
-    public ListEvnPCLoginResponse getListEvnPCLoginResponse() {
+    public String getListEvnPCLoginResponse() {
         return listEvnPCLoginResponse;
     }
 
-    public void setListEvnPCLoginResponse(ListEvnPCLoginResponse listEvnPCLoginResponse) {
+    public void setListEvnPCLoginResponse(String listEvnPCLoginResponse) {
         this.listEvnPCLoginResponse = listEvnPCLoginResponse;
     }
 }

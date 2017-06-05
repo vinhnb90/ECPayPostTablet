@@ -1,8 +1,6 @@
 package views.ecpay.com.postabletecpay.util.webservice;
 
-import android.content.Context;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -17,6 +15,7 @@ import org.ksoap2.transport.HttpTransportSE;
 
 import java.lang.reflect.Type;
 
+import views.ecpay.com.postabletecpay.model.adapter.EvnRequestAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.LoginRequestAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.LoginResponseAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
@@ -24,6 +23,14 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.Bod
 import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.ChangePassRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.FooterChangePassRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.HeaderChangePassRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityData.BodyListDataRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityData.FooterListDataRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityData.HeaderListDataRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityData.ListDataRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityEVN.BodyEVNRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityEVN.EVNRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityEVN.FooterEVNRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityEVN.HeaderEVNRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.BodyLoginRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.FooterLoginRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.HeaderLoginRequest;
@@ -31,6 +38,7 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.LoginReq
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.BodySearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.SearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEVNReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
@@ -157,6 +165,120 @@ public class SoapAPI {
 
         return jsonResult;
 
+    }
+
+    //region create JSON Request service
+    public static String getJsonSyncPC(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver, String signatureEncrypted, String edong, String accountId) {
+        if (agent == null || agent.isEmpty() || agent.trim().equals(""))
+            return null;
+        if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
+            return null;
+        if (commandId == null || commandId.isEmpty() || commandId.trim().equals(""))
+            return null;
+        if (mac == null || mac.isEmpty() || mac.trim().equals(""))
+            return null;
+        if (diskDriver == null || diskDriver.isEmpty() || diskDriver.trim().equals(""))
+            return null;
+        if (signatureEncrypted == null || signatureEncrypted.isEmpty() || signatureEncrypted.trim().equals(""))
+            return null;
+        if (edong == null || edong.isEmpty() || edong.trim().equals(""))
+            return null;
+        if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
+            return null;
+
+        HeaderEVNRequest headerEVNRequest = new HeaderEVNRequest();
+        headerEVNRequest.setAgent(agent);
+        headerEVNRequest.setPassword(agentEncypted);
+        headerEVNRequest.setCommandId(commandId);
+
+        BodyEVNRequest bodyEVNRequest = new BodyEVNRequest();
+        bodyEVNRequest.setAuditNumber(auditNumber);
+        bodyEVNRequest.setMac(mac);
+        bodyEVNRequest.setDiskDrive(diskDriver);
+        bodyEVNRequest.setSignature(signatureEncrypted);
+        bodyEVNRequest.setEdong(edong);
+
+        FooterEVNRequest footerEVNRequest = new FooterEVNRequest();
+        footerEVNRequest.setAccountIdt(accountId);
+
+        final EVNRequest evnRequest = new EVNRequest();
+        evnRequest.setHeaderEVNRequest(headerEVNRequest);
+        evnRequest.setBodyEVNRequest(bodyEVNRequest);
+        evnRequest.setFooterEVNRequest(footerEVNRequest);
+
+
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(EVNRequest.class, new EvnRequestAdapter());
+        gsonBuilder.setPrettyPrinting();
+        final Gson gson = gsonBuilder.create();
+
+        //Serialised
+        final String jsonResult = gson.toJson(evnRequest);
+
+        //Test Deserialised
+        final EVNRequest parsedRequest = gson.fromJson(jsonResult, EVNRequest.class);
+
+        return jsonResult;
+    }
+
+    //region create JSON Request service
+    public static String getJsonRequestSynData(String agent, String agentEncypted, String commandId, long auditNumber, String mac,
+                                               String diskDriver, String signatureEncrypted, String pcCode, String bookCmis,
+                                               long fromIdChanged, long fromDateChanged, String accountId) {
+        if (agent == null || agent.isEmpty() || agent.trim().equals(""))
+            return null;
+        if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
+            return null;
+        if (commandId == null || commandId.isEmpty() || commandId.trim().equals(""))
+            return null;
+        if (mac == null || mac.isEmpty() || mac.trim().equals(""))
+            return null;
+        if (diskDriver == null || diskDriver.isEmpty() || diskDriver.trim().equals(""))
+            return null;
+        if (signatureEncrypted == null || signatureEncrypted.isEmpty() || signatureEncrypted.trim().equals(""))
+            return null;
+//        if (pcCode == null || pcCode.isEmpty() || pcCode.trim().equals(""))
+//            return null;
+        if (bookCmis == null || bookCmis.isEmpty() || bookCmis.trim().equals(""))
+            return null;
+        if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
+            return null;
+
+        HeaderListDataRequest headerListDataRequest = new HeaderListDataRequest();
+        headerListDataRequest.setAgent(agent);
+        headerListDataRequest.setPassword(agentEncypted);
+        headerListDataRequest.setCommandID(commandId);
+
+        BodyListDataRequest bodyListDataRequest = new BodyListDataRequest();
+        bodyListDataRequest.setAuditNumber(auditNumber);
+        bodyListDataRequest.setMac(mac);
+        bodyListDataRequest.setDiskDrive(diskDriver);
+        bodyListDataRequest.setSignature(signatureEncrypted);
+        bodyListDataRequest.setPcCode(pcCode);
+        bodyListDataRequest.setBookCmis(bookCmis);
+        bodyListDataRequest.setFromIdChanged(fromIdChanged);
+        bodyListDataRequest.setFromDateChanged(fromDateChanged);
+
+        FooterListDataRequest footerListDataRequest = new FooterListDataRequest();
+        footerListDataRequest.setAccountIdt(accountId);
+
+        final ListDataRequest listDataRequest = new ListDataRequest();
+        listDataRequest.setHeaderListDataRequest(headerListDataRequest);
+        listDataRequest.setBodyListDataRequest(bodyListDataRequest);
+        listDataRequest.setFooterListDataRequest(footerListDataRequest);
+
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+//        gsonBuilder.registerTypeAdapter(ListDataRequest.class, new LoginRequestAdapter());
+//        gsonBuilder.setPrettyPrinting();
+        final Gson gson = gsonBuilder.create();
+
+        //Serialised
+        final String jsonResult = gson.toJson(listDataRequest);
+
+        //Test Deserialised
+        final ListDataRequest parsedRequest = gson.fromJson(jsonResult, ListDataRequest.class);
+
+        return jsonResult;
     }
 
     public static String getJsonRequestSearchOnline(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver, String signatureEncrypted, String directEvn,
@@ -625,7 +747,7 @@ public class SoapAPI {
 
             ListEVNReponse listEVNReponse = null;
             final GsonBuilder gsonBuilder = new GsonBuilder();
-//            gsonBuilder.registerTypeAdapter(ListEVNReponse.class, new LoginResponseAdapter());
+//            gsonBuilder.registerTypeAdapter(ListEVNReponse.class, new EVNRe());
 //            gsonBuilder.setPrettyPrinting();
             final Gson gson = gsonBuilder.create();
 
@@ -664,6 +786,114 @@ public class SoapAPI {
                 return;
 
             callBack.onTimeOut(soapSynchronizePC);
+        }
+
+        public boolean isEndCallSoap() {
+            return isEndCallSoap;
+        }
+
+        public void setEndCallSoap(boolean endCallSoap) {
+            isEndCallSoap = endCallSoap;
+        }
+    }
+    //endregion
+
+    //region đồng bộ
+    public static class AsyncSoapSynchronizeData extends AsyncTask<String, String, ListDataResponse> {
+
+        //request action to eStore
+        private static final String METHOD_NAME = "execute";
+        private static final String NAMESPACE = "http://services.ecpay.org/";
+        private static final String URL = ENDPOINT_URL;
+        private static final String SOAP_ACTION = "request action to eStore";
+        private static final String METHOD_PARAM = "message";
+        private AsyncSoapSynchronizeDataCallBack callBack;
+        private boolean isEndCallSoap = false;
+
+        public AsyncSoapSynchronizeData(AsyncSoapSynchronizeDataCallBack callBack) throws Exception {
+            this.callBack = callBack;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            callBack.onPre(this);
+        }
+
+        @Override
+        protected ListDataResponse doInBackground(String... jsons) {
+            String json = jsons[0];
+            Log.d("here", "doInBackground: " + json);
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            request.addProperty(METHOD_PARAM, json);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE ht;
+            SoapPrimitive response = null;
+
+            try {
+                ht = new HttpTransportSE(URL);
+                ht.call(SOAP_ACTION, envelope);
+                response = (SoapPrimitive) envelope.getResponse();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (response == null) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                return null;
+            }
+
+            String data = response.toString();
+            if (data.isEmpty()) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return null;
+            }
+
+            ListDataResponse listDataResponse = null;
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+//            gsonBuilder.registerTypeAdapter(ListEVNReponse.class, new LoginResponseAdapter());
+//            gsonBuilder.setPrettyPrinting();
+            final Gson gson = gsonBuilder.create();
+
+            listDataResponse = gson.fromJson(data, ListDataResponse.class);
+
+            return listDataResponse;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            String message = values[0];
+            if (isEndCallSoap)
+                callBack.onUpdate(message);
+        }
+
+        @Override
+        protected void onPostExecute(ListDataResponse listDataResponse) {
+            super.onPostExecute(listDataResponse);
+            if (!isEndCallSoap)
+                callBack.onPost(listDataResponse);
+        }
+
+        public static abstract class AsyncSoapSynchronizeDataCallBack {
+            public abstract void onPre(final AsyncSoapSynchronizeData soapSynchronizeData);
+
+            public abstract void onUpdate(String message);
+
+            public abstract void onPost(ListDataResponse response);
+
+            public abstract void onTimeOut(final AsyncSoapSynchronizeData soapSynchronizeData);
+        }
+
+        public void callCountdown(final AsyncSoapSynchronizeData soapSynchronizeData) {
+            if (soapSynchronizeData == null)
+                return;
+
+            callBack.onTimeOut(soapSynchronizeData);
         }
 
         public boolean isEndCallSoap() {

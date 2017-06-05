@@ -379,19 +379,27 @@ public class Common {
     public enum COMMAND_ID {
         LOGIN,
         CHANGE_PIN,
-        CUSTOMER_BILL,
-        GET_BOOK_CMIS_BY_CASHIER;
+        GET_BOOK_CMIS_BY_CASHIER,
+        SYNC_DATA,
+        GET_FILE_GEN;
 
         @Override
         public String toString() {
             if (this == LOGIN)
                 return "LOGIN";
+
             if (this == CHANGE_PIN)
                 return "CHANGE-PIN";
-            if (this == CUSTOMER_BILL)
-                return "CUSTOMER-BILL";
+
             if (this == GET_BOOK_CMIS_BY_CASHIER)
                 return "GET-BOOK-CMIS-BY-CASHIER";
+
+            if (this == SYNC_DATA)
+                return "SYNC-DATA";
+
+            if (this == GET_FILE_GEN)
+                return "GET-FILE-GEN";
+
             return super.toString();
         }
     }
@@ -969,6 +977,8 @@ public class Common {
 
         return configInfo;
     }
+
+
 
     //endregion
 
