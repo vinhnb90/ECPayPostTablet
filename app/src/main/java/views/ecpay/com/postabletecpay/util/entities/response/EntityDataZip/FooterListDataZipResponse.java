@@ -1,4 +1,4 @@
-package views.ecpay.com.postabletecpay.util.entities.response.EntityData;
+package views.ecpay.com.postabletecpay.util.entities.response.EntityDataZip;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by macbook on 6/1/17.
  */
 
-public class FooterListDataResponse {
+public class FooterListDataZipResponse {
     @SerializedName("account-idt")
     @Expose
     private String account_idt;
