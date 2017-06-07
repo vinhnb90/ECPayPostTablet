@@ -114,6 +114,7 @@ public class Common {
     public static final int LENGTH_MAX = 16;
 
     public static final String DIRECT_EVN = "0";
+
     public static enum TYPE_SEARCH {
         ALL(0, "Tất cả"),
         MA_KH_SO_THE(1, "Mã KH/Số thẻ"),
@@ -160,6 +161,38 @@ public class Common {
     }
     //endregion
 
+    //region parrams billing
+    public enum PARTNER_CODE {
+        DT0813("DT0813", "Luồng quầy thu đang năng"),
+        DT0807("DT0807", "Luồng tài khoản tiền điện"),
+        DT0605("DT0605", "Các trường hợp khác");
+
+        PARTNER_CODE(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+        private String message;
+
+        public static PARTNER_CODE findCodeMessage(String code) {
+            for (PARTNER_CODE v : values()) {
+                if (v.getCode().equals(code)) {
+                    return v;
+                }
+            }
+            return PARTNER_CODE.DT0605;
+        }
+    }
+    //endregion
     //region Description key
     public static final String TAG = "TAG";
     public static final String KEY_EDONG = "EDONG";
@@ -370,6 +403,48 @@ public class Common {
             return CODE_REPONSE_SEARCH_ONLINE.e9999;
         }
     }
+
+    public enum CODE_REPONSE_BILL_ONLINE {
+        e000("000", "Thực hiện nghiệp vụ thành công"),
+        e040("040", "Tài khoản ví chưa được đăng ký"),
+        e041("041", "Tài khoản ví đã bị hủy"),
+        e042("042", "Tài khoản ví đã bị khóa"),
+        e043("043", "Tài khoản ví chưa được duyệt"),
+        e050("050", "Tài khoản bị từ chối dịch vụ"),
+        e051("051", "Tài khoản bị chặn dịch vụ"),
+        e2032("2032", "Giao dịch đang được hệ thống giữ chấm nợ bởi số ví khác"),
+        e2038("2038", "Không thể login, sai địa chỉ MAC"),
+        e2039("2039", "Không thể login, sai địa chỉ IP"),
+        e2040("2039", "Không thể login, đã login ở 1 thiết bị khác"),
+        e2042("2042", "Tài khoản chưa được xác định loại tài khoản"),
+        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
+        ex10000("10000", "Chưa có hóa đơn nào được trọn");
+
+        CODE_REPONSE_BILL_ONLINE(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+        private String message;
+
+        public static CODE_REPONSE_BILL_ONLINE findCodeMessage(String code) {
+            for (CODE_REPONSE_BILL_ONLINE v : values()) {
+                if (v.getCode().equals(code)) {
+                    return v;
+                }
+            }
+            return CODE_REPONSE_BILL_ONLINE.e9999;
+        }
+    }
     //endregion
 
     //region info communication server
@@ -379,8 +454,10 @@ public class Common {
     public enum COMMAND_ID {
         LOGIN,
         CHANGE_PIN,
+        BILLING,
         GET_BOOK_CMIS_BY_CASHIER,
         SYNC_DATA,
+        CUSTOMER_BILL,
         GET_FILE_GEN;
 
         @Override
@@ -391,11 +468,17 @@ public class Common {
             if (this == CHANGE_PIN)
                 return "CHANGE-PIN";
 
+            if (this == BILLING)
+                return "BILLING";
+
             if (this == GET_BOOK_CMIS_BY_CASHIER)
                 return "GET-BOOK-CMIS-BY-CASHIER";
 
             if (this == SYNC_DATA)
                 return "SYNC-DATA";
+
+            if (this == CUSTOMER_BILL)
+                return "CUSTOMER-BILL";
 
             if (this == GET_FILE_GEN)
                 return "GET-FILE-GEN";
@@ -979,7 +1062,6 @@ public class Common {
     }
 
 
-
     //endregion
 
     //region method utils
@@ -1143,7 +1225,7 @@ public class Common {
     }
 
     public static String convertDateToDate(String time, DATE_TIME_TYPE typeDefault, DATE_TIME_TYPE typeConvert) {
-        if(time == null || time.trim().isEmpty())
+        if (time == null || time.trim().isEmpty())
             return "";
 
         long longDate = Common.convertDateToLong(time, typeDefault);
@@ -1152,7 +1234,7 @@ public class Common {
         return dateByDefaultType;
     }
 
-    public static long convertDateToLong(String date,  DATE_TIME_TYPE typeDefault) {
+    public static long convertDateToLong(String date, DATE_TIME_TYPE typeDefault) {
         SimpleDateFormat formatter = new SimpleDateFormat(typeDefault.toString());
         formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
         Date dateParse;
@@ -1164,5 +1246,18 @@ public class Common {
         }
         return dateParse.getTime();
     }
+
+    public static String getVersionApp(Context context) {
+        String versionApp = "";
+        try {
+            versionApp = context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return versionApp;
+    }
+
     //endregion
 }

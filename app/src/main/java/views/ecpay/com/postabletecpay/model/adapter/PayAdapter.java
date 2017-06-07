@@ -21,14 +21,10 @@ import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
-import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
-
-import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.PayEntityAdapter.TT_CON_NO;
-import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.PayEntityAdapter.TT_HET_NO;
 
 /**
  * Created by VinhNB on 5/26/2017.
@@ -67,7 +63,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         PayEntityAdapter entityAdapter = mAdapterList.get(position);
         String code = entityAdapter.getMaKH();
         String edong = entityAdapter.getEdong();
-        boolean isConNo = entityAdapter.isConNo();
+        boolean isConNo = entityAdapter.isPayed();
 
         holder.tvTenKH.setText(entityAdapter.getTenKH());
         holder.tvDiaChi.setText(entityAdapter.getDiaChi());
@@ -83,7 +79,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         List<PayAdapter.BillEntityAdapter> listBill = new ArrayList<>();
         listBill = payModel.getAllBillOfCustomer(edong, code);
-        holder.insideTodayAdapter.setBillList(edong, code, listBill);
+        holder.insideTodayAdapter.setBillList(edong, code, listBill, position);
 
         boolean isShowBill = mAdapterList.get(position).isShowBill();
         holder.rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
@@ -163,7 +159,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         private String loTrinh;
         private String maKH;
         private long tongTien;
-        private boolean isConNo;
+        private boolean isPayed;
 
         //param extension
         private boolean isShowBill;
@@ -171,14 +167,14 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         public PayEntityAdapter() {
         }
 
-        public PayEntityAdapter(String edong, String tenKH, String diaChi, String loTrinh, String maKH, long tongTien, boolean isConNo, boolean isShowBill) {
+        public PayEntityAdapter(String edong, String tenKH, String diaChi, String loTrinh, String maKH, long tongTien, boolean isPayed, boolean isShowBill) {
             this.edong = edong;
             this.tenKH = tenKH;
             this.diaChi = diaChi;
             this.loTrinh = loTrinh;
             this.maKH = maKH;
             this.tongTien = tongTien;
-            this.isConNo = isConNo;
+            this.isPayed = isPayed;
             this.isShowBill = isShowBill;
         }
 
@@ -206,12 +202,12 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             return tongTien;
         }
 
-        public boolean isConNo() {
-            return isConNo;
+        public boolean isPayed() {
+            return isPayed;
         }
 
-        public void setConNo(boolean conNo) {
-            this.isConNo = conNo;
+        public void setPayed(boolean payed) {
+            this.isPayed = payed;
         }
 
         public void setEdong(String edong) {
@@ -348,6 +344,9 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         private static String edong;
         private static BillInsidePayViewHolder.OnInterationBillInsidePayAdapter interaction;
 
+        //extends
+        private static int posCustomer;
+
         public BillInsidePayAdapter(Context context) {
             if (context instanceof BillInsidePayViewHolder.OnInterationBillInsidePayAdapter) {
                 interaction = (BillInsidePayViewHolder.OnInterationBillInsidePayAdapter) context;
@@ -355,10 +354,11 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                 throw new ClassCastException("Context must be implement BillInsidePayViewHolder.OnInterationBillInsidePayAdapter!");
         }
 
-        public void setBillList(String edong, String code, List<BillEntityAdapter> billList) {
+        public void setBillList(String edong, String code, List<BillEntityAdapter> billList, int posCustomer) {
             this.billList = billList;
             this.code = code;
             this.edong = edong;
+            this.posCustomer = posCustomer;
         }
 
         @Override
@@ -375,7 +375,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             holder.cb.setChecked(entity.isChecked());
             holder.cb.setEnabled(!entity.isPayed);
             holder.tvDate.setText(entity.getMonthBill());
-            holder.tvMoneyBill.setText(String.valueOf(entity.getMoneyBill()));
+            holder.tvMoneyBill.setText((int) entity.getMoneyBill() + Common.TEXT_SPACE + Common.UNIT_MONEY);
             holder.tvStatusBill.setText(entity.isPayed ? IS_PAY : NOT_PAY_YET);
             holder.ibtnPrintInside.setVisibility(entity.isPrint ? View.VISIBLE : View.INVISIBLE);
             holder.ibtnDelete.setVisibility(entity.isPayed ? View.VISIBLE : View.INVISIBLE);
@@ -412,7 +412,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                 BillEntityAdapter bill = billList.get(position);
                 bill.setChecked(checked);
 
-                interaction.processCheckedBill(edong, code, bill);
+                interaction.processCheckedBillFragment(edong, code, bill, posCustomer);
 
             }
 
@@ -441,7 +441,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             }
 
             public interface OnInterationBillInsidePayAdapter {
-                void processCheckedBill(String edong, String code, BillEntityAdapter bill);
+                void processCheckedBillFragment(String edong, String code, BillEntityAdapter bill, int posCustomer);
             }
         }
     }

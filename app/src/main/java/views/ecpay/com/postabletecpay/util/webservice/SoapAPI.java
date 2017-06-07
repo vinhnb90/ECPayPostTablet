@@ -1,6 +1,7 @@
 package views.ecpay.com.postabletecpay.util.webservice;
 
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -281,30 +282,27 @@ public class SoapAPI {
         return jsonResult;
     }
 
-    public static String getJsonRequestSearchOnline(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver, String signatureEncrypted, String directEvn,
+    public static String getJsonRequestSearchOnline(String agent, String agentEncypted, String commandId, long auditNumber, String mac,
+                                                    String diskDriver, String signatureEncrypted, String directEvn,
                                                     String customerCode,
                                                     String pcCode,
                                                     String bookCmis,
                                                     String accountId) {
-        if (agent == null || agent.isEmpty() || agent.trim().equals(""))
-            return null;
-        if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
-            return null;
-        if (commandId == null || commandId.isEmpty() || commandId.trim().equals(""))
-            return null;
-        if (mac == null || mac.isEmpty() || mac.trim().equals(""))
-            return null;
-        if (diskDriver == null || diskDriver.isEmpty() || diskDriver.trim().equals(""))
-            return null;
-        if (signatureEncrypted == null || signatureEncrypted.isEmpty() || signatureEncrypted.trim().equals(""))
-            return null;
-        if (customerCode == null || customerCode.isEmpty() || customerCode.trim().equals(""))
-            return null;
-        if (pcCode == null)
-            return null;
-        if (bookCmis == null)
-            return null;
-        if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
+        boolean fail =
+                TextUtils.isEmpty(agent) ||
+                        TextUtils.isEmpty(agentEncypted) ||
+                        TextUtils.isEmpty(commandId) ||
+                        TextUtils.isEmpty(mac) ||
+                        TextUtils.isEmpty(diskDriver) ||
+                        TextUtils.isEmpty(diskDriver) ||
+                        TextUtils.isEmpty(signatureEncrypted) ||
+                        TextUtils.isEmpty(directEvn) ||
+                        TextUtils.isEmpty(customerCode) ||
+                        TextUtils.isEmpty(pcCode) ||
+                        TextUtils.isEmpty(bookCmis) ||
+                        TextUtils.isEmpty(accountId);
+
+        if (fail)
             return null;
 
         HeaderLoginRequest headerLoginRequest = new HeaderLoginRequest();
@@ -339,6 +337,30 @@ public class SoapAPI {
     }
 
     public static String getJsonRequestSynchronizePC() {
+        return null;
+    }
+
+
+    public static String getJsonRequestBillOnline(String agent, String agentEncypted, String commandId, long auditNumber,
+                                                  String macAdressHexValue, String diskDriver, String signatureEncrypted,
+                                                  String code, String session, int billId, Long amount, String phone,
+                                                  String providerCode, String account_type, String accountId) {
+        boolean fail =
+                TextUtils.isEmpty(agent) ||
+                        TextUtils.isEmpty(agentEncypted) ||
+                        TextUtils.isEmpty(commandId) ||
+                        TextUtils.isEmpty(macAdressHexValue) ||
+                        TextUtils.isEmpty(diskDriver) ||
+                        TextUtils.isEmpty(signatureEncrypted) ||
+                        TextUtils.isEmpty(code) ||
+                        TextUtils.isEmpty(session) ||
+                        TextUtils.isEmpty(phone) ||
+                        TextUtils.isEmpty(providerCode) ||
+                        TextUtils.isEmpty(account_type) ||
+                        TextUtils.isEmpty(accountId);
+
+        if (fail)
+            return null;
         return null;
     }
 

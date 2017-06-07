@@ -24,6 +24,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
+import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.presenter.IMainPagePresenter;
 import views.ecpay.com.postabletecpay.presenter.MainPagePresenter;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
@@ -45,7 +46,9 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM
  * Created by macbook on 4/28/17.
  */
 
-public class MainPageFragment extends Fragment implements IMainPageView, View.OnClickListener, PopupMenu.OnItemSelectedListener {
+public class MainPageFragment extends Fragment implements
+        IMainPageView,
+        View.OnClickListener, PopupMenu.OnItemSelectedListener {
 
     private OnFragmentInteractionListener listener;
     private String mEdong;
@@ -253,6 +256,7 @@ public class MainPageFragment extends Fragment implements IMainPageView, View.On
     public Context getContextView() {
         return getContext();
     }
+
     //endregion
 
     public interface OnFragmentInteractionListener {

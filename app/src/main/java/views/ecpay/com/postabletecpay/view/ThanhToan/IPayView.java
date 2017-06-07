@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
+import views.ecpay.com.postabletecpay.model.adapter.PayListBillsAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.ICommonView;
 
@@ -25,5 +26,15 @@ public interface IPayView extends ICommonView {
 
     void showEditTextSearch(String value);
 
-    void showCountBillsAndCountTotalMoney(int size, int totalMoneyAllBills);
+    void showCountBillsAndCountTotalMoney(int size, long totalMoneyAllBills);
+
+    void showPayRecyclerListBills(List<PayListBillsAdapter.Entity> listBillChecked);
+
+    void showCountBillsAndCountTotalMoneyInDialog(int totalBillsInList, long totalMoneyInList);
+
+    void showMessageNotifyBillOnlineDialog(String message);
+
+    void showBillOnlineDialogPrecess();
+
+    void hideBillOnlineDialogPrecess();
 }

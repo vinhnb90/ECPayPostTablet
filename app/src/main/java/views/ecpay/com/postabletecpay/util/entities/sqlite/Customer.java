@@ -20,9 +20,11 @@ public class Customer {
     private String idNumber;
     private String bankName;
     private String edongKey;
-    private boolean isChecked;
 
-    public Customer(String code, String name, String address, String pcCode, String pcCodeExt, String phoneByevn, String phoneByecp, String bookCmis, String electricityMeter, String inning, String status, String bankAccount, String idNumber, String bankName, String edongKey, boolean isChecked) {
+    //extensive
+    private boolean isShowBill;
+
+    public Customer(String code, String name, String address, String pcCode, String pcCodeExt, String phoneByevn, String phoneByecp, String bookCmis, String electricityMeter, String inning, String status, String bankAccount, String idNumber, String bankName, String edongKey, boolean isShowBill) {
         this.code = code;
         this.name = name;
         this.address = address;
@@ -38,7 +40,7 @@ public class Customer {
         this.idNumber = idNumber;
         this.bankName = bankName;
         this.edongKey = edongKey;
-        this.isChecked = isChecked;
+        this.isShowBill = isShowBill;
     }
 
     public String getCode() {
@@ -161,11 +163,11 @@ public class Customer {
         this.edongKey = edongKey;
     }
 
-    public boolean isChecked() {
-        return isChecked;
+    public boolean isShowBill() {
+        return isShowBill;
     }
 
-    public void setChecked(boolean checked) {
-        isChecked = checked;
+    public void setShowBill(boolean showBill) {
+        isShowBill = showBill;
     }
 }

@@ -5,11 +5,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,22 +24,26 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
-import butterknife.BindInt;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
 import butterknife.OnPageChange;
 import butterknife.OnTextChanged;
+import butterknife.Optional;
+import butterknife.Unbinder;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
+import views.ecpay.com.postabletecpay.model.adapter.PayListBillsAdapter;
 import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
 import views.ecpay.com.postabletecpay.presenter.PayPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 
+import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 
 /**
@@ -45,62 +51,101 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
  */
 
 public class PayFragment extends Fragment implements
-        IPayView,
-        PayAdapter.BillInsidePayAdapter.BillInsidePayViewHolder.OnInterationBillInsidePayAdapter,
-        View.OnClickListener {
+        IPayView {
     public static final int FIRST_PAGE_INDEX = 1;
     public static final int PAGE_INCREMENT = 1;
     public static final int ROWS_ON_PAGE = 10;
 
-    @BindView(R.id.ibtn_frag_user_info_back)
-    ImageButton ibBack;
-    @BindView(R.id.ibScaner)
-    ImageButton ibScaner;
-    @BindView(R.id.ibAdd)
-    ImageButton ibAdd;
-    @BindView(R.id.etSearch)
+    @Nullable
+    @BindView(R.id.et_frag_thanh_toan_search)
     EditText etSearch;
-    @BindView(R.id.btThanhToan)
-    Button btThanhToan;
-    @BindView(R.id.rvKhachHang)
+    @Nullable
+    @BindView(R.id.ll_frag_thanh_toan_count)
+    LinearLayout llCount;
+    @Nullable
+    @BindView(R.id.rv_frag_thanh_toan_customer)
     RecyclerView rvKH;
-    @BindView(R.id.tabs)
+    @Nullable
+    @BindView(R.id.tabs_frag_thanh_toan)
     TabLayout tabLayout;
-    @BindView(R.id.view_pager)
+    @Nullable
+    @BindView(R.id.vpage_frag_thanh_toan)
     ViewPager viewPager;
+    @Nullable
     @BindView(R.id.btn_frag_thanh_toan_pre)
     Button btnPre;
+    @Nullable
     @BindView(R.id.btn_frag_thanh_toan_next)
     Button btnNext;
+    @Nullable
     @BindView(R.id.tv_frag_thanh_toan_page)
     TextView tvPage;
+    @Nullable
     @BindView(R.id.ll_frag_thanh_toan_page)
     LinearLayout llCountPage;
+    @Nullable
     @BindView(R.id.ibtn_frag_thanhtoan_clear_text_search)
     ImageButton ibtnClearSearch;
+    @Nullable
     @BindView(R.id.tv_fragment_thanh_toan_total_bills_checked)
     TextView tvTotalBills;
+    @Nullable
     @BindView(R.id.tv_fragment_thanh_toan_total_bills_money)
     TextView tvTotalBillsMoney;
 
     //Search online
+    @Nullable
     @BindView(R.id.rv_frag_thanhtoan_search_online_progress)
     RelativeLayout rvProgressSearchOnline;
+    @Nullable
     @BindView(R.id.tv_frag_thanh_toan_search_online_message)
     TextView tvMessageNotifySearchOnlne;
+    @Nullable
     @BindView(R.id.pbar_frag_thanhtoan_search_online)
     ProgressBar pbarSearchOnline;
+    @Nullable
     @BindView(R.id.ibtn_frag_thanhtoan_action_research_online)
     ImageButton ibtnResearchOnline;
+    @Nullable
     @BindView(R.id.ibtn_frag_thanhtoan_action_cancel_search_online)
     ImageButton ibtnCancelSearchOnline;
+
+    //Dialog pay list bills
+    @Nullable
+    @BindView(R.id.rv_dialog_thanhtoan_bills)
+    RecyclerView rvListBill;
+    @Nullable
+    @BindView(R.id.tv_dialog_thanhtoan_total_money_bills)
+    TextView tvTotalBillsMoneyDialog;
+    @Nullable
+    @BindView(R.id.tv_dialog_thanhtoan_bills_count)
+    TextView tvTotalBillsDialog;
+    @Nullable
+    @BindView(R.id.btn_dialog_thanhtoan_cancel)
+    Button btnCancelDialog;
+    @Nullable
+    @BindView(R.id.btn_dialog_thanhtoan_pay)
+    Button btnPayDialog;
+    @Nullable
+    @BindView(R.id.tv_diaglog_thanhtoan_message)
+    TextView tvMessageDialog;
+    @Nullable
+    @BindView(R.id.pbar_diaglog_thanhtoan)
+    ProgressBar pbarDialogBilling;
+    @Nullable
+    @BindView(R.id.rv_dialog_thanhtoan_request_pay)
+    RelativeLayout rvBillOnline;
 
     private OnFragmentInteractionListener listener;
     private PayAdapter payAdapter;
     private IPayPresenter mIPayPresenter;
     private String mEdong;
     private int mPageIndex;
+    private Unbinder unbinder;
     private Common.TYPE_SEARCH typeSearch;
+    private PayListBillsAdapter payListBillsAdapter;
+    private View rootView;
+    private static Dialog dialog;
 
     public static PayFragment newInstance(String edong) {
         Bundle bundle = new Bundle();
@@ -119,13 +164,13 @@ public class PayFragment extends Fragment implements
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_thanh_toan, container, false);
-        ButterKnife.bind(this, view);
+        rootView = inflater.inflate(R.layout.fragment_thanh_toan, container, false);
+        unbinder = ButterKnife.bind(this, rootView);
 
-        ibBack.setOnClickListener(this);
+       /* ibBack.setOnClickListener(this);
         ibScaner.setOnClickListener(this);
         ibAdd.setOnClickListener(this);
-        btThanhToan.setOnClickListener(this);
+        btnPay.setOnClickListener(this);*/
 
         viewPager.setAdapter(new TimKiemAdapter(getChildFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
@@ -133,12 +178,12 @@ public class PayFragment extends Fragment implements
         mIPayPresenter = new PayPresenter(this);
         mEdong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
 
-        setupPayRecyclerView(view);
+        setupPayRecyclerView(rootView);
         //first page
         typeSearch = Common.TYPE_SEARCH.ALL;
         mPageIndex = FIRST_PAGE_INDEX;
         mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
-        return view;
+        return rootView;
     }
 
     private void setupPayRecyclerView(final View view) {
@@ -165,22 +210,8 @@ public class PayFragment extends Fragment implements
         listener = null;
     }
 
-    //region onClick
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.ibtn_frag_user_info_back:
-                break;
-            case R.id.ibScaner:
-                break;
-            case R.id.ibAdd:
-                break;
-            case R.id.btThanhToan:
-                showDialogThanhToan();
-                break;
-        }
-    }
-
+    //region onClick fragment
+    @Optional
     @OnClick(R.id.btn_frag_thanh_toan_next)
     public void clickNext(View view) {
         if (payAdapter == null)
@@ -190,6 +221,7 @@ public class PayFragment extends Fragment implements
         mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
     }
 
+    @Optional
     @OnClick(R.id.btn_frag_thanh_toan_pre)
     public void clickPre(View view) {
         if (payAdapter == null)
@@ -199,6 +231,7 @@ public class PayFragment extends Fragment implements
         mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
     }
 
+    @Optional
     @OnClick(R.id.ibtn_frag_thanhtoan_action_cancel_search_online)
     public void clickCancelSearchOnline(View view) {
         Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
@@ -206,6 +239,7 @@ public class PayFragment extends Fragment implements
         mIPayPresenter.cancelSeachOnline();
     }
 
+    @Optional
     @OnClick(R.id.ibtn_frag_thanhtoan_action_research_online)
     public void clickResearchOnline(View view) {
         Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
@@ -213,15 +247,38 @@ public class PayFragment extends Fragment implements
         mIPayPresenter.reseachOnline(mEdong);
     }
 
+    @Optional
     @OnClick(R.id.ibtn_frag_thanhtoan_clear_text_search)
     public void clickClearTextSearch(View view) {
         Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
         etSearch.setText("");
     }
+
+    @Optional
+    @OnClick(R.id.btn_frag_thanh_toan_paying)
+    public void clickPaying(View view) {
+        showDialogThanhToan();
+    }
+    //endregion
+
+    //region onClick dialog
+    @Optional
+    @OnClick(R.id.btn_dialog_thanhtoan_cancel)
+    public void clickCancelDialog(View view) {
+        if (dialog.isShowing())
+            dialog.dismiss();
+    }
+
+    @Optional
+    @OnClick(R.id.btn_dialog_thanhtoan_pay)
+    public void clickPayDialog(View view) {
+        mIPayPresenter.callPayOnline(mEdong);
+    }
     //endregion
 
     //region listener tablayout
-    @OnPageChange(R.id.view_pager)
+    @Optional
+    @OnPageChange(R.id.vpage_frag_thanh_toan)
     public void onPageSelected(int position) {
         mPageIndex = FIRST_PAGE_INDEX;
         Common.TYPE_SEARCH typeSearch = Common.TYPE_SEARCH.findMessage(position);
@@ -240,8 +297,9 @@ public class PayFragment extends Fragment implements
     //endregion
 
     //region listener et search
-    @OnFocusChange(R.id.etSearch)
-    public void OnFocusChangeListener(boolean hasFocus) {
+    @Optional
+    @OnFocusChange(R.id.et_frag_thanh_toan_search)
+    public void onFocusChange(boolean hasFocus) {
         if (hasFocus) {
             tabLayout.setVisibility(View.VISIBLE);
         } else {
@@ -250,7 +308,8 @@ public class PayFragment extends Fragment implements
         mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
     }
 
-    @OnTextChanged(R.id.etSearch)
+    @Optional
+    @OnTextChanged(R.id.et_frag_thanh_toan_search)
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         //first page
         mPageIndex = FIRST_PAGE_INDEX;
@@ -317,7 +376,7 @@ public class PayFragment extends Fragment implements
 
         //set adapter
         if (pageIndex == FIRST_PAGE_INDEX) {
-            payAdapter = new PayAdapter(getContext(), this, adapterList);
+            payAdapter = new PayAdapter(this.getContext(), this, adapterList);
             rvKH.setAdapter(payAdapter);
         } else
             rvKH.invalidate();
@@ -366,9 +425,69 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
-    public void showCountBillsAndCountTotalMoney(int size, int totalMoneyAllBills) {
+    public void showCountBillsAndCountTotalMoney(int size, long totalMoneyAllBills) {
         tvTotalBills.setText(String.valueOf(size));
-        tvTotalBillsMoney.setText(String.valueOf(totalMoneyAllBills) + Common.UNIT_MONEY);
+        tvTotalBillsMoney.setText(String.valueOf(totalMoneyAllBills) + Common.TEXT_SPACE + Common.UNIT_MONEY);
+    }
+
+    @Override
+    public void showPayRecyclerListBills(List<PayListBillsAdapter.Entity> listBillChecked) {
+        if (listBillChecked == null)
+            return;
+
+        if (payListBillsAdapter == null) {
+            payListBillsAdapter = new PayListBillsAdapter(this.getContext(), listBillChecked);
+            rvListBill.setAdapter(payListBillsAdapter);
+        } else
+            payListBillsAdapter.refreshData(listBillChecked);
+
+        rvListBill.invalidate();
+    }
+
+    @Override
+    public void showCountBillsAndCountTotalMoneyInDialog(int totalBillsInDialog, long totalMoneyInDialog) {
+        if (tvTotalBillsDialog == null)
+            return;
+        if (tvTotalBillsMoneyDialog == null)
+            return;
+
+        tvTotalBillsDialog.setText(String.valueOf(totalBillsInDialog));
+        tvTotalBillsMoneyDialog.setText(String.valueOf(totalMoneyInDialog) + Common.TEXT_SPACE + Common.UNIT_MONEY);
+    }
+
+    @Override
+    public void showMessageNotifyBillOnlineDialog(String message) {
+        if (message == null)
+            return;
+        if (isHasNullViewDialog())
+            return;
+
+        showBillOnlineDialogPrecess();
+        hideBillOnlineDialogPrecess();
+
+        tvMessageDialog.setVisibility(View.VISIBLE);
+        tvMessageDialog.setText(message);
+    }
+
+    private boolean isHasNullViewDialog() {
+        return rvBillOnline == null || pbarDialogBilling == null || tvMessageDialog == null;
+    }
+
+    @Override
+    public void showBillOnlineDialogPrecess() {
+        if (isHasNullViewDialog())
+            return;
+
+        rvBillOnline.setVisibility(View.VISIBLE);
+        tvMessageDialog.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void hideBillOnlineDialogPrecess() {
+        if (isHasNullViewDialog())
+            return;
+
+        rvBillOnline.setVisibility(View.GONE);
     }
 
     private void setEnablePreNext(int i) {
@@ -389,19 +508,20 @@ public class PayFragment extends Fragment implements
             btnNext.setEnabled(true);
         }
     }
-    //endregion
 
-    //region PayAdapter.BillInsidePayAdapter.BillInsidePayViewHolder.OnInterationBillInsidePayAdapter
-    @Override
-    public void processCheckedBill(String edong, String code, PayAdapter.BillEntityAdapter bill) {
-        if (edong == null || edong.trim().isEmpty())
-            return;
-        if (code == null || code.trim().isEmpty())
-            return;
-        if (bill == null)
-            return;
+    public void showBillCheckedFragment(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomer) {
+        mIPayPresenter.callProcessDataBillFragmentChecked(edong, code, bill, posCustomer);
+    }
 
-        mIPayPresenter.callProcessDataBillChecked(edong, code, bill);
+    public void showBillCheckedDialog(int pos, boolean isChecked) {
+        mIPayPresenter.callProcessDataBillDialogChecked(pos, isChecked);
+    }
+
+    public void bindViewAgain() {
+        if (unbinder == null)
+            return;
+        unbinder.unbind();
+        unbinder = ButterKnife.bind(this, rootView);
     }
     //endregion
 
@@ -409,34 +529,18 @@ public class PayFragment extends Fragment implements
     }
 
     private void showDialogThanhToan() {
-        final Dialog dialog = new Dialog(this.getActivity());
+        dialog = new Dialog(this.getActivity());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_thanhtoan);
+        dialog.setCanceledOnTouchOutside(true);
         dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-
-        TextView tvSoHoaDon = (TextView) dialog.findViewById(R.id.tvSoHoaDon);
-        TextView tvTongTien = (TextView) dialog.findViewById(R.id.tv_fragment_thanh_toan_total_bills_money);
-        RecyclerView rvDanhSach = (RecyclerView) dialog.findViewById(R.id.rvDanhSach);
-        Button btHuy = (Button) dialog.findViewById(R.id.btHuy);
-        Button btThanhToan = (Button) dialog.findViewById(R.id.btThanhToan);
-
-        btHuy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        btThanhToan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
+        unbinder.unbind();
+        unbinder = ButterKnife.bind(this, dialog);
+        rvBillOnline.setVisibility(View.INVISIBLE);
+        rvListBill.setLayoutManager(new LinearLayoutManager(getContext()));
+        mIPayPresenter.callPayRecyclerDialog(mEdong);
         dialog.show();
     }
-
 }

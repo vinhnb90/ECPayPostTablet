@@ -6,23 +6,21 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import org.apache.log4j.chainsaw.Main;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
+import views.ecpay.com.postabletecpay.model.adapter.PayListBillsAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
@@ -49,14 +47,24 @@ public class PayPresenter implements IPayPresenter {
     private SoapAPI.AsyncSoapSearchOnline soapSearchOnline;
     private Handler handlerDelay = new Handler();
 
+    //list bills in fragment
+    int totalBillsFragment = 0;
+    long totalMoneyFragment = 0;
+    private List<PayListBillsAdapter.Entity> listBillCheckedFragment = new ArrayList<>();
+
+    //list bills in dialog
+    int totalBillsDialog = 0;
+    long totalMoneyDialog = 0;
+    private List<PayListBillsAdapter.Entity> listBillCheckedDialog = new ArrayList<>();
+
     public PayPresenter(IPayView mIPayView) {
         this.mIPayView = mIPayView;
         mPayModel = new PayModel(mIPayView.getContextView());
     }
 
     @Override
-    public void callPayRecycler(String mEdong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch, boolean isSeachOnline) {
-        if (mEdong == null)
+    public void callPayRecycler(String edong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch, boolean isSeachOnline) {
+        if (edong == null)
             return;
         if (infoSearch == null)
             return;
@@ -71,9 +79,9 @@ public class PayPresenter implements IPayPresenter {
         if (pageIndex == PayFragment.FIRST_PAGE_INDEX) {
             mAdapterList.clear();
             if (typeSearch == Common.TYPE_SEARCH.ALL)
-                mAdapterList = mPayModel.getInforRowCustomer(mEdong);
+                mAdapterList = mPayModel.getInforRowCustomer(edong);
             else
-                mAdapterList = mPayModel.getInforRowCustomerFitterBy(mEdong, typeSearch, infoSearch);
+                mAdapterList = mPayModel.getInforRowCustomerFitterBy(edong, typeSearch, infoSearch);
 
             totalPage = mAdapterList.size() / ROWS_ON_PAGE;
             if (totalPage * ROWS_ON_PAGE != mAdapterList.size() || (totalPage == 0))
@@ -98,13 +106,15 @@ public class PayPresenter implements IPayPresenter {
             }
         }
 
+        listBillCheckedFragment = mPayModel.getAllBillOfCustomerChecked(edong);
+        refreshTotalBillsAndTotalMoneyInFragment();
+
         mIPayView.showPayRecyclerPage(fitter, pageIndex, totalPage, infoSearch, isSeachOnline);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void callSearchOnline(String mEdong, String infoSearch, boolean isReseach) {
-
         String textMessage = "";
         Context context = mIPayView.getContextView();
         Boolean isErr = false;
@@ -134,13 +144,7 @@ public class PayPresenter implements IPayPresenter {
 
         //setup info login
         ConfigInfo configInfo;
-        String versionApp = "";
-        try {
-            versionApp = mIPayView.getContextView().getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
+        String versionApp = Common.getVersionApp(context);
 
         try {
             configInfo = Common.setupInfoRequest(context, mEdong, Common.COMMAND_ID.CUSTOMER_BILL.toString(), versionApp);
@@ -156,7 +160,8 @@ public class PayPresenter implements IPayPresenter {
         String bookCmis = Common.TEXT_EMPTY;
 
         //create request to server
-        String jsonRequestSearchOnline = SoapAPI.getJsonRequestSearchOnline(
+        String jsonRequestSearchOnline = "";
+                /*SoapAPI.getJsonRequestSearchOnline(
                 configInfo.getAGENT(),
                 configInfo.getAgentEncypted(),
                 configInfo.getCommandId(),
@@ -167,10 +172,7 @@ public class PayPresenter implements IPayPresenter {
 
                 directEvn,
                 customerCode,
-                pcCode,
-                bookCmis,
-
-                configInfo.getAccountId());
+                configInfo.getAccountId());*/
 
         if (jsonRequestSearchOnline == null)
             return;
@@ -187,14 +189,12 @@ public class PayPresenter implements IPayPresenter {
                 soapSearchOnline.setEndCallSoap(true);
                 soapSearchOnline.cancel(true);
 
-//                soapSearchOnlineThread.interrupt();
                 handlerDelay.removeCallbacks(runnableCountTime);
                 soapSearchOnline = new SoapAPI.AsyncSoapSearchOnline(mTypeSearch, mEdong, infoSearch, soapSearchOnlineCallBack);
             } else {
                 //if running or finish
                 handlerDelay.removeCallbacks(runnableCountTime);
 
-//                soapSearchOnlineThread.interrupt();
                 soapSearchOnline = new SoapAPI.AsyncSoapSearchOnline(mTypeSearch, mEdong, infoSearch, soapSearchOnlineCallBack);
             }
 
@@ -208,6 +208,83 @@ public class PayPresenter implements IPayPresenter {
             mIPayView.showMessageNotifySearchOnline(e.getMessage());
             return;
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void callPayOnline(String edong) {
+        if (totalBillsDialog == 0)
+            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10000.getMessage());
+
+        mIPayView.showBillOnlineDialogPrecess();
+
+        Context context = mIPayView.getContextView();
+        String versionApp = Common.getVersionApp(context);
+
+        int index = 0;
+        for (; index < totalBillsDialog; index++) {
+            PayListBillsAdapter.Entity entity = listBillCheckedDialog.get(index);
+
+            if (entity.isChecked())
+                payOnlineTheBill(context, versionApp, edong, entity);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void payOnlineTheBill(Context context, String versionApp, String edong, PayListBillsAdapter.Entity entity) {
+        ConfigInfo configInfo = null;
+        try {
+            configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.BILLING.toString(), versionApp);
+        } catch (Exception e) {
+            mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+            return;
+        }
+
+        //Số ví edong thực hiện thanh toán
+        String phone = edong;
+        Long amount = entity.getAmount();
+
+        //Phiên làm việc của TNV đang thực hiện
+        String session = mPayModel.getSession(edong);
+
+        /**
+         * Luồng quầy thu đang năng : DT0813
+         * Luồng tài khoản tiền điện : DT0807
+         * Còn lại sử dụng DT0605
+         *
+         * ECPAY mặc định sử dụng DT0605
+         */
+
+        String partnerCode = Common.PARTNER_CODE.DT0605.getCode();
+
+        String providerCode = "NCC0468";
+        String account_type = "";
+
+        //create request to server
+        String jsonRequestSearchOnline = SoapAPI.getJsonRequestBillOnline(
+                configInfo.getAGENT(),
+                configInfo.getAgentEncypted(),
+                configInfo.getCommandId(),
+                configInfo.getAuditNumber(),
+                configInfo.getMacAdressHexValue(),
+                configInfo.getDiskDriver(),
+                configInfo.getSignatureEncrypted(),
+                entity.getCode(),
+                session,
+                entity.getBillId(),
+                amount,
+                phone,
+
+                providerCode,
+                account_type,
+
+//                edong,
+//                partnerCode,
+                configInfo.getAccountId());
+
+        if (jsonRequestSearchOnline == null)
+            return;
+
     }
 
     @Override
@@ -228,23 +305,90 @@ public class PayPresenter implements IPayPresenter {
     }
 
     @Override
-    public void callProcessDataBillChecked(String edong, String code, PayAdapter.BillEntityAdapter bill) {
-        if (edong == null || edong.trim().isEmpty())
+    public void callProcessDataBillFragmentChecked(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomer) {
+        if (TextUtils.isEmpty(edong))
             return;
-        if (code == null || code.trim().isEmpty())
+        if (TextUtils.isEmpty(code))
             return;
         if (bill == null)
             return;
+        if (posCustomer >= mAdapterList.size())
+            return;
 
-            mPayModel.updateBillIsChecked(edong, code, bill.getBillId(), bill.isChecked());
+        mPayModel.updateBillIsChecked(edong, code, bill.getBillId(), bill.isChecked());
 
-        int totalBills = mPayModel.countAllBillsIsChecked(edong);
+        //show bill or not show bill
+        mPayModel.updateCustomerIsShowBill(edong, code, bill.isChecked());
+        mAdapterList.get(posCustomer).setShowBill(bill.isChecked());
 
         //show total bills and total money of all bills is checked
+        int totalBills = mPayModel.countAllBillsIsChecked(edong);
         int totalMoneyAllBills = mPayModel.countMoneyAllBillsIsChecked(edong);
 
-
         mIPayView.showCountBillsAndCountTotalMoney(totalBills, totalMoneyAllBills);
+    }
+
+    @Override
+    public void callPayRecyclerDialog(String edong) {
+        if (TextUtils.isEmpty(edong))
+            return;
+
+        listBillCheckedDialog = mPayModel.getAllBillOfCustomerChecked(edong);
+        refreshTotalBillsAndTotalMoneyInDialog();
+
+        mIPayView.showPayRecyclerListBills(listBillCheckedDialog);
+    }
+
+    @Override
+    public void callProcessDataBillDialogChecked(int pos, boolean isChecked) {
+        if (listBillCheckedFragment.size() <= pos)
+            return;
+        //update again
+        /*
+        String edong = this.listBillCheckedFragment.get(pos).getEdong();
+        String code = this.listBillCheckedFragment.get(pos).getCode();
+        int bill = this.listBillCheckedFragment.get(pos).getBillId();
+
+        mPayModel.updateBillIsChecked(edong, code, bill, isChecked);*/
+
+        listBillCheckedDialog.clear();
+        listBillCheckedDialog.addAll(listBillCheckedFragment);
+        listBillCheckedDialog.get(pos).setChecked(isChecked);
+
+        refreshTotalBillsAndTotalMoneyInDialog();
+    }
+
+    private void refreshTotalBillsAndTotalMoneyInFragment() {
+        totalBillsFragment = 0;
+        totalMoneyFragment = 0;
+
+        int index = 0;
+        int maxIndex = listBillCheckedFragment.size();
+        for (; index < maxIndex; index++) {
+            if (listBillCheckedFragment.get(index).isChecked()) {
+                totalBillsFragment++;
+                totalMoneyFragment += listBillCheckedFragment.get(index).getAmount();
+            }
+        }
+
+        mIPayView.showCountBillsAndCountTotalMoney(totalBillsFragment, totalMoneyFragment);
+    }
+
+    private void refreshTotalBillsAndTotalMoneyInDialog() {
+        totalBillsDialog = 0;
+        totalMoneyDialog = 0;
+
+        int index = 0;
+        int maxIndex = listBillCheckedDialog.size();
+
+        for (; index < maxIndex; index++) {
+            if (listBillCheckedDialog.get(index).isChecked()) {
+                totalBillsDialog++;
+                totalMoneyDialog += listBillCheckedDialog.get(index).getAmount();
+            }
+        }
+
+        mIPayView.showCountBillsAndCountTotalMoneyInDialog(totalBillsDialog, totalMoneyDialog);
     }
 
     private SoapAPI.AsyncSoapSearchOnline.AsyncSoapSearchOnlineCallBack soapSearchOnlineCallBack = new SoapAPI.AsyncSoapSearchOnline.AsyncSoapSearchOnlineCallBack() {

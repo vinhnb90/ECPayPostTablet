@@ -44,47 +44,47 @@
             android:layout_below="@+id/tvTitle">
 
             <ImageButton
-                android:layout_marginRight="10dp"
-                android:id="@+id/ibScaner"
+                android:id="@+id/ibtn_frag_thanhtoan_qrcode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
                 android:background="@drawable/bg_edittext"
                 android:src="@mipmap/ic_barcode" />
 
             <EditText
-                android:lines="1"
-                android:scrollHorizontally="true"
-                android:id="@+id/etSearch"
+                android:id="@+id/et_frag_thanh_toan_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/ibScaner"
+                android:layout_alignBaseline="@+id/ibtn_frag_thanhtoan_qrcode"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:layout_toLeftOf="@+id/ibScaner"
+                android:layout_toLeftOf="@+id/ibtn_frag_thanhtoan_qrcode"
                 android:background="@drawable/bg_edittext"
                 android:drawableLeft="@drawable/ic_search_black_24dp"
                 android:imeOptions="actionSearch"
                 android:inputType="textNoSuggestions|textVisiblePassword"
+                android:lines="1"
                 android:paddingBottom="10dp"
                 android:paddingLeft="10dp"
                 android:paddingRight="50dp"
                 android:paddingTop="10dp"
+                android:scrollHorizontally="true"
                 android:text="" />
 
             <ImageButton
                 android:id="@+id/ibtn_frag_thanhtoan_clear_text_search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/etSearch"
-                android:layout_alignRight="@+id/etSearch"
-                android:layout_alignTop="@+id/etSearch"
+                android:layout_alignBottom="@id/et_frag_thanh_toan_search"
+                android:layout_alignRight="@id/et_frag_thanh_toan_search"
+                android:layout_alignTop="@+d/et_frag_thanh_toan_search"
                 android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/ibScaner"
+                android:layout_toLeftOf="@+id/ibtn_frag_thanhtoan_qrcode"
                 android:background="@null"
                 android:padding="10dp"
                 android:src="@drawable/ic_cancel" />
@@ -232,7 +232,7 @@
     </RelativeLayout>
 
     <android.support.design.widget.TabLayout
-        android:id="@+id/tabs"
+        android:id="@+id/tabs_frag_thanh_toan"
         style="@style/MyCustomTabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -242,7 +242,7 @@
         android:visibility="gone" />
 
     <android.support.v4.view.ViewPager
-        android:id="@+id/view_pager"
+        android:id="@+id/vpage_frag_thanh_toan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone" />
@@ -260,88 +260,110 @@
             android:layout_alignParentBottom="true"
             android:paddingTop="10dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/tv_fragment_thanh_toan_total_bills_money"
-                android:layout_alignParentLeft="true"
-                android:layout_alignTop="@+id/tvTitleTongTien"
-                android:layout_toLeftOf="@+id/tv_fragment_thanh_toan_total_bills_money"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:text="Hoá đơn"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tv_fragment_thanh_toan_total_bills_checked"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:text="0"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvTitleTongTien"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="5dp"
-                android:text="Tổng tiền"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/tv_fragment_thanh_toan_total_bills_money"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvTitleTongTien"
-                android:layout_centerHorizontal="true"
-                android:text="0 đ"
-                android:textColor="@color/colorRed"
-                android:textSize="18sp"
-                android:textStyle="bold" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/tv_fragment_thanh_toan_total_bills_money"
-                android:layout_alignParentRight="true"
-                android:layout_alignTop="@+id/tvTitleTongTien"
-                android:layout_toRightOf="@+id/tv_fragment_thanh_toan_total_bills_money"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageButton
-                    android:id="@+id/ibAdd"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:src="@mipmap/ic_them" />
-
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btThanhToan"
+                android:id="@+id/ll_frag_thanh_toan_count"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_fragment_thanh_toan_total_bills_money"
+                android:layout_alignParentTop="true"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:text="Hoá đơn"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tv_fragment_thanh_toan_total_bills_checked"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:lines="1"
+                        android:scrollHorizontally="true"
+                        android:text="0"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvTitleTongTien"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="5dp"
+                        android:text="Tổng tiền"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tv_fragment_thanh_toan_total_bills_money"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvTitleTongTien"
+                        android:layout_centerHorizontal="true"
+                        android:lines="1"
+                        android:text="0 đ"
+                        android:textColor="@color/colorRed"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/tv_fragment_thanh_toan_total_bills_money"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignTop="@+id/tvTitleTongTien"
+                    android:layout_toRightOf="@+id/tv_fragment_thanh_toan_total_bills_money"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:id="@+id/ibtn_frag_thanh_toan_add"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:src="@mipmap/ic_them" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <Button
+                android:layout_below="@+id/ll_frag_thanh_toan_count"
+                android:id="@+id/btn_frag_thanh_toan_paying"
+                android:layout_width="match_parent"
                 android:layout_margin="10dp"
                 android:background="@drawable/bg_button"
                 android:text="THANH TOÁN"
-                android:textColor="@color/colorTextWhite" />
+                android:textColor="@color/colorTextWhite"
+                android:layout_height="wrap_content" />
 
         </RelativeLayout>
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/rvKhachHang"
+            android:id="@+id/rv_frag_thanh_toan_customer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/rlBottom"

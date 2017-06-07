@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <LinearLayout
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal|center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <LinearLayout
+            android:id="@+id/ll1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cb_row_thanhtoan_list_bills_choose"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:gravity="left"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_row_thanhtoan_list_bills_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/cb_row_thanhtoan_list_bills_choose"
+                    android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:text="PD384728938" />
+
+                <TextView
+                    android:id="@+id/tv_row_thanhtoan_list_bills_term"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tv_row_thanhtoan_list_bills_code"
+                    android:layout_marginTop="5dp"
+                    android:layout_toRightOf="@+id/cb_row_thanhtoan_list_bills_choose"
+                    android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:text="Kỳ 03/2017" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_row_thanhtoan_list_bills_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:lines="1"
+                android:scrollHorizontally="true"
+                android:text="Ten"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_row_thanhtoan_list_bills_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:gravity="center_horizontal"
+                android:lines="1"
+                android:scrollHorizontally="true"
+                android:text="100.000 đ100100.000 đ.000 đ100100.000 đ.000 đ100.000 đ100.000 đ" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_row_thanhtoan_list_bills_status_pay"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:text="Chưa thanh toán"
+            android:textColor="@color/colorDarkOrange" />
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.File;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
+import views.ecpay.com.postabletecpay.model.adapter.PayListBillsAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
@@ -50,11 +52,11 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     private String CREATE_TABLE_EVN_PC = "CREATE TABLE `" + TABLE_NAME_EVN_PC + "` ( `pcId` NOT NULL PRIMARY KEY, `parentId` INTEGER, `code` TEXT, `ext` TEXT, `fullName` TEXT, `shortName` TEXT, `address` TEXT, `taxCode` TEXT, `phone1` TEXT, `phone2` TEXT, `fax` TEXT, `level` INTEGER )";
 
-    private String CREATE_TABLE_CUSTOMER = "CREATE TABLE `" + TABLE_NAME_CUSTOMER + "` ( `code` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `address` TEXT, `pcCode` TEXT, `pcCodeExt` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `bookCmis` TEXT, `electricityMeter` TEXT, `inning` TEXT, `status` TEXT, `bankAccount` TEXT, `idNumber` TEXT, `bankName` TEXT , `edongKey` TEXT NOT NULL)";
+    private String CREATE_TABLE_CUSTOMER = "CREATE TABLE `" + TABLE_NAME_CUSTOMER + "` ( `code` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `address` TEXT, `pcCode` TEXT, `pcCodeExt` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `bookCmis` TEXT, `electricityMeter` TEXT, `inning` TEXT, `status` TEXT, `bankAccount` TEXT, `idNumber` TEXT, `bankName` TEXT , `edongKey` TEXT NOT NULL, `isShowBill` INTEGER DEFAULT 0)";
 
     private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `customerCode` TEXT, `customerPayCode` TEXT, `billId` INTEGER NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, `strIssueDate` TEXT, `status` INTEGER, `seri` TEXT, `pcCode` TEXT, `handoverCode` TEXT, `cashierCode` TEXT, `bookCmis` TEXT, `fromDate` TEXT, `toDate` TEXT, `strFromDate` TEXT, `strToDate` TEXT, `home` TEXT, `tax` REAL, `billNum` TEXT, `currency` TEXT, `priceDetails` TEXT, `numeDetails` TEXT, `amountDetails` TEXT, `oldIndex` TEXT, `newIndex` TEXT, `nume` TEXT, `amountNotTax` INTEGER, `amountTax` INTEGER, `multiple` TEXT, `billType` TEXT, `typeIndex` TEXT, `groupTypeIndex` TEXT, `createdDate` TEXT, `idChanged` INTEGER, `dateChanged` TEXT, `edong` TEXT, `pcCodeExt` TEXT, `code` TEXT, `name` TEXT, `nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, `taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, `billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `edongKey` TEXT NOT NULL, `isChecked` INTEGER default 0)";
 
-    private String CREATE_TABLE_LICH_SU_TTOAN = "CREATE TABLE " + TABLE_NAME_LICH_SU_TTOAN + "(ID INTEGER AUTOINCREMENT, " +
+    private String CREATE_TABLE_LICH_SU_TTOAN = "CREATE TABLE " + TABLE_NAME_LICH_SU_TTOAN + "(ID INTEGER AUTO INCREMENT, " +
             "SERI_HDON INTEGER, " + "MA_KHANG TEXT, " + "MA_THE TEXT, " + "TEN_KHANG TEXT, " + "DIA_CHI TEXT, " + "THANG_TTOAN DATE, " +
             "PHIEN_TTOAN INTEGER, " + "SO_TIEN_TTOAN DOUBLE, " + "SO_GCS TEXT, " + "DIEN_LUC TEXT, " + "SO_HO TEXT, " +
             "SO_DAU_KY TEXT, " + "SO_CUOI_KY TEXT, " + "SO_CTO TEXT, " + "SDT_ECPAY TEXT, " + "SDT_EVN TEXT, " + "GIAO_THU INTEGER, " +
@@ -320,7 +322,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         boolean isPayed = false;
         database = this.getReadableDatabase();
         Cursor mCursor = database.rawQuery(query, null);
-        isPayed = (mCursor.getCount() == 0) ? false : true;
+        isPayed = (mCursor.getCount() == 0) ? true : false;
 
         if (mCursor != null && !mCursor.isClosed()) {
             mCursor.close();
@@ -376,9 +378,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 String idNumber = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idNumber")));
                 String bankName = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bankName")));
                 String edongKey = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edongKey")));
-                boolean isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))) == 0 ? false : true;
+                boolean isShowBill = booleanConvertNull(mCursor.getInt(mCursor.getColumnIndex("isShowBill")));
 
-                Customer customer = new Customer(code, name, address, pcCode, pcCodeExt, phoneByevn, phoneByecp, bookCmis, electricityMeter, inning, status, bankAccount, idNumber, bankName, edongKey, isChecked);
+                Customer customer = new Customer(code, name, address, pcCode, pcCodeExt, phoneByevn, phoneByecp, bookCmis, electricityMeter, inning, status, bankAccount, idNumber, bankName, edongKey, isShowBill);
                 customerList.add(customer);
             }
             while (mCursor.moveToNext());
@@ -401,6 +403,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId")));
             int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
             int status = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")));
+            boolean isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))) == 0 ? false : true;
             String customerPayCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerPayCode")));
             String billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
 
@@ -415,7 +418,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             bill.setMoneyBill(amount);
             bill.setMonthBill(term);
             bill.setPayed(status == 0 ? false : true);
-            bill.setChecked(false);
+            bill.setChecked(isChecked);
             if (billingBy.equals(edong) || bill.isPayed())
                 bill.setPrint(true);
             else bill.setPrint(false);
@@ -549,7 +552,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("isChecked", checked == true ? ONE : ZERO);
 
         database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_BILL, initialValues, "edong = ? and customerCode = ? and billId = ?", new String[]{edong, code, String.valueOf(billId)});
+        int rowAffect = (int) database.update(TABLE_NAME_BILL, initialValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, code, String.valueOf(billId)});
         Log.d(TAG, "updateBillOfCustomerIsChecked: rowAffect is " + rowAffect);
     }
 
@@ -583,5 +586,72 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return totalBills;
     }
 
+    public List<PayListBillsAdapter.Entity> selectAllBillsOfAllCustomerChecked(String edong) {
+        database = getReadableDatabase();
+
+        String query = "SELECT A.billId, A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, customerCode, term, amount, isChecked FROM TBL_BILL WHERE edongKey='" + edong + "' and isChecked = " + ONE + ") AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+        Cursor mCursor = database.rawQuery(query, null);
+        List<PayListBillsAdapter.Entity> listBillChecked = new ArrayList<>();
+        PayListBillsAdapter.Entity entity = null;
+
+        if (mCursor.moveToFirst()) {
+            do {
+                entity = new PayListBillsAdapter.Entity(
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term"))),
+                        longConvertNull(mCursor.getLong(mCursor.getColumnIndex("amount"))),
+                        booleanConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))),
+                        edong,
+                        intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId"))));
+
+                listBillChecked.add(entity);
+            }
+            while (mCursor.moveToNext());
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+
+        return listBillChecked;
+    }
+
+    private boolean booleanConvertNull(int isChecked) {
+        return isChecked == Common.ONE ? true : false;
+    }
+
+    public void updateCustomerIsShowBill(String edong, String code, boolean checked) {
+        ContentValues initialValues = new ContentValues();
+        initialValues.put("isShowBill", checked == true ? ONE : ZERO);
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.update(TABLE_NAME_CUSTOMER, initialValues, "edongKey = ? and code = ?", new String[]{edong, code});
+        Log.d(TAG, "updateBillOfCustomerIsChecked: rowAffect is " + rowAffect);
+    }
+
+    public String selectSessionAccount(String edong) {
+        if (TextUtils.isEmpty(edong))
+            return null;
+
+        String query = "SELECT session FROM " + TABLE_NAME_ACCOUNT + " WHERE edong = '" + edong + "'";
+        String session = "";
+
+        database = this.getReadableDatabase();
+        Cursor mCursor = database.rawQuery(query, null);
+        mCursor.moveToFirst();
+
+        int count = mCursor.getCount();
+        //get first value
+        if (count != Common.ZERO)
+            session = mCursor.getString(mCursor.getColumnIndex("session"));
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return session;
+    }
+    /*
+                boolean isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))) == 0 ? false : true;*/
     //endregion
 }
