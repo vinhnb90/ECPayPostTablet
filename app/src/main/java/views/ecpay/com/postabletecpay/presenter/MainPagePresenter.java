@@ -13,6 +13,7 @@ import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityDataZip.ListDataZipResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEVNReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ListEvnPCLoginResponse;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
@@ -214,40 +215,41 @@ public class MainPagePresenter implements IMainPagePresenter{
         }
 
         try {
-            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.SYNC_DATA.toString(), versionApp);
+            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp);
         } catch (Exception e) {
             iMainPageView.showTextMessage(e.getMessage());
             return;
         }
 
-        String jsonRequestData = SoapAPI.getJsonRequestSynData(
+//        String dataSign = Common.getDataSignRSA(agent, commandId, auditNumber, macAdressHexValue, diskDriver, pcCode, accountId, privateKeyRSA);
+
+        String jsonRequestZipData = SoapAPI.getJsonRequestSynDataZip(
                 configInfo.getAGENT(),
                 configInfo.getAgentEncypted(),
                 configInfo.getCommandId(),
-                configInfo.getAuditNumber(),
+                114235346063l,//configInfo.getAuditNumber(),
                 configInfo.getMacAdressHexValue(),
                 configInfo.getDiskDriver(),
-                configInfo.getSignatureEncrypted(),
-                configInfo.getPC_CODE(),
-                "PD2722168",
-                0l,
-                0l,
+                "DbwnSmHdcXKYCZ6yARbXW+KwGGLXwPbYuAuhvq66Sdsp3NXx88QLXWkSr7vqVV+zviRcF86YCMno\\n/Ycr+dGOLNfXpuMULu28bdc0JSxbQdV9TfI1fdFHPyGqhF8+x+Pe10Y5enaR4R8VaEnEVC1ortws\\nCk+oVBjXb+GyYG9fK/4=\\n",//configInfo.getSignatureEncrypted(),
+//                configInfo.getPC_CODE(),
+                "PD1600",
+                "",//"D1680225",
                 configInfo.getAccountId());
 
-        if (jsonRequestData != null) {
+        if (jsonRequestZipData != null) {
             try {
-                final SoapAPI.AsyncSoapSynchronizeData soapSynchronizeData;
+                final SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeDataZip;
 
-                soapSynchronizeData = new SoapAPI.AsyncSoapSynchronizeData(callBackData);
+                soapSynchronizeDataZip = new SoapAPI.AsyncSoapSynchronizeDataZip(callBackData);
 
-                if (soapSynchronizeData.getStatus() != AsyncTask.Status.RUNNING) {
-                    soapSynchronizeData.execute(jsonRequestData);
+                if (soapSynchronizeDataZip.getStatus() != AsyncTask.Status.RUNNING) {
+                    soapSynchronizeDataZip.execute(jsonRequestZipData);
 
                     //thread time out
                     Thread soapDataThread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            ListDataResponse listDataResponse = null;
+                            ListDataZipResponse listDataZipResponse = null;
 
                             //call time out
                             try {
@@ -255,8 +257,8 @@ public class MainPagePresenter implements IMainPagePresenter{
                             } catch (InterruptedException e) {
                                 iMainPageView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
                             } finally {
-                                if (listDataResponse == null) {
-                                    soapSynchronizeData.callCountdown(soapSynchronizeData);
+                                if (listDataZipResponse == null) {
+                                    soapSynchronizeDataZip.callCountdown(soapSynchronizeDataZip);
                                 }
                             }
                         }
@@ -272,9 +274,9 @@ public class MainPagePresenter implements IMainPagePresenter{
         }
     }
 
-    private SoapAPI.AsyncSoapSynchronizeData.AsyncSoapSynchronizeDataCallBack callBackData = new SoapAPI.AsyncSoapSynchronizeData.AsyncSoapSynchronizeDataCallBack() {
+    private SoapAPI.AsyncSoapSynchronizeDataZip.AsyncSoapSynchronizeDataZipCallBack callBackData = new SoapAPI.AsyncSoapSynchronizeDataZip.AsyncSoapSynchronizeDataZipCallBack() {
         @Override
-        public void onPre(SoapAPI.AsyncSoapSynchronizeData soapSynchronizeInvoices) {
+        public void onPre(SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeInvoices) {
 
         }
 
@@ -284,12 +286,12 @@ public class MainPagePresenter implements IMainPagePresenter{
         }
 
         @Override
-        public void onPost(ListDataResponse response) {
+        public void onPost(ListDataZipResponse response) {
 
         }
 
         @Override
-        public void onTimeOut(SoapAPI.AsyncSoapSynchronizeData soapSynchronizeInvoices) {
+        public void onTimeOut(SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeInvoices) {
 
         }
     };

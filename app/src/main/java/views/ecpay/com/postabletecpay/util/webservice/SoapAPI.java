@@ -28,6 +28,10 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityData.BodyListD
 import views.ecpay.com.postabletecpay.util.entities.request.EntityData.FooterListDataRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityData.HeaderListDataRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityData.ListDataRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityDataZip.BodyListDataZipRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityDataZip.FooterListDataZipRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityDataZip.HeaderListDataZipRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityDataZip.ListDataZipRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityEVN.BodyEVNRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityEVN.EVNRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityEVN.FooterEVNRequest;
@@ -40,6 +44,7 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.B
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.SearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityDataZip.ListDataZipResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEVNReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
@@ -269,8 +274,6 @@ public class SoapAPI {
         listDataRequest.setFooterListDataRequest(footerListDataRequest);
 
         final GsonBuilder gsonBuilder = new GsonBuilder();
-//        gsonBuilder.registerTypeAdapter(ListDataRequest.class, new LoginRequestAdapter());
-//        gsonBuilder.setPrettyPrinting();
         final Gson gson = gsonBuilder.create();
 
         //Serialised
@@ -282,8 +285,64 @@ public class SoapAPI {
         return jsonResult;
     }
 
-    public static String getJsonRequestSearchOnline(String agent, String agentEncypted, String commandId, long auditNumber, String mac,
-                                                    String diskDriver, String signatureEncrypted, String directEvn,
+    //region create JSON Request service
+    public static String getJsonRequestSynDataZip(String agent, String agentEncypted, String commandId, long auditNumber, String mac,
+                                               String diskDriver, String signatureEncrypted, String pcCode, String bookCmis,
+                                               String accountId) {
+        if (agent == null || agent.isEmpty() || agent.trim().equals(""))
+            return null;
+        if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
+            return null;
+        if (commandId == null || commandId.isEmpty() || commandId.trim().equals(""))
+            return null;
+        if (mac == null || mac.isEmpty() || mac.trim().equals(""))
+            return null;
+        if (diskDriver == null || diskDriver.isEmpty() || diskDriver.trim().equals(""))
+            return null;
+        if (signatureEncrypted == null || signatureEncrypted.isEmpty() || signatureEncrypted.trim().equals(""))
+            return null;
+//        if (pcCode == null || pcCode.isEmpty() || pcCode.trim().equals(""))
+//            return null;
+//        if (bookCmis == null || bookCmis.isEmpty() || bookCmis.trim().equals(""))
+//            return null;
+        if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
+            return null;
+
+        HeaderListDataZipRequest headerListDataZipRequest = new HeaderListDataZipRequest();
+        headerListDataZipRequest.setAgent(agent);
+        headerListDataZipRequest.setPassword(agentEncypted);
+        headerListDataZipRequest.setCommandID(commandId);
+
+        BodyListDataZipRequest bodyListDataZipRequest = new BodyListDataZipRequest();
+        bodyListDataZipRequest.setAuditNumber(auditNumber);
+        bodyListDataZipRequest.setMac(mac);
+        bodyListDataZipRequest.setDiskDrive(diskDriver);
+        bodyListDataZipRequest.setSignature(signatureEncrypted);
+        bodyListDataZipRequest.setPcCode(pcCode);
+        bodyListDataZipRequest.setBookCmis(bookCmis);
+
+        FooterListDataZipRequest footerListDataZipRequest = new FooterListDataZipRequest();
+        footerListDataZipRequest.setAccountIdt(accountId);
+
+        final ListDataZipRequest listDataZipRequest = new ListDataZipRequest();
+        listDataZipRequest.setHeaderListDataZipRequest(headerListDataZipRequest);
+        listDataZipRequest.setBodyListDataZipRequest(bodyListDataZipRequest);
+        listDataZipRequest.setFooterListDataZipRequest(footerListDataZipRequest);
+
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+
+        final Gson gson = gsonBuilder.create();
+
+        //Serialised
+        final String jsonResult = gson.toJson(listDataZipRequest);
+
+        //Test Deserialised
+        final ListDataZipRequest parsedRequest = gson.fromJson(jsonResult, ListDataZipRequest.class);
+
+        return jsonResult;
+    }
+
+    public static String getJsonRequestSearchOnline(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver, String signatureEncrypted, String directEvn,
                                                     String customerCode,
                                                     String pcCode,
                                                     String bookCmis,
@@ -916,6 +975,114 @@ public class SoapAPI {
                 return;
 
             callBack.onTimeOut(soapSynchronizeData);
+        }
+
+        public boolean isEndCallSoap() {
+            return isEndCallSoap;
+        }
+
+        public void setEndCallSoap(boolean endCallSoap) {
+            isEndCallSoap = endCallSoap;
+        }
+    }
+    //endregion
+
+    //region đồng bộ
+    public static class AsyncSoapSynchronizeDataZip extends AsyncTask<String, String, ListDataZipResponse> {
+
+        //request action to eStore
+        private static final String METHOD_NAME = "execute";
+        private static final String NAMESPACE = "http://services.ecpay.org/";
+        private static final String URL = ENDPOINT_URL;
+        private static final String SOAP_ACTION = "request action to eStore";
+        private static final String METHOD_PARAM = "message";
+        private AsyncSoapSynchronizeDataZipCallBack callBack;
+        private boolean isEndCallSoap = false;
+
+        public AsyncSoapSynchronizeDataZip(AsyncSoapSynchronizeDataZipCallBack callBack) throws Exception {
+            this.callBack = callBack;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            callBack.onPre(this);
+        }
+
+        @Override
+        protected ListDataZipResponse doInBackground(String... jsons) {
+            String json = jsons[0];
+            Log.d("here", "doInBackground: " + json);
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            request.addProperty(METHOD_PARAM, json);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE ht;
+            SoapPrimitive response = null;
+
+            try {
+                ht = new HttpTransportSE(URL);
+                ht.call(SOAP_ACTION, envelope);
+                response = (SoapPrimitive) envelope.getResponse();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (response == null) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                return null;
+            }
+
+            String data = response.toString();
+            if (data.isEmpty()) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return null;
+            }
+
+            ListDataZipResponse listDataZipResponse = null;
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+//            gsonBuilder.registerTypeAdapter(ListEVNReponse.class, new LoginResponseAdapter());
+//            gsonBuilder.setPrettyPrinting();
+            final Gson gson = gsonBuilder.create();
+
+            listDataZipResponse = gson.fromJson(data, ListDataZipResponse.class);
+
+            return listDataZipResponse;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            String message = values[0];
+            if (isEndCallSoap)
+                callBack.onUpdate(message);
+        }
+
+        @Override
+        protected void onPostExecute(ListDataZipResponse listDataZipResponse) {
+            super.onPostExecute(listDataZipResponse);
+            if (!isEndCallSoap)
+                callBack.onPost(listDataZipResponse);
+        }
+
+        public static abstract class AsyncSoapSynchronizeDataZipCallBack {
+            public abstract void onPre(final AsyncSoapSynchronizeDataZip soapSynchronizeDataZip);
+
+            public abstract void onUpdate(String message);
+
+            public abstract void onPost(ListDataZipResponse response);
+
+            public abstract void onTimeOut(final AsyncSoapSynchronizeDataZip soapSynchronizeDataZip);
+        }
+
+        public void callCountdown(final AsyncSoapSynchronizeDataZip soapSynchronizeDataZip) {
+            if (soapSynchronizeDataZip == null)
+                return;
+
+            callBack.onTimeOut(soapSynchronizeDataZip);
         }
 
         public boolean isEndCallSoap() {

@@ -1,4 +1,4 @@
-package views.ecpay.com.postabletecpay.util.entities.response.EntityData;
+package views.ecpay.com.postabletecpay.util.entities.request.EntityDataZip;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by macbook on 6/1/17.
  */
 
-public class HeaderListDataResponse {
+public class HeaderListDataZipRequest {
     @SerializedName("agent")
     @Expose
     private String agent;
@@ -16,7 +16,7 @@ public class HeaderListDataResponse {
     private String password;
     @SerializedName("command-id")
     @Expose
-    private String command_id;
+    private String commandID;
 
     public String getAgent() {
         return agent;
@@ -34,11 +34,11 @@ public class HeaderListDataResponse {
         this.password = password;
     }
 
-    public String getCommand_id() {
-        return command_id;
+    public String getCommandID() {
+        return commandID;
     }
 
-    public void setCommand_id(String command_id) {
-        this.command_id = command_id;
+    public void setCommandID(String commandID) {
+        this.commandID = commandID;
     }
 }
