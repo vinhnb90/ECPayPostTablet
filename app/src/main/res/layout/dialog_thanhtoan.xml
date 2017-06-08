@@ -103,6 +103,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="20dp"
+            android:padding="10dp"
             android:background="@color/colorTextGreen"
             android:visibility="visible">
 
@@ -112,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:text="Online bills pay..."
+                android:text="Đã thanh toán..."
                 android:textColor="@color/colorTextWhite" />
 
             <!--   <LinearLayout
@@ -143,21 +144,38 @@
                        android:visibility="visible" />
                </LinearLayout>-->
 
-            <ProgressBar
-                android:id="@+id/pbar_diaglog_thanhtoan"
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            <RelativeLayout
+                android:id="@+id/rv_diaglog_thanhtoan_process_bill"
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/ll_frag_thanh_toan_action_search"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_toLeftOf="@+id/ll_frag_thanh_toan_action_search"
                 android:layout_toRightOf="@+id/tv_search"
-                android:indeterminate="true"
-                android:indeterminateTint="@color/colorTextWhite"
-                android:indeterminateTintMode="src_atop"
-                android:visibility="gone" />
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/tv_diaglog_thanhtoan_count_bill_payed"
+                    android:textColor="@color/colorTextWhite"
+                    android:layout_alignParentLeft="true"
+                    android:text="1/7 Hóa đơn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <ProgressBar
+                    android:layout_toRightOf="@+id/tv_diaglog_thanhtoan_count_bill_payed"
+                    android:id="@+id/pbar_diaglog_thanhtoan"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/ll_frag_thanh_toan_action_search"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@+id/ll_frag_thanh_toan_action_search"
+
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/colorTextWhite"
+                    android:indeterminateTintMode="src_atop"
+                    android:visibility="visible" />
+            </RelativeLayout>
+
 
 
             <TextView
@@ -176,7 +194,7 @@
                 android:scrollHorizontally="true"
                 android:text="Disconnect"
                 android:textColor="@color/colorTextWhite"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
         </RelativeLayout>
 

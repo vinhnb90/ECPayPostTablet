@@ -24,7 +24,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
-import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.presenter.IMainPagePresenter;
 import views.ecpay.com.postabletecpay.presenter.MainPagePresenter;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
@@ -38,9 +37,13 @@ import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
+import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_BILL;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_EMPTY;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_SLASH;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_SPACE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;
+import static views.ecpay.com.postabletecpay.util.commons.Common.UNIT_MONEY;
 
 /**
  * Created by macbook on 4/28/17.
@@ -107,12 +110,12 @@ public class MainPageFragment extends Fragment implements
 
         mEdong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
 
-
-
         ibTroGiup.setOnClickListener(this);
         btXoaDuLieu.setOnClickListener(this);
         btThanhToan.setOnClickListener(this);
         btBaoCao.setOnClickListener(this);
+
+        iMainPagePresenter.callInfoMain(mEdong);
 
         return view;
     }
@@ -241,9 +244,9 @@ public class MainPageFragment extends Fragment implements
             userName = TEXT_EMPTY;
 
         tvUsername.setText(userName);
-        tvSoDuKhaDung.setText(String.valueOf(balance));
+        tvSoDuKhaDung.setText(String.valueOf(balance) + TEXT_SPACE + UNIT_MONEY);
         tvSoHoaDon.setText(String.valueOf(totalBills));
-        tvTongTien.setText(String.valueOf(totalMoney));
+        tvTongTien.setText(String.valueOf(totalMoney) + TEXT_SPACE + UNIT_MONEY);
 
     }
 

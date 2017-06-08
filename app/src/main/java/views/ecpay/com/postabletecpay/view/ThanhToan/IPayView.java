@@ -26,15 +26,21 @@ public interface IPayView extends ICommonView {
 
     void showEditTextSearch(String value);
 
-    void showCountBillsAndCountTotalMoney(int size, long totalMoneyAllBills);
+    void showCountBillsAndTotalMoneyFragment(int size, long totalMoneyAllBills);
 
     void showPayRecyclerListBills(List<PayListBillsAdapter.Entity> listBillChecked);
 
-    void showCountBillsAndCountTotalMoneyInDialog(int totalBillsInList, long totalMoneyInList);
+    void showCountBillsAndTotalMoneyInDialog(int totalBillsInList, long totalMoneyInList);
 
     void showMessageNotifyBillOnlineDialog(String message);
 
-    void showBillOnlineDialogPrecess();
+    void showPayingRViewStart();
 
-    void hideBillOnlineDialogPrecess();
+    void showPayingRviewFinish();
+
+    void showPayingRviewMessage();
+
+    void showTextCountBillsPayed(int countBillPayedSuccess, int totalBillsDialog);
+
+    void showTextCountBillsPayedSuccess(int countBillPayedSuccess, int totalBillsChooseDialog);
 }

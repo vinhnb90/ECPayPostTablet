@@ -27,7 +27,10 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 public class MainActivity extends AppCompatActivity implements MainPageFragment.OnFragmentInteractionListener,
         PayAdapter.BillInsidePayAdapter.BillInsidePayViewHolder.OnInterationBillInsidePayAdapter,
         PayListBillsAdapter.OnInteractionListBillAdapter,
-        PayFragment.OnFragmentInteractionListener, BaoCaoFragment.OnFragmentInteractionListener,
+        PayFragment.OnFragmentInteractionListener,
+
+        PayFragment.CallbackDialog,
+        BaoCaoFragment.OnFragmentInteractionListener,
         UserInfoFragment.OnFragmentInteractionListener {
 
     public static BottomNavigationView navigation;
@@ -90,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements MainPageFragment.
         navigation = (BottomNavigationView) findViewById(R.id.navigation_ac_main);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
-
+/*
     @Override
     protected void onResume() {
         super.onResume();
@@ -101,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements MainPageFragment.
         }
 
         ((PayFragment)fragmentVisibling).bindViewAgain();
-    }
+    }*/
 
     private void getBundle() {
         mEdong = getIntent().getExtras().getString(KEY_EDONG, "");
@@ -148,6 +151,20 @@ public class MainActivity extends AppCompatActivity implements MainPageFragment.
 
         ((PayFragment)fragmentVisibling).showBillCheckedDialog(pos, isChecked);
 
+    }
+
+    //endregion
+
+    //region PayFragment.CallbackDialog,
+    @Override
+    public void processOnDismissDialog() {
+        //check fragment
+        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+            return;
+        }
+
+        ((PayFragment)fragmentVisibling).bindViewAgain();
     }
     //endregion
 }

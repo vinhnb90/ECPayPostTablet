@@ -1,6 +1,8 @@
 package views.ecpay.com.postabletecpay.util.webservice;
 
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -20,6 +22,10 @@ import views.ecpay.com.postabletecpay.model.adapter.EvnRequestAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.LoginRequestAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.LoginResponseAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityBillingOnline.BillingOnlineRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityBillingOnline.BodyBillingOnlineRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityBillingOnline.FooterBillingOnlineRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityBillingOnline.HeaderBillingOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.BodyChangePassRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.ChangePassRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.FooterChangePassRequest;
@@ -42,11 +48,13 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.HeaderLo
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.LoginRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.BodySearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.SearchOnlineRequest;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityBillOnline.BillingOnlineRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityDataZip.ListDataZipResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEVNReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ResponseLoginResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
@@ -342,10 +350,10 @@ public class SoapAPI {
         return jsonResult;
     }
 
-    public static String getJsonRequestSearchOnline(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver, String signatureEncrypted, String directEvn,
+    public static String getJsonRequestSearchOnline(String agent, String agentEncypted, String commandId, long auditNumber, String mac,
+                                                    String diskDriver, String signatureEncrypted, String directEvn,
                                                     String customerCode,
                                                     String pcCode,
-                                                    String bookCmis,
                                                     String accountId) {
         boolean fail =
                 TextUtils.isEmpty(agent) ||
@@ -353,12 +361,9 @@ public class SoapAPI {
                         TextUtils.isEmpty(commandId) ||
                         TextUtils.isEmpty(mac) ||
                         TextUtils.isEmpty(diskDriver) ||
-                        TextUtils.isEmpty(diskDriver) ||
                         TextUtils.isEmpty(signatureEncrypted) ||
                         TextUtils.isEmpty(directEvn) ||
                         TextUtils.isEmpty(customerCode) ||
-                        TextUtils.isEmpty(pcCode) ||
-                        TextUtils.isEmpty(bookCmis) ||
                         TextUtils.isEmpty(accountId);
 
         if (fail)
@@ -403,8 +408,8 @@ public class SoapAPI {
     public static String getJsonRequestBillOnline(String agent, String agentEncypted, String commandId, long auditNumber,
                                                   String macAdressHexValue, String diskDriver, String signatureEncrypted,
                                                   String code, String session, int billId, Long amount, String phone,
-                                                  String providerCode, String account_type, String accountId) {
-        boolean fail =
+                                                  String providerCode, String partnerCode, String accountId) {
+        boolean hasNull =
                 TextUtils.isEmpty(agent) ||
                         TextUtils.isEmpty(agentEncypted) ||
                         TextUtils.isEmpty(commandId) ||
@@ -415,12 +420,48 @@ public class SoapAPI {
                         TextUtils.isEmpty(session) ||
                         TextUtils.isEmpty(phone) ||
                         TextUtils.isEmpty(providerCode) ||
-                        TextUtils.isEmpty(account_type) ||
+                        TextUtils.isEmpty(partnerCode) ||
                         TextUtils.isEmpty(accountId);
 
-        if (fail)
+        if (hasNull)
             return null;
-        return null;
+
+        HeaderBillingOnlineRequest headerBillingOnlineRequest = new HeaderBillingOnlineRequest();
+        headerBillingOnlineRequest.setAgent(agent);
+        headerBillingOnlineRequest.setPassword(agentEncypted);
+        headerBillingOnlineRequest.setCommandId(commandId);
+
+        BodyBillingOnlineRequest bodyBillingOnlineRequest = new BodyBillingOnlineRequest();
+        bodyBillingOnlineRequest.setAuditNumber(auditNumber);
+        bodyBillingOnlineRequest.setMac(macAdressHexValue);
+        bodyBillingOnlineRequest.setDiskDrive(diskDriver);
+        bodyBillingOnlineRequest.setSignature(signatureEncrypted);
+        bodyBillingOnlineRequest.setCustomerCode(code);
+        bodyBillingOnlineRequest.setSession(session);
+        bodyBillingOnlineRequest.setBillId(billId);
+        bodyBillingOnlineRequest.setAmount(amount);
+        bodyBillingOnlineRequest.setPhone(phone);
+        bodyBillingOnlineRequest.setProviderCode(providerCode);
+        bodyBillingOnlineRequest.setPartnerCode(partnerCode);
+
+        FooterBillingOnlineRequest footerBillingOnlineRequest = new FooterBillingOnlineRequest();
+        footerBillingOnlineRequest.setAccountIdt(accountId);
+
+        final BillingOnlineRequest billingOnlineRequest = new BillingOnlineRequest();
+        billingOnlineRequest.setHeaderBillingOnlineRequest(headerBillingOnlineRequest);
+        billingOnlineRequest.setBodyBillingOnlineRequest(bodyBillingOnlineRequest);
+        billingOnlineRequest.setFooterBillingOnlineRequest(footerBillingOnlineRequest);
+
+
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        Type type = new TypeToken<BillingOnlineRequest>() {
+        }.getType();
+        final Gson gson = gsonBuilder.create();
+
+        //Serialised
+        final String jsonResult = gson.toJson(billingOnlineRequest, type);
+
+        return jsonResult;
     }
 
     //endregion
@@ -708,7 +749,7 @@ public class SoapAPI {
             gsonBuilder.setPrettyPrinting();
             final Gson gson = gsonBuilder.create();
 
-            searchOnlineResponse = gson.fromJson(data, LoginResponseReponse.class);*/
+            billingOnlineRespone = gson.fromJson(data, LoginResponseReponse.class);*/
 
             return searchOnlineResponse;
         }
@@ -769,6 +810,138 @@ public class SoapAPI {
             return searchOnlineResponse;
         }
     }
+
+    public static class AsyncSoapBillOnline extends AsyncTask<String, String, BillingOnlineRespone> {
+
+        //request action to eStore
+        private String edong;
+        private static final String METHOD_NAME = "execute";
+        private static final String NAMESPACE = "http://services.ecpay.org/";
+        private static final String URL = ENDPOINT_URL;
+        private static final String SOAP_ACTION = "request action to eStore";
+        private static final String METHOD_PARAM = "message";
+        private AsyncSoapBillOnlineCallBack callBack;
+        private boolean isEndCallSoap = false;
+        private BillingOnlineRespone billingOnlineRespone;
+        private Handler handlerDelay;
+        int positionIndexListAsyncBillOnline;
+
+        public AsyncSoapBillOnline(String edong, AsyncSoapBillOnlineCallBack callBack, Handler handler, int positionIndexListAsyncBillOnline) throws Exception {
+            this.callBack = callBack;
+            this.edong = edong;
+            this.handlerDelay = handler;
+            this.positionIndexListAsyncBillOnline = positionIndexListAsyncBillOnline;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            billingOnlineRespone = null;
+            callBack.onPre(this);
+        }
+
+        @Override
+        protected BillingOnlineRespone doInBackground(String... jsons) {
+            String json = jsons[0];
+            Log.d("here", "doInBackground: " + json);
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            request.addProperty(METHOD_PARAM, json);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE ht;
+            SoapPrimitive response = null;
+
+            try {
+                ht = new HttpTransportSE(URL);
+                ht.call(SOAP_ACTION, envelope);
+                response = (SoapPrimitive) envelope.getResponse();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (response == null) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                return null;
+            }
+
+            String data = response.toString();
+            if (data.isEmpty()) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return null;
+            }
+
+            billingOnlineRespone = new Gson().fromJson(data, BillingOnlineRespone.class);
+           /* final GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter(LoginResponseReponse.class, new LoginResponseAdapter());
+//            gsonBuilder.registerTypeAdapter(ResponseLoginResponse.class, new )
+            gsonBuilder.setPrettyPrinting();
+            final Gson gson = gsonBuilder.create();
+
+            billingOnlineRespone = gson.fromJson(data, LoginResponseReponse.class);*/
+
+            return billingOnlineRespone;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            String message = values[0];
+            isEndCallSoap = true;
+            callBack.onUpdate(message, positionIndexListAsyncBillOnline);
+        }
+
+        @Override
+        protected void onPostExecute(BillingOnlineRespone billingOnlineRespone) {
+            super.onPostExecute(billingOnlineRespone);
+            if (!isEndCallSoap)
+                callBack.onPost(billingOnlineRespone, positionIndexListAsyncBillOnline);
+        }
+
+        public static abstract class AsyncSoapBillOnlineCallBack {
+            public abstract void onPre(final AsyncSoapBillOnline soapBillOnline);
+
+            public abstract void onUpdate(String message, final int positionIndex);
+
+            public abstract void onPost(BillingOnlineRespone response, final int positionIndex);
+
+            public abstract void onTimeOut(final AsyncSoapBillOnline soapBillOnline);
+        }
+
+        public void callCountdown(final AsyncSoapBillOnline soapBillOnline) {
+            if (soapBillOnline == null)
+                return;
+
+            callBack.onTimeOut(soapBillOnline);
+        }
+
+        public boolean isEndCallSoap() {
+            return isEndCallSoap;
+        }
+
+        public void setEndCallSoap(boolean endCallSoap) {
+            isEndCallSoap = endCallSoap;
+        }
+
+        public String getEdong() {
+            return edong;
+        }
+
+        public BillingOnlineRespone getBillingOnlineRespone() {
+            return billingOnlineRespone;
+        }
+
+        public Handler getHandlerDelay() {
+            return handlerDelay;
+        }
+
+        public int getPositionIndexListAsyncBillOnline() {
+            return positionIndexListAsyncBillOnline;
+        }
+    }
+
     //endregion
 
     //region đồng bộ
