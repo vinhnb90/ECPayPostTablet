@@ -151,9 +151,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("parentEdong", account.getParentEdong());
 
         database = getWritableDatabase();
-        int id = (int) database.insertWithOnConflict(TABLE_NAME_ACCOUNT, null, initialValues, SQLiteDatabase.CONFLICT_IGNORE);
-        if (id == ERROR_OCCUR) {
-            database.update(TABLE_NAME_ACCOUNT, initialValues, "edong=?", new String[]{account.getEdong()});  // number 1 is the _id here, update to variable for your code
+        int rowAffect = (int) database.insertWithOnConflict(TABLE_NAME_ACCOUNT, null, initialValues, SQLiteDatabase.CONFLICT_IGNORE);
+        if (rowAffect == ERROR_OCCUR) {
+            rowAffect = database.update(TABLE_NAME_ACCOUNT, initialValues, "edong=?", new String[]{account.getEdong()});  // number 1 is the _id here, update to variable for your code
+        }
+        if (rowAffect == ERROR_OCCUR) {
+            Log.e(TAG, "insertOrUpdateAccount: cannot update or insert data to account table");
         }
     }
 
@@ -265,10 +268,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         database = this.getReadableDatabase();
 
-        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "'";
+        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status = " + ZERO;
         Cursor mCursor = database.rawQuery(query, null);
         int count = mCursor.getCount();
-
+        if (count != ZERO) {
+            mCursor.moveToFirst();
+            count = Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT")));
+        }
         if (mCursor != null && !mCursor.isClosed()) {
             mCursor.close();
         }
@@ -435,7 +441,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public int countMoneyAllBill(String edong) {
         database = this.getReadableDatabase();
-        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "'";
+        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status = " + ZERO;
         Cursor mCursor = database.rawQuery(query, null);
         int totalMoney = ERROR_OCCUR;
         if (mCursor.moveToFirst())

@@ -28,4 +28,6 @@ public interface IPayPresenter {
     void callProcessDataBillDialogChecked(int pos, boolean isChecked);
 
     void callPayOnline(String edong);
+
+    void refreshTextCountBillPayedSuccess();
 }

@@ -198,10 +198,12 @@ public class PayListBillsAdapter extends RecyclerView.Adapter<PayListBillsAdapte
 
         @OnCheckedChanged(R.id.cb_row_thanhtoan_list_bills_choose)
         public void onCheckedChanged(CheckBox cbChoose, boolean isChecked) {
-            int pos = getAdapterPosition();
-            listBillChecked.get(pos).setChecked(isChecked);
+            if(cbChoose.isPressed()) {
+                int pos = getAdapterPosition();
+                listBillChecked.get(pos).setChecked(isChecked);
 
-            onInteractor.processDataBillsListChecked(pos, isChecked);
+                onInteractor.processDataBillsListChecked(pos, isChecked);
+            }
         }
     }
 

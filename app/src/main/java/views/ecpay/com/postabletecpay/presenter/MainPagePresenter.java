@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 
 import org.ecpay.client.test.SecurityUtils;
 
@@ -21,6 +22,7 @@ import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.TrangChu.IMainPageView;
 
 import static android.content.Context.MODE_PRIVATE;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TAG;
 
 /**
  * Created by VinhNB on 5/23/2017.
@@ -39,7 +41,7 @@ public class MainPagePresenter implements IMainPagePresenter{
 
     //region IMainPagePresenter
     @Override
-    public void getInfoMain(String edong) {
+    public void callInfoMain(String edong) {
         Account account = mainPageModel.getAccountInfo(edong);
         int countTotalBill = mainPageModel.getTotalBill(edong);
         int countTotalMoney = mainPageModel.getTotalMoney(edong);
@@ -221,19 +223,30 @@ public class MainPagePresenter implements IMainPagePresenter{
             return;
         }
 
+
+        String signatureEncrypted = "";
+        try {
+            String dataSign = Common.getDataSignRSA(
+                    configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
+                    configInfo.getDiskDriver(), "PD16", configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
+            Log.d(TAG, "setupInfoRequest: " + dataSign);
+            signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
+            Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
+        } catch (Exception e) {
+        }
+        configInfo.setSignatureEncrypted(signatureEncrypted);
 //        String dataSign = Common.getDataSignRSA(agent, commandId, auditNumber, macAdressHexValue, diskDriver, pcCode, accountId, privateKeyRSA);
 
         String jsonRequestZipData = SoapAPI.getJsonRequestSynDataZip(
                 configInfo.getAGENT(),
                 configInfo.getAgentEncypted(),
                 configInfo.getCommandId(),
-                114235346063l,//configInfo.getAuditNumber(),
+                configInfo.getAuditNumber(),
                 configInfo.getMacAdressHexValue(),
                 configInfo.getDiskDriver(),
-                "DbwnSmHdcXKYCZ6yARbXW+KwGGLXwPbYuAuhvq66Sdsp3NXx88QLXWkSr7vqVV+zviRcF86YCMno\\n/Ycr+dGOLNfXpuMULu28bdc0JSxbQdV9TfI1fdFHPyGqhF8+x+Pe10Y5enaR4R8VaEnEVC1ortws\\nCk+oVBjXb+GyYG9fK/4=\\n",//configInfo.getSignatureEncrypted(),
-//                configInfo.getPC_CODE(),
-                "PD1600",
-                "",//"D1680225",
+                configInfo.getSignatureEncrypted(),
+                "PD16",
+                "D1680225",
                 configInfo.getAccountId());
 
         if (jsonRequestZipData != null) {

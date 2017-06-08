@@ -162,7 +162,7 @@ public class Common {
     //endregion
 
     //region parrams billing
-    public enum PARTNER_CODE {
+    public  enum PARTNER_CODE {
         DT0813("DT0813", "Luồng quầy thu đang năng"),
         DT0807("DT0807", "Luồng tài khoản tiền điện"),
         DT0605("DT0605", "Các trường hợp khác");
@@ -192,7 +192,51 @@ public class Common {
             return PARTNER_CODE.DT0605;
         }
     }
+
+    public enum PROVIDER_CODE {
+        NCC0498("NCC0498", "Tổng Công Ty Điện Lực Miền Nam"),
+        NCC0499("NCC0499", "Tổng Công Ty Điện Lực Miền Trung"),
+        NCC0483("NCC0483", "Tổng Công ty điện lực miền Bắc"),
+        NCC0466("NCC0466", "Tổng Công Ty Điện Lực Hồ Chí Minh"),
+        NCC0468("NCC0468", "Tổng Công Ty Điện Lực Hà Nội"),
+        NCC0500("NCC0500", "Công ty điện lực Hải Phòng"),
+        NCC0502("NCC0502", "Công ty điện lực Khánh Hòa"),
+        NCC0501("NCC0501", "Tổng Công Ty Truyền Hình Cáp Việt Nam"),
+        NCC0469("NCC0469", "Tổng Công Ty Viễn Thông Quân Đội Viettel"),
+        NCC0470("NCC0470", "Công Ty Thông Tin Di Động MobiFone"),
+        NCC0471("NCC0471", "Công Ty Dịch Vụ Viễn Thông VinaPhone");
+
+        PROVIDER_CODE(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+        private String message;
+
+        public static PROVIDER_CODE findCodeMessage(String code) {
+            for (PROVIDER_CODE v : values()) {
+                if (v.getCode().equals(code)) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
+
+    public static final String PARTNER_CODE_DEFAULT = PARTNER_CODE.DT0605.getCode();
+    public static final String PROVIDER_DEFAULT = PROVIDER_CODE.NCC0468.getCode();
+
     //endregion
+
     //region Description key
     public static final String TAG = "TAG";
     public static final String KEY_EDONG = "EDONG";
@@ -491,6 +535,7 @@ public class Common {
     public static final String TEXT_SPACE = " ";
     public static final String TEXT_EMPTY = "";
     public static final String TEXT_SLASH = "/";
+    public static final String TEXT_BILL = "Hóa đơn";
     public static final String TEXT_MULTI_SPACE = TEXT_SPACE.concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE);
     public static final String TEXT_SEARCHING = "Searching online....";
     public static final int ZERO = 0;

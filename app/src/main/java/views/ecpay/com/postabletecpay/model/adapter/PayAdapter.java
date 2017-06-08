@@ -408,12 +408,13 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
             @OnCheckedChanged(R.id.cb_row_bill_inside_pay)
             public void onCheckedChanged(CheckBox checkBox, boolean checked) {
-                int position = getAdapterPosition();
-                BillEntityAdapter bill = billList.get(position);
-                bill.setChecked(checked);
+                if (checkBox.isPressed()) {
+                    int position = getAdapterPosition();
+                    BillEntityAdapter bill = billList.get(position);
+                    bill.setChecked(checked);
 
-                interaction.processCheckedBillFragment(edong, code, bill, posCustomer);
-
+                    interaction.processCheckedBillFragment(edong, code, bill, posCustomer);
+                }
             }
 
             public CheckBox getCb() {
