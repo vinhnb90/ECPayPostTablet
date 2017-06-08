@@ -4,9 +4,22 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.RequiresApi;
 
 import org.ecpay.client.test.SecurityUtils;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import views.ecpay.com.postabletecpay.model.MainPageModel;
 import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
@@ -215,7 +228,7 @@ public class MainPagePresenter implements IMainPagePresenter{
         }
 
         try {
-            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp);
+            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp, "PD16");
         } catch (Exception e) {
             iMainPageView.showTextMessage(e.getMessage());
             return;
@@ -227,12 +240,13 @@ public class MainPagePresenter implements IMainPagePresenter{
                 configInfo.getAGENT(),
                 configInfo.getAgentEncypted(),
                 configInfo.getCommandId(),
-                114235346063l,//configInfo.getAuditNumber(),
+                configInfo.getAuditNumber(),
                 configInfo.getMacAdressHexValue(),
                 configInfo.getDiskDriver(),
-                "DbwnSmHdcXKYCZ6yARbXW+KwGGLXwPbYuAuhvq66Sdsp3NXx88QLXWkSr7vqVV+zviRcF86YCMno\\n/Ycr+dGOLNfXpuMULu28bdc0JSxbQdV9TfI1fdFHPyGqhF8+x+Pe10Y5enaR4R8VaEnEVC1ortws\\nCk+oVBjXb+GyYG9fK/4=\\n",//configInfo.getSignatureEncrypted(),
+                configInfo.getSignatureEncrypted(),
+//                "DbwnSmHdcXKYCZ6yARbXW+KwGGLXwPbYuAuhvq66Sdsp3NXx88QLXWkSr7vqVV+zviRcF86YCMno\\n/Ycr+dGOLNfXpuMULu28bdc0JSxbQdV9TfI1fdFHPyGqhF8+x+Pe10Y5enaR4R8VaEnEVC1ortws\\nCk+oVBjXb+GyYG9fK/4=\\n",//configInfo.getSignatureEncrypted(),
 //                configInfo.getPC_CODE(),
-                "PD1600",
+                "PD16",
                 "",//"D1680225",
                 configInfo.getAccountId());
 
@@ -287,7 +301,66 @@ public class MainPagePresenter implements IMainPagePresenter{
 
         @Override
         public void onPost(ListDataZipResponse response) {
+            String sData = response.getBodyListDataResponse().getFile_data();
+            byte[] decodedContent = org.apache.commons.codec.binary.Base64.decodeBase64(sData .getBytes());
 
+
+
+//            ZipInputStream zipStream = new ZipInputStream(new ByteArrayInputStream(decodedContent));
+//
+//            try{
+//                ZipEntry entry = null;
+//
+//                while ((entry = zipStream.getNextEntry()) != null) {
+//
+//                    String fileName = entry.getName();
+//
+//                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//
+//                    byte[] buffer = new byte[1024];
+//                    int count;
+//
+//                    while ((count = zipStream.read(buffer)) != -1) {
+//                        baos.write(buffer, 0, count);
+//                    }
+//
+//                    baos.close();
+//                    zipStream.closeEntry();
+//
+//                    byte[] bytes = baos.toByteArray();
+//
+//                    writeBytesToFile(new File(fileName), bytes);
+//                }
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } finally{
+//                try {
+//                    zipStream.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+
+
+
+//            FileOutputStream fos = null;
+//            try {
+//                if (decoded != null) {
+//                    fos = iMainPageView.getContextView().openFileOutput(Environment.getExternalStorageDirectory() + "/data.zip", Context.MODE_PRIVATE);
+//                    byte[] decodedString = android.util.Base64.decode(decoded, android.util.Base64.DEFAULT);
+//                    fos.write(decodedString);
+//                    fos.flush();
+//                    fos.close();
+//                }
+//
+//            } catch (Exception e) {
+//
+//            } finally {
+//                if (fos != null) {
+//                    fos = null;
+//                }
+//            }
         }
 
         @Override
@@ -295,5 +368,23 @@ public class MainPagePresenter implements IMainPagePresenter{
 
         }
     };
+
+    public static void writeBytesToFile(File theFile, byte[] bytes) throws IOException {
+        BufferedOutputStream bos = null;
+
+        try {
+            FileOutputStream fos = new FileOutputStream(theFile);
+            bos = new BufferedOutputStream(fos);
+            bos.write(bytes);
+        }finally {
+            if(bos != null) {
+                try  {
+                    //flush and close the BufferedOutputStream
+                    bos.flush();
+                    bos.close();
+                } catch(Exception e){}
+            }
+        }
+    }
     //endregion
 }
