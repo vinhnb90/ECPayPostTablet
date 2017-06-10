@@ -16,6 +16,8 @@ import java.util.List;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayListBillsAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPCResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
@@ -44,13 +46,19 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     private String TABLE_NAME_ACCOUNT = "TBL_ACCOUNT";
     private String TABLE_NAME_EVN_PC = "TBL_EVN_PC";
+    private String TABLE_NAME_BOOK_CMIS = "TBL_BOOK_CMIS";
     private String TABLE_NAME_CUSTOMER = "TBL_CUSTOMER";
     private String TABLE_NAME_BILL = "TBL_BILL";
     private String TABLE_NAME_LICH_SU_TTOAN = "TBL_LICH_SU_TTOAN";
 
     private String CREATE_TABLE_ACCOUNT = "CREATE TABLE `" + TABLE_NAME_ACCOUNT + "` (`edong` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `address` TEXT, `email` TEXT, `birthday` TEXT, `session` TEXT, `balance` NUMERIC, `lockMoney` NUMERIC, `changePIN` INTEGER, `verified` INTEGER, `mac` TEXT, `ip` TEXT, `strLoginTime` TEXT, `strLogoutTime` TEXT, `type` INTEGER, `status` TEXT, `idNumber` TEXT, `idNumberDate` TEXT, `idNumberPlace` TEXT, `parentEdong` TEXT )";
 
-    private String CREATE_TABLE_EVN_PC = "CREATE TABLE `" + TABLE_NAME_EVN_PC + "` ( `pcId` NOT NULL PRIMARY KEY, `parentId` INTEGER, `code` TEXT, `ext` TEXT, `fullName` TEXT, `shortName` TEXT, `address` TEXT, `taxCode` TEXT, `phone1` TEXT, `phone2` TEXT, `fax` TEXT, `level` INTEGER )";
+    private String CREATE_TABLE_EVN_PC = "CREATE TABLE " + TABLE_NAME_EVN_PC + " ( pcId NOT NULL PRIMARY KEY, strPcId TEXT, parentId INTEGER, " +
+            "strParentId TEXT, code TEXT, ext TEXT, fullName TEXT, shortName TEXT, address TEXT, taxCode TEXT, phone1 TEXT, phone2 TEXT, " +
+            "fax TEXT, level INTEGER, strLevel TEXT, mailTo TEXT, mailCc TEXT, status INTEGER, strStatus , dateCreated DATE, strDateCreated TEXT, " +
+            "idChanged INTEGER, dateChanged DATE, strDateChanged TEXT, regionId INTEGER, parentPcCode TEXT, cardPrefix TEXT)";
+
+    private String CREATE_TABLE_BOOK_CMIS = "CREATE TABLE " + TABLE_NAME_BOOK_CMIS + "(bookCmis TEXT, pcCode TEXT, pcCodeExt TEXT, inningDate TEXT, email TEXT, status INTEGER, strStatus TEXT, strCreateDate TEXT, strChangeDate TEXT, idChanged INTEGER, id INTEGER, parentPcCode TEXT, countBill INTEGER, countBillPaid INTEGER, countCustomer INTEGER, listCustomer TEXT, listBillUnpaid TEXT, listBillPaid TEXT)";
 
     private String CREATE_TABLE_CUSTOMER = "CREATE TABLE `" + TABLE_NAME_CUSTOMER + "` ( `code` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `address` TEXT, `pcCode` TEXT, `pcCodeExt` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `bookCmis` TEXT, `electricityMeter` TEXT, `inning` TEXT, `status` TEXT, `bankAccount` TEXT, `idNumber` TEXT, `bankName` TEXT , `edongKey` TEXT NOT NULL, `isShowBill` INTEGER DEFAULT 0)";
 
@@ -96,6 +104,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         try {
             db.execSQL(CREATE_TABLE_ACCOUNT);
             db.execSQL(CREATE_TABLE_EVN_PC);
+            db.execSQL(CREATE_TABLE_BOOK_CMIS);
             db.execSQL(CREATE_TABLE_BILL);
             db.execSQL(CREATE_TABLE_CUSTOMER);
             db.execSQL(CREATE_TABLE_LICH_SU_TTOAN);
@@ -108,6 +117,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_ACCOUNT);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_EVN_PC);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_BOOK_CMIS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_BILL);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_CUSTOMER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_LICH_SU_TTOAN);
@@ -660,4 +670,116 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     /*
                 boolean isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))) == 0 ? false : true;*/
     //endregion
+
+    //region EVN
+    public long insertEvnPC(ListEvnPCResponse listEvnPCResponse) {
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("parentId", listEvnPCResponse.getParentId());
+        initialValues.put("strParentId", listEvnPCResponse.getStrParentId());
+        initialValues.put("pcId", listEvnPCResponse.getPcId());
+        initialValues.put("strPcId", listEvnPCResponse.getStrPcId());
+        initialValues.put("code", listEvnPCResponse.getCode());
+        initialValues.put("ext", listEvnPCResponse.getExt());
+        initialValues.put("fullName", listEvnPCResponse.getFullName());
+        initialValues.put("shortName", listEvnPCResponse.getShortName());
+        initialValues.put("address", listEvnPCResponse.getAddress());
+        initialValues.put("taxCode", listEvnPCResponse.getTaxCode());
+        initialValues.put("phone1", listEvnPCResponse.getPhone1());
+        initialValues.put("phone2", listEvnPCResponse.getPhone2());
+        initialValues.put("fax", listEvnPCResponse.getFax());
+        initialValues.put("level", listEvnPCResponse.getLevel());
+        initialValues.put("strLevel", listEvnPCResponse.getStrLevel());
+        initialValues.put("mailTo", listEvnPCResponse.getMailTo());
+        initialValues.put("mailCc", listEvnPCResponse.getMailCc());
+        initialValues.put("status", listEvnPCResponse.getStatus());
+        initialValues.put("strStatus", listEvnPCResponse.getStrStatus());
+        initialValues.put("dateCreated", listEvnPCResponse.getDateCreated());
+        initialValues.put("strDateCreated", listEvnPCResponse.getStrDateCreated());
+        initialValues.put("idChanged", listEvnPCResponse.getIdChanged());
+        initialValues.put("dateChanged", listEvnPCResponse.getDateChanged());
+        initialValues.put("strDateChanged", listEvnPCResponse.getStrDateChanged());
+        initialValues.put("regionId", listEvnPCResponse.getRegionId());
+        initialValues.put("parentPcCode", listEvnPCResponse.getParentPcCode());
+        initialValues.put("cardPrefix", listEvnPCResponse.getCardPrefix());
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.insert(TABLE_NAME_EVN_PC, null, initialValues);
+        return rowAffect;
+    }
+
+    public long deleteAllPC() {
+        database = this.getWritableDatabase();
+        return database.delete(TABLE_NAME_EVN_PC, null, null);
+    }
+
+    public long checkEvnPCExist(int pcId) {
+        database = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_EVN_PC + " WHERE pcId = " + pcId;
+        Cursor mCursor = database.rawQuery(query, null);
+        if (mCursor.moveToFirst())
+            return mCursor.getInt(0);
+        return 0;
+    }
+
+    public String getPcCode() {
+        database = this.getReadableDatabase();
+        String query = "SELECT ext FROM " + TABLE_NAME_EVN_PC;
+        Cursor c = database.rawQuery(query, null);
+        if(c.moveToFirst()){
+            return  c.getString(0);
+        }
+        return "";
+    }
+    //endregion
+
+    //region BOOK CMIS
+    public long insertBookCmis(ListBookCmisResponse listBookCmisResponse) {
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("bookCmis", listBookCmisResponse.getBookCmis());
+        initialValues.put("pcCode", listBookCmisResponse.getPcCode());
+        initialValues.put("pcCodeExt", listBookCmisResponse.getPcCodeExt());
+        initialValues.put("inningDate", listBookCmisResponse.getInningDate());
+        initialValues.put("email", listBookCmisResponse.getEmail());
+        initialValues.put("status", listBookCmisResponse.getStatus());
+        initialValues.put("strStatus", listBookCmisResponse.getStrStatus());
+        initialValues.put("strCreateDate", listBookCmisResponse.getStrCreateDate());
+        initialValues.put("strChangeDate", listBookCmisResponse.getStrChangeDate());
+        initialValues.put("idChanged", listBookCmisResponse.getIdChanged());
+        initialValues.put("id", listBookCmisResponse.getId());
+        initialValues.put("parentPcCode", listBookCmisResponse.getParentPcCode());
+        initialValues.put("countBill", listBookCmisResponse.getCountBill());
+        initialValues.put("countBillPaid", listBookCmisResponse.getCountBillPaid());
+        initialValues.put("countCustomer", listBookCmisResponse.getCountCustomer());
+        initialValues.put("listCustomer", listBookCmisResponse.getListCustomer());
+        initialValues.put("listBillUnpaid", listBookCmisResponse.getListBillUnpaid());
+        initialValues.put("listBillPaid", listBookCmisResponse.getListBillPaid());
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.insert(TABLE_NAME_BOOK_CMIS, null, initialValues);
+        return rowAffect;
+    }
+
+    public long deleteAllBookCmis() {
+        database = this.getWritableDatabase();
+        return database.delete(TABLE_NAME_BOOK_CMIS, null, null);
+    }
+
+    public long checkBookCmisExist(String bookCmis) {
+        database = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BOOK_CMIS + " WHERE bookCmis = '" + bookCmis + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+        if (mCursor.moveToFirst())
+            return mCursor.getInt(0);
+        return 0;
+    }
+
+    public  Cursor getAllBookCmis() {
+        database = this.getReadableDatabase();
+        String query = "SELECT bookCmis FROM " + TABLE_NAME_BOOK_CMIS;
+        return database.rawQuery(query, null);
+    }
+    //endregion
+
 }

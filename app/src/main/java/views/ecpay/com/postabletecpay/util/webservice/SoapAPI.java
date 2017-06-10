@@ -1,5 +1,7 @@
 package views.ecpay.com.postabletecpay.util.webservice;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -1171,14 +1173,21 @@ public class SoapAPI {
         private static final String METHOD_PARAM = "message";
         private AsyncSoapSynchronizeDataZipCallBack callBack;
         private boolean isEndCallSoap = false;
+        private Context context;
+        private ProgressDialog progressDialog;
 
-        public AsyncSoapSynchronizeDataZip(AsyncSoapSynchronizeDataZipCallBack callBack) throws Exception {
+        public AsyncSoapSynchronizeDataZip(AsyncSoapSynchronizeDataZipCallBack callBack, Context context) throws Exception {
             this.callBack = callBack;
+            this.context = context;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setMessage("Downloading file ...");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.show();
             callBack.onPre(this);
         }
 
@@ -1239,6 +1248,7 @@ public class SoapAPI {
             super.onPostExecute(listDataZipResponse);
             if (!isEndCallSoap)
                 callBack.onPost(listDataZipResponse);
+            progressDialog.dismiss();
         }
 
         public static abstract class AsyncSoapSynchronizeDataZipCallBack {

@@ -46,6 +46,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlSerializer;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -547,6 +548,7 @@ public class Common {
     public static final String PATH_FOLDER_ROOT = Environment.getExternalStorageDirectory() + File.separator + "PosTablet" + File.separator;
     public static final String PATH_FOLDER_DB = PATH_FOLDER_ROOT + "DB" + File.separator;
     public static final String PATH_FOLDER_CONFIG = PATH_FOLDER_ROOT + "Config" + File.separator;
+    public static final String PATH_FOLDER_DOWNLOAD = PATH_FOLDER_ROOT + "Download" + File.separator;
     //endregion
 
     //region info connect API SOAP
@@ -604,6 +606,11 @@ public class Common {
                 folderDB.mkdir();
             }
 
+            File folderDownload = new File(PATH_FOLDER_DOWNLOAD);
+            if (!folderDownload.exists()) {
+                folderDownload.mkdir();
+            }
+
             File folderConfig = new File(PATH_FOLDER_CONFIG);
             if (!folderConfig.exists()) {
                 folderConfig.mkdir();
@@ -650,6 +657,16 @@ public class Common {
             }
             if (allFilesDb != null)
                 scanFile(ctx, allFilesDb);
+
+            // Load download folder
+            File file_download = new File(Common.PATH_FOLDER_DOWNLOAD);
+            String[] allFilesDownload = file_db.list();
+
+            for (int i = 0; i < allFilesDownload.length; i++) {
+                allFilesDownload[i] = Common.PATH_FOLDER_DOWNLOAD + allFilesDownload[i];
+            }
+            if (allFilesDownload != null)
+                scanFile(ctx, allFilesDownload);
 
         } else {
             ctx.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri
@@ -1387,5 +1404,26 @@ public class Common {
         return versionApp;
     }
 
+    //endregion
+
+    //region save file
+    public static void writeBytesToFile(File theFile, byte[] bytes) throws IOException {
+        if (bytes != null) {
+            BufferedOutputStream bos = null;
+
+            try {
+                FileOutputStream fos = new FileOutputStream(theFile);
+                bos = new BufferedOutputStream(fos);
+                bos.write(bytes);
+            }finally {
+                if(bos != null) {
+                    try  {
+                        bos.flush();
+                        bos.close();
+                    } catch(Exception e){}
+                }
+            }
+        }
+    }
     //endregion
 }

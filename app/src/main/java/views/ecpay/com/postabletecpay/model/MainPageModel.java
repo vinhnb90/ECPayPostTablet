@@ -1,6 +1,10 @@
 package views.ecpay.com.postabletecpay.model;
 
 import android.content.Context;
+import android.database.Cursor;
+
+import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPCResponse;
 
 /**
  * Created by VinhNB on 5/23/2017.
@@ -19,6 +23,38 @@ public class MainPageModel extends CommonModel {
 
     public int getTotalMoney(String edong) {
         return sqLiteConnection.countMoneyAllBill(edong);
+    }
+
+    public long insertEvnPC(ListEvnPCResponse listEvnPCResponse) {
+        return sqLiteConnection.insertEvnPC(listEvnPCResponse);
+    }
+
+    public long deleteAllPC() {
+        return sqLiteConnection.deleteAllPC();
+    }
+
+    public  long checkEvnPCExist(int pcId) {
+        return sqLiteConnection.checkEvnPCExist(pcId);
+    }
+
+    public long insertBookCmis(ListBookCmisResponse listBookCmisResponse) {
+        return sqLiteConnection.insertBookCmis(listBookCmisResponse);
+    }
+
+    public String getPcCode(){
+        return sqLiteConnection.getPcCode();
+    }
+
+    public long deleteAllBookCmis() {
+        return sqLiteConnection.deleteAllBookCmis();
+    }
+
+    public  long checkBookCmisExist(String bookCmis) {
+        return sqLiteConnection.checkBookCmisExist(bookCmis);
+    }
+
+    public Cursor getAllBookCmis() {
+        return sqLiteConnection.getAllBookCmis();
     }
     //endregion
 }

@@ -2,13 +2,18 @@ package views.ecpay.com.postabletecpay.presenter;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.ecpay.client.test.SecurityUtils;
+import org.json.JSONArray;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -28,7 +33,9 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityDataZip.ListDataZipResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEVNReponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPCResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ListEvnPCLoginResponse;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
@@ -45,6 +52,8 @@ public class MainPagePresenter implements IMainPagePresenter{
     private IMainPageView iMainPageView;
     private MainPageModel mainPageModel;
     private SharePrefManager mSharedPrefLogin;
+
+    private String bookCmis;
 
     public MainPagePresenter(IMainPageView iMainPageView) {
         this.iMainPageView = iMainPageView;
@@ -175,7 +184,34 @@ public class MainPagePresenter implements IMainPagePresenter{
 
         @Override
         public void onPost(ListEVNReponse response) {
-
+            try {
+                GsonBuilder gsonBuilder = new GsonBuilder();
+                Gson gson = gsonBuilder.create();
+                //Insert EVN PC
+                ListEvnPCResponse listEvnPCResponse;
+                String dataEvnPC = response.getBodyListEVNResponse().getListEvnPCLoginResponse();
+                JSONArray jaEvnPC = new JSONArray(dataEvnPC);
+                for (int i = 0; i < jaEvnPC.length(); i++){
+                    listEvnPCResponse = gson.fromJson(jaEvnPC.getString(i), ListEvnPCResponse.class);
+                    if(mainPageModel.deleteAllPC() != -1) {
+                        mainPageModel.insertEvnPC(listEvnPCResponse);
+                    }
+                }
+                //Insert BOOK CMIS
+                ListBookCmisResponse listBookCmisResponse;
+                String dataBookCmis = response.getBodyListEVNResponse().getListBookCmissResponse();
+                JSONArray jaBookCmis = new JSONArray(dataBookCmis);
+//                if(mainPageModel.deleteAllBookCmis() != -1) {
+                    for (int i = 0; i < jaBookCmis.length(); i++){
+                        listBookCmisResponse = gson.fromJson(jaBookCmis.getString(i), ListBookCmisResponse.class);
+                        if(mainPageModel.checkBookCmisExist(listBookCmisResponse.getBookCmis()) == 0) {
+                            mainPageModel.insertBookCmis(listBookCmisResponse);
+                        }
+                    }
+//                }
+            } catch(Exception ex) {
+                iMainPageView.showTextMessage(ex.getMessage());
+            }
         }
 
         @Override
@@ -248,62 +284,61 @@ public class MainPagePresenter implements IMainPagePresenter{
         } catch (Exception e) {
         }
         configInfo.setSignatureEncrypted(signatureEncrypted);
-//        String dataSign = Common.getDataSignRSA(agent, commandId, auditNumber, macAdressHexValue, diskDriver, pcCode, accountId, privateKeyRSA);
 
-        String jsonRequestZipData = SoapAPI.getJsonRequestSynDataZip(
-                configInfo.getAGENT(),
-                configInfo.getAgentEncypted(),
-                configInfo.getCommandId(),
-                configInfo.getAuditNumber(),
-                configInfo.getMacAdressHexValue(),
-                configInfo.getDiskDriver(),
-                configInfo.getSignatureEncrypted(),
-<<<<<<< HEAD
-//                "DbwnSmHdcXKYCZ6yARbXW+KwGGLXwPbYuAuhvq66Sdsp3NXx88QLXWkSr7vqVV+zviRcF86YCMno\\n/Ycr+dGOLNfXpuMULu28bdc0JSxbQdV9TfI1fdFHPyGqhF8+x+Pe10Y5enaR4R8VaEnEVC1ortws\\nCk+oVBjXb+GyYG9fK/4=\\n",//configInfo.getSignatureEncrypted(),
-//                configInfo.getPC_CODE(),
-                "PD16",
-                "",//"D1680225",
-=======
-                "PD16",
-                "D1680225",
->>>>>>> 895cab2cdf44a332b450bcd78c04d3252b064b2f
-                configInfo.getAccountId());
+        Cursor c = mainPageModel.getAllBookCmis();
+        if(c.moveToFirst()) {
+            do {
+                bookCmis = c.getString(0);
 
-        if (jsonRequestZipData != null) {
-            try {
-                final SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeDataZip;
+                String jsonRequestZipData = SoapAPI.getJsonRequestSynDataZip(
+                        configInfo.getAGENT(),
+                        configInfo.getAgentEncypted(),
+                        configInfo.getCommandId(),
+                        configInfo.getAuditNumber(),
+                        configInfo.getMacAdressHexValue(),
+                        configInfo.getDiskDriver(),
+                        configInfo.getSignatureEncrypted(),
+                        mainPageModel.getPcCode(),
+                        c.getString(0),
+                        configInfo.getAccountId());
 
-                soapSynchronizeDataZip = new SoapAPI.AsyncSoapSynchronizeDataZip(callBackData);
+                if (jsonRequestZipData != null) {
+                    try {
+                        final SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeDataZip;
 
-                if (soapSynchronizeDataZip.getStatus() != AsyncTask.Status.RUNNING) {
-                    soapSynchronizeDataZip.execute(jsonRequestZipData);
+                        soapSynchronizeDataZip = new SoapAPI.AsyncSoapSynchronizeDataZip(callBackData, iMainPageView.getContextView());
 
-                    //thread time out
-                    Thread soapDataThread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ListDataZipResponse listDataZipResponse = null;
+                        if (soapSynchronizeDataZip.getStatus() != AsyncTask.Status.RUNNING) {
+                            soapSynchronizeDataZip.execute(jsonRequestZipData);
 
-                            //call time out
-                            try {
-                                Thread.sleep(Common.TIME_OUT_CONNECT);
-                            } catch (InterruptedException e) {
-                                iMainPageView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
-                            } finally {
-                                if (listDataZipResponse == null) {
-                                    soapSynchronizeDataZip.callCountdown(soapSynchronizeDataZip);
+                            //thread time out
+                            Thread soapDataThread = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ListDataZipResponse listDataZipResponse = null;
+
+                                    //call time out
+                                    try {
+                                        Thread.sleep(Common.TIME_OUT_CONNECT);
+                                    } catch (InterruptedException e) {
+                                        iMainPageView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                                    } finally {
+                                        if (listDataZipResponse == null) {
+                                            soapSynchronizeDataZip.callCountdown(soapSynchronizeDataZip);
+                                        }
+                                    }
                                 }
-                            }
+                            });
+
+                            soapDataThread.start();
                         }
-                    });
+                    } catch (Exception e) {
+                        iMainPageView.showTextMessage(e.getMessage());
+                        return;
+                    }
 
-                    soapDataThread.start();
                 }
-            } catch (Exception e) {
-                iMainPageView.showTextMessage(e.getMessage());
-                return;
-            }
-
+            } while (c.moveToNext());
         }
     }
 
@@ -321,65 +356,15 @@ public class MainPagePresenter implements IMainPagePresenter{
         @Override
         public void onPost(ListDataZipResponse response) {
             String sData = response.getBodyListDataResponse().getFile_data();
-            byte[] decodedContent = org.apache.commons.codec.binary.Base64.decodeBase64(sData .getBytes());
+            if(sData != null && !sData.isEmpty()) {
+                byte[] zipByte = org.apache.commons.codec.binary.Base64.decodeBase64(sData.getBytes());
 
-
-
-//            ZipInputStream zipStream = new ZipInputStream(new ByteArrayInputStream(decodedContent));
-//
-//            try{
-//                ZipEntry entry = null;
-//
-//                while ((entry = zipStream.getNextEntry()) != null) {
-//
-//                    String fileName = entry.getName();
-//
-//                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//
-//                    byte[] buffer = new byte[1024];
-//                    int count;
-//
-//                    while ((count = zipStream.read(buffer)) != -1) {
-//                        baos.write(buffer, 0, count);
-//                    }
-//
-//                    baos.close();
-//                    zipStream.closeEntry();
-//
-//                    byte[] bytes = baos.toByteArray();
-//
-//                    writeBytesToFile(new File(fileName), bytes);
-//                }
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            } finally{
-//                try {
-//                    zipStream.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-
-
-
-//            FileOutputStream fos = null;
-//            try {
-//                if (decoded != null) {
-//                    fos = iMainPageView.getContextView().openFileOutput(Environment.getExternalStorageDirectory() + "/data.zip", Context.MODE_PRIVATE);
-//                    byte[] decodedString = android.util.Base64.decode(decoded, android.util.Base64.DEFAULT);
-//                    fos.write(decodedString);
-//                    fos.flush();
-//                    fos.close();
-//                }
-//
-//            } catch (Exception e) {
-//
-//            } finally {
-//                if (fos != null) {
-//                    fos = null;
-//                }
-//            }
+                try {
+                    Common.writeBytesToFile(new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + ".zip"), zipByte);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         @Override
@@ -387,23 +372,5 @@ public class MainPagePresenter implements IMainPagePresenter{
 
         }
     };
-
-    public static void writeBytesToFile(File theFile, byte[] bytes) throws IOException {
-        BufferedOutputStream bos = null;
-
-        try {
-            FileOutputStream fos = new FileOutputStream(theFile);
-            bos = new BufferedOutputStream(fos);
-            bos.write(bytes);
-        }finally {
-            if(bos != null) {
-                try  {
-                    //flush and close the BufferedOutputStream
-                    bos.flush();
-                    bos.close();
-                } catch(Exception e){}
-            }
-        }
-    }
     //endregion
 }
