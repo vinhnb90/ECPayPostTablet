@@ -18,6 +18,12 @@ import views.ecpay.com.postabletecpay.model.adapter.PayListBillsAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPCResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.BodyBillResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.BodyCustomerResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.FooterBillResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.FooterCustomerResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListBillResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListCustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
@@ -60,9 +66,22 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     private String CREATE_TABLE_BOOK_CMIS = "CREATE TABLE " + TABLE_NAME_BOOK_CMIS + "(bookCmis TEXT, pcCode TEXT, pcCodeExt TEXT, inningDate TEXT, email TEXT, status INTEGER, strStatus TEXT, strCreateDate TEXT, strChangeDate TEXT, idChanged INTEGER, id INTEGER, parentPcCode TEXT, countBill INTEGER, countBillPaid INTEGER, countCustomer INTEGER, listCustomer TEXT, listBillUnpaid TEXT, listBillPaid TEXT)";
 
-    private String CREATE_TABLE_CUSTOMER = "CREATE TABLE `" + TABLE_NAME_CUSTOMER + "` ( `code` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `address` TEXT, `pcCode` TEXT, `pcCodeExt` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `bookCmis` TEXT, `electricityMeter` TEXT, `inning` TEXT, `status` TEXT, `bankAccount` TEXT, `idNumber` TEXT, `bankName` TEXT , `edongKey` TEXT NOT NULL, `isShowBill` INTEGER DEFAULT 0)";
+    private String CREATE_TABLE_CUSTOMER = "CREATE TABLE `" + TABLE_NAME_CUSTOMER + "` ( `code` TEXT NOT NULL PRIMARY KEY, `name` TEXT, " +
+            "`address` TEXT, `pcCode` TEXT, `pcCodeExt` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `bookCmis` TEXT, " +
+            "`electricityMeter` TEXT, `inning` TEXT, `status` TEXT, `bankAccount` TEXT, `idNumber` TEXT, `bankName` TEXT , " +
+            "`edongKey` TEXT NOT NULL, `isShowBill` INTEGER DEFAULT 0, idChanged TEXT, dateChanged TEXT)" ;
 
-    private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `customerCode` TEXT, `customerPayCode` TEXT, `billId` INTEGER NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, `strIssueDate` TEXT, `status` INTEGER, `seri` TEXT, `pcCode` TEXT, `handoverCode` TEXT, `cashierCode` TEXT, `bookCmis` TEXT, `fromDate` TEXT, `toDate` TEXT, `strFromDate` TEXT, `strToDate` TEXT, `home` TEXT, `tax` REAL, `billNum` TEXT, `currency` TEXT, `priceDetails` TEXT, `numeDetails` TEXT, `amountDetails` TEXT, `oldIndex` TEXT, `newIndex` TEXT, `nume` TEXT, `amountNotTax` INTEGER, `amountTax` INTEGER, `multiple` TEXT, `billType` TEXT, `typeIndex` TEXT, `groupTypeIndex` TEXT, `createdDate` TEXT, `idChanged` INTEGER, `dateChanged` TEXT, `edong` TEXT, `pcCodeExt` TEXT, `code` TEXT, `name` TEXT, `nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, `taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, `billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `edongKey` TEXT NOT NULL, `isChecked` INTEGER default 0)";
+    private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `customerCode` TEXT, `customerPayCode` TEXT, " +
+            "`billId` INTEGER NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, " +
+            "`strIssueDate` TEXT, `status` INTEGER, `seri` TEXT, `pcCode` TEXT, `handoverCode` TEXT, `cashierCode` TEXT, `bookCmis` TEXT, " +
+            "`fromDate` TEXT, `toDate` TEXT, `strFromDate` TEXT, `strToDate` TEXT, `home` TEXT, `tax` REAL, `billNum` TEXT, `currency` TEXT, " +
+            "`priceDetails` TEXT, `numeDetails` TEXT, `amountDetails` TEXT, `oldIndex` TEXT, `newIndex` TEXT, `nume` TEXT, " +
+            "`amountNotTax` INTEGER, `amountTax` INTEGER, `multiple` TEXT, `billType` TEXT, `typeIndex` TEXT, `groupTypeIndex` TEXT, " +
+            "`createdDate` TEXT, `idChanged` INTEGER, `dateChanged` TEXT, `edong` TEXT, `pcCodeExt` TEXT, `code` TEXT, `name` TEXT, " +
+            "`nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, " +
+            "`taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` TEXT, `lastQuery` TEXT, `groupType` INTEGER, " +
+            "`billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `edongKey` TEXT NOT NULL, " +
+            "`isChecked` INTEGER default 0)";
 
     private String CREATE_TABLE_LICH_SU_TTOAN = "CREATE TABLE " + TABLE_NAME_LICH_SU_TTOAN + "(ID INTEGER AUTO INCREMENT, " +
             "SERI_HDON INTEGER, " + "MA_KHANG TEXT, " + "MA_THE TEXT, " + "TEN_KHANG TEXT, " + "DIA_CHI TEXT, " + "THANG_TTOAN DATE, " +
@@ -779,6 +798,152 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         database = this.getReadableDatabase();
         String query = "SELECT bookCmis FROM " + TABLE_NAME_BOOK_CMIS;
         return database.rawQuery(query, null);
+    }
+    //endregion
+
+    //region CUSTOMER
+    public long insertCustomer(ListCustomerResponse listCustomerResponse) {
+        ContentValues initialValues = new ContentValues();
+
+        BodyCustomerResponse bodyCustomerResponse = listCustomerResponse.getBodyCustomerResponse();
+        FooterCustomerResponse footerCustomerResponse = listCustomerResponse.getFooterCustomerResponse();
+
+        initialValues.put("code", bodyCustomerResponse.getCustomerCode());
+        initialValues.put("name", bodyCustomerResponse.getName());
+        initialValues.put("address", bodyCustomerResponse.getAddress());
+        initialValues.put("pcCode", bodyCustomerResponse.getPcCode());
+        initialValues.put("pcCodeExt", bodyCustomerResponse.getPcCodeExt());
+        initialValues.put("phoneByevn", bodyCustomerResponse.getPhoneByEVN());
+        initialValues.put("phoneByecp", bodyCustomerResponse.getPhoneByECP());
+        initialValues.put("bookCmis", bodyCustomerResponse.getBookCmis());
+        initialValues.put("electricityMeter", bodyCustomerResponse.getElectricityMeter());
+        initialValues.put("inning", bodyCustomerResponse.getInning());
+        initialValues.put("status", bodyCustomerResponse.getStatus());
+        initialValues.put("bankAccount", "");
+        initialValues.put("idNumber", bodyCustomerResponse.getId());
+        initialValues.put("bankName", "");
+        initialValues.put("edongKey", "");
+        initialValues.put("isShowBill", 0);
+        initialValues.put("idChanged", footerCustomerResponse.getIdChanged());
+        initialValues.put("dateChanged", footerCustomerResponse.getDateChanged());
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.insert(TABLE_NAME_CUSTOMER, null, initialValues);
+        return rowAffect;
+    }
+
+    public long checkCustomerExist(String code) {
+        database = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_CUSTOMER + " WHERE code = '" + code + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+        if (mCursor.moveToFirst())
+            return mCursor.getInt(0);
+        return 0;
+    }
+    //endregion
+
+    //region BILL
+    public long insertBill(ListBillResponse listBillResponse) {
+        ContentValues initialValues = new ContentValues();
+
+        BodyBillResponse bodyBillResponse = listBillResponse.getBodyBillResponse();
+        FooterBillResponse footerBillResponse = listBillResponse.getFooterBillResponse();
+
+        initialValues.put("customerCode", bodyBillResponse.getCustomerCode());
+        initialValues.put("customerPayCode", "");
+        initialValues.put("billId", !bodyBillResponse.getBillId().isEmpty()?Integer.parseInt(bodyBillResponse.getBillId()):0);
+        initialValues.put("term", bodyBillResponse.getTerm());
+        initialValues.put("strTerm", "");
+        initialValues.put("amount", !bodyBillResponse.getAmount().equals("")?Integer.parseInt(bodyBillResponse.getAmount()):0);
+        initialValues.put("period", bodyBillResponse.getPeriod());
+        initialValues.put("issueDate", bodyBillResponse.getIssueDate());
+        initialValues.put("strIssueDate", "");
+        initialValues.put("status", !bodyBillResponse.getStatus().isEmpty()?Integer.parseInt(bodyBillResponse.getStatus()):0);
+        initialValues.put("seri", bodyBillResponse.getSeri());
+        initialValues.put("pcCode", bodyBillResponse.getPcCode());
+        initialValues.put("handoverCode", bodyBillResponse.getHandOverCode());
+        initialValues.put("cashierCode", bodyBillResponse.getCashierCode());
+        initialValues.put("bookCmis", bodyBillResponse.getBookCmis());
+        initialValues.put("fromDate", bodyBillResponse.getFromDate());
+        initialValues.put("toDate", bodyBillResponse.getToDate());
+        initialValues.put("strFromDate", "");
+        initialValues.put("strToDate", "");
+        initialValues.put("home", bodyBillResponse.getHome());
+        initialValues.put("tax", !bodyBillResponse.getTax().isEmpty()?Float.parseFloat(bodyBillResponse.getTax()):0f);
+        initialValues.put("billNum", bodyBillResponse.getBillNum());
+        initialValues.put("currency", bodyBillResponse.getCurrency());
+        initialValues.put("priceDetails", bodyBillResponse.getPriceDetail());
+        initialValues.put("numeDetails", bodyBillResponse.getNumeDetail());
+        initialValues.put("amountDetails", bodyBillResponse.getAmountDetail());
+        initialValues.put("oldIndex", bodyBillResponse.getOldIndex());
+        initialValues.put("newIndex", bodyBillResponse.getNewIndex());
+        initialValues.put("nume", bodyBillResponse.getNume());
+        initialValues.put("amountNotTax", !bodyBillResponse.getAmountNotTax().isEmpty()?Integer.parseInt(bodyBillResponse.getAmountNotTax()):0);
+        initialValues.put("amountTax", !bodyBillResponse.getAmountTax().isEmpty()?Integer.parseInt(bodyBillResponse.getAmountTax()):0);
+        initialValues.put("multiple", bodyBillResponse.getMultiple());
+        initialValues.put("billType", bodyBillResponse.getBillType());
+        initialValues.put("typeIndex", bodyBillResponse.getTypeIndex());
+        initialValues.put("groupTypeIndex", bodyBillResponse.getGroupTypeIndex());
+        initialValues.put("createdDate", bodyBillResponse.getCreatedDate());
+        initialValues.put("idChanged", footerBillResponse.getIdChanged());
+        initialValues.put("dateChanged", footerBillResponse.getDateChanged());
+        initialValues.put("edong", bodyBillResponse.getEdong());
+        initialValues.put("pcCodeExt", "");
+        initialValues.put("code", "");
+        initialValues.put("name", "");
+        initialValues.put("nameNosign", "");
+        initialValues.put("phoneByevn", "");
+        initialValues.put("phoneByecp", "");
+        initialValues.put("electricityMeter", "");
+        initialValues.put("inning", "");
+        initialValues.put("road", "");
+        initialValues.put("station", "");
+        initialValues.put("taxCode", bodyBillResponse.getTax());
+        initialValues.put("trade", "");
+        initialValues.put("countPeriod", "");
+        initialValues.put("team", "");
+        initialValues.put("type", bodyBillResponse.getBillType());
+        initialValues.put("lastQuery", "");
+        initialValues.put("groupType", !bodyBillResponse.getGroupTypeIndex().isEmpty()?Integer.parseInt(bodyBillResponse.getGroupTypeIndex()):0);
+        initialValues.put("billingChannel", "");
+        initialValues.put("billingType", bodyBillResponse.getBillingType());
+        initialValues.put("billingBy", "");
+        initialValues.put("cashierPay", bodyBillResponse.getCashierCode());
+        initialValues.put("edongKey", bodyBillResponse.getEdong());
+        initialValues.put("isChecked", 0);
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
+        return rowAffect;
+    }
+
+    public long checkBillExist(int billId) {
+        database = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE billId = " + billId;
+        Cursor mCursor = database.rawQuery(query, null);
+        if (mCursor.moveToFirst())
+            return mCursor.getInt(0);
+        return 0;
+    }
+
+    public long getMaxIdChanged() {
+        database = this.getReadableDatabase();
+        String query = "SELECT MAX(idChanged) FROM " + TABLE_NAME_BILL;
+        Cursor c = database.rawQuery(query, null);
+        if(c.moveToFirst()) {
+            return c.getLong(0);
+        }
+        return 0l;
+    }
+
+    public String getMaxDateChanged() {
+        database = this.getReadableDatabase();
+        String query = "SELECT MAX(dateChanged) FROM " + TABLE_NAME_BILL;
+        Cursor c = database.rawQuery(query, null);
+        if(c.moveToFirst()) {
+            return c.getString(0);
+        }
+        return "";
     }
     //endregion
 

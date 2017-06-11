@@ -5,6 +5,8 @@ import android.database.Cursor;
 
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPCResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListBillResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListCustomerResponse;
 
 /**
  * Created by VinhNB on 5/23/2017.
@@ -55,6 +57,30 @@ public class MainPageModel extends CommonModel {
 
     public Cursor getAllBookCmis() {
         return sqLiteConnection.getAllBookCmis();
+    }
+
+    public  long checkCustomerExist(String code) {
+        return sqLiteConnection.checkCustomerExist(code);
+    }
+
+    public long insertCustomer(ListCustomerResponse listCustomerResponse) {
+        return sqLiteConnection.insertCustomer(listCustomerResponse);
+    }
+
+    public  long checkBillExist(int billId) {
+        return sqLiteConnection.checkBillExist(billId);
+    }
+
+    public long insertBill(ListBillResponse listBillResponse) {
+        return sqLiteConnection.insertBill(listBillResponse);
+    }
+
+    public long getMaxIdChanged() {
+        return sqLiteConnection.getMaxIdChanged();
+    }
+
+    public String getMaxDateChanged() {
+        return sqLiteConnection.getMaxDateChanged();
     }
     //endregion
 }

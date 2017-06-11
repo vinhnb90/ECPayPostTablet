@@ -32,7 +32,7 @@ public class BodyListDataRequest {
     private long fromIdChanged;
     @SerializedName("from-date-changed")
     @Expose
-    private long fromDateChanged;
+    private String fromDateChanged;
 
     public long getAuditNumber() {
         return auditNumber;
@@ -90,11 +90,11 @@ public class BodyListDataRequest {
         this.fromIdChanged = fromIdChanged;
     }
 
-    public long getFromDateChanged() {
+    public String getFromDateChanged() {
         return fromDateChanged;
     }
 
-    public void setFromDateChanged(long fromDateChanged) {
+    public void setFromDateChanged(String fromDateChanged) {
         this.fromDateChanged = fromDateChanged;
     }
 }

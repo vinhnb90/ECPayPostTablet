@@ -240,7 +240,7 @@ public class SoapAPI {
     //region create JSON Request service
     public static String getJsonRequestSynData(String agent, String agentEncypted, String commandId, long auditNumber, String mac,
                                                String diskDriver, String signatureEncrypted, String pcCode, String bookCmis,
-                                               long fromIdChanged, long fromDateChanged, String accountId) {
+                                               long fromIdChanged, String fromDateChanged, String accountId) {
         if (agent == null || agent.isEmpty() || agent.trim().equals(""))
             return null;
         if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
@@ -1066,7 +1066,7 @@ public class SoapAPI {
         private AsyncSoapSynchronizeDataCallBack callBack;
         private boolean isEndCallSoap = false;
 
-        public AsyncSoapSynchronizeData(AsyncSoapSynchronizeDataCallBack callBack) throws Exception {
+        public AsyncSoapSynchronizeData(AsyncSoapSynchronizeDataCallBack callBack, Context contextView) throws Exception {
             this.callBack = callBack;
         }
 
