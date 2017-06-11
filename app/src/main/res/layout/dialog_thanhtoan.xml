@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_margin="20dp"
     android:orientation="vertical"
     app:cardBackgroundColor="@android:color/white"
@@ -116,33 +117,6 @@
                 android:text="Đã thanh toán..."
                 android:textColor="@color/colorTextWhite" />
 
-            <!--   <LinearLayout
-                   android:id="@+id/ll_frag_thanh_toan_action_search"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_alignParentRight="true"
-                   android:orientation="horizontal">
-
-                   <ImageButton
-                       android:id="@+id/ibtn_frag_thanhtoan_action_cancel_search_online"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:layout_marginLeft="10dp"
-                       android:layout_marginRight="10dp"
-                       android:background="@drawable/bg_circle_gray"
-                       android:src="@drawable/ic_cancel_white"
-                       android:visibility="gone" />
-
-                   <ImageButton
-                       android:id="@+id/ibtn_frag_thanhtoan_action_research_online"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:layout_marginLeft="10dp"
-                       android:layout_marginRight="10dp"
-                       android:background="@drawable/bg_circle_green"
-                       android:src="@drawable/ic_refresh"
-                       android:visibility="visible" />
-               </LinearLayout>-->
 
             <RelativeLayout
                 android:id="@+id/rv_diaglog_thanhtoan_process_bill"
@@ -154,7 +128,7 @@
                     android:id="@+id/tv_diaglog_thanhtoan_count_bill_payed"
                     android:textColor="@color/colorTextWhite"
                     android:layout_alignParentLeft="true"
-                    android:text="1/7 Hóa đơn"
+                    tools:text="1/7 Hóa đơn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 

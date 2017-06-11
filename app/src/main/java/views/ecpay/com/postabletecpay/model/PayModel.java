@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
-import views.ecpay.com.postabletecpay.model.adapter.PayListBillsAdapter;
+import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
@@ -188,23 +188,6 @@ public class PayModel extends CommonModel {
     }
 
     public List<PayAdapter.BillEntityAdapter> getAllBillOfCustomer(String edong, String code) {
-
-       /* List<PayAdapter.BillEntityAdapter> list = new ArrayList<>();
-        PayAdapter.BillEntityAdapter v1 = new PayAdapter.BillEntityAdapter("1/2017", 3400000, true, true, false, 1, code, "01214500702");
-        PayAdapter.BillEntityAdapter v2 = new PayAdapter.BillEntityAdapter("2/2017", 1400000, true, true, false, 2, code, "01214500702");
-        PayAdapter.BillEntityAdapter v3 = new PayAdapter.BillEntityAdapter("3/2017", 1400000, false, false, false, 3, code, "01214500702");
-        PayAdapter.BillEntityAdapter v4 = new PayAdapter.BillEntityAdapter("4/2017", 2400000, false, false, false, 4, code, "01214500702");
-        PayAdapter.BillEntityAdapter v5 = new PayAdapter.BillEntityAdapter("5/2017", 1400000, true, true, false, 5, code, "01214500702");
-        PayAdapter.BillEntityAdapter v6 = new PayAdapter.BillEntityAdapter("6/2017", 400000, false, false, false, 6, code, "01214500702");
-
-        list.add(v1);
-        list.add(v2);
-        list.add(v3);
-        list.add(v4);
-        list.add(v5);
-        list.add(v6);
-
-        return list;*/
         return sqLiteConnection.selectInfoBillOfCustomer(edong, code);
     }
 
@@ -242,12 +225,28 @@ public class PayModel extends CommonModel {
         return sqLiteConnection.countAllBillsIsChecked(edong);
     }
 
-    public List<PayListBillsAdapter.Entity> getAllBillOfCustomerChecked(String edong) {
+    public int countAllBillsIsCheckedWithStatusPay(String edong, Common.STATUS_BILLING statusBilling) {
+        if (edong == null || edong.trim().isEmpty())
+            return ERROR_OCCUR;
+
+        return sqLiteConnection.countAllBillsIsCheckedWithStatusPay(edong, statusBilling);
+
+    }
+
+    public List<PayBillsDialogAdapter.Entity> getAllBillOfCustomerChecked(String edong) {
         if (edong == null || edong.trim().isEmpty())
             return null;
 
         return sqLiteConnection.selectAllBillsOfAllCustomerChecked(edong);
     }
+
+    public List<PayBillsDialogAdapter.Entity> getAllBillOfCustomerCheckedWithStatusPay(String edong, Common.STATUS_BILLING statusBilling) {
+        if (edong == null || edong.trim().isEmpty())
+            return null;
+
+        return sqLiteConnection.selectAllBillsOfAllCustomerCheckedWithStatus(edong, statusBilling);
+    }
+
 
     public void updateCustomerIsShowBill(String edong, String code, boolean checked) {
         sqLiteConnection.updateCustomerIsShowBill(edong, code, checked);
@@ -258,5 +257,33 @@ public class PayModel extends CommonModel {
             return null;
 
         return sqLiteConnection.selectSessionAccount(edong);
+    }
+
+    public int updateBillStatus(String edong, String customerCode, Long billId, Common.STATUS_BILLING status) {
+        boolean failInput =
+                TextUtils.isEmpty(edong) ||
+                        TextUtils.isEmpty(customerCode);
+        if (failInput)
+            return ERROR_OCCUR;
+
+        return sqLiteConnection.updateBillStatusPay(edong, customerCode, billId, status);
+    }
+
+    public long countMoneyAllBillsIsCheckedWithStatusPay(String edong, Common.STATUS_BILLING statusBilling) {
+        if (edong == null || edong.trim().isEmpty())
+            return ERROR_OCCUR;
+
+        return sqLiteConnection.countMoneyAllBillIsCheckedWithStatusPay(edong, statusBilling);
+    }
+
+    public void updateBillRequestDateBill(String edong, String customerCode, Long billId, String dateNow) {
+        boolean failInput =
+                TextUtils.isEmpty(edong) ||
+                        TextUtils.isEmpty(customerCode) ||
+                        TextUtils.isEmpty(dateNow);
+        if (failInput)
+            return;
+
+        sqLiteConnection.countMoneyAllBillIsCheckedWithStatusPay(edong, customerCode, billId, dateNow);
     }
 }

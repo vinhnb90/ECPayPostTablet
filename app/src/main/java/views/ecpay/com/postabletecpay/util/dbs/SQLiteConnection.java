@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
-import views.ecpay.com.postabletecpay.model.adapter.PayListBillsAdapter;
+import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
@@ -22,7 +22,6 @@ import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
 
-import static android.R.attr.id;
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ONE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_CONFIG;
@@ -54,7 +53,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     private String CREATE_TABLE_CUSTOMER = "CREATE TABLE `" + TABLE_NAME_CUSTOMER + "` ( `code` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `address` TEXT, `pcCode` TEXT, `pcCodeExt` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `bookCmis` TEXT, `electricityMeter` TEXT, `inning` TEXT, `status` TEXT, `bankAccount` TEXT, `idNumber` TEXT, `bankName` TEXT , `edongKey` TEXT NOT NULL, `isShowBill` INTEGER DEFAULT 0)";
 
-    private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `customerCode` TEXT, `customerPayCode` TEXT, `billId` INTEGER NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, `strIssueDate` TEXT, `status` INTEGER, `seri` TEXT, `pcCode` TEXT, `handoverCode` TEXT, `cashierCode` TEXT, `bookCmis` TEXT, `fromDate` TEXT, `toDate` TEXT, `strFromDate` TEXT, `strToDate` TEXT, `home` TEXT, `tax` REAL, `billNum` TEXT, `currency` TEXT, `priceDetails` TEXT, `numeDetails` TEXT, `amountDetails` TEXT, `oldIndex` TEXT, `newIndex` TEXT, `nume` TEXT, `amountNotTax` INTEGER, `amountTax` INTEGER, `multiple` TEXT, `billType` TEXT, `typeIndex` TEXT, `groupTypeIndex` TEXT, `createdDate` TEXT, `idChanged` INTEGER, `dateChanged` TEXT, `edong` TEXT, `pcCodeExt` TEXT, `code` TEXT, `name` TEXT, `nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, `taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, `billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `edongKey` TEXT NOT NULL, `isChecked` INTEGER default 0)";
+    private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `customerCode` TEXT, `customerPayCode` TEXT, `billId` INTEGER NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, `strIssueDate` TEXT, `status` INTEGER, `seri` TEXT, `pcCode` TEXT, `handoverCode` TEXT, `cashierCode` TEXT, `bookCmis` TEXT, `fromDate` TEXT, `toDate` TEXT, `strFromDate` TEXT, `strToDate` TEXT, `home` TEXT, `tax` REAL, `billNum` TEXT, `currency` TEXT, `priceDetails` TEXT, `numeDetails` TEXT, `amountDetails` TEXT, `oldIndex` TEXT, `newIndex` TEXT, `nume` TEXT, `amountNotTax` INTEGER, `amountTax` INTEGER, `multiple` TEXT, `billType` TEXT, `typeIndex` TEXT, `groupTypeIndex` TEXT, `createdDate` TEXT, `idChanged` INTEGER, `dateChanged` TEXT, `edong` TEXT, `pcCodeExt` TEXT, `code` TEXT, `name` TEXT, `nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, `taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, `billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `requestDate` TEXT,`edongKey` TEXT NOT NULL, `isChecked` INTEGER default 0)";
 
     private String CREATE_TABLE_LICH_SU_TTOAN = "CREATE TABLE " + TABLE_NAME_LICH_SU_TTOAN + "(ID INTEGER AUTO INCREMENT, " +
             "SERI_HDON INTEGER, " + "MA_KHANG TEXT, " + "MA_THE TEXT, " + "TEN_KHANG TEXT, " + "DIA_CHI TEXT, " + "THANG_TTOAN DATE, " +
@@ -404,7 +403,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         Cursor mCursor = database.rawQuery(query, null);
 
         mCursor.moveToFirst();
-
         do {
             int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId")));
             int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
@@ -416,6 +414,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             String term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
             term = Common.convertDateToDate(term, Common.DATE_TIME_TYPE.yyyymmdd, Common.DATE_TIME_TYPE.mmyyyy);
 
+            String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
 
             PayAdapter.BillEntityAdapter bill = new PayAdapter.BillEntityAdapter();
             bill.setBillId(billId);
@@ -428,6 +427,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             if (billingBy.equals(edong) || bill.isPayed())
                 bill.setPrint(true);
             else bill.setPrint(false);
+
+            bill.setRequestDate(dateRequest);
 
             billList.add(bill);
         }
@@ -577,6 +578,25 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return totalMoney;
     }
 
+    public long countMoneyAllBillIsCheckedWithStatusPay(String edong, Common.STATUS_BILLING statusBilling) {
+        if (edong == null || edong.trim().isEmpty())
+            return ERROR_OCCUR;
+
+        database = this.getReadableDatabase();
+        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and isChecked = " + Common.ONE + " and status = " + statusBilling.getCode();
+        Cursor mCursor = database.rawQuery(query, null);
+
+        int totalMoney = ERROR_OCCUR;
+        if (mCursor.moveToFirst())
+            totalMoney = mCursor.getInt(0);
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return totalMoney;
+    }
+
+
     public int countAllBillsIsChecked(String edong) {
         database = this.getReadableDatabase();
         String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and isChecked = " + Common.ONE;
@@ -592,24 +612,40 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return totalBills;
     }
 
-    public List<PayListBillsAdapter.Entity> selectAllBillsOfAllCustomerChecked(String edong) {
-        database = getReadableDatabase();
-
-        String query = "SELECT A.billId, A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, customerCode, term, amount, isChecked FROM TBL_BILL WHERE edongKey='" + edong + "' and isChecked = " + ONE + ") AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+    public int countAllBillsIsCheckedWithStatusPay(String edong, Common.STATUS_BILLING statusBilling) {
+        database = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and isChecked = " + Common.ONE + " and status = " + statusBilling.getCode();
         Cursor mCursor = database.rawQuery(query, null);
-        List<PayListBillsAdapter.Entity> listBillChecked = new ArrayList<>();
-        PayListBillsAdapter.Entity entity = null;
+
+        int totalBills = ERROR_OCCUR;
+        if (mCursor.moveToFirst())
+            totalBills = mCursor.getInt(0);
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return totalBills;
+    }
+
+
+    private List<PayBillsDialogAdapter.Entity> selectAllBillsOfAllCustomerCheckedWithQuery(String edong, String query) {
+        database = getReadableDatabase();
+        Cursor mCursor = database.rawQuery(query, null);
+        List<PayBillsDialogAdapter.Entity> listBillChecked = new ArrayList<>();
+        PayBillsDialogAdapter.Entity entity = null;
 
         if (mCursor.moveToFirst()) {
             do {
-                entity = new PayListBillsAdapter.Entity(
+                entity = new PayBillsDialogAdapter.Entity(
                         stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode"))),
                         stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name"))),
                         stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term"))),
                         longConvertNull(mCursor.getLong(mCursor.getColumnIndex("amount"))),
                         booleanConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))),
                         edong,
-                        intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId"))));
+                        intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId"))),
+                        intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")))
+                );
 
                 listBillChecked.add(entity);
             }
@@ -621,6 +657,22 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         }
 
         return listBillChecked;
+    }
+
+    public List<PayBillsDialogAdapter.Entity> selectAllBillsOfAllCustomerChecked(String edong) {
+        if (TextUtils.isEmpty(edong))
+            return null;
+
+        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+        return selectAllBillsOfAllCustomerCheckedWithQuery(edong, query);
+    }
+
+    public List<PayBillsDialogAdapter.Entity> selectAllBillsOfAllCustomerCheckedWithStatus(String edong, Common.STATUS_BILLING statusBilling) {
+        if (TextUtils.isEmpty(edong))
+            return null;
+
+        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " and status = " + statusBilling.getCode() + ") AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+        return selectAllBillsOfAllCustomerCheckedWithQuery(edong, query);
     }
 
     private boolean booleanConvertNull(int isChecked) {
@@ -657,6 +709,33 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         }
         return session;
     }
+
+    public int updateBillStatusPay(String edong, String customerCode, Long billId, Common.STATUS_BILLING statusBilling) {
+        boolean failInput =
+                TextUtils.isEmpty(edong) ||
+                        TextUtils.isEmpty(customerCode);
+        if (failInput)
+            return ERROR_OCCUR;
+        database = this.getReadableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("status", statusBilling.getCode());
+        return database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, customerCode, String.valueOf(billId)});
+    }
+
+    public int countMoneyAllBillIsCheckedWithStatusPay(String edong, String customerCode, Long billId, String dateNow) {
+        boolean failInput =
+                TextUtils.isEmpty(edong) ||
+                        TextUtils.isEmpty(customerCode) ||
+                        TextUtils.isEmpty(dateNow);
+        if (failInput)
+            return ERROR_OCCUR;
+
+        database = this.getReadableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("requestDate", dateNow);
+        return database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, customerCode, String.valueOf(billId)});
+    }
+
     /*
                 boolean isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))) == 0 ? false : true;*/
     //endregion
