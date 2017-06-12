@@ -589,7 +589,9 @@ public class PayPresenter implements IPayPresenter {
     private void refreshTotalBillsAndTotalMoneyInFragment(String edong, Common.STATUS_BILLING statusBilling) {
         totalBillsFragment = 0;
         totalMoneyFragment = 0;
+        listBillCheckedFragment.clear();
 
+        listBillCheckedFragment = mPayModel.getAllBillOfCustomerCheckedWithStatusPay(edong, statusBilling);
         totalBillsFragment = mPayModel.countAllBillsIsCheckedWithStatusPay(edong, statusBilling);
         totalMoneyFragment = mPayModel.countMoneyAllBillsIsCheckedWithStatusPay(edong, statusBilling);
 
@@ -597,9 +599,17 @@ public class PayPresenter implements IPayPresenter {
     }
 
     private void refreshTotalBillsAndTotalMoneyInDialogWhenChecked(String edong, Common.STATUS_BILLING statusBilling) {
-        totalBillsChooseDialog = mPayModel.countAllBillsIsCheckedWithStatusPay(edong, statusBilling);
-        totalMoneyBillChooseDialog = mPayModel.countMoneyAllBillsIsCheckedWithStatusPay(edong, statusBilling);
+//        totalBillsChooseDialog = mPayModel.countAllBillsIsCheckedWithStatusPay(edong, statusBilling);
+//        totalMoneyBillChooseDialog = mPayModel.countMoneyAllBillsIsCheckedWithStatusPay(edong, statusBilling);
 
+        totalBillsChooseDialog = 0;
+        totalMoneyBillChooseDialog = 0;
+        for (PayBillsDialogAdapter.Entity bill : listBillDialog) {
+            if (bill.isChecked()) {
+                totalBillsChooseDialog++;
+                totalMoneyBillChooseDialog += bill.getAmount();
+            }
+        }
         mIPayView.showCountBillsAndTotalMoneyInDialog(totalBillsChooseDialog, totalMoneyBillChooseDialog);
     }
 
@@ -820,10 +830,16 @@ public class PayPresenter implements IPayPresenter {
 
     private SoapAPI.AsyncSoapDeleteBillOnline.AsyncSoapDeleteBillOnlineCallBack soapDeleteBillOnlineCallBack = new SoapAPI.AsyncSoapDeleteBillOnline.AsyncSoapDeleteBillOnlineCallBack() {
         private String edong;
+        private String reasonDeleteBill;
+        private String code;
+        private Long billId;
 
         @Override
         public void onPre(final SoapAPI.AsyncSoapDeleteBillOnline soapDeleteBillOnline) {
             edong = soapDeleteBillOnline.getEdong();
+            reasonDeleteBill = soapDeleteBillOnline.getCauseDeleteBill();
+            code = soapDeleteBillOnline.getCode();
+            billId = soapDeleteBillOnline.getBillId();
 
             mIPayView.showDeleteBillOnlineProcess();
             mIPayView.visibleButtonDeleteDialog(HIDE_COUNTINUE);
@@ -878,6 +894,7 @@ public class PayPresenter implements IPayPresenter {
             }
 
             //Cập nhật thông tin hủy hóa đơn trên danh sách hóa đơn
+            mPayModel.updateBillReasonDelete(edong, code, billId, reasonDeleteBill, Common.STATUS_BILLING.DANG_CHO_HUY);
 
 //            mPayModel.updateBillStatusCancelBillOnline()
             mIPayView.showMessageNotifyDeleteOnlineDialog(codeResponse.getMessage());
@@ -969,7 +986,7 @@ public class PayPresenter implements IPayPresenter {
         try {
             if (soapDeleteBillOnline == null) {
                 //if null then create new
-                soapDeleteBillOnline = new SoapAPI.AsyncSoapDeleteBillOnline(edong, soapDeleteBillOnlineCallBack);
+                soapDeleteBillOnline = new SoapAPI.AsyncSoapDeleteBillOnline(edong, reasonDeleteBill, code, billId, soapDeleteBillOnlineCallBack);
             } else if (soapDeleteBillOnline.getStatus() == AsyncTask.Status.PENDING) {
                 //if running not yet then run
 
@@ -979,12 +996,12 @@ public class PayPresenter implements IPayPresenter {
                 soapDeleteBillOnline.cancel(true);
 
                 handlerDelay.removeCallbacks(runnableCountTimeDeleteBillOnline);
-                soapDeleteBillOnline = new SoapAPI.AsyncSoapDeleteBillOnline(edong, soapDeleteBillOnlineCallBack);
+                soapDeleteBillOnline = new SoapAPI.AsyncSoapDeleteBillOnline(edong, reasonDeleteBill, code, billId, soapDeleteBillOnlineCallBack);
             } else {
                 //if running or finish
                 handlerDelay.removeCallbacks(runnableCountTimeDeleteBillOnline);
 
-                soapDeleteBillOnline = new SoapAPI.AsyncSoapDeleteBillOnline(edong, soapDeleteBillOnlineCallBack);
+                soapDeleteBillOnline = new SoapAPI.AsyncSoapDeleteBillOnline(edong, reasonDeleteBill, code, billId, soapDeleteBillOnlineCallBack);
             }
 
             soapDeleteBillOnline.execute(jsonRequestDeleteBillOnline);
@@ -998,10 +1015,6 @@ public class PayPresenter implements IPayPresenter {
             return;
         }
 
-
-
-
-        mIPayView.showMessageNotifyDeleteOnlineDialog(TEXT_SPACE + "\nChưa đủ hướng dẫn nghiệp vụ của API hủy.");
     }
 
     private Runnable runnableCountTimeDeleteBillOnline = new Runnable() {

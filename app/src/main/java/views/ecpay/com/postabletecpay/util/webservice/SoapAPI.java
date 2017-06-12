@@ -1189,10 +1189,16 @@ public class SoapAPI {
         private AsyncSoapDeleteBillOnlineCallBack callBack;
         private boolean isEndCallSoap = false;
         private DeleteBillOnlineRespone deleteBillOnlineRespone;
+        private String causeDeleteBill;
+        private String code;
+        private Long billId;
 
-        public AsyncSoapDeleteBillOnline(String edong, AsyncSoapDeleteBillOnlineCallBack callBack) throws Exception {
+        public AsyncSoapDeleteBillOnline(String edong, String causeDeleteBill, String code, Long billId, AsyncSoapDeleteBillOnlineCallBack callBack) throws Exception {
             this.callBack = callBack;
             this.edong = edong;
+             this.causeDeleteBill = causeDeleteBill;
+             this.code = code;
+             this.billId = billId;
 
         }
 
@@ -1284,6 +1290,17 @@ public class SoapAPI {
             return edong;
         }
 
+        public String getCauseDeleteBill() {
+            return causeDeleteBill;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public Long getBillId() {
+            return billId;
+        }
 
         public DeleteBillOnlineRespone getDeleteBillOnlineRespone() {
             return deleteBillOnlineRespone;

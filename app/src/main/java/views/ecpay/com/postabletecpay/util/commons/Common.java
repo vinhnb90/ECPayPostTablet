@@ -244,7 +244,8 @@ public class Common {
     public enum STATUS_BILLING {
         CHUA_THANH_TOAN(0, "Chưa thanh toán"),
         DA_THANH_TOAN(1, "Đã thanh toán"),
-        HUY_HOA_DON(2, "Đã bị hủy hóa đơn");
+        HUY_HOA_DON(2, "Đã bị hủy hóa đơn"),
+        DANG_CHO_HUY(3, "Đang chờ hủy");
 
         STATUS_BILLING(int code, String message) {
             this.code = code;

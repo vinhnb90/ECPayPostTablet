@@ -3,15 +3,19 @@ package views.ecpay.com.postabletecpay.view.Main;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -94,6 +98,19 @@ public class MainActivity extends AppCompatActivity implements
         fragmentTransaction.commit();
 
         navigation = (BottomNavigationView) findViewById(R.id.navigation_ac_main);
+
+
+       /* BottomNavigationMenuView menuView = (BottomNavigationMenuView) navigation.getChildAt(0);
+        for (int i = 0; i < menuView.getChildCount(); i++) {
+            final View iconView = menuView.getChildAt(i).findViewById(android.support.design.R.id.icon);
+            menuView.getChildAt(i).get
+            final ViewGroup.LayoutParams layoutParams = iconView.getLayoutParams();
+            final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, displayMetrics);
+            layoutParams.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, displayMetrics);
+            iconView.setLayoutParams(layoutParams);
+        }*/
+
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 

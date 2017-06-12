@@ -477,11 +477,11 @@ public class PayFragment extends Fragment implements
             setEnablePreNext(3);
 
         //set adapter
-        if (payAdapter == null) {
-            payAdapter = new PayAdapter(this.getContext(), this, adapterList);
-            rvKH.setAdapter(payAdapter);
-        } else
-            payAdapter.refreshData(adapterList);
+//        if (payAdapter == null) {
+        payAdapter = new PayAdapter(this.getContext(), this, adapterList);
+        rvKH.setAdapter(payAdapter);
+       /* } else
+            payAdapter.refreshData(adapterList);*/
         rvKH.invalidate();
 
         //if isSeachOnline
@@ -638,6 +638,9 @@ public class PayFragment extends Fragment implements
             dialogPayingOnline.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
             dialogPayingOnline.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
             dialogPayingOnline.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            Window window = dialogPayingOnline.getWindow();
+            window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 
             unbinder.unbind();
             unbinder = ButterKnife.bind(this, dialogPayingOnline);
@@ -675,6 +678,10 @@ public class PayFragment extends Fragment implements
             dialogDeleteBillOnline.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
             dialogDeleteBillOnline.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
             dialogDeleteBillOnline.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+            Window window = dialogDeleteBillOnline.getWindow();
+            window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 
             unbinder.unbind();
             unbinder = ButterKnife.bind(this, dialogDeleteBillOnline);

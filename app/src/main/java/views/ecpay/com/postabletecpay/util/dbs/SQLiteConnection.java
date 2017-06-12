@@ -86,8 +86,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             "`taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, " +
             "`billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `requestDate` TEXT,`edongKey` TEXT NOT NULL, " +
             "`isChecked` INTEGER default 0," +
-            "`traceNumber` INTERGER " +
-            "`statusCancelBillOnline` INTERGER" +
+            "`traceNumber` INTERGER, " +
             "`causeCancelBillOnline` TEXT)";
 
     private String CREATE_TABLE_LICH_SU_TTOAN = "CREATE TABLE " + TABLE_NAME_LICH_SU_TTOAN + "(ID INTEGER AUTO INCREMENT, " +
@@ -452,11 +451,11 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             bill.setCustomerPayCode(customerPayCode);
             bill.setMoneyBill(amount);
             bill.setMonthBill(term);
-            bill.setPayed(status == 0 ? false : true);
+            bill.setStatus(status);
             bill.setChecked(isChecked);
-            if (billingBy.equals(edong) || bill.isPayed())
-                bill.setPrint(true);
-            else bill.setPrint(false);
+            if (bill.getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())
+                bill.setPrint(false);
+            else bill.setPrint(true);
 
             bill.setRequestDate(dateRequest);
 
@@ -767,6 +766,25 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, customerCode, String.valueOf(billId)});
     }
 
+    public Long SelectTraceNumberBill(String edong, String code, Long billId) {
+        database = this.getReadableDatabase();
+        String query = "SELECT traceNumber FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and billId = " + billId;
+        Cursor mCursor = database.rawQuery(query, null);
+        if (mCursor.moveToFirst())
+            return longConvertNull(mCursor.getLong(mCursor.getColumnIndex("traceNumber")));
+
+        return 0l;
+    }
+
+    public void updateBillReasonDelete(String edong, String code, Long billId, String reasonDeleteBill, Common.STATUS_BILLING statusBilling) {
+        database = this.getReadableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("causeCancelBillOnline", reasonDeleteBill);
+        contentValues.put("status", statusBilling.getCode());
+
+        database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, code, String.valueOf(billId)});
+    }
+
     //endregion
 
     //region EVN
@@ -1048,16 +1066,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             return c.getString(0);
         }
         return "";
-    }
-
-    public Long SelectTraceNumberBill(String edong, String code, Long billId) {
-        database = this.getReadableDatabase();
-        String query = "SELECT traceNumber FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and billId = " + billId;
-        Cursor mCursor = database.rawQuery(query, null);
-        if (mCursor.moveToFirst())
-            return longConvertNull(mCursor.getLong(mCursor.getColumnIndex("traceNumber")));
-
-        return 0l;
     }
     //endregion
 
