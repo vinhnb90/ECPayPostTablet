@@ -20,11 +20,16 @@ public class Customer {
     private String idNumber;
     private String bankName;
     private String edongKey;
+    private String idChanged;
+    private String dateChanged;
 
     //extensive
     private boolean isShowBill;
 
-    public Customer(String code, String name, String address, String pcCode, String pcCodeExt, String phoneByevn, String phoneByecp, String bookCmis, String electricityMeter, String inning, String status, String bankAccount, String idNumber, String bankName, String edongKey, boolean isShowBill) {
+    public Customer() {
+    }
+
+    public Customer(String code, String name, String address, String pcCode, String pcCodeExt, String phoneByevn, String phoneByecp, String bookCmis, String electricityMeter, String inning, String status, String bankAccount, String idNumber, String bankName, String edongKey, String idChanged, String dateChanged, boolean isShowBill) {
         this.code = code;
         this.name = name;
         this.address = address;
@@ -40,6 +45,8 @@ public class Customer {
         this.idNumber = idNumber;
         this.bankName = bankName;
         this.edongKey = edongKey;
+        this.idChanged = idChanged;
+        this.dateChanged = dateChanged;
         this.isShowBill = isShowBill;
     }
 
@@ -161,6 +168,22 @@ public class Customer {
 
     public void setEdongKey(String edongKey) {
         this.edongKey = edongKey;
+    }
+
+    public String getIdChanged() {
+        return idChanged;
+    }
+
+    public void setIdChanged(String idChanged) {
+        this.idChanged = idChanged;
+    }
+
+    public String getDateChanged() {
+        return dateChanged;
+    }
+
+    public void setDateChanged(String dateChanged) {
+        this.dateChanged = dateChanged;
     }
 
     public boolean isShowBill() {

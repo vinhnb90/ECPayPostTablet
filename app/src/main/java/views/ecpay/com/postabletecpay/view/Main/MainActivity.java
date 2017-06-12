@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
-import views.ecpay.com.postabletecpay.model.adapter.PayListBillsAdapter;
+import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
@@ -25,11 +25,11 @@ import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 
 public class MainActivity extends AppCompatActivity implements MainPageFragment.OnFragmentInteractionListener,
-        PayAdapter.BillInsidePayAdapter.BillInsidePayViewHolder.OnInterationBillInsidePayAdapter,
-        PayListBillsAdapter.OnInteractionListBillAdapter,
+        PayAdapter.OnInterationBillInsidePayAdapter,
+        PayBillsDialogAdapter.OnInteractionBillDialogRecycler,
         PayFragment.OnFragmentInteractionListener,
-
-        PayFragment.CallbackDialog,
+        PayFragment.CallbackPayingOnlineDialog,
+        PayFragment.CallbackDeleteBillOnlineDialog,
         BaoCaoFragment.OnFragmentInteractionListener,
         UserInfoFragment.OnFragmentInteractionListener {
 
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements MainPageFragment.
     public void processCheckedBillFragment(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomer) {
         if (TextUtils.isEmpty(edong))
             return;
-        if(TextUtils.isEmpty(code))
+        if (TextUtils.isEmpty(code))
             return;
         if (bill == null)
             return;
@@ -134,14 +134,14 @@ public class MainActivity extends AppCompatActivity implements MainPageFragment.
             return;
         }
 
-        ((PayFragment)fragmentVisibling).showBillCheckedFragment(edong, code, bill, posCustomer);
+        ((PayFragment) fragmentVisibling).showBillCheckedFragment(edong, code, bill, posCustomer);
     }
 
-    //endregion
-
-    //region PayListBillsAdapter.OnInteractionListBillAdapter
     @Override
-    public void processDataBillsListChecked(int pos, boolean isChecked) {
+    public void processDeleteBillOnlineFragment(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside) {
+        boolean fail = TextUtils.isEmpty(edong) || TextUtils.isEmpty(code) || bill == null;
+        if (fail)
+            return;
 
         //check fragment
         Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
@@ -149,22 +149,53 @@ public class MainActivity extends AppCompatActivity implements MainPageFragment.
             return;
         }
 
-        ((PayFragment)fragmentVisibling).showBillCheckedDialog(pos, isChecked);
-
+        ((PayFragment) fragmentVisibling).processDialogDeleteBillOnline(edong, code, bill, posCustomerInside);
     }
 
     //endregion
 
-    //region PayFragment.CallbackDialog,
+    //region PayBillsDialogAdapter.OnInteractionBillDialogRecycler
     @Override
-    public void processOnDismissDialog() {
+    public void processDataBillsDialogChecked(int pos, boolean isChecked) {
+
         //check fragment
         Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
         if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
             return;
         }
 
-        ((PayFragment)fragmentVisibling).bindViewAgain();
+        ((PayFragment) fragmentVisibling).showBillCheckedDialog(mEdong, pos, isChecked);
+
+    }
+
+    //endregion
+
+    //region PayFragment.CallbackPayingOnlineDialog
+    @Override
+    public void processOnDismissPayingOnlineDialog() {
+        //check fragment
+        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+            return;
+        }
+
+        ((PayFragment) fragmentVisibling).bindViewAgain();
+        ((PayFragment) fragmentVisibling).refreshRecyclerListFragment();
+    }
+
+    //endregion
+
+    //region PayFragment.CallbackDeleteBillOnlineDialog,
+    @Override
+    public void processOnDismissDeleteBillOnlineDialog() {
+        //check fragment
+        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+            return;
+        }
+
+//        ((PayFragment) fragmentVisibling).showDialogDeleteBillOnline();
+//        ((PayFragment) fragmentVisibling).refreshRecyclerListFragment();
     }
     //endregion
 }

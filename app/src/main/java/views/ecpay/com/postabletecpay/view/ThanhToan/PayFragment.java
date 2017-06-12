@@ -10,8 +10,10 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,20 +40,22 @@ import butterknife.Optional;
 import butterknife.Unbinder;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
-import views.ecpay.com.postabletecpay.model.adapter.PayListBillsAdapter;
+import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
 import views.ecpay.com.postabletecpay.presenter.PayPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_SPACE;
+import static views.ecpay.com.postabletecpay.util.commons.Common.UNIT_MONEY;
 
 /**
  * Created by macbook on 4/28/17.
  */
 
 public class PayFragment extends Fragment implements
-        IPayView{
+        IPayView {
     public static final int FIRST_PAGE_INDEX = 1;
     public static final int PAGE_INCREMENT = 1;
     public static final int ROWS_ON_PAGE = 10;
@@ -139,6 +143,39 @@ public class PayFragment extends Fragment implements
     @BindView(R.id.rv_dialog_thanhtoan_request_pay)
     RelativeLayout rvBillOnline;
 
+    //Dialog delete bill online
+    @Nullable
+    @BindView(R.id.tv_dialog_delete_bill_online_code_customer)
+    TextView tvCodeCustomerDeleteDialog;
+    @Nullable
+    @BindView(R.id.tv_dialog_delete_bill_online_name_customer)
+    TextView tvNameCustomerDeleteDialog;
+    @Nullable
+    @BindView(R.id.tv_dialog_delete_bill_online_term)
+    TextView tvTermBillDeleteDialog;
+    @Nullable
+    @BindView(R.id.tv_dialog_delete_bill_online_amount)
+    TextView tvAmountBillDeleteDialog;
+    @Nullable
+    @BindView(R.id.et_dialog_delete_bill_online_reason)
+    EditText etReasonDeleteBillDeleteDialog;
+    @Nullable
+    @BindView(R.id.btn_dialog_delete_bill_ignore)
+    Button btnIgnoreDeleteDialog;
+    @Nullable
+    @BindView(R.id.btn_dialog_delete_bill_continued)
+    Button btnContinuedDeleteDialog;
+    @Nullable
+    @BindView(R.id.tv_dialog_delete_bill_message_online)
+    TextView tvMessageBillDeleteDialog;
+    @Nullable
+    @BindView(R.id.pbar_dialog_delete_bill_online)
+    ProgressBar pbarBillDeleteDialog;
+    @Nullable
+    @BindView(R.id.card_dialog_delete_bill_online_message)
+    CardView cardMessage;
+
+
     private OnFragmentInteractionListener listener;
     private PayAdapter payAdapter;
     private IPayPresenter mIPayPresenter;
@@ -146,9 +183,52 @@ public class PayFragment extends Fragment implements
     private int mPageIndex;
     private Unbinder unbinder;
     private Common.TYPE_SEARCH typeSearch;
-    private PayListBillsAdapter payListBillsAdapter;
+    private PayBillsDialogAdapter payBillsDialogAdapter;
     private View rootView;
-    private Dialog dialog;
+    private Dialog dialogPayingOnline, dialogDeleteBillOnline;
+
+    public enum VISIBLE_BUTTON_DELETE_DIALOG{
+        SHOW_ALL(0),
+        HIDE_ALL(1),
+        HIDE_CANCEL(2),
+        HIDE_COUNTINUE(3);
+
+        private final int value;
+
+        VISIBLE_BUTTON_DELETE_DIALOG(int value) {
+            this.value = value;
+        }
+    }
+    public  enum TYPE_PAYING_PROCESS {
+        HIDE_ALL(1, "Hide all"),
+        IS_PAYING(2, "Show pbar && is paying"),
+        FINISH_PAYED(3, "Show pbar && finish payed"),
+        SHOW_MESSAGE(4, "show pbar && show message");
+
+        TYPE_PAYING_PROCESS(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        private int code;
+        private String description;
+
+        public int getCode() {
+            return code;
+        }
+
+        public void setCode(int code) {
+            this.code = code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+    }
 
     public static PayFragment newInstance(String edong) {
         Bundle bundle = new Bundle();
@@ -170,31 +250,17 @@ public class PayFragment extends Fragment implements
         rootView = inflater.inflate(R.layout.fragment_thanh_toan, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
-       /* ibBack.setOnClickListener(this);
-        ibScaner.setOnClickListener(this);
-        ibAdd.setOnClickListener(this);
-        btnPay.setOnClickListener(this);*/
-
         viewPager.setAdapter(new TimKiemAdapter(getChildFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
 
         mIPayPresenter = new PayPresenter(this);
         mEdong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
-
         setUpRecyclerFragment(rootView);
         //first page
         typeSearch = Common.TYPE_SEARCH.ALL;
         mPageIndex = FIRST_PAGE_INDEX;
         mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
         return rootView;
-    }
-
-    private void setUpRecyclerFragment(final View view) {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-
-        if (rvKH != null)
-            rvKH.setLayoutManager(linearLayoutManager);
     }
 
     @Override
@@ -265,22 +331,39 @@ public class PayFragment extends Fragment implements
     @Optional
     @OnClick(R.id.btn_frag_thanh_toan_paying)
     public void clickPaying(View view) {
-        showDialogThanhToan();
+        hideSearchOnlineProcess();
+        mIPayPresenter.callShowDialogPay();
     }
     //endregion
 
-    //region onClick dialog
+    //region onClick dialogPayingOnline
     @Optional
     @OnClick(R.id.btn_dialog_thanhtoan_cancel)
-    public void clickCancelDialog(View view) {
-        if (dialog.isShowing())
-            dialog.dismiss();
+    public void clickCancelPayingOnlineDialog(View view) {
+        if (dialogPayingOnline.isShowing())
+            dialogPayingOnline.dismiss();
     }
 
     @Optional
     @OnClick(R.id.btn_dialog_thanhtoan_pay)
-    public void clickPayDialog(View view) {
-        mIPayPresenter.callPayOnline(mEdong);
+    public void clickPayPayingOnlineDialog(View view) {
+
+        mIPayPresenter.callPayingBillOnline(mEdong);
+    }
+    //endregion
+
+    //region onClick dialogDeleteBillOnline
+    @Optional
+    @OnClick(R.id.btn_dialog_delete_bill_ignore)
+    public void clickIgnoreDeleteBillDialog(View view) {
+        if (dialogDeleteBillOnline.isShowing())
+            dialogDeleteBillOnline.dismiss();
+    }
+
+    @Optional
+    @OnClick(R.id.btn_dialog_delete_bill_continued)
+    public void clickContinuedDialog(View view) {
+        mIPayPresenter.callDeleteOnlineSoap(mEdong, etReasonDeleteBillDeleteDialog.getText().toString().trim());
     }
     //endregion
 
@@ -355,6 +438,11 @@ public class PayFragment extends Fragment implements
 
     //endregion
 
+    @Optional @OnTextChanged(R.id.et_dialog_delete_bill_online_reason)
+    public void onTextChangedReasonDeleteBill(CharSequence s, int start, int before, int count) {
+        hideAllProcessDeleteBillOnline();
+    }
+
     //region IPayView
     @Override
     public Context getContextView() {
@@ -383,11 +471,12 @@ public class PayFragment extends Fragment implements
             setEnablePreNext(3);
 
         //set adapter
-        if (pageIndex == FIRST_PAGE_INDEX) {
+        if (payAdapter == null) {
             payAdapter = new PayAdapter(this.getContext(), this, adapterList);
             rvKH.setAdapter(payAdapter);
         } else
-            rvKH.invalidate();
+            payAdapter.refreshData(adapterList);
+        rvKH.invalidate();
 
         //if isSeachOnline
         if (isSeachOnline == false || infoSearch == null)
@@ -440,17 +529,17 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
-    public void showPayRecyclerListBills(List<PayListBillsAdapter.Entity> listBillChecked) {
+    public void showPayRecyclerListBills(List<PayBillsDialogAdapter.Entity> listBillChecked) {
         if (listBillChecked == null)
             return;
 
         setUpRecyclerDialog();
 
-//        if (payListBillsAdapter == null) {
-            payListBillsAdapter = new PayListBillsAdapter(this.getContext(), listBillChecked);
-            rvListBill.setAdapter(payListBillsAdapter);
+//        if (payBillsDialogAdapter == null) {
+        payBillsDialogAdapter = new PayBillsDialogAdapter(this.getContext(), listBillChecked);
+        rvListBill.setAdapter(payBillsDialogAdapter);
 //        } else
-//            payListBillsAdapter.refreshData(listBillChecked);
+//            payBillsDialogAdapter.refreshData(listBillChecked);
 
         rvListBill.invalidate();
     }
@@ -474,53 +563,222 @@ public class PayFragment extends Fragment implements
     public void showMessageNotifyBillOnlineDialog(String message) {
         if (message == null)
             return;
-        if (isHasNullViewDialog())
+        if (isHasNullViewPayingOnlineDialog())
             return;
 
-        showPayingRViewStart();
-        showPayingRviewFinish();
+        showPayingRViewDialogStart();
+        showPayingRviewDialogFinish();
 
         tvMessageDialog.setVisibility(View.VISIBLE);
         tvMessageDialog.setText(message);
     }
 
     @Override
-    public void showPayingRViewStart() {
-        if (isHasNullViewDialog())
+    public void showPayingRViewDialogStart() {
+        if (isHasNullViewPayingOnlineDialog())
             return;
 
-        setVisibleViewDialogBillOnlineProcess(2);
+        setVisibleViewDialogBillOnlineProcess(TYPE_PAYING_PROCESS.IS_PAYING);
     }
 
     @Override
-    public void showPayingRviewFinish() {
-        if (isHasNullViewDialog())
+    public void showPayingRviewDialogFinish() {
+        if (isHasNullViewPayingOnlineDialog())
             return;
 
-        setVisibleViewDialogBillOnlineProcess(3);
+        setVisibleViewDialogBillOnlineProcess(TYPE_PAYING_PROCESS.FINISH_PAYED);
     }
 
     @Override
-    public void showPayingRviewMessage() {
-        if (isHasNullViewDialog())
+    public void showPayingRviewDialogMessage() {
+        if (isHasNullViewPayingOnlineDialog())
             return;
 
-        setVisibleViewDialogBillOnlineProcess(4);
+        setVisibleViewDialogBillOnlineProcess(TYPE_PAYING_PROCESS.SHOW_MESSAGE);
+    }
+
+    @Override
+    public void hidePayingRViewDialog() {
+        if (isHasNullViewPayingOnlineDialog())
+            return;
+
+        setVisibleViewDialogBillOnlineProcess(TYPE_PAYING_PROCESS.HIDE_ALL);
     }
 
     @Override
     public void showTextCountBillsPayed(int countBillPayedSuccess, int totalBillsDialog) {
-        if (isHasNullViewDialog())
+        if (isHasNullViewPayingOnlineDialog())
             return;
         tvCountBillPayedSuccessDialog.setText(countBillPayedSuccess + Common.TEXT_SLASH + totalBillsDialog + Common.TEXT_BILL);
     }
 
     @Override
     public void showTextCountBillsPayedSuccess(int countBillPayedSuccess, int totalBillsChooseDialog) {
-        if (isHasNullViewDialog())
+        if (isHasNullViewPayingOnlineDialog())
             return;
 
         tvCountBillPayedSuccessDialog.setText(countBillPayedSuccess + Common.TEXT_SLASH + totalBillsChooseDialog + Common.TEXT_SPACE + Common.TEXT_BILL);
+    }
+
+    @Override
+    public void showDialogPayingOnline() {
+        if (this.getActivity() instanceof CallbackPayingOnlineDialog) {
+            final CallbackPayingOnlineDialog callbackPayingOnlineDialog = (CallbackPayingOnlineDialog) getContextView();
+
+            dialogPayingOnline = new Dialog(this.getActivity());
+            dialogPayingOnline.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialogPayingOnline.setContentView(R.layout.dialog_thanhtoan);
+            dialogPayingOnline.setCanceledOnTouchOutside(true);
+            dialogPayingOnline.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+            dialogPayingOnline.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            dialogPayingOnline.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+            unbinder.unbind();
+            unbinder = ButterKnife.bind(this, dialogPayingOnline);
+
+            rvBillOnline.setVisibility(View.INVISIBLE);
+
+            setUpRecyclerDialog();
+            mIPayPresenter.callPayRecyclerDialog(mEdong);
+
+
+            dialogPayingOnline.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    callbackPayingOnlineDialog.processOnDismissPayingOnlineDialog();
+                }
+            });
+            dialogPayingOnline.show();
+        } else
+            Log.e(TAG, "showDialogPayingOnline: fragment cannot implement CallbackPayingOnlineDialog");
+    }
+
+    @Override
+    public void showDialogDeleteBillOnline(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside) {
+        boolean fail = TextUtils.isEmpty(edong) || TextUtils.isEmpty(code) || bill == null;
+        if (fail)
+            return;
+
+        if (this.getActivity() instanceof CallbackDeleteBillOnlineDialog) {
+            final CallbackDeleteBillOnlineDialog callbackDeleteBillOnlineDialog = (CallbackDeleteBillOnlineDialog) getContextView();
+
+            dialogDeleteBillOnline = new Dialog(this.getActivity());
+            dialogDeleteBillOnline.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialogDeleteBillOnline.setContentView(R.layout.dialog_delete_bill_online);
+            dialogDeleteBillOnline.setCanceledOnTouchOutside(true);
+            dialogDeleteBillOnline.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+            dialogDeleteBillOnline.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            dialogDeleteBillOnline.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+            unbinder.unbind();
+            unbinder = ButterKnife.bind(this, dialogDeleteBillOnline);
+
+            hideAllProcessDeleteBillOnline();
+            mIPayPresenter.callFillInfoBillDeleteDialog(edong, code, bill, posCustomerInside);
+
+            dialogDeleteBillOnline.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    callbackDeleteBillOnlineDialog.processOnDismissDeleteBillOnlineDialog();
+                }
+            });
+
+            dialogDeleteBillOnline.show();
+        } else
+            Log.e(TAG, "showdialogDeleteBillOnline: fragment cannot implement callbackDeleteBillOnlineDialog");
+    }
+
+    @Override
+    public void showInfoBillDeleteDialog(String customerPayCode, String tenKH, String monthBill, double moneyBill) {
+        boolean fail = TextUtils.isEmpty(customerPayCode) ||
+                TextUtils.isEmpty(tenKH) ||
+                TextUtils.isEmpty(monthBill) ||
+                isHasNullViewDeleteBillOnlineDialog();
+        if (fail) return;
+
+        tvCodeCustomerDeleteDialog.setText(customerPayCode);
+        tvNameCustomerDeleteDialog.setText(tenKH);
+        tvTermBillDeleteDialog.setText(monthBill);
+        tvAmountBillDeleteDialog.setText(String.valueOf(moneyBill) + TEXT_SPACE + UNIT_MONEY);
+    }
+
+
+    @Override
+    public void showDeleteBillOnlineProcess() {
+        if (isHasNullViewDeleteBillOnlineDialog())
+            return;
+    }
+
+    @Override
+    public void showPbarDeleteBillOnline() {
+        cardMessage.setVisibility(View.VISIBLE);
+        tvMessageBillDeleteDialog.setVisibility(View.GONE);
+        pbarBillDeleteDialog.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideAllProcessDeleteBillOnline() {
+        cardMessage.setVisibility(View.INVISIBLE);
+        tvMessageBillDeleteDialog.setVisibility(View.INVISIBLE);
+        pbarBillDeleteDialog.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showMessageNotifyDeleteOnlineDialog(String message) {
+        if (TextUtils.isEmpty(message))
+            return;
+        cardMessage.setVisibility(View.VISIBLE);
+        pbarBillDeleteDialog.setVisibility(View.GONE);
+        tvMessageBillDeleteDialog.setVisibility(View.VISIBLE);
+        tvMessageBillDeleteDialog.setText(message);
+    }
+
+    @Override
+    public void visibleButtonDeleteDialog(PayFragment.VISIBLE_BUTTON_DELETE_DIALOG type) {
+        if(isHasNullViewDeleteBillOnlineDialog())
+            return;
+        btnContinuedDeleteDialog.setEnabled(true);
+//        btnIgnoreDeleteDialog.setEnabled(true);
+
+        etReasonDeleteBillDeleteDialog.setEnabled(true);
+
+        if(type == VISIBLE_BUTTON_DELETE_DIALOG.HIDE_ALL)
+        {
+            btnContinuedDeleteDialog.setEnabled(false);
+            etReasonDeleteBillDeleteDialog.setEnabled(false);
+        }
+
+        if(type == VISIBLE_BUTTON_DELETE_DIALOG.HIDE_CANCEL)
+        {
+            btnContinuedDeleteDialog.setEnabled(false);
+            etReasonDeleteBillDeleteDialog.setEnabled(false);
+        }
+
+        if(type == VISIBLE_BUTTON_DELETE_DIALOG.HIDE_COUNTINUE)
+        {
+            btnContinuedDeleteDialog.setEnabled(false);
+            etReasonDeleteBillDeleteDialog.setEnabled(true);
+        }
+
+        if(type == VISIBLE_BUTTON_DELETE_DIALOG.SHOW_ALL)
+        {
+            btnContinuedDeleteDialog.setEnabled(true);
+            etReasonDeleteBillDeleteDialog.setEnabled(true);
+        }
+    }
+
+    @Override
+    public void enableReasonEditText() {
+        if(isHasNullViewDeleteBillOnlineDialog())
+            return;
+
+        etReasonDeleteBillDeleteDialog.setEnabled(true);
+    }
+
+    private boolean isHasNullViewDeleteBillOnlineDialog() {
+        return tvCodeCustomerDeleteDialog == null || tvNameCustomerDeleteDialog == null || tvTermBillDeleteDialog == null
+                || tvAmountBillDeleteDialog == null || etReasonDeleteBillDeleteDialog == null || btnContinuedDeleteDialog == null
+                || btnIgnoreDeleteDialog == null || tvMessageBillDeleteDialog == null || pbarBillDeleteDialog == null || cardMessage == null;
     }
 
     private void setEnablePreNext(int i) {
@@ -546,8 +804,12 @@ public class PayFragment extends Fragment implements
         mIPayPresenter.callProcessDataBillFragmentChecked(edong, code, bill, posCustomer);
     }
 
-    public void showBillCheckedDialog(int pos, boolean isChecked) {
-        mIPayPresenter.callProcessDataBillDialogChecked(pos, isChecked);
+    public void processDialogDeleteBillOnline(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside) {
+        mIPayPresenter.callProcessDeleteBillOnline(edong, code, bill, posCustomerInside);
+    }
+
+    public void showBillCheckedDialog(String edong, int pos, boolean isChecked) {
+        mIPayPresenter.callProcessDataBillDialogChecked(edong, pos, isChecked);
     }
 
     public void bindViewAgain() {
@@ -556,16 +818,16 @@ public class PayFragment extends Fragment implements
         unbinder = ButterKnife.bind(this, rootView);
     }
 
-    private boolean isHasNullViewDialog() {
+    private boolean isHasNullViewPayingOnlineDialog() {
         return rvBillOnline == null || pbarDialogBilling == null || tvMessageDialog == null;
     }
 
-    private void setVisibleViewDialogBillOnlineProcess(int type) {
-        if (isHasNullViewDialog())
+    private void setVisibleViewDialogBillOnlineProcess(TYPE_PAYING_PROCESS type) {
+        if (isHasNullViewPayingOnlineDialog())
             return;
-
+        tvCountBillPayedSuccessDialog.setVisibility(View.VISIBLE);
         //hide all
-        if (type == 1) {
+        if (type == TYPE_PAYING_PROCESS.HIDE_ALL) {
             rvBillOnline.setVisibility(View.INVISIBLE);
 
             btnPayDialog.setEnabled(true);
@@ -573,9 +835,9 @@ public class PayFragment extends Fragment implements
         }
 
         //show pbar && is paying
-        if (type == 2) {
+        if (type == TYPE_PAYING_PROCESS.IS_PAYING) {
             rvBillOnline.setVisibility(View.VISIBLE);
-            mIPayPresenter.refreshTextCountBillPayedSuccess();
+//            mIPayPresenter.refreshTextCountBillPayedSuccess();
             pbarDialogBilling.setVisibility(View.VISIBLE);
             tvMessageDialog.setVisibility(View.GONE);
 
@@ -584,7 +846,7 @@ public class PayFragment extends Fragment implements
         }
 
         //show pbar && finish payed
-        if (type == 3) {
+        if (type == TYPE_PAYING_PROCESS.FINISH_PAYED) {
             rvBillOnline.setVisibility(View.VISIBLE);
             mIPayPresenter.refreshTextCountBillPayedSuccess();
             pbarDialogBilling.setVisibility(View.GONE);
@@ -595,56 +857,38 @@ public class PayFragment extends Fragment implements
         }
 
         //show pbar && show message
-        if (type == 4) {
+        if (type == TYPE_PAYING_PROCESS.SHOW_MESSAGE) {
             rvBillOnline.setVisibility(View.VISIBLE);
-            mIPayPresenter.refreshTextCountBillPayedSuccess();
+//            mIPayPresenter.refreshTextCountBillPayedSuccess();
             pbarDialogBilling.setVisibility(View.GONE);
             tvMessageDialog.setVisibility(View.VISIBLE);
 
             btnPayDialog.setEnabled(true);
             btnCancelDialog.setEnabled(true);
         }
-
     }
 
+    public void refreshRecyclerListFragment() {
+        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+    }
+
+    private void setUpRecyclerFragment(final View view) {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        if (rvKH != null)
+            rvKH.setLayoutManager(linearLayoutManager);
+    }
     //endregion
 
     public interface OnFragmentInteractionListener {
     }
 
-    private void showDialogThanhToan() {
-        if (this.getActivity() instanceof CallbackDialog) {
-            final CallbackDialog callbackDialog = (CallbackDialog) getContextView();
-
-            dialog = new Dialog(this.getActivity());
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            dialog.setContentView(R.layout.dialog_thanhtoan);
-            dialog.setCanceledOnTouchOutside(true);
-            dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
-            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-
-            unbinder.unbind();
-            unbinder = ButterKnife.bind(this, dialog);
-
-            rvBillOnline.setVisibility(View.INVISIBLE);
-
-            setUpRecyclerDialog();
-            mIPayPresenter.callPayRecyclerDialog(mEdong);
-
-
-            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    callbackDialog.processOnDismissDialog();
-                }
-            });
-            dialog.show();
-        } else
-            Log.e(TAG, "showDialogThanhToan: fragment cannot implement CallbackDialog");
+    public interface CallbackPayingOnlineDialog {
+        void processOnDismissPayingOnlineDialog();
     }
 
-    public interface CallbackDialog {
-        void processOnDismissDialog();
+    public interface CallbackDeleteBillOnlineDialog {
+        void processOnDismissDeleteBillOnlineDialog();
     }
 }

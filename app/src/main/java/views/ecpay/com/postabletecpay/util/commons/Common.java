@@ -168,7 +168,7 @@ public class Common {
     //endregion
 
     //region parrams billing
-    public  enum PARTNER_CODE {
+    public enum PARTNER_CODE {
         DT0813("DT0813", "Luồng quầy thu đang năng"),
         DT0807("DT0807", "Luồng tài khoản tiền điện"),
         DT0605("DT0605", "Các trường hợp khác");
@@ -241,6 +241,36 @@ public class Common {
     public static final String PARTNER_CODE_DEFAULT = PARTNER_CODE.DT0605.getCode();
     public static final String PROVIDER_DEFAULT = PROVIDER_CODE.NCC0468.getCode();
 
+    public enum STATUS_BILLING {
+        CHUA_THANH_TOAN(0, "Chưa thanh toán"),
+        DA_THANH_TOAN(1, "Đã thanh toán"),
+        HUY_HOA_DON(2, "Đã bị hủy hóa đơn");
+
+        STATUS_BILLING(int code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final int code;
+        private String message;
+
+        public static STATUS_BILLING findCodeMessage(int code) {
+            for (STATUS_BILLING v : values()) {
+                if (v.getCode() == code) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
     //endregion
 
     //region Description key
@@ -441,6 +471,12 @@ public class Common {
             return message;
         }
 
+        public static String getMessageServerNotify(String nameCustomer, String term, String message)
+        {
+            return "Gặp vấn đề với hóa đơn của khách hàng " + nameCustomer + " tại kỳ " + term
+                    + "\nnhư sau: " + message;
+        }
+
         private final String code;
         private String message;
 
@@ -468,7 +504,10 @@ public class Common {
         e2040("2039", "Không thể login, đã login ở 1 thiết bị khác"),
         e2042("2042", "Tài khoản chưa được xác định loại tài khoản"),
         e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
-        ex10000("10000", "Chưa có hóa đơn nào được trọn");
+
+        ex10000("10000", "Chưa có hóa đơn nào được chọn"),
+        ex10001("10001", "Quá trình thanh toán kết thúc"),
+        ex10002("10002", "Vui lòng kiểm tra sự tồn tại của database");
 
         CODE_REPONSE_BILL_ONLINE(String code, String message) {
             this.code = code;
@@ -495,6 +534,77 @@ public class Common {
             return CODE_REPONSE_BILL_ONLINE.e9999;
         }
     }
+
+    public enum CODE_REPONSE_DELETE_BILL_ONLINE {
+        e000("000", "Thành công"),
+        e2006("2006", "Không tìm thấy giao dịch tương ứng"),
+        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
+
+        ex10000("10000", "Không tồn tại hóa đơn trong cơ sở dữ liệu"),
+        ex10001("10001", "Vui lòng điền lý do hủy");
+
+        CODE_REPONSE_DELETE_BILL_ONLINE(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+        private String message;
+
+        public static CODE_REPONSE_DELETE_BILL_ONLINE findCodeMessage(String code) {
+            for (CODE_REPONSE_DELETE_BILL_ONLINE v : values()) {
+                if (v.getCode().equals(code)) {
+                    return v;
+                }
+            }
+            return CODE_REPONSE_DELETE_BILL_ONLINE.e9999;
+        }
+    }
+
+    public enum CODE_REPONSE_API_CHECK_TRAINS {
+        eBILLING("BILLING", "Thanh toán thành công"),
+        eOFF("OFF", "Giao dịch đang được giữ"),
+        eEDONG_OTHER("EDONG_OTHER", "Hóa đơn được thanh toán bởi ví khác"),
+        eSOURCE_OTHER("SOURCE_OTHER", "Hóa đơn được thanh toán bởi đối tác khác"),
+        eTIMEOUT("TIMEOUT", "Timeout-Giao dịch nghi ngờ"),
+        eERROR("ERROR", "Thanh toán lỗi"),
+        eREVERT("BILLING", "Hủy hóa đơn"),
+        e2006("2006", "Không tìm thấy giao dịch tương ứng"),
+        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ");
+
+        CODE_REPONSE_API_CHECK_TRAINS(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+        private String message;
+
+        public static CODE_REPONSE_API_CHECK_TRAINS findCodeMessage(String code) {
+            for (CODE_REPONSE_API_CHECK_TRAINS v : values()) {
+                if (v.getCode().equals(code)) {
+                    return v;
+                }
+            }
+            return CODE_REPONSE_API_CHECK_TRAINS.e9999;
+        }
+    }
     //endregion
 
     //region info communication server
@@ -508,31 +618,27 @@ public class Common {
         GET_BOOK_CMIS_BY_CASHIER,
         SYNC_DATA,
         CUSTOMER_BILL,
-        GET_FILE_GEN;
+        GET_FILE_GEN,
+        CHECK_TRANS;
 
         @Override
         public String toString() {
             if (this == LOGIN)
                 return "LOGIN";
-
             if (this == CHANGE_PIN)
                 return "CHANGE-PIN";
-
             if (this == BILLING)
                 return "BILLING";
-
             if (this == GET_BOOK_CMIS_BY_CASHIER)
                 return "GET-BOOK-CMIS-BY-CASHIER";
-
             if (this == SYNC_DATA)
                 return "SYNC-DATA";
-
             if (this == CUSTOMER_BILL)
                 return "CUSTOMER-BILL";
-
             if (this == GET_FILE_GEN)
                 return "GET-FILE-GEN";
-
+            if (this == CHECK_TRANS)
+                return "CHECK-TRANS";
             return super.toString();
         }
     }
@@ -544,6 +650,7 @@ public class Common {
     public static final String TEXT_BILL = "Hóa đơn";
     public static final String TEXT_MULTI_SPACE = TEXT_SPACE.concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE);
     public static final String TEXT_SEARCHING = "Searching online....";
+    public static final int NEGATIVE_ONE = -1;
     public static final int ZERO = 0;
     public static final int ONE = 1;
     public static final boolean BOOL_DEFAULT = false;
@@ -1250,6 +1357,7 @@ public class Common {
         HHmmss,
         yyyymmdd,
         mmyyyy,
+        ddmmyyyy,
         FULL;
 
         @Override
@@ -1260,6 +1368,8 @@ public class Common {
                 return "yyyy-mm-dd";
             if (this == mmyyyy)
                 return "mm/yyyy";
+            if (this == ddmmyyyy)
+                return "dd/MM/yyyy";
             if (this == FULL)
                 return "yyyy-MM-dd'T'HH:mm:ss";
             return super.toString();

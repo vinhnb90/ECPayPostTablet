@@ -64,10 +64,13 @@ public class Bill {
     private String billingType;
     private String billingBy;
     private String cashierPay;
+    private String requestDate;
+    //extenal
     private String edongKey;
     private int isChecked;
 
-    public Bill(String customerCode, String customerPayCode, String billId, String term, Integer amount, String period, String issueDate, String strIssueDate, Integer status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate, String strToDate, String home, String tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex, String newIndex, String nume, Integer amountNotTax, Integer amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex, String createdDate, Integer idChanged, String dateChanged, String edong, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp, String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, Integer type, String lastQuery, Integer groupType, String billingChannel, String billingType, String billingBy, String cashierPay, String edongKey, int isChecked) {
+
+    public Bill(String customerCode, String customerPayCode, String billId, String term, Integer amount, String period, String issueDate, String strIssueDate, Integer status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate, String strToDate, String home, String tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex, String newIndex, String nume, Integer amountNotTax, Integer amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex, String createdDate, Integer idChanged, String dateChanged, String edong, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp, String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, Integer type, String lastQuery, Integer groupType, String billingChannel, String billingType, String billingBy, String cashierPay, String requestDate, String edongKey, int isChecked) {
         this.customerCode = customerCode;
         this.customerPayCode = customerPayCode;
         this.billId = billId;
@@ -127,6 +130,7 @@ public class Bill {
         this.billingType = billingType;
         this.billingBy = billingBy;
         this.cashierPay = cashierPay;
+        this.requestDate = requestDate;
         this.edongKey = edongKey;
         this.isChecked = isChecked;
     }
@@ -617,5 +621,13 @@ public class Bill {
 
     public void setIsChecked(int isChecked) {
         this.isChecked = isChecked;
+    }
+
+    public String getRequestDate() {
+        return requestDate;
+    }
+
+    public void setRequestDate(String requestDate) {
+        this.requestDate = requestDate;
     }
 }

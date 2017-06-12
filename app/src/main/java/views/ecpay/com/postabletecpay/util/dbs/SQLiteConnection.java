@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
-import views.ecpay.com.postabletecpay.model.adapter.PayListBillsAdapter;
+import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPCResponse;
@@ -30,7 +30,6 @@ import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
 
-import static android.R.attr.id;
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ONE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_CONFIG;
@@ -59,9 +58,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     private String CREATE_TABLE_ACCOUNT = "CREATE TABLE `" + TABLE_NAME_ACCOUNT + "` (`edong` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `address` TEXT, `email` TEXT, `birthday` TEXT, `session` TEXT, `balance` NUMERIC, `lockMoney` NUMERIC, `changePIN` INTEGER, `verified` INTEGER, `mac` TEXT, `ip` TEXT, `strLoginTime` TEXT, `strLogoutTime` TEXT, `type` INTEGER, `status` TEXT, `idNumber` TEXT, `idNumberDate` TEXT, `idNumberPlace` TEXT, `parentEdong` TEXT )";
 
+
     private String CREATE_TABLE_EVN_PC = "CREATE TABLE " + TABLE_NAME_EVN_PC + " ( pcId NOT NULL PRIMARY KEY, strPcId TEXT, parentId INTEGER, " +
-            "strParentId TEXT, code TEXT, ext TEXT, fullName TEXT, shortName TEXT, address TEXT, taxCode TEXT, phone1 TEXT, phone2 TEXT, " +
-            "fax TEXT, level INTEGER, strLevel TEXT, mailTo TEXT, mailCc TEXT, status INTEGER, strStatus , dateCreated DATE, strDateCreated TEXT, " +
+            "strParentId TEXT, " +
+            "code TEXT, ext TEXT, fullName TEXT, shortName TEXT, address TEXT, taxCode TEXT, phone1 TEXT, phone2 TEXT, " +
+            "fax TEXT, level INTEGER, " +
+            "strLevel TEXT, mailTo TEXT, mailCc TEXT, status INTEGER, strStatus , dateCreated DATE, strDateCreated TEXT, " +
             "idChanged INTEGER, dateChanged DATE, strDateChanged TEXT, regionId INTEGER, parentPcCode TEXT, cardPrefix TEXT)";
 
     private String CREATE_TABLE_BOOK_CMIS = "CREATE TABLE " + TABLE_NAME_BOOK_CMIS + "(bookCmis TEXT, pcCode TEXT, pcCodeExt TEXT, inningDate TEXT, email TEXT, status INTEGER, strStatus TEXT, strCreateDate TEXT, strChangeDate TEXT, idChanged INTEGER, id INTEGER, parentPcCode TEXT, countBill INTEGER, countBillPaid INTEGER, countCustomer INTEGER, listCustomer TEXT, listBillUnpaid TEXT, listBillPaid TEXT)";
@@ -69,8 +71,10 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     private String CREATE_TABLE_CUSTOMER = "CREATE TABLE `" + TABLE_NAME_CUSTOMER + "` ( `code` TEXT NOT NULL PRIMARY KEY, `name` TEXT, " +
             "`address` TEXT, `pcCode` TEXT, `pcCodeExt` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `bookCmis` TEXT, " +
             "`electricityMeter` TEXT, `inning` TEXT, `status` TEXT, `bankAccount` TEXT, `idNumber` TEXT, `bankName` TEXT , " +
-            "`edongKey` TEXT NOT NULL, `isShowBill` INTEGER DEFAULT 0, idChanged TEXT, dateChanged TEXT)" ;
+            "`edongKey` TEXT NOT NULL, `isShowBill` INTEGER DEFAULT 0, " +
+            "idChanged TEXT, dateChanged TEXT)";
 
+    //add new field requestDate: date bill paying online success from tablet
     private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `customerCode` TEXT, `customerPayCode` TEXT, " +
             "`billId` INTEGER NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, " +
             "`strIssueDate` TEXT, `status` INTEGER, `seri` TEXT, `pcCode` TEXT, `handoverCode` TEXT, `cashierCode` TEXT, `bookCmis` TEXT, " +
@@ -79,8 +83,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             "`amountNotTax` INTEGER, `amountTax` INTEGER, `multiple` TEXT, `billType` TEXT, `typeIndex` TEXT, `groupTypeIndex` TEXT, " +
             "`createdDate` TEXT, `idChanged` INTEGER, `dateChanged` TEXT, `edong` TEXT, `pcCodeExt` TEXT, `code` TEXT, `name` TEXT, " +
             "`nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, " +
-            "`taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` TEXT, `lastQuery` TEXT, `groupType` INTEGER, " +
-            "`billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `edongKey` TEXT NOT NULL, " +
+            "`taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, " +
+            "`billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `requestDate` TEXT,`edongKey` TEXT NOT NULL, " +
             "`isChecked` INTEGER default 0)";
 
     private String CREATE_TABLE_LICH_SU_TTOAN = "CREATE TABLE " + TABLE_NAME_LICH_SU_TTOAN + "(ID INTEGER AUTO INCREMENT, " +
@@ -266,31 +270,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return object = (object == null) ? 0 : object.intValue();
     }
 
-    public void insertOrUpdateEvnPc(EvnPC evnPC) {
-        if (evnPC == null)
-            return;
-
-        ContentValues initialValues = new ContentValues();
-        initialValues.put("pcId", evnPC.getPcId());
-        initialValues.put("parentId", evnPC.getParentId());
-        initialValues.put("code", evnPC.getCode());
-        initialValues.put("ext", evnPC.getExt());
-        initialValues.put("fullName", evnPC.getFullName());
-        initialValues.put("shortName", evnPC.getShortName());
-        initialValues.put("address", evnPC.getAddress());
-        initialValues.put("taxCode", evnPC.getTaxCode());
-        initialValues.put("phone1", evnPC.getPhone1());
-        initialValues.put("phone2", evnPC.getPhone2());
-        initialValues.put("fax", evnPC.getFax());
-        initialValues.put("level", evnPC.getLevel());
-
-        database = getWritableDatabase();
-        int id = (int) database.insertWithOnConflict(TABLE_NAME_EVN_PC, null, initialValues, SQLiteDatabase.CONFLICT_IGNORE);
-        if (id == -1) {
-            database.update(TABLE_NAME_EVN_PC, initialValues, "pcId=?", new String[]{String.valueOf(evnPC.getPcId())});
-        }
-    }
-
     public int countBill(String edong) {
         if (edong == null)
             return 0;
@@ -415,7 +394,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 String edongKey = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edongKey")));
                 boolean isShowBill = booleanConvertNull(mCursor.getInt(mCursor.getColumnIndex("isShowBill")));
 
-                Customer customer = new Customer(code, name, address, pcCode, pcCodeExt, phoneByevn, phoneByecp, bookCmis, electricityMeter, inning, status, bankAccount, idNumber, bankName, edongKey, isShowBill);
+                String idChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idChanged")));
+                String dateChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("dateChanged")));
+                Customer customer = new Customer(code, name, address, pcCode, pcCodeExt, phoneByevn, phoneByecp, bookCmis, electricityMeter, inning, status, bankAccount, idNumber, bankName, edongKey, idChanged, dateChanged, isShowBill);
                 customerList.add(customer);
             }
             while (mCursor.moveToNext());
@@ -433,7 +414,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         Cursor mCursor = database.rawQuery(query, null);
 
         mCursor.moveToFirst();
-
         do {
             int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId")));
             int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
@@ -445,6 +425,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             String term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
             term = Common.convertDateToDate(term, Common.DATE_TIME_TYPE.yyyymmdd, Common.DATE_TIME_TYPE.mmyyyy);
 
+            String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
 
             PayAdapter.BillEntityAdapter bill = new PayAdapter.BillEntityAdapter();
             bill.setBillId(billId);
@@ -457,6 +438,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             if (billingBy.equals(edong) || bill.isPayed())
                 bill.setPrint(true);
             else bill.setPrint(false);
+
+            bill.setRequestDate(dateRequest);
 
             billList.add(bill);
         }
@@ -484,7 +467,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return totalMoney;
     }
 
-    public int insertNotUpdateCustomer(String edong, CustomerInsideBody customer) {
+    public int insertNotUpdateCustomerFromSearchOnline(String edong, CustomerInsideBody customer) {
         if (edong == null || edong.trim().isEmpty() || customer == null)
             return ERROR_OCCUR;
 
@@ -606,6 +589,25 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return totalMoney;
     }
 
+    public long countMoneyAllBillIsCheckedWithStatusPay(String edong, Common.STATUS_BILLING statusBilling) {
+        if (edong == null || edong.trim().isEmpty())
+            return ERROR_OCCUR;
+
+        database = this.getReadableDatabase();
+        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and isChecked = " + Common.ONE + " and status = " + statusBilling.getCode();
+        Cursor mCursor = database.rawQuery(query, null);
+
+        int totalMoney = ERROR_OCCUR;
+        if (mCursor.moveToFirst())
+            totalMoney = mCursor.getInt(0);
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return totalMoney;
+    }
+
+
     public int countAllBillsIsChecked(String edong) {
         database = this.getReadableDatabase();
         String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and isChecked = " + Common.ONE;
@@ -621,24 +623,40 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return totalBills;
     }
 
-    public List<PayListBillsAdapter.Entity> selectAllBillsOfAllCustomerChecked(String edong) {
-        database = getReadableDatabase();
-
-        String query = "SELECT A.billId, A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, customerCode, term, amount, isChecked FROM TBL_BILL WHERE edongKey='" + edong + "' and isChecked = " + ONE + ") AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+    public int countAllBillsIsCheckedWithStatusPay(String edong, Common.STATUS_BILLING statusBilling) {
+        database = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and isChecked = " + Common.ONE + " and status = " + statusBilling.getCode();
         Cursor mCursor = database.rawQuery(query, null);
-        List<PayListBillsAdapter.Entity> listBillChecked = new ArrayList<>();
-        PayListBillsAdapter.Entity entity = null;
+
+        int totalBills = ERROR_OCCUR;
+        if (mCursor.moveToFirst())
+            totalBills = mCursor.getInt(0);
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return totalBills;
+    }
+
+
+    private List<PayBillsDialogAdapter.Entity> selectAllBillsOfAllCustomerCheckedWithQuery(String edong, String query) {
+        database = getReadableDatabase();
+        Cursor mCursor = database.rawQuery(query, null);
+        List<PayBillsDialogAdapter.Entity> listBillChecked = new ArrayList<>();
+        PayBillsDialogAdapter.Entity entity = null;
 
         if (mCursor.moveToFirst()) {
             do {
-                entity = new PayListBillsAdapter.Entity(
+                entity = new PayBillsDialogAdapter.Entity(
                         stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode"))),
                         stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name"))),
                         stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term"))),
                         longConvertNull(mCursor.getLong(mCursor.getColumnIndex("amount"))),
                         booleanConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))),
                         edong,
-                        intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId"))));
+                        intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId"))),
+                        intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")))
+                );
 
                 listBillChecked.add(entity);
             }
@@ -650,6 +668,22 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         }
 
         return listBillChecked;
+    }
+
+    public List<PayBillsDialogAdapter.Entity> selectAllBillsOfAllCustomerChecked(String edong) {
+        if (TextUtils.isEmpty(edong))
+            return null;
+
+        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+        return selectAllBillsOfAllCustomerCheckedWithQuery(edong, query);
+    }
+
+    public List<PayBillsDialogAdapter.Entity> selectAllBillsOfAllCustomerCheckedWithStatus(String edong, Common.STATUS_BILLING statusBilling) {
+        if (TextUtils.isEmpty(edong))
+            return null;
+
+        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " and status = " + statusBilling.getCode() + ") AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+        return selectAllBillsOfAllCustomerCheckedWithQuery(edong, query);
     }
 
     private boolean booleanConvertNull(int isChecked) {
@@ -686,11 +720,61 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         }
         return session;
     }
-    /*
-                boolean isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))) == 0 ? false : true;*/
+
+    public int updateBillStatusPay(String edong, String customerCode, Long billId, Common.STATUS_BILLING statusBilling) {
+        boolean failInput =
+                TextUtils.isEmpty(edong) ||
+                        TextUtils.isEmpty(customerCode);
+        if (failInput)
+            return ERROR_OCCUR;
+        database = this.getReadableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("status", statusBilling.getCode());
+        return database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, customerCode, String.valueOf(billId)});
+    }
+
+    public int countMoneyAllBillIsCheckedWithStatusPay(String edong, String customerCode, Long billId, String dateNow) {
+        boolean failInput =
+                TextUtils.isEmpty(edong) ||
+                        TextUtils.isEmpty(customerCode) ||
+                        TextUtils.isEmpty(dateNow);
+        if (failInput)
+            return ERROR_OCCUR;
+
+        database = this.getReadableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("requestDate", dateNow);
+        return database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, customerCode, String.valueOf(billId)});
+    }
+
     //endregion
 
     //region EVN
+    public void insertOrUpdateEvnPcFromLoginReponse(EvnPC evnPC) {
+        if (evnPC == null)
+            return;
+
+        ContentValues initialValues = new ContentValues();
+        initialValues.put("pcId", evnPC.getPcId());
+        initialValues.put("parentId", evnPC.getParentId());
+        initialValues.put("code", evnPC.getCode());
+        initialValues.put("ext", evnPC.getExt());
+        initialValues.put("fullName", evnPC.getFullName());
+        initialValues.put("shortName", evnPC.getShortName());
+        initialValues.put("address", evnPC.getAddress());
+        initialValues.put("taxCode", evnPC.getTaxCode());
+        initialValues.put("phone1", evnPC.getPhone1());
+        initialValues.put("phone2", evnPC.getPhone2());
+        initialValues.put("fax", evnPC.getFax());
+        initialValues.put("level", evnPC.getLevel());
+
+        database = getWritableDatabase();
+        int id = (int) database.insertWithOnConflict(TABLE_NAME_EVN_PC, null, initialValues, SQLiteDatabase.CONFLICT_IGNORE);
+        if (id == -1) {
+            database.update(TABLE_NAME_EVN_PC, initialValues, "pcId=?", new String[]{String.valueOf(evnPC.getPcId())});
+        }
+    }
+
     public long insertEvnPC(ListEvnPCResponse listEvnPCResponse) {
         ContentValues initialValues = new ContentValues();
 
@@ -745,8 +829,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         database = this.getReadableDatabase();
         String query = "SELECT ext FROM " + TABLE_NAME_EVN_PC;
         Cursor c = database.rawQuery(query, null);
-        if(c.moveToFirst()){
-            return  c.getString(0);
+        if (c.moveToFirst()) {
+            return c.getString(0);
         }
         return "";
     }
@@ -794,7 +878,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return 0;
     }
 
-    public  Cursor getAllBookCmis() {
+    public Cursor getAllBookCmis() {
         database = this.getReadableDatabase();
         String query = "SELECT bookCmis FROM " + TABLE_NAME_BOOK_CMIS;
         return database.rawQuery(query, null);
@@ -851,14 +935,14 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         initialValues.put("customerCode", bodyBillResponse.getCustomerCode());
         initialValues.put("customerPayCode", "");
-        initialValues.put("billId", !bodyBillResponse.getBillId().isEmpty()?Integer.parseInt(bodyBillResponse.getBillId()):0);
+        initialValues.put("billId", !bodyBillResponse.getBillId().isEmpty() ? Integer.parseInt(bodyBillResponse.getBillId()) : 0);
         initialValues.put("term", bodyBillResponse.getTerm());
         initialValues.put("strTerm", "");
-        initialValues.put("amount", !bodyBillResponse.getAmount().equals("")?Integer.parseInt(bodyBillResponse.getAmount()):0);
+        initialValues.put("amount", !bodyBillResponse.getAmount().equals("") ? Integer.parseInt(bodyBillResponse.getAmount()) : 0);
         initialValues.put("period", bodyBillResponse.getPeriod());
         initialValues.put("issueDate", bodyBillResponse.getIssueDate());
         initialValues.put("strIssueDate", "");
-        initialValues.put("status", !bodyBillResponse.getStatus().isEmpty()?Integer.parseInt(bodyBillResponse.getStatus()):0);
+        initialValues.put("status", !bodyBillResponse.getStatus().isEmpty() ? Integer.parseInt(bodyBillResponse.getStatus()) : 0);
         initialValues.put("seri", bodyBillResponse.getSeri());
         initialValues.put("pcCode", bodyBillResponse.getPcCode());
         initialValues.put("handoverCode", bodyBillResponse.getHandOverCode());
@@ -869,7 +953,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("strFromDate", "");
         initialValues.put("strToDate", "");
         initialValues.put("home", bodyBillResponse.getHome());
-        initialValues.put("tax", !bodyBillResponse.getTax().isEmpty()?Float.parseFloat(bodyBillResponse.getTax()):0f);
+        initialValues.put("tax", !bodyBillResponse.getTax().isEmpty() ? Float.parseFloat(bodyBillResponse.getTax()) : 0f);
         initialValues.put("billNum", bodyBillResponse.getBillNum());
         initialValues.put("currency", bodyBillResponse.getCurrency());
         initialValues.put("priceDetails", bodyBillResponse.getPriceDetail());
@@ -878,8 +962,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("oldIndex", bodyBillResponse.getOldIndex());
         initialValues.put("newIndex", bodyBillResponse.getNewIndex());
         initialValues.put("nume", bodyBillResponse.getNume());
-        initialValues.put("amountNotTax", !bodyBillResponse.getAmountNotTax().isEmpty()?Integer.parseInt(bodyBillResponse.getAmountNotTax()):0);
-        initialValues.put("amountTax", !bodyBillResponse.getAmountTax().isEmpty()?Integer.parseInt(bodyBillResponse.getAmountTax()):0);
+        initialValues.put("amountNotTax", !bodyBillResponse.getAmountNotTax().isEmpty() ? Integer.parseInt(bodyBillResponse.getAmountNotTax()) : 0);
+        initialValues.put("amountTax", !bodyBillResponse.getAmountTax().isEmpty() ? Integer.parseInt(bodyBillResponse.getAmountTax()) : 0);
         initialValues.put("multiple", bodyBillResponse.getMultiple());
         initialValues.put("billType", bodyBillResponse.getBillType());
         initialValues.put("typeIndex", bodyBillResponse.getTypeIndex());
@@ -904,7 +988,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("team", "");
         initialValues.put("type", bodyBillResponse.getBillType());
         initialValues.put("lastQuery", "");
-        initialValues.put("groupType", !bodyBillResponse.getGroupTypeIndex().isEmpty()?Integer.parseInt(bodyBillResponse.getGroupTypeIndex()):0);
+        initialValues.put("groupType", !bodyBillResponse.getGroupTypeIndex().isEmpty() ? Integer.parseInt(bodyBillResponse.getGroupTypeIndex()) : 0);
         initialValues.put("billingChannel", "");
         initialValues.put("billingType", bodyBillResponse.getBillingType());
         initialValues.put("billingBy", "");
@@ -930,7 +1014,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         database = this.getReadableDatabase();
         String query = "SELECT MAX(idChanged) FROM " + TABLE_NAME_BILL;
         Cursor c = database.rawQuery(query, null);
-        if(c.moveToFirst()) {
+        if (c.moveToFirst()) {
             return c.getLong(0);
         }
         return 0l;
@@ -940,7 +1024,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         database = this.getReadableDatabase();
         String query = "SELECT MAX(dateChanged) FROM " + TABLE_NAME_BILL;
         Cursor c = database.rawQuery(query, null);
-        if(c.moveToFirst()) {
+        if (c.moveToFirst()) {
             return c.getString(0);
         }
         return "";

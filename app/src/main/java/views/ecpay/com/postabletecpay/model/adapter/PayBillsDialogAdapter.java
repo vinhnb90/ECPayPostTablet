@@ -1,6 +1,5 @@
 package views.ecpay.com.postabletecpay.model.adapter;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -13,33 +12,31 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
-import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.commons.Common;
-import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 /**
  * Created by VinhNB on 6/5/2017.
  */
 
-public class PayListBillsAdapter extends RecyclerView.Adapter<PayListBillsAdapter.BillDialogViewHorder> {
+public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAdapter.BillDialogViewHorder> {
 
     private static Context context;
     private static List<Entity> listBillChecked;
-    private static OnInteractionListBillAdapter onInteractor;
+    private static OnInteractionBillDialogRecycler onInteractor;
 
-    public PayListBillsAdapter(Context context, List<Entity> listBillChecked) {
+    public PayBillsDialogAdapter(Context context, List<Entity> listBillChecked) {
         this.listBillChecked = listBillChecked;
         this.context = context;
-        if (context instanceof OnInteractionListBillAdapter)
-            this.onInteractor = (OnInteractionListBillAdapter) context;
-        else throw new ClassCastException("Class must be implement OnInteractionListBillAdapter!");
+        if (context instanceof OnInteractionBillDialogRecycler)
+            this.onInteractor = (OnInteractionBillDialogRecycler) context;
+        else throw new ClassCastException("Class must be implement OnInteractionBillDialogRecycler!");
     }
 
     @Override
     public BillDialogViewHorder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = View.inflate(parent.getContext(), R.layout.row_thanhtoan_list_bills, null);
-        PayListBillsAdapter.BillDialogViewHorder viewHorder = new BillDialogViewHorder(view);
+        PayBillsDialogAdapter.BillDialogViewHorder viewHorder = new BillDialogViewHorder(view);
 
         return viewHorder;
     }
@@ -49,11 +46,18 @@ public class PayListBillsAdapter extends RecyclerView.Adapter<PayListBillsAdapte
         Entity billChecked = listBillChecked.get(position);
 
         holder.getCbChoose().setChecked(billChecked.isChecked());
+
         holder.getTvCode().setText(billChecked.getCode());
         holder.getTvTerm().setText(Common.convertDateToDate(billChecked.getTerm(), Common.DATE_TIME_TYPE.yyyymmdd, Common.DATE_TIME_TYPE.mmyyyy));
         holder.getTvName().setText(billChecked.getName());
         holder.getTvAmount().setText(String.valueOf(billChecked.getAmount()) +Common.TEXT_SPACE + Common.UNIT_MONEY);
-        holder.getTvPayStatus().setText(PayAdapter.BillInsidePayAdapter.NOT_PAY_YET);
+
+        String status = Common.STATUS_BILLING.findCodeMessage(billChecked.getStatus()).getMessage();
+        if(billChecked.getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())
+            holder.getCbChoose().setVisibility(View.VISIBLE);
+        else
+            holder.getCbChoose().setVisibility(View.INVISIBLE);
+        holder.getTvPayStatus().setText(status);
     }
 
     @Override
@@ -78,8 +82,9 @@ public class PayListBillsAdapter extends RecyclerView.Adapter<PayListBillsAdapte
         //extends
         private String edong;
         private int billId;
+        private int status;
 
-        public Entity(String code, String name, String term, Long amount, boolean isChecked, String edong, int billId) {
+        public Entity(String code, String name, String term, Long amount, boolean isChecked, String edong, int billId, int status) {
             this.code = code;
             this.name = name;
             this.term = term;
@@ -87,6 +92,7 @@ public class PayListBillsAdapter extends RecyclerView.Adapter<PayListBillsAdapte
             this.isChecked = isChecked;
             this.edong = edong;
             this.billId = billId;
+            this.status = status;
         }
 
         public String getCode() {
@@ -125,6 +131,10 @@ public class PayListBillsAdapter extends RecyclerView.Adapter<PayListBillsAdapte
             return isChecked;
         }
 
+        public void setChecked(boolean checked) {
+            isChecked = checked;
+        }
+
         public String getEdong() {
             return edong;
         }
@@ -133,16 +143,20 @@ public class PayListBillsAdapter extends RecyclerView.Adapter<PayListBillsAdapte
             this.edong = edong;
         }
 
-        public void setChecked(boolean checked) {
-            isChecked = checked;
-        }
-
         public int getBillId() {
             return billId;
         }
 
         public void setBillId(int billId) {
             this.billId = billId;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
         }
     }
 
@@ -202,12 +216,12 @@ public class PayListBillsAdapter extends RecyclerView.Adapter<PayListBillsAdapte
                 int pos = getAdapterPosition();
                 listBillChecked.get(pos).setChecked(isChecked);
 
-                onInteractor.processDataBillsListChecked(pos, isChecked);
+                onInteractor.processDataBillsDialogChecked(pos, isChecked);
             }
         }
     }
 
-    public interface OnInteractionListBillAdapter {
-        void processDataBillsListChecked(int pos, boolean isChecked);
+    public interface OnInteractionBillDialogRecycler {
+        void processDataBillsDialogChecked(int pos, boolean isChecked);
     }
 }

@@ -2,9 +2,6 @@ package views.ecpay.com.postabletecpay.model;
 
 import android.content.Context;
 
-import views.ecpay.com.postabletecpay.model.sharedPreference.ICommonSharedReference;
-import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
-import views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
 
@@ -28,7 +25,7 @@ public class LoginModel extends CommonModel {
     public void writeSqliteEvnPcTable(EvnPC evnPC) {
         if (evnPC == null)
             return;
-        sqLiteConnection.insertOrUpdateEvnPc(evnPC);
+        sqLiteConnection.insertOrUpdateEvnPcFromLoginReponse(evnPC);
     }
     //endregion
 }

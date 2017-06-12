@@ -21,10 +21,14 @@ import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
+
+import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.BillInsidePayAdapter.IS_DEBT;
+import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.BillInsidePayAdapter.NOT_DEBT;
 
 /**
  * Created by VinhNB on 5/26/2017.
@@ -34,7 +38,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     private static Context sContext;
     private static IPayView sIPayView;
     private PayModel payModel;
-    private static List<PayEntityAdapter> mAdapterList = new ArrayList<>();
+    private static List<PayEntityAdapter> billList = new ArrayList<>();
     @BindDrawable(R.drawable.bg_button_orange)
     Drawable green;
     @BindDrawable(R.drawable.bg_button)
@@ -42,10 +46,12 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     @BindView(R.id.btn_row_thanhtoan_recycler_print)
     Button btnPrintBill;
 
-    public PayAdapter(Context sContext, IPayView sIPayView, List<PayEntityAdapter> mAdapterList) {
+    private static int positionCustomer;
+
+    public PayAdapter(Context sContext, IPayView sIPayView, List<PayEntityAdapter> billList) {
         this.sContext = sContext;
         this.sIPayView = sIPayView;
-        this.mAdapterList = mAdapterList;
+        this.billList = billList;
 
         payModel = new PayModel(sIPayView.getContextView());
     }
@@ -59,54 +65,51 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final PayViewHolder holder, final int position) {
-        PayEntityAdapter entityAdapter = mAdapterList.get(position);
+    public void onBindViewHolder(final PayViewHolder holder, int position) {
+        positionCustomer = position;
+        PayEntityAdapter entityAdapter = billList.get(position);
         String code = entityAdapter.getMaKH();
         String edong = entityAdapter.getEdong();
-        boolean isConNo = entityAdapter.isPayed();
+        boolean isPayed = entityAdapter.isPayed();
 
         holder.tvTenKH.setText(entityAdapter.getTenKH());
         holder.tvDiaChi.setText(entityAdapter.getDiaChi());
         holder.tvLoTrinh.setText(entityAdapter.getLoTrinh());
-        holder.tvTongTien.setText(entityAdapter.getTongTien() + "");
+        holder.tvTongTien.setText(entityAdapter.getTongTien() + Common.TEXT_SPACE + Common.UNIT_MONEY);
         holder.tvMaKH.setText(code);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            holder.btnTrangThaiNo.setBackground(isConNo ? green : violet);
+            holder.btnTrangThaiNo.setBackground(isPayed ? green : violet);
         } else {
-            holder.btnTrangThaiNo.setBackgroundDrawable(isConNo ? green : violet);
+            holder.btnTrangThaiNo.setBackgroundDrawable(isPayed ? green : violet);
         }
+        holder.btnTrangThaiNo.setText(isPayed ? NOT_DEBT : IS_DEBT);
+
         Common.runAnimationClickViewScale(holder.cardView, R.anim.twinking_view, Common.TIME_DELAY_ANIM);
 
         List<PayAdapter.BillEntityAdapter> listBill = new ArrayList<>();
         listBill = payModel.getAllBillOfCustomer(edong, code);
-        holder.insideTodayAdapter.setBillList(edong, code, listBill, position);
+        holder.billsInsideAdapter.setBillList(edong, code, listBill, positionCustomer);
+        holder.rvBill.invalidate();
 
-        boolean isShowBill = mAdapterList.get(position).isShowBill();
+        boolean isShowBill = billList.get(positionCustomer).isShowBill();
         holder.rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
 
-        holder.getItemView().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean isShowBill = mAdapterList.get(position).isShowBill();
 
-                mAdapterList.get(position).setShowBill(isShowBill = !isShowBill);
-                holder.rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
-            }
-        });
     }
 
     @Override
     public int getItemCount() {
-        return mAdapterList.size();
+        return billList.size();
     }
 
     public void refreshData(List<PayEntityAdapter> adapterList) {
         if (adapterList == null)
             return;
 
-        this.mAdapterList.clear();
-        this.mAdapterList.addAll(adapterList);
-        this.notifyDataSetChanged();
+        this.billList.clear();
+        this.billList.addAll(adapterList);
+        notifyDataSetChanged();
     }
 
     public class PayViewHolder extends RecyclerView.ViewHolder {
@@ -134,15 +137,24 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             ButterKnife.bind(this, itemView);
             this.itemView = itemView;
 
-            insideTodayAdapter = new BillInsidePayAdapter(sContext);
+            billsInsideAdapter = new BillInsidePayAdapter(sContext);
             rvBill.setLayoutManager(new LinearLayoutManager(sContext, LinearLayoutManager.VERTICAL, false));
-            rvBill.setAdapter(insideTodayAdapter);
+            rvBill.setAdapter(billsInsideAdapter);
 
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    boolean isShowBill = billList.get(positionCustomer).isShowBill();
+
+                    billList.get(positionCustomer).setShowBill(isShowBill = !isShowBill);
+                    rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
+                }
+            });
             //set 10 rows and a page
 //            cardView.getLayoutParams().height = (int) (height / PayFragment.ROWS_ON_PAGE);
         }
 
-        private BillInsidePayAdapter insideTodayAdapter;
+        private BillInsidePayAdapter billsInsideAdapter;
 
         public View getItemView() {
             return itemView;
@@ -150,8 +162,6 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     }
 
     public static class PayEntityAdapter {
-        public final static String TT_HET_NO = "Hết nợ";
-        public final static String TT_CON_NO = "Còn nợ";
 
         private String edong;
         private String tenKH;
@@ -250,24 +260,26 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         private boolean isPrint;
         private boolean isPayed;
         private boolean isChecked;
+        private String requestDate;
 
         //info extension
-        private int billId;
+        private long billId;
         private String customerPayCode;
         private String billingBy;
 
-        public BillEntityAdapter(String monthBill, double moneyBill, boolean isPrint, boolean isPayed, boolean isChecked, int billId, String customerPayCode, String billingBy) {
+        public BillEntityAdapter() {
+        }
+
+        public BillEntityAdapter(String monthBill, double moneyBill, boolean isPrint, boolean isPayed, boolean isChecked, String requestDate, int billId, String customerPayCode, String billingBy) {
             this.monthBill = monthBill;
             this.moneyBill = moneyBill;
             this.isPrint = isPrint;
             this.isPayed = isPayed;
             this.isChecked = isChecked;
+            this.requestDate = requestDate;
             this.billId = billId;
             this.customerPayCode = customerPayCode;
             this.billingBy = billingBy;
-        }
-
-        public BillEntityAdapter() {
         }
 
         public String getMonthBill() {
@@ -310,11 +322,19 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             isChecked = checked;
         }
 
-        public int getBillId() {
+        public String getRequestDate() {
+            return requestDate;
+        }
+
+        public void setRequestDate(String requestDate) {
+            this.requestDate = requestDate;
+        }
+
+        public long getBillId() {
             return billId;
         }
 
-        public void setBillId(int billId) {
+        public void setBillId(long billId) {
             this.billId = billId;
         }
 
@@ -335,30 +355,34 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
     }
 
-    public static class BillInsidePayAdapter extends RecyclerView.Adapter<BillInsidePayAdapter.BillInsidePayViewHolder> {
+    public class BillInsidePayAdapter extends RecyclerView.Adapter<BillInsidePayAdapter.BillInsidePayViewHolder> {
         public static final String IS_PAY = "Đã thanh toán";
         public static final String NOT_PAY_YET = "Chưa thanh toán";
+        public static final String IS_DEBT = "Còn nợ";
+        public static final String NOT_DEBT = "Hết nợ";
 
-        private static List<BillEntityAdapter> billList;
-        private static String code;
-        private static String edong;
-        private static BillInsidePayViewHolder.OnInterationBillInsidePayAdapter interaction;
+        private List<BillEntityAdapter> billList = new ArrayList<>();
+        private String code;
+        private String edong;
+        private OnInterationBillInsidePayAdapter interaction;
 
         //extends
-        private static int posCustomer;
+        private int posCustomerInside;
 
         public BillInsidePayAdapter(Context context) {
-            if (context instanceof BillInsidePayViewHolder.OnInterationBillInsidePayAdapter) {
-                interaction = (BillInsidePayViewHolder.OnInterationBillInsidePayAdapter) context;
+            if (context instanceof OnInterationBillInsidePayAdapter) {
+                interaction = (OnInterationBillInsidePayAdapter) context;
             } else
                 throw new ClassCastException("Context must be implement BillInsidePayViewHolder.OnInterationBillInsidePayAdapter!");
         }
 
         public void setBillList(String edong, String code, List<BillEntityAdapter> billList, int posCustomer) {
-            this.billList = billList;
+            this.billList = new ArrayList<>();
+            this.billList.addAll(billList);
             this.code = code;
             this.edong = edong;
-            this.posCustomer = posCustomer;
+            this.posCustomerInside = posCustomer;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -387,7 +411,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
 
-        public static class BillInsidePayViewHolder extends RecyclerView.ViewHolder {
+        public class BillInsidePayViewHolder extends RecyclerView.ViewHolder {
             @BindView(R.id.cb_row_bill_inside_pay)
             CheckBox cb;
             @BindView(R.id.tv_row_bill_inside_pay_date)
@@ -413,8 +437,17 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                     BillEntityAdapter bill = billList.get(position);
                     bill.setChecked(checked);
 
-                    interaction.processCheckedBillFragment(edong, code, bill, posCustomer);
+                    interaction.processCheckedBillFragment(edong, code, bill, posCustomerInside);
                 }
+            }
+
+            @OnClick(R.id.btn_row_bill_inside_pay_delete)
+            public void doClickDelete(View view)
+            {
+                int position = getAdapterPosition();
+                BillEntityAdapter bill = billList.get(position);
+
+                interaction.processDeleteBillOnlineFragment(edong, code, bill, posCustomerInside);
             }
 
             public CheckBox getCb() {
@@ -440,10 +473,12 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             public ImageButton getIbtnDelete() {
                 return ibtnDelete;
             }
-
-            public interface OnInterationBillInsidePayAdapter {
-                void processCheckedBillFragment(String edong, String code, BillEntityAdapter bill, int posCustomer);
-            }
         }
+    }
+
+    public interface OnInterationBillInsidePayAdapter {
+        void processCheckedBillFragment(String edong, String code, BillEntityAdapter bill, int posCustomer);
+
+        void processDeleteBillOnlineFragment(String edong, String code, BillEntityAdapter bill, int posCustomerInside);
     }
 }

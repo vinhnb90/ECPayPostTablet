@@ -1,11 +1,6 @@
 package views.ecpay.com.postabletecpay.presenter;
 
-import android.support.v7.widget.RecyclerView;
-
-import java.util.List;
-
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
-import views.ecpay.com.postabletecpay.model.adapter.PayListBillsAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 
 /**
@@ -25,9 +20,17 @@ public interface IPayPresenter {
 
     void callPayRecyclerDialog(String mEdong);
 
-    void callProcessDataBillDialogChecked(int pos, boolean isChecked);
+    void callProcessDataBillDialogChecked(String edong, int pos, boolean isChecked);
 
-    void callPayOnline(String edong);
+    void callPayingBillOnline(String edong);
 
     void refreshTextCountBillPayedSuccess();
+
+    void callShowDialogPay();
+
+    void callProcessDeleteBillOnline(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside);
+
+    void callFillInfoBillDeleteDialog(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside);
+
+    void callDeleteOnlineSoap(String edong, String reasonDeleteBill);
 }

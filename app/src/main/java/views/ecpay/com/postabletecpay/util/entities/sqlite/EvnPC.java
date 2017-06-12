@@ -8,6 +8,7 @@ public class EvnPC {
     private int pcId;
     private int parentId;
     private String code;
+    private String strParentId;
     private String ext;
     private String fullName;
     private String shortName;
@@ -17,14 +18,28 @@ public class EvnPC {
     private String phone2;
     private String fax;
     private int level;
+    private String strLevel;
+    private String mailTo;
+    private String mailCc;
+    private int status;
+    private String strStatus;
+    private String dateCreated;
+    private String strDateCreated;
+    private int idChanged;
+    private String dateChanged;
+    private String strDateChanged;
+    private int regionId;
+    private String parentPcCode;
+    private String cardPrefix;
 
     public EvnPC() {
     }
 
-    public EvnPC(int pcId, int parentId, String code, String ext, String fullName, String shortName, String address, String taxCode, String phone1, String phone2, String fax, int level) {
+    public EvnPC(int pcId, int parentId, String code, String strParentId, String ext, String fullName, String shortName, String address, String taxCode, String phone1, String phone2, String fax, int level, String strLevel, String mailTo, String mailCc, int status, String strStatus, String dateCreated, String strDateCreated, int idChanged, String dateChanged, String strDateChanged, int regionId, String parentPcCode, String cardPrefix) {
         this.pcId = pcId;
         this.parentId = parentId;
         this.code = code;
+        this.strParentId = strParentId;
         this.ext = ext;
         this.fullName = fullName;
         this.shortName = shortName;
@@ -34,6 +49,19 @@ public class EvnPC {
         this.phone2 = phone2;
         this.fax = fax;
         this.level = level;
+        this.strLevel = strLevel;
+        this.mailTo = mailTo;
+        this.mailCc = mailCc;
+        this.status = status;
+        this.strStatus = strStatus;
+        this.dateCreated = dateCreated;
+        this.strDateCreated = strDateCreated;
+        this.idChanged = idChanged;
+        this.dateChanged = dateChanged;
+        this.strDateChanged = strDateChanged;
+        this.regionId = regionId;
+        this.parentPcCode = parentPcCode;
+        this.cardPrefix = cardPrefix;
     }
 
     public int getPcId() {
@@ -58,6 +86,14 @@ public class EvnPC {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getStrParentId() {
+        return strParentId;
+    }
+
+    public void setStrParentId(String strParentId) {
+        this.strParentId = strParentId;
     }
 
     public String getExt() {
@@ -132,4 +168,107 @@ public class EvnPC {
         this.level = level;
     }
 
+    public String getStrLevel() {
+        return strLevel;
+    }
+
+    public void setStrLevel(String strLevel) {
+        this.strLevel = strLevel;
+    }
+
+    public String getMailTo() {
+        return mailTo;
+    }
+
+    public void setMailTo(String mailTo) {
+        this.mailTo = mailTo;
+    }
+
+    public String getMailCc() {
+        return mailCc;
+    }
+
+    public void setMailCc(String mailCc) {
+        this.mailCc = mailCc;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getStrStatus() {
+        return strStatus;
+    }
+
+    public void setStrStatus(String strStatus) {
+        this.strStatus = strStatus;
+    }
+
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public String getStrDateCreated() {
+        return strDateCreated;
+    }
+
+    public void setStrDateCreated(String strDateCreated) {
+        this.strDateCreated = strDateCreated;
+    }
+
+    public int getIdChanged() {
+        return idChanged;
+    }
+
+    public void setIdChanged(int idChanged) {
+        this.idChanged = idChanged;
+    }
+
+    public String getDateChanged() {
+        return dateChanged;
+    }
+
+    public void setDateChanged(String dateChanged) {
+        this.dateChanged = dateChanged;
+    }
+
+    public String getStrDateChanged() {
+        return strDateChanged;
+    }
+
+    public void setStrDateChanged(String strDateChanged) {
+        this.strDateChanged = strDateChanged;
+    }
+
+    public int getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(int regionId) {
+        this.regionId = regionId;
+    }
+
+    public String getParentPcCode() {
+        return parentPcCode;
+    }
+
+    public void setParentPcCode(String parentPcCode) {
+        this.parentPcCode = parentPcCode;
+    }
+
+    public String getCardPrefix() {
+        return cardPrefix;
+    }
+
+    public void setCardPrefix(String cardPrefix) {
+        this.cardPrefix = cardPrefix;
+    }
 }
