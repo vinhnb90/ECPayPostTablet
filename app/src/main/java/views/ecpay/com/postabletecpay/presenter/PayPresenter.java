@@ -37,6 +37,7 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.PARTNER_CODE_DE
 import static views.ecpay.com.postabletecpay.util.commons.Common.PROVIDER_DEFAULT;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_SPACE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT;
+import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
 import static views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection.ERROR_OCCUR;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.PAGE_INCREMENT;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.ROWS_ON_PAGE;
@@ -100,6 +101,8 @@ public class PayPresenter implements IPayPresenter {
         if (typeSearch == null)
             return;
 
+        mIPayView.showRecyclerFragment();
+
         this.mTypeSearch = typeSearch;
         List<PayAdapter.PayEntityAdapter> fitter = new ArrayList<>();
         int indexBegin = 0;
@@ -119,6 +122,11 @@ public class PayPresenter implements IPayPresenter {
                 indexEnd = mAdapterList.size();
             for (; indexBegin < indexEnd; indexBegin++)
                 fitter.add(mAdapterList.get(indexBegin));
+
+            if (fitter.size() == ZERO) {
+                mIPayView.showTextNoData();
+                return;
+            }
         } else {
             if (pageIndex > totalPage)
                 return;
@@ -661,7 +669,6 @@ public class PayPresenter implements IPayPresenter {
         @Override
         public void onPost(SearchOnlineResponse response) {
             if (response == null) {
-                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return;
             }
 
@@ -793,7 +800,6 @@ public class PayPresenter implements IPayPresenter {
         @Override
         public void onPost(CheckTrainOnlineResponse response) {
             if (response == null) {
-                mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return;
             }
 
@@ -878,7 +884,6 @@ public class PayPresenter implements IPayPresenter {
         @Override
         public void onPost(DeleteBillOnlineRespone response) {
             if (response == null) {
-                mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return;
             }
 

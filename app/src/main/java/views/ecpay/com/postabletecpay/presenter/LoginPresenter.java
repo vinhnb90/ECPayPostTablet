@@ -240,6 +240,9 @@ public class LoginPresenter implements ILoginPresenter {
 
         @Override
         public void onPost(LoginResponseReponse response) {
+            if (response == null)
+                return;
+
             mILoginView.hidePbarLogin();
 
             if (response == null) {

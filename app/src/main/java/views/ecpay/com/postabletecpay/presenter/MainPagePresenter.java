@@ -44,7 +44,7 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.TAG;
  * Created by VinhNB on 5/23/2017.
  */
 
-public class MainPagePresenter implements IMainPagePresenter{
+public class MainPagePresenter implements IMainPagePresenter {
     private IMainPageView iMainPageView;
     private MainPageModel mainPageModel;
     private SharePrefManager mSharedPrefLogin;
@@ -180,6 +180,9 @@ public class MainPagePresenter implements IMainPagePresenter{
 
         @Override
         public void onPost(ListEVNReponse response) {
+            if (response == null)
+                return;
+
             try {
                 GsonBuilder gsonBuilder = new GsonBuilder();
                 Gson gson = gsonBuilder.create();
@@ -187,9 +190,9 @@ public class MainPagePresenter implements IMainPagePresenter{
                 ListEvnPCResponse listEvnPCResponse;
                 String dataEvnPC = response.getBodyListEVNResponse().getListEvnPCLoginResponse();
                 JSONArray jaEvnPC = new JSONArray(dataEvnPC);
-                for (int i = 0; i < jaEvnPC.length(); i++){
+                for (int i = 0; i < jaEvnPC.length(); i++) {
                     listEvnPCResponse = gson.fromJson(jaEvnPC.getString(i), ListEvnPCResponse.class);
-                    if(mainPageModel.deleteAllPC() != -1) {
+                    if (mainPageModel.deleteAllPC() != -1) {
                         mainPageModel.insertEvnPC(listEvnPCResponse);
                     }
                 }
@@ -198,14 +201,14 @@ public class MainPagePresenter implements IMainPagePresenter{
                 String dataBookCmis = response.getBodyListEVNResponse().getListBookCmissResponse();
                 JSONArray jaBookCmis = new JSONArray(dataBookCmis);
 //                if(mainPageModel.deleteAllBookCmis() != -1) {
-                    for (int i = 0; i < jaBookCmis.length(); i++){
-                        listBookCmisResponse = gson.fromJson(jaBookCmis.getString(i), ListBookCmisResponse.class);
-                        if(mainPageModel.checkBookCmisExist(listBookCmisResponse.getBookCmis()) == 0) {
-                            mainPageModel.insertBookCmis(listBookCmisResponse);
-                        }
+                for (int i = 0; i < jaBookCmis.length(); i++) {
+                    listBookCmisResponse = gson.fromJson(jaBookCmis.getString(i), ListBookCmisResponse.class);
+                    if (mainPageModel.checkBookCmisExist(listBookCmisResponse.getBookCmis()) == 0) {
+                        mainPageModel.insertBookCmis(listBookCmisResponse);
                     }
+                }
 //                }
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 iMainPageView.showTextMessage(ex.getMessage());
             }
         }
@@ -282,7 +285,7 @@ public class MainPagePresenter implements IMainPagePresenter{
         configInfo.setSignatureEncrypted(signatureEncrypted);
 
         Cursor c = mainPageModel.getAllBookCmis();
-        if(c.moveToFirst()) {
+        if (c.moveToFirst()) {
             do {
                 bookCmis = c.getString(0);
 
@@ -401,11 +404,11 @@ public class MainPagePresenter implements IMainPagePresenter{
         configInfo.setSignatureEncrypted(signatureEncrypted);
 
         Cursor c = mainPageModel.getAllBookCmis();
-        if(c.moveToFirst()) {
+        if (c.moveToFirst()) {
             do {
                 bookCmis = c.getString(0);
                 File fileBookCmis = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + ".zip");
-                if(fileBookCmis.exists()) {
+                if (fileBookCmis.exists()) {
                     String jsonRequestData = SoapAPI.getJsonRequestSynData(
                             configInfo.getAGENT(),
                             configInfo.getAgentEncypted(),
@@ -475,18 +478,21 @@ public class MainPagePresenter implements IMainPagePresenter{
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onPost(ListDataZipResponse response) {
+            if (response == null)
+                return;
+
             String sData = response.getBodyListDataResponse().getFile_data();
-            if(sData != null && !sData.isEmpty()) {
+            if (sData != null && !sData.isEmpty()) {
                 byte[] zipByte = org.apache.commons.codec.binary.Base64.decodeBase64(sData.getBytes());
 
                 try {
                     File file = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + ".zip");
                     Common.writeBytesToFile(file, zipByte);
-                    if(file.exists()) {
-                        File fileText = new File(Common.PATH_FOLDER_DOWNLOAD,"full.txt");
-                        if(fileText.exists())
+                    if (file.exists()) {
+                        File fileText = new File(Common.PATH_FOLDER_DOWNLOAD, "full.txt");
+                        if (fileText.exists())
                             fileText.delete();
-                        if(Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + ".zip")) {
+                        if (Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + ".zip")) {
                             StringBuilder text = new StringBuilder();
                             try {
                                 BufferedReader br = new BufferedReader(new FileReader(fileText));
@@ -502,22 +508,21 @@ public class MainPagePresenter implements IMainPagePresenter{
                                 GsonBuilder gsonBuilder = new GsonBuilder();
                                 Gson gson = gsonBuilder.create();
                                 FileGenResponse fileGenResponse = gson.fromJson(ja.toString(), FileGenResponse.class);
-                                for(ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
-                                    if(mainPageModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0){
-                                        if(mainPageModel.insertCustomer(listCustomerResponse) != -1) {
+                                for (ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
+                                    if (mainPageModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
+                                        if (mainPageModel.insertCustomer(listCustomerResponse) != -1) {
                                             Log.i("INFO", "TEST");
                                         }
                                     }
                                 }
-                                for(ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
-                                    if(mainPageModel.checkBillExist(Integer.parseInt(listBillResponse.getBodyBillResponse().getBillId())) == 0) {
-                                        if(mainPageModel.insertBill(listBillResponse) != -1) {
+                                for (ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
+                                    if (mainPageModel.checkBillExist(Integer.parseInt(listBillResponse.getBodyBillResponse().getBillId())) == 0) {
+                                        if (mainPageModel.insertBill(listBillResponse) != -1) {
                                             Log.i("INFO", "TEST");
                                         }
                                     }
                                 }
-                            }
-                            catch (IOException e) {
+                            } catch (IOException e) {
                                 e.printStackTrace();
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -550,6 +555,9 @@ public class MainPagePresenter implements IMainPagePresenter{
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onPost(ListDataResponse response) {
+            if (response == null)
+                return;
+
 //            String sData = response.getBodyListDataResponse().getFile_data();
 //            if(sData != null && !sData.isEmpty()) {
 //                byte[] zipByte = org.apache.commons.codec.binary.Base64.decodeBase64(sData.getBytes());

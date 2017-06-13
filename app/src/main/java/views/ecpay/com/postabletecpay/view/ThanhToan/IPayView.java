@@ -60,4 +60,8 @@ public interface IPayView extends ICommonView {
     void visibleButtonDeleteDialog(PayFragment.VISIBLE_BUTTON_DELETE_DIALOG type);
 
     void enableReasonEditText();
+
+    void showRecyclerFragment();
+
+    void showTextNoData();
 }

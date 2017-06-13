@@ -71,6 +71,9 @@ public class PayFragment extends Fragment implements
     @BindView(R.id.rv_frag_thanh_toan_customer)
     RecyclerView rvKH;
     @Nullable
+    @BindView(R.id.tv_frag_thanh_toan_no_data)
+    TextView tvNoData;
+    @Nullable
     @BindView(R.id.tabs_frag_thanh_toan)
     TabLayout tabLayout;
     @Nullable
@@ -476,12 +479,8 @@ public class PayFragment extends Fragment implements
         } else
             setEnablePreNext(3);
 
-        //set adapter
-//        if (payAdapter == null) {
         payAdapter = new PayAdapter(this.getContext(), this, adapterList);
         rvKH.setAdapter(payAdapter);
-       /* } else
-            payAdapter.refreshData(adapterList);*/
         rvKH.invalidate();
 
         //if isSeachOnline
@@ -782,6 +781,23 @@ public class PayFragment extends Fragment implements
             return;
 
         etReasonDeleteBillDeleteDialog.setEnabled(true);
+    }
+
+    @Override
+    public void showRecyclerFragment() {
+        if (rvKH == null || tvNoData == null)
+            return;
+        rvKH.setVisibility(View.VISIBLE);
+        tvNoData.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showTextNoData() {
+        if (rvKH == null || tvNoData == null)
+            return;
+        Common.runAnimationClickViewScale(tvNoData, R.anim.scale_view_pull, Common.TIME_DELAY_ANIM);
+        rvKH.setVisibility(View.GONE);
+        tvNoData.setVisibility(View.VISIBLE);
     }
 
     private boolean isHasNullViewDeleteBillOnlineDialog() {
