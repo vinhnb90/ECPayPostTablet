@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -187,7 +188,7 @@ public class PayFragment extends Fragment implements
     private View rootView;
     private Dialog dialogPayingOnline, dialogDeleteBillOnline;
 
-    public enum VISIBLE_BUTTON_DELETE_DIALOG{
+    public enum VISIBLE_BUTTON_DELETE_DIALOG {
         SHOW_ALL(0),
         HIDE_ALL(1),
         HIDE_CANCEL(2),
@@ -199,7 +200,8 @@ public class PayFragment extends Fragment implements
             this.value = value;
         }
     }
-    public  enum TYPE_PAYING_PROCESS {
+
+    public enum TYPE_PAYING_PROCESS {
         HIDE_ALL(1, "Hide all"),
         IS_PAYING(2, "Show pbar && is paying"),
         FINISH_PAYED(3, "Show pbar && finish payed"),
@@ -247,6 +249,7 @@ public class PayFragment extends Fragment implements
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         rootView = inflater.inflate(R.layout.fragment_thanh_toan, container, false);
         unbinder = ButterKnife.bind(this, rootView);
 
@@ -372,7 +375,7 @@ public class PayFragment extends Fragment implements
     @OnPageChange(R.id.vpage_frag_thanh_toan)
     public void onPageSelected(int position) {
         mPageIndex = FIRST_PAGE_INDEX;
-        Common.TYPE_SEARCH typeSearch = Common.TYPE_SEARCH.findMessage(position);
+        typeSearch = Common.TYPE_SEARCH.findMessage(position);
 //        boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
 //        if (isSeachOnline)
 //            return;
@@ -424,6 +427,8 @@ public class PayFragment extends Fragment implements
 //                }
 //            });
         } else {
+            if (typeSearch != Common.TYPE_SEARCH.ALL)
+                mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), isSeachOnline);
             hideSearchOnlineProcess();
         }
     }
@@ -438,7 +443,8 @@ public class PayFragment extends Fragment implements
 
     //endregion
 
-    @Optional @OnTextChanged(R.id.et_dialog_delete_bill_online_reason)
+    @Optional
+    @OnTextChanged(R.id.et_dialog_delete_bill_online_reason)
     public void onTextChangedReasonDeleteBill(CharSequence s, int start, int before, int count) {
         hideAllProcessDeleteBillOnline();
     }
@@ -735,33 +741,29 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void visibleButtonDeleteDialog(PayFragment.VISIBLE_BUTTON_DELETE_DIALOG type) {
-        if(isHasNullViewDeleteBillOnlineDialog())
+        if (isHasNullViewDeleteBillOnlineDialog())
             return;
         btnContinuedDeleteDialog.setEnabled(true);
 //        btnIgnoreDeleteDialog.setEnabled(true);
 
         etReasonDeleteBillDeleteDialog.setEnabled(true);
 
-        if(type == VISIBLE_BUTTON_DELETE_DIALOG.HIDE_ALL)
-        {
+        if (type == VISIBLE_BUTTON_DELETE_DIALOG.HIDE_ALL) {
             btnContinuedDeleteDialog.setEnabled(false);
             etReasonDeleteBillDeleteDialog.setEnabled(false);
         }
 
-        if(type == VISIBLE_BUTTON_DELETE_DIALOG.HIDE_CANCEL)
-        {
+        if (type == VISIBLE_BUTTON_DELETE_DIALOG.HIDE_CANCEL) {
             btnContinuedDeleteDialog.setEnabled(false);
             etReasonDeleteBillDeleteDialog.setEnabled(false);
         }
 
-        if(type == VISIBLE_BUTTON_DELETE_DIALOG.HIDE_COUNTINUE)
-        {
+        if (type == VISIBLE_BUTTON_DELETE_DIALOG.HIDE_COUNTINUE) {
             btnContinuedDeleteDialog.setEnabled(false);
-            etReasonDeleteBillDeleteDialog.setEnabled(true);
+            etReasonDeleteBillDeleteDialog.setEnabled(false);
         }
 
-        if(type == VISIBLE_BUTTON_DELETE_DIALOG.SHOW_ALL)
-        {
+        if (type == VISIBLE_BUTTON_DELETE_DIALOG.SHOW_ALL) {
             btnContinuedDeleteDialog.setEnabled(true);
             etReasonDeleteBillDeleteDialog.setEnabled(true);
         }
@@ -769,7 +771,7 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void enableReasonEditText() {
-        if(isHasNullViewDeleteBillOnlineDialog())
+        if (isHasNullViewDeleteBillOnlineDialog())
             return;
 
         etReasonDeleteBillDeleteDialog.setEnabled(true);
@@ -837,7 +839,7 @@ public class PayFragment extends Fragment implements
         //show pbar && is paying
         if (type == TYPE_PAYING_PROCESS.IS_PAYING) {
             rvBillOnline.setVisibility(View.VISIBLE);
-//            mIPayPresenter.refreshTextCountBillPayedSuccess();
+            mIPayPresenter.refreshTextCountBillPayedSuccess();
             pbarDialogBilling.setVisibility(View.VISIBLE);
             tvMessageDialog.setVisibility(View.GONE);
 

@@ -576,7 +576,7 @@ public class Common {
         eSOURCE_OTHER("SOURCE_OTHER", "Hóa đơn được thanh toán bởi đối tác khác"),
         eTIMEOUT("TIMEOUT", "Timeout-Giao dịch nghi ngờ"),
         eERROR("ERROR", "Thanh toán lỗi"),
-        eREVERT("BILLING", "Hủy hóa đơn"),
+        eREVERT("REVERT", "Hủy hóa đơn"),
         e2006("2006", "Không tìm thấy giao dịch tương ứng"),
         e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ");
 
@@ -605,6 +605,37 @@ public class Common {
             return CODE_REPONSE_API_CHECK_TRAINS.e9999;
         }
     }
+
+    public enum CODE_REPONSE_TRANSACTION_CANCELLATION {
+        e000("000", "Thành công"),
+        e2006("2006", "Không tìm thấy giao dịch tương ứng"),
+        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ");
+
+        CODE_REPONSE_TRANSACTION_CANCELLATION(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+        private String message;
+
+        public static CODE_REPONSE_TRANSACTION_CANCELLATION findCodeMessage(String code) {
+            for (CODE_REPONSE_TRANSACTION_CANCELLATION v : values()) {
+                if (v.getCode().equals(code)) {
+                    return v;
+                }
+            }
+            return CODE_REPONSE_TRANSACTION_CANCELLATION.e9999;
+        }
+    }
     //endregion
 
     //region info communication server
@@ -619,7 +650,8 @@ public class Common {
         SYNC_DATA,
         CUSTOMER_BILL,
         GET_FILE_GEN,
-        CHECK_TRANS;
+        CHECK_TRANS,
+        TRANSACTION_CANCELLATION;
 
         @Override
         public String toString() {
@@ -639,6 +671,8 @@ public class Common {
                 return "GET-FILE-GEN";
             if (this == CHECK_TRANS)
                 return "CHECK-TRANS";
+            if (this == TRANSACTION_CANCELLATION)
+                return "TRANSACTION-CANCELLATION";
             return super.toString();
         }
     }

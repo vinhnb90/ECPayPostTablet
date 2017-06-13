@@ -85,7 +85,10 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             "`nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, " +
             "`taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, " +
             "`billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `requestDate` TEXT,`edongKey` TEXT NOT NULL, " +
-            "`isChecked` INTEGER default 0)";
+            "`isChecked` INTEGER default 0," +
+            "`traceNumber` INTERGER " +
+            "`statusCancelBillOnline` INTERGER" +
+            "`causeCancelBillOnline` TEXT)";
 
     private String CREATE_TABLE_LICH_SU_TTOAN = "CREATE TABLE " + TABLE_NAME_LICH_SU_TTOAN + "(ID INTEGER AUTO INCREMENT, " +
             "SERI_HDON INTEGER, " + "MA_KHANG TEXT, " + "MA_THE TEXT, " + "TEN_KHANG TEXT, " + "DIA_CHI TEXT, " + "THANG_TTOAN DATE, " +
@@ -345,32 +348,48 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
     public List<Customer> selectAllCustomerFitterBy(String edong, Common.TYPE_SEARCH typeSearch, String infoSearch) {
+        List<Customer> customerList = new ArrayList<>();
+
+        boolean fail = TextUtils.isEmpty(edong) || TextUtils.isEmpty(infoSearch) && typeSearch.getPosition() != Common.TYPE_SEARCH.ALL.getPosition();
+        if (fail)
+            return customerList;
+
         String query = null;
         switch (typeSearch.getPosition()) {
             case 0:
                 query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "'";
                 break;
             case 1:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and code ='" + infoSearch + "'";
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and code like '%" + infoSearch + "%'";
                 break;
             case 2:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and name ='" + infoSearch + "'";
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and name like '%" + infoSearch + "%'";
                 break;
             case 3:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and phoneByevn ='" + infoSearch + "'";
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and phoneByevn like '%" + infoSearch + "%'";
                 break;
             case 4:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and name ='" + infoSearch + "'";
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and address like '%" + infoSearch + "%'";
                 break;
             case 5:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and bookCmis ='" + infoSearch + "'";
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and bookCmis like '%" + infoSearch + "%'";
                 break;
             case 6:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and road ='" + infoSearch + "'";
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and road like '%" + infoSearch + "%'";
                 break;
+
+          /*  case 7:
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong
+                        + "' and code like '%" + infoSearch
+                        + "%' or name like '%" + infoSearch
+                        + "%' or phoneByevn like '%" + infoSearch
+                        + "%' or address like '%" + infoSearch
+                        + "%' or bookCmis like '%" + infoSearch
+                        + "%' or road like '%" + infoSearch
+                        + "%' ";
+                break;*/
         }
 
-        List<Customer> customerList = new ArrayList<>();
         database = this.getWritableDatabase();
         Cursor mCursor = database.rawQuery(query, null);
 
@@ -406,7 +425,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return customerList;
     }
 
-    public List<PayAdapter.BillEntityAdapter> selectInfoBillOfCustomer(String edong, String code) {
+    public List<PayAdapter.BillEntityAdapter> selectInfoBillOfCustomerToRecycler(String edong, String code) {
         List<PayAdapter.BillEntityAdapter> billList = new ArrayList<>();
 
         database = this.getReadableDatabase();
@@ -733,7 +752,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, customerCode, String.valueOf(billId)});
     }
 
-    public int countMoneyAllBillIsCheckedWithStatusPay(String edong, String customerCode, Long billId, String dateNow) {
+    public int countMoneyAllBillIsCheckedWithStatusPay(String edong, String customerCode, Long billId, String dateNow, Long traceNumber) {
         boolean failInput =
                 TextUtils.isEmpty(edong) ||
                         TextUtils.isEmpty(customerCode) ||
@@ -744,6 +763,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         database = this.getReadableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("requestDate", dateNow);
+        contentValues.put("traceNumber", traceNumber);
         return database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, customerCode, String.valueOf(billId)});
     }
 
@@ -1028,6 +1048,16 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             return c.getString(0);
         }
         return "";
+    }
+
+    public Long SelectTraceNumberBill(String edong, String code, Long billId) {
+        database = this.getReadableDatabase();
+        String query = "SELECT traceNumber FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and billId = " + billId;
+        Cursor mCursor = database.rawQuery(query, null);
+        if (mCursor.moveToFirst())
+            return longConvertNull(mCursor.getLong(mCursor.getColumnIndex("traceNumber")));
+
+        return 0l;
     }
     //endregion
 

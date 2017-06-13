@@ -188,7 +188,7 @@ public class PayModel extends CommonModel {
     }
 
     public List<PayAdapter.BillEntityAdapter> getAllBillOfCustomer(String edong, String code) {
-        return sqLiteConnection.selectInfoBillOfCustomer(edong, code);
+        return sqLiteConnection.selectInfoBillOfCustomerToRecycler(edong, code);
     }
 
     public int writeSQLiteCustomerTableFromSearchOnline(String edong, CustomerInsideBody customerResponse) {
@@ -276,7 +276,7 @@ public class PayModel extends CommonModel {
         return sqLiteConnection.countMoneyAllBillIsCheckedWithStatusPay(edong, statusBilling);
     }
 
-    public void updateBillRequestDateBill(String edong, String customerCode, Long billId, String dateNow) {
+    public void updateBillRequestDateBill(String edong, String customerCode, Long billId, String dateNow, Long traceNumber) {
         boolean failInput =
                 TextUtils.isEmpty(edong) ||
                         TextUtils.isEmpty(customerCode) ||
@@ -284,6 +284,17 @@ public class PayModel extends CommonModel {
         if (failInput)
             return;
 
-        sqLiteConnection.countMoneyAllBillIsCheckedWithStatusPay(edong, customerCode, billId, dateNow);
+        sqLiteConnection.countMoneyAllBillIsCheckedWithStatusPay(edong, customerCode, billId, dateNow, traceNumber);
+    }
+
+    public Long getTraceNumberBill(String edong, String code, Long billId) {
+        boolean failInput =
+                TextUtils.isEmpty(edong) ||
+                        TextUtils.isEmpty(code);
+
+        if (failInput)
+            return null;
+
+        return sqLiteConnection.SelectTraceNumberBill(edong, code, billId);
     }
 }

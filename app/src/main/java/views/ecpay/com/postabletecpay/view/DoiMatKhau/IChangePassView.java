@@ -12,4 +12,6 @@ public interface IChangePassView extends ICommonView {
 
     void showText(String message);
     void hideText();
+
+    void showInfo(String name, String mEdong);
 }

@@ -7,6 +7,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,7 +25,8 @@ import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 
-public class MainActivity extends AppCompatActivity implements MainPageFragment.OnFragmentInteractionListener,
+public class MainActivity extends AppCompatActivity implements
+        MainPageFragment.OnFragmentInteractionListener,
         PayAdapter.OnInterationBillInsidePayAdapter,
         PayBillsDialogAdapter.OnInteractionBillDialogRecycler,
         PayFragment.OnFragmentInteractionListener,
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements MainPageFragment.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -93,18 +96,6 @@ public class MainActivity extends AppCompatActivity implements MainPageFragment.
         navigation = (BottomNavigationView) findViewById(R.id.navigation_ac_main);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
-/*
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //check fragment
-        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
-            return;
-        }
-
-        ((PayFragment)fragmentVisibling).bindViewAgain();
-    }*/
 
     private void getBundle() {
         mEdong = getIntent().getExtras().getString(KEY_EDONG, "");

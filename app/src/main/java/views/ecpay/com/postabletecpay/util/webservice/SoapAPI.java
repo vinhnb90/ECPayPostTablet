@@ -43,6 +43,10 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityDataZip.BodyLi
 import views.ecpay.com.postabletecpay.util.entities.request.EntityDataZip.FooterListDataZipRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityDataZip.HeaderListDataZipRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityDataZip.ListDataZipRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityDeleteBillOnline.BodyDeleteBillOnlineRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityDeleteBillOnline.DeleteBillOnlineRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityDeleteBillOnline.FooterDeleteBillOnlineRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityDeleteBillOnline.HeaderDeleteBillOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityEVN.BodyEVNRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityEVN.EVNRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityEVN.FooterEVNRequest;
@@ -58,6 +62,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.Ch
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCheckTrainOnline.CheckTrainOnlineResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityDataZip.ListDataZipResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityDeleteBillOnline.DeleteBillOnlineRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEVNReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
@@ -161,6 +166,10 @@ public class SoapAPI {
         bodyChangePassRequest.setMac(mac);
         bodyChangePassRequest.setDiskDrive(diskDriver);
         bodyChangePassRequest.setSignature(signatureEncrypted);
+        bodyChangePassRequest.setPinLogin(pinLogin);
+        bodyChangePassRequest.setSession(session);
+        bodyChangePassRequest.setNewPin(passNew);
+        bodyChangePassRequest.setRetryPin(passRetype);
 
         FooterChangePassRequest footerChangePassRequest = new FooterChangePassRequest();
         footerChangePassRequest.setAccountIdt(accountId);
@@ -171,7 +180,6 @@ public class SoapAPI {
         changePassRequest.setFooterChangePassRequest(footerChangePassRequest);
 
 
-
         final GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ChangePassRequest.class, new ChangePassRequestAdapter());
         gsonBuilder.setPrettyPrinting();
@@ -180,8 +188,8 @@ public class SoapAPI {
         //Serialised
         final String jsonResult = gson.toJson(changePassRequest);
 
-        //Test Deserialised
-        final ChangePassRequest parsedRequest = gson.fromJson(jsonResult, ChangePassRequest.class);
+
+//        String jsonResult = new GsonBuilder().setPrettyPrinting().create().toJson(changePassRequest);
 
         return jsonResult;
 
@@ -529,6 +537,63 @@ public class SoapAPI {
         return jsonResult;
     }
 
+    public static String getJsonRequestTransationCancellation(String agent, String agentEncypted, String commandId,
+                                                              long auditNumber, String macAdressHexValue, String diskDriver,
+                                                              String signatureEncrypted, Long amount, String code, Long billId,
+                                                              String requestDate, Long traceNumber, String reasonDeleteBill, String accountId) {
+        boolean hasNull =
+                TextUtils.isEmpty(agent) ||
+                        TextUtils.isEmpty(agentEncypted) ||
+                        TextUtils.isEmpty(commandId) ||
+                        TextUtils.isEmpty(macAdressHexValue) ||
+                        TextUtils.isEmpty(diskDriver) ||
+                        TextUtils.isEmpty(signatureEncrypted) ||
+                        TextUtils.isEmpty(code) ||
+                        TextUtils.isEmpty(requestDate) ||
+                        TextUtils.isEmpty(reasonDeleteBill) ||
+                        TextUtils.isEmpty(accountId);
+
+        if (hasNull)
+            return null;
+
+
+        HeaderDeleteBillOnlineRequest headerDeleteBillOnlineRequest = new HeaderDeleteBillOnlineRequest();
+        headerDeleteBillOnlineRequest.setAgent(agent);
+        headerDeleteBillOnlineRequest.setPassword(agentEncypted);
+        headerDeleteBillOnlineRequest.setCommandId(commandId);
+
+        BodyDeleteBillOnlineRequest bodyDeleteBillOnlineRequest = new BodyDeleteBillOnlineRequest();
+        bodyDeleteBillOnlineRequest.setAuditNumber(auditNumber);
+        bodyDeleteBillOnlineRequest.setMac(macAdressHexValue);
+        bodyDeleteBillOnlineRequest.setDiskDrive(diskDriver);
+        bodyDeleteBillOnlineRequest.setSignature(signatureEncrypted);
+
+        bodyDeleteBillOnlineRequest.setAmount(amount);
+        bodyDeleteBillOnlineRequest.setCustomerCode(code);
+        bodyDeleteBillOnlineRequest.setBillId(billId);
+        bodyDeleteBillOnlineRequest.setBillingDate(requestDate);
+        bodyDeleteBillOnlineRequest.setTraceNumber(traceNumber);
+        bodyDeleteBillOnlineRequest.setReason(reasonDeleteBill);
+
+        FooterDeleteBillOnlineRequest footerDeleteBillOnlineRequest = new FooterDeleteBillOnlineRequest();
+        footerDeleteBillOnlineRequest.setAccountIdt(accountId);
+
+        final DeleteBillOnlineRequest deleteBillOnlineRequest = new DeleteBillOnlineRequest();
+        deleteBillOnlineRequest.setHeader(headerDeleteBillOnlineRequest);
+        deleteBillOnlineRequest.setBody(bodyDeleteBillOnlineRequest);
+        deleteBillOnlineRequest.setFooter(footerDeleteBillOnlineRequest);
+
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        Type type = new TypeToken<DeleteBillOnlineRequest>() {
+        }.getType();
+        final Gson gson = gsonBuilder.create();
+
+        //Serialised
+        final String jsonResult = gson.toJson(deleteBillOnlineRequest, type);
+
+        return jsonResult;
+    }
+
     //endregion
 
     //region class api soap
@@ -670,27 +735,26 @@ public class SoapAPI {
                 ht.call(SOAP_ACTION, envelope);
                 response = (SoapPrimitive) envelope.getResponse();
             } catch (Exception e) {
-                e.printStackTrace();
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "Không nhận được dữ liệu");
+                return null;
             }
 
             if (response == null) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                return null;
             }
 
             String data = response.toString();
-            if (data.isEmpty())
+            if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return null;
+            }
 
             ChangePassResponse changePassResponse = null;
-
             final GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder.registerTypeAdapter(ChangePassRequest.class, new ChangePassResponse());
-            gsonBuilder.setPrettyPrinting();
             final Gson gson = gsonBuilder.create();
-
-            //end Tests
-
             changePassResponse = gson.fromJson(data, ChangePassResponse.class);
 
             return changePassResponse;
@@ -700,15 +764,17 @@ public class SoapAPI {
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             String message = values[0];
-            if (isEndCallSoap)
-                callBack.onUpdate(message);
+            isEndCallSoap = true;
+            callBack.onUpdate(message);
         }
 
         @Override
         protected void onPostExecute(ChangePassResponse changePassResponse) {
             super.onPostExecute(changePassResponse);
-            if (!isEndCallSoap)
-                callBack.onPost(changePassResponse);
+            if (changePassResponse == null)
+                return;
+            isEndCallSoap = true;
+            callBack.onPost(changePassResponse);
         }
 
         public static abstract class AsyncSoapChangePassCallBack {
@@ -997,9 +1063,8 @@ public class SoapAPI {
     public static class AsyncSoapCheckTrainOnline extends AsyncTask<String, String, CheckTrainOnlineResponse> {
 
         //request action to eStore
-        private Common.TYPE_SEARCH typeSearch;
         private String edong;
-        private String infoSearch;
+        private String reasonDeleteBill;
         private static final String METHOD_NAME = "execute";
         private static final String NAMESPACE = "http://services.ecpay.org/";
         private static final String URL = ENDPOINT_URL;
@@ -1009,9 +1074,10 @@ public class SoapAPI {
         private boolean isEndCallSoap = false;
         private CheckTrainOnlineResponse checkTrainOnlineResponse;
 
-        public AsyncSoapCheckTrainOnline(String edong, AsyncSoapCheckTrainOnlineCallBack callBack) throws Exception {
+        public AsyncSoapCheckTrainOnline(String edong, AsyncSoapCheckTrainOnlineCallBack callBack, String reasonDeleteBill) throws Exception {
             this.callBack = callBack;
             this.edong = edong;
+            this.reasonDeleteBill = reasonDeleteBill;
         }
 
         @Override
@@ -1098,16 +1164,12 @@ public class SoapAPI {
             isEndCallSoap = endCallSoap;
         }
 
-        public Common.TYPE_SEARCH getTypeSearch() {
-            return typeSearch;
-        }
-
         public String getEdong() {
             return edong;
         }
 
-        public String getInfoSearch() {
-            return infoSearch;
+        public String getReasonDeleteBill() {
+            return reasonDeleteBill;
         }
 
         public CheckTrainOnlineResponse getCheckTrainOnlineResponse() {
@@ -1115,12 +1177,10 @@ public class SoapAPI {
         }
     }
 
-    public static class AsyncSoapDeleteBillOnline extends AsyncTask<String, String, CheckTrainOnlineResponse> {
+    public static class AsyncSoapDeleteBillOnline extends AsyncTask<String, String, DeleteBillOnlineRespone> {
 
         //request action to eStore
-        private Common.TYPE_SEARCH typeSearch;
         private String edong;
-        private String infoSearch;
         private static final String METHOD_NAME = "execute";
         private static final String NAMESPACE = "http://services.ecpay.org/";
         private static final String URL = ENDPOINT_URL;
@@ -1128,22 +1188,23 @@ public class SoapAPI {
         private static final String METHOD_PARAM = "message";
         private AsyncSoapDeleteBillOnlineCallBack callBack;
         private boolean isEndCallSoap = false;
-        private CheckTrainOnlineResponse checkTrainOnlineResponse;
+        private DeleteBillOnlineRespone deleteBillOnlineRespone;
 
         public AsyncSoapDeleteBillOnline(String edong, AsyncSoapDeleteBillOnlineCallBack callBack) throws Exception {
             this.callBack = callBack;
             this.edong = edong;
+
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            checkTrainOnlineResponse = null;
+            deleteBillOnlineRespone = null;
             callBack.onPre(this);
         }
 
         @Override
-        protected CheckTrainOnlineResponse doInBackground(String... jsons) {
+        protected DeleteBillOnlineRespone doInBackground(String... jsons) {
             String json = jsons[0];
             Log.d("here", "doInBackground: " + json);
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
@@ -1175,8 +1236,8 @@ public class SoapAPI {
                 return null;
             }
 
-            checkTrainOnlineResponse = new Gson().fromJson(data, CheckTrainOnlineResponse.class);
-            return checkTrainOnlineResponse;
+            deleteBillOnlineRespone = new Gson().fromJson(data, DeleteBillOnlineRespone.class);
+            return deleteBillOnlineRespone;
         }
 
         @Override
@@ -1188,27 +1249,27 @@ public class SoapAPI {
         }
 
         @Override
-        protected void onPostExecute(CheckTrainOnlineResponse checkTrainOnlineResponse) {
-            super.onPostExecute(checkTrainOnlineResponse);
+        protected void onPostExecute(DeleteBillOnlineRespone deleteBillOnlineRespone) {
+            super.onPostExecute(deleteBillOnlineRespone);
             isEndCallSoap = true;
-            callBack.onPost(checkTrainOnlineResponse);
+            callBack.onPost(deleteBillOnlineRespone);
         }
 
         public static abstract class AsyncSoapDeleteBillOnlineCallBack {
-            public abstract void onPre(final AsyncSoapDeleteBillOnline searchOnlineResponse);
+            public abstract void onPre(final AsyncSoapDeleteBillOnline soapDeleteBillOnline);
 
             public abstract void onUpdate(String message);
 
-            public abstract void onPost(CheckTrainOnlineResponse response);
+            public abstract void onPost(DeleteBillOnlineRespone response);
 
-            public abstract void onTimeOut(final AsyncSoapDeleteBillOnline searchOnlineResponse);
+            public abstract void onTimeOut(final AsyncSoapDeleteBillOnline soapDeleteBillOnline);
         }
 
-        public void callCountdown(final AsyncSoapDeleteBillOnline searchOnlineResponse) {
-            if (searchOnlineResponse == null)
+        public void callCountdown(final AsyncSoapDeleteBillOnline soapDeleteBillOnline) {
+            if (soapDeleteBillOnline == null)
                 return;
 
-            callBack.onTimeOut(searchOnlineResponse);
+            callBack.onTimeOut(soapDeleteBillOnline);
         }
 
         public boolean isEndCallSoap() {
@@ -1219,20 +1280,13 @@ public class SoapAPI {
             isEndCallSoap = endCallSoap;
         }
 
-        public Common.TYPE_SEARCH getTypeSearch() {
-            return typeSearch;
-        }
-
         public String getEdong() {
             return edong;
         }
 
-        public String getInfoSearch() {
-            return infoSearch;
-        }
 
-        public CheckTrainOnlineResponse getCheckTrainOnlineResponse() {
-            return checkTrainOnlineResponse;
+        public DeleteBillOnlineRespone getDeleteBillOnlineRespone() {
+            return deleteBillOnlineRespone;
         }
     }
     //endregion

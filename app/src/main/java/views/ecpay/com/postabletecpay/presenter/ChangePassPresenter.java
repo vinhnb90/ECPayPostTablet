@@ -4,6 +4,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
 
 import org.ecpay.client.test.SecurityUtils;
 
@@ -11,8 +12,10 @@ import views.ecpay.com.postabletecpay.model.ChangePassModel;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
+import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
 import views.ecpay.com.postabletecpay.view.DoiMatKhau.IChangePassView;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -22,14 +25,16 @@ import static android.content.Context.MODE_PRIVATE;
  */
 
 public class ChangePassPresenter implements IChangePassPresenter {
-    public ChangePassPresenter(IChangePassView mIChangePassView) {
+
+    public ChangePassPresenter(IChangePassView mIChangePassView){
         this.mIChangePassView = mIChangePassView;
         mChangePassModel = new ChangePassModel(mIChangePassView.getContextView());
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void validateInputChangePass(String passOld, String passNew, String passRetype) {
+    public void validateInputChangePass(String edong, String passOld, String passNew, String passRetype) {
         if (passOld == null || passOld.isEmpty() || passOld.trim().equals("")) {
             mIChangePassView.showText(Common.MESSAGE_NOTIFY.CHANGE_PASS_ERR_PASS_OLD.toString());
             return;
@@ -74,13 +79,17 @@ public class ChangePassPresenter implements IChangePassPresenter {
         String pinLoginEncrypted;
         try {
             pinLoginEncrypted = SecurityUtils.tripleDesc(mIChangePassView.getContextView(), pass.trim(), configInfo.getPRIVATE_KEY().trim(), configInfo.getPUBLIC_KEY().trim());
+            passNew = passRetype = SecurityUtils.tripleDesc(mIChangePassView.getContextView(), passNew.trim(), configInfo.getPRIVATE_KEY().trim(), configInfo.getPUBLIC_KEY().trim());
         } catch (Exception e) {
             mIChangePassView.showText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
             return;
         }
 
         //create request to server
-        String session = "";
+        String session = mChangePassModel.getSessionLogin(edong);
+        if (session == null)
+            return;
+
         String jsonRequestChangePass = SoapAPI.getJsonRequestChangePass(
                 configInfo.getAGENT(),
                 configInfo.getAgentEncypted(),
@@ -133,6 +142,14 @@ public class ChangePassPresenter implements IChangePassPresenter {
         }
     }
 
+    @Override
+    public void callInfo(String mEdong) {
+        if(TextUtils.isEmpty(mEdong))
+            return;
+        Account account = mChangePassModel.getAccountInfo(mEdong);
+        mIChangePassView.showInfo(account.getName(), mEdong);
+    }
+
     private IChangePassView mIChangePassView;
     private ChangePassModel mChangePassModel;
     private SoapAPI.AsyncSoapChangePass.AsyncSoapChangePassCallBack mSoapChangePassCallBack = new SoapAPI.AsyncSoapChangePass.AsyncSoapChangePassCallBack() {
@@ -160,6 +177,8 @@ public class ChangePassPresenter implements IChangePassPresenter {
                 soapChangePass.setEndCallSoap(true);
                 soapChangePass.cancel(true);
             }
+
+            mIChangePassView.showPbar();
         }
 
         @Override
@@ -191,14 +210,13 @@ public class ChangePassPresenter implements IChangePassPresenter {
 
         @Override
         public void onTimeOut(final SoapAPI.AsyncSoapChangePass soapChangePass) {
-            soapChangePass.cancel(true);
-
             //thread call asyntask is running. must call in other thread to update UI
-            ((LoginActivity) mIChangePassView).runOnUiThread(new Runnable() {
+            ((ChangePassActivity) mIChangePassView).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     mIChangePassView.hidePbar();
                     if (!soapChangePass.isEndCallSoap()) {
+                        soapChangePass.cancel(true);
                         mIChangePassView.showText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
                     }
                 }

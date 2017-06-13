@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -29,7 +30,7 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM
  * Created by TungNV on 5/3/17.
  */
 
-public class ChangePassActivity extends ActionBarActivity implements IChangePassView{
+public class ChangePassActivity extends ActionBarActivity implements IChangePassView {
     @BindView(R.id.ibtn_frag_user_info_back)
     ImageButton ibBack;
     @BindView(R.id.tvUsername)
@@ -51,6 +52,8 @@ public class ChangePassActivity extends ActionBarActivity implements IChangePass
     @BindView(R.id.tv_ac_change_pass_message)
     TextView tvMessage;
 
+    private String mEdong;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,11 +67,16 @@ public class ChangePassActivity extends ActionBarActivity implements IChangePass
                 decorView.setSystemUiVisibility(uiOptions);
             }
 
+            mEdong = getIntent().getExtras().getString(Common.KEY_EDONG, null);
+            if (mEdong == null)
+                return;
+
             setContentView(R.layout.activity_doi_mat_khau);
             ButterKnife.bind(this);
             hideText();
             hidePbar();
             mIChangePassPresenter = new ChangePassPresenter(this);
+            mIChangePassPresenter.callInfo(mEdong);
 
         } catch (Exception ex) {
             Toast.makeText(this, ex.getMessage(), Toast.LENGTH_LONG).show();
@@ -101,7 +109,7 @@ public class ChangePassActivity extends ActionBarActivity implements IChangePass
                 String passOld = etPassOld.getText().toString();
                 String passNew = etPassNew.getText().toString();
                 String passRetype = etPassRetype.getText().toString();
-                mIChangePassPresenter.validateInputChangePass(passOld, passNew, passRetype);
+                mIChangePassPresenter.validateInputChangePass(mEdong, passOld, passNew, passRetype);
             }
         }, TIME_DELAY_ANIM);
     }
@@ -139,6 +147,16 @@ public class ChangePassActivity extends ActionBarActivity implements IChangePass
     @Override
     public void hideText() {
         tvMessage.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void showInfo(String name, String mEdong) {
+        boolean fail = TextUtils.isEmpty(name) || TextUtils.isEmpty(mEdong);
+        if (fail)
+            return;
+
+        tvUsername.setText(name);
+        tvSDT.setText(mEdong);
     }
     //endregion
 

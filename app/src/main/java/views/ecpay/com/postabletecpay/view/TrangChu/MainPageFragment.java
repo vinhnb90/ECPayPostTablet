@@ -182,7 +182,7 @@ public class MainPageFragment extends Fragment implements
                         break;
 
                     case CHANGE_PASS:
-                        startActivity(new Intent(MainPageFragment.this.getActivity(), ChangePassActivity.class));
+                        startActivity(new Intent(MainPageFragment.this.getActivity(), ChangePassActivity.class).putExtra(Common.KEY_EDONG, mEdong));
                         break;
 
                     case HELP:

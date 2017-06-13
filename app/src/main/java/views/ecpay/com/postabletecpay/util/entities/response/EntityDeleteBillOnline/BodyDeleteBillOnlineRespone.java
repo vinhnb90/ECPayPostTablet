@@ -9,7 +9,7 @@ public class BodyDeleteBillOnlineRespone implements Serializable
 
 @SerializedName("audit-number")
 @Expose
-private Integer auditNumber;
+private Long auditNumber;
 @SerializedName("disk-drive")
 @Expose
 private String diskDrive;
@@ -21,11 +21,11 @@ private String mac;
 private String signature;
 private final static long serialVersionUID = 7037756095110182669L;
 
-public Integer getAuditNumber() {
+public Long getAuditNumber() {
 return auditNumber;
 }
 
-public void setAuditNumber(Integer auditNumber) {
+public void setAuditNumber(Long auditNumber) {
 this.auditNumber = auditNumber;
 }
 

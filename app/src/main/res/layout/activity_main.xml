@@ -16,14 +16,91 @@
         app:itemBackground="@color/colorLightGray"
         app:menu="@menu/navigation"/>
 
+    <RelativeLayout
+        android:layout_above="@+id/navigation_ac_main"
+        android:id="@+id/rv_ac_main_request_pay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@color/colorTextGreen"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_ac_main_put_off_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="Thanh toán..."
+            android:textColor="@color/colorTextWhite" />
+
+
+        <RelativeLayout
+            android:id="@+id/rv_ac_main_process_bill"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_toRightOf="@+id/tv_ac_main_put_off_title"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tv_ac_main_count_bill_payed"
+                android:textColor="@color/colorTextWhite"
+                android:layout_alignParentLeft="true"
+                tools:text="1/7 Hóa đơn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <ProgressBar
+                android:layout_toRightOf="@+id/tv_ac_main_count_bill_payed"
+                android:id="@+id/pbar_ac_main"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/ll_frag_thanh_toan_action_search"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toLeftOf="@+id/ll_frag_thanh_toan_action_search"
+
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorTextWhite"
+                android:indeterminateTintMode="src_atop"
+                android:visibility="visible" />
+
+            <TextView
+                android:layout_alignParentRight="true"
+                android:id="@+id/tv_ac_main_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toRightOf="@+id/tv_ac_main_count_bill_payed"
+                android:gravity="right"
+
+                android:lines="1"
+                android:scrollHorizontally="true"
+                android:text="Disconnect"
+                android:textColor="@color/colorTextWhite"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
+
+
+
+    </RelativeLayout>
+
     <FrameLayout
+        android:layout_above="@+id/rv_ac_main_request_pay"
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/navigation_ac_main"
         android:layout_alignParentTop="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     </FrameLayout>
+
+
+
 
 </RelativeLayout>

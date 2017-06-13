@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -82,12 +83,12 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@id/et_frag_thanh_toan_search"
                 android:layout_alignRight="@id/et_frag_thanh_toan_search"
-                android:layout_alignTop="@+d/et_frag_thanh_toan_search"
+                android:layout_alignTop="@+id/et_frag_thanh_toan_search"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/ibtn_frag_thanhtoan_qrcode"
                 android:background="@null"
                 android:padding="10dp"
-                android:src="@drawable/ic_cancel" />
+                app:srcCompat="@drawable/ic_cancel" />
         </RelativeLayout>
 
         <LinearLayout
@@ -174,7 +175,7 @@
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:background="@drawable/bg_circle_gray"
-                        android:src="@drawable/ic_cancel_white"
+                        app:srcCompat="@drawable/ic_cancel_white"
                         android:visibility="gone" />
 
                     <ImageButton
@@ -184,7 +185,7 @@
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:background="@drawable/bg_circle_green"
-                        android:src="@drawable/ic_refresh"
+                        app:srcCompat="@drawable/ic_refresh"
                         android:visibility="visible" />
                 </LinearLayout>
 
@@ -363,11 +364,15 @@
         </RelativeLayout>
 
         <android.support.v7.widget.RecyclerView
+            android:layout_margin="10dp"
+            android:layout_above="@+id/rlBottom"
             android:id="@+id/rv_frag_thanh_toan_customer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/rlBottom"
-            android:background="@android:color/transparent"></android.support.v7.widget.RecyclerView>
+            android:background="@android:color/transparent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"></android.support.v7.widget.RecyclerView>
 
     </RelativeLayout>
 
