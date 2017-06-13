@@ -24,6 +24,8 @@ public interface IPayPresenter {
 
     void callPayingBillOnline(String edong);
 
+    void callPayingBillOffline(String edong);
+
     void refreshTextCountBillPayedSuccess();
 
     void callShowDialogPay();

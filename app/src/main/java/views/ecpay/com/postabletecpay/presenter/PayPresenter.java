@@ -281,6 +281,29 @@ public class PayPresenter implements IPayPresenter {
     }
 
     @Override
+    public void callPayingBillOffline(String edong) {
+        if (totalBillsChooseDialog == 0) {
+            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10000.getMessage());
+            return;
+        }
+
+        totalBillsChooseDialogTemp = totalBillsChooseDialog;
+
+        mIPayView.showPayingRViewDialogStart();
+
+        Context context = mIPayView.getContextView();
+        String versionApp = Common.getVersionApp(context);
+
+        int index = 0;
+
+        //stop all thread
+        int maxIndex = billOnlineAsyncList.size();
+
+        //start count billDeleteOnline pay
+        countBillPayedSuccess = 0;
+    }
+
+    @Override
     public void refreshTextCountBillPayedSuccess() {
         mIPayView.showTextCountBillsPayedSuccess(countBillPayedSuccess, totalBillsChooseDialogTemp);
     }
