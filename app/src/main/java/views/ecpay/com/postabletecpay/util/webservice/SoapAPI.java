@@ -1410,14 +1410,21 @@ public class SoapAPI {
         private static final String METHOD_PARAM = "message";
         private AsyncSoapSynchronizeDataCallBack callBack;
         private boolean isEndCallSoap = false;
+        private Context context;
+        private ProgressDialog progressDialog;
 
         public AsyncSoapSynchronizeData(AsyncSoapSynchronizeDataCallBack callBack, Context contextView) throws Exception {
             this.callBack = callBack;
+            this.context = contextView;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setMessage("Downloading file ...");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.show();
             callBack.onPre(this);
         }
 
@@ -1476,6 +1483,7 @@ public class SoapAPI {
         @Override
         protected void onPostExecute(ListDataResponse listDataResponse) {
             super.onPostExecute(listDataResponse);
+            progressDialog.dismiss();
             if (!isEndCallSoap)
                 callBack.onPost(listDataResponse);
         }

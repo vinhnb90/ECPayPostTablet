@@ -35,6 +35,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListB
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListCustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.TrangChu.IMainPageView;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -381,7 +382,7 @@ public class MainPagePresenter implements IMainPagePresenter{
         }
 
         try {
-            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp, "PD16");
+            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.SYNC_DATA.toString(), versionApp, "PD16");
         } catch (Exception e) {
             iMainPageView.showTextMessage(e.getMessage());
             return;
@@ -419,6 +420,7 @@ public class MainPagePresenter implements IMainPagePresenter{
                             mainPageModel.getMaxIdChanged(),
                             mainPageModel.getMaxDateChanged(),
                             configInfo.getAccountId());
+
 
                     if (jsonRequestData != null) {
                         try {
@@ -510,6 +512,7 @@ public class MainPagePresenter implements IMainPagePresenter{
                                     }
                                 }
                                 for(ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
+                                    listBillResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
                                     if(mainPageModel.checkBillExist(Integer.parseInt(listBillResponse.getBodyBillResponse().getBillId())) == 0) {
                                         if(mainPageModel.insertBill(listBillResponse) != -1) {
                                             Log.i("INFO", "TEST");
@@ -550,13 +553,13 @@ public class MainPagePresenter implements IMainPagePresenter{
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onPost(ListDataResponse response) {
-//            String sData = response.getBodyListDataResponse().getFile_data();
-//            if(sData != null && !sData.isEmpty()) {
-//                byte[] zipByte = org.apache.commons.codec.binary.Base64.decodeBase64(sData.getBytes());
-//
-//                try {
-//                    File file = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + ".zip");
-//                    Common.writeBytesToFile(file, zipByte);
+            String sDataCustomer = response.getBodyListDataResponse().getCustomer();
+            if(sDataCustomer != null && !sDataCustomer.isEmpty()) {
+                byte[] zipByteCustomer = org.apache.commons.codec.binary.Base64.decodeBase64(sDataCustomer.getBytes());
+
+                try {
+                    File file = new File(Common.PATH_FOLDER_DATA + bookCmis + "_CUSTOMER.zip");
+                    Common.writeBytesToFile(file, zipByteCustomer);
 //                    if(file.exists()) {
 //                        File fileText = new File(Common.PATH_FOLDER_DOWNLOAD,"full.txt");
 //                        if(fileText.exists())
@@ -599,10 +602,21 @@ public class MainPagePresenter implements IMainPagePresenter{
 //                            }
 //                        }
 //                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            String sDataBill = response.getBodyListDataResponse().getBill();
+            if(sDataBill  != null && !sDataBill .isEmpty()) {
+                byte[] zipByteBill = org.apache.commons.codec.binary.Base64.decodeBase64(sDataBill.getBytes());
+
+                try {
+                    File file = new File(Common.PATH_FOLDER_DATA + bookCmis + "_BILL.zip");
+                    Common.writeBytesToFile(file, zipByteBill);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         @Override

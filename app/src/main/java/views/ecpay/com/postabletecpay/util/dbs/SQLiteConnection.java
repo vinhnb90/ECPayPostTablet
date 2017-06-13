@@ -29,6 +29,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ONE;
@@ -926,7 +927,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("bankAccount", "");
         initialValues.put("idNumber", bodyCustomerResponse.getId());
         initialValues.put("bankName", "");
-        initialValues.put("edongKey", "");
+        initialValues.put("edongKey", MainActivity.mEdong);
         initialValues.put("isShowBill", 0);
         initialValues.put("idChanged", footerCustomerResponse.getIdChanged());
         initialValues.put("dateChanged", footerCustomerResponse.getDateChanged());

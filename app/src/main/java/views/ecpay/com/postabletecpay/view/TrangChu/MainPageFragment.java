@@ -101,7 +101,7 @@ public class MainPageFragment extends Fragment implements
         iMainPagePresenter = new MainPagePresenter(this);
         iMainPagePresenter.synchronizePC();
         iMainPagePresenter.synchronizeFileGen();
-//        iMainPagePresenter.synchronizeData();
+        iMainPagePresenter.synchronizeData();
     }
 
     @Override

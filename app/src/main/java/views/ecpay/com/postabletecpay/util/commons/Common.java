@@ -695,6 +695,7 @@ public class Common {
     public static final String PATH_FOLDER_DB = PATH_FOLDER_ROOT + "DB" + File.separator;
     public static final String PATH_FOLDER_CONFIG = PATH_FOLDER_ROOT + "Config" + File.separator;
     public static final String PATH_FOLDER_DOWNLOAD = PATH_FOLDER_ROOT + "Download" + File.separator;
+    public static final String PATH_FOLDER_DATA = PATH_FOLDER_ROOT + "Data" + File.separator;
     //endregion
 
     //region info connect API SOAP
@@ -755,6 +756,11 @@ public class Common {
             File folderDownload = new File(PATH_FOLDER_DOWNLOAD);
             if (!folderDownload.exists()) {
                 folderDownload.mkdir();
+            }
+
+            File folderData = new File(PATH_FOLDER_DATA);
+            if (!folderData.exists()) {
+                folderData.mkdir();
             }
 
             File folderConfig = new File(PATH_FOLDER_CONFIG);

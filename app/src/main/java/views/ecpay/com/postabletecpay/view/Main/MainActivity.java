@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements
         UserInfoFragment.OnFragmentInteractionListener {
 
     public static BottomNavigationView navigation;
-    private String mEdong;
+    public static String mEdong;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
