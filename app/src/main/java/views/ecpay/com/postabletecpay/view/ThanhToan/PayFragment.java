@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -424,9 +425,10 @@ public class PayFragment extends Fragment implements
     @Optional
     @OnClick(R.id.btn_dialog_barcode_cancel)
     public void clickRefreshBarcode(View view) {
-        if (dialogBarcode == null || mScannerView == null)
+        if (dialogBarcode == null || mScannerView == null || tvTextBarcode == null)
             return;
-//
+
+        tvTextBarcode.setText(Common.TEXT_EMPTY);
         mScannerView.setResultHandler((MainActivity) getContext()); // Register ourselves as a handler for scan results.
         mScannerView.startCamera();
         listener.refreshCamera(mScannerView);
@@ -927,13 +929,21 @@ public class PayFragment extends Fragment implements
                 mScannerView = new ZXingScannerView(dialogBarcode.getContext());
                 mScannerView.setResultHandler((MainActivity) getContext());
 //
-//                    ViewGroup parent = (ViewGroup) view.getParent();
-//                    int idLLBarcode = parent.indexOfChild(llBarcode);
+                ViewGroup parent = (ViewGroup) llBarcode.getParent();
+//                int idLLBarcode = parent.indexOfChild(llBarcode);
+
+//                ViewGroup llBarcodeMain = (ViewGroup) parent.getChildAt(idLLBarcode);
+
                 if (llBarcode.getChildCount() > ZERO) {
                     llBarcode.removeAllViews();
                 }
 
                 llBarcode.addView(mScannerView);
+//                ViewStub llBarcodeMain = (ViewStub) dialogBarcode.findViewById(R.id.ll_dialog_barcode);
+//                parent.removeViewAt(idLLBarcode);
+//                parent.removeView(llBarcode);
+//                parent.addView(mScannerView, idLLBarcode);
+//                llBarcode.addView(mScannerView);
 //                if(!mScannerView.isShown()){
 //                    mScannerView.resumeCameraPreview();
 //                }
