@@ -64,17 +64,19 @@ public class MainPagePresenter implements IMainPagePresenter {
         int countTotalBill = mainPageModel.getTotalBill(edong);
         int countTotalMoney = mainPageModel.getTotalMoney(edong);
 
-        iMainPageView.showMainPageInfo(account.getName(), account.getBalance(), countTotalBill, countTotalMoney);
+//        iMainPageView.showMainPageInfo(account.getName(), account.getBalance(), countTotalBill, countTotalMoney);
     }
     //endregion
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void synchronizePC() {
-        String userName = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
-                .getString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, "");
-        String pass = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
-                .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
+        String userName = "01214500702";
+//                mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
+//                .getString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, "");
+        String pass = "123456";
+//                mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
+//                .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
 
         String textMessage = "";
         Context context = iMainPageView.getContextView();
@@ -224,11 +226,12 @@ public class MainPagePresenter implements IMainPagePresenter {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void synchronizeFileGen() {
-        String userName = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
-                .getString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, "");
-        String pass = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
-                .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
-
+        String userName = "01214500702";
+//                mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
+//                .getString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, "");
+        String pass = "123456";
+//                mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
+//                .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
         String textMessage = "";
         Context context = iMainPageView.getContextView();
         Boolean isErr = false;

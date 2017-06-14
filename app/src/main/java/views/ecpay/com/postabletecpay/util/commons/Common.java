@@ -277,6 +277,7 @@ public class Common {
     //region Description key
     public static final String TAG = "TAG";
     public static final String KEY_EDONG = "EDONG";
+
     //endregion
 
     //region info error message android

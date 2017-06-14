@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -51,6 +52,7 @@ import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
 import views.ecpay.com.postabletecpay.presenter.PayPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.view.Barcode.BarcodeActivity;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 import static android.content.ContentValues.TAG;
@@ -218,7 +220,8 @@ public class PayFragment extends Fragment implements
     private PayBillsDialogAdapter payBillsDialogAdapter;
     private View rootView;
     private Dialog dialogPayingOnline, dialogDeleteBillOnline, dialogBarcode;
-
+    public static final int REQUEST_BARCODE = 999;
+    public static final int RESPONSE_BARCODE = 1000;
     public enum VISIBLE_BUTTON_DELETE_DIALOG {
         SHOW_ALL(0),
         HIDE_ALL(1),
@@ -323,6 +326,7 @@ public class PayFragment extends Fragment implements
         listener = null;
     }
 
+
     //region onClick fragment
     @Optional
     @OnClick(R.id.btn_frag_thanh_toan_next)
@@ -384,6 +388,16 @@ public class PayFragment extends Fragment implements
     @OnClick(R.id.ibtn_frag_thanhtoan_qrcode)
     public void clickBarcode(View view) {
         isScannerBarcode = true;
+        /*((MainActivity)getContext()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mIPayPresenter.callShowDialogBarcode();
+            }
+        });*/
+
+        Intent intent = new Intent((MainActivity)getContext(), BarcodeActivity.class);
+
+        startActivityForResult(intent, REQUEST_BARCODE);
         mIPayPresenter.callShowDialogBarcode();
 //        listener.showBarcodeCamera(view);
     }
@@ -456,6 +470,7 @@ public class PayFragment extends Fragment implements
     }
 
     //endregion
+
     //region listener tablayout
     @Optional
     @OnPageChange(R.id.vpage_frag_thanh_toan)
@@ -921,46 +936,41 @@ public class PayFragment extends Fragment implements
         unbinder.unbind();
         unbinder = ButterKnife.bind(this, dialogBarcode);
 
-        ((MainActivity) getContextView()).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (llBarcode == null)
-                    return;
-                mScannerView = new ZXingScannerView(dialogBarcode.getContext());
-                mScannerView.setResultHandler((MainActivity) getContext());
+//        ((MainActivity) getContextView()).runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+        if (llBarcode == null)
+            return;
+        LinearLayout ll = (LinearLayout) dialogBarcode.findViewById(R.id.ll_dialog_barcode_main);
+
+
+        mScannerView = new ZXingScannerView(getContext());
+        mScannerView.setResultHandler((MainActivity) getContext());
+        ViewGroup parent = (ViewGroup) ll.getParent();
+
+        int idLLBarcodeMain = parent.indexOfChild(ll);
 //
-                ViewGroup parent = (ViewGroup) llBarcode.getParent();
-//                int idLLBarcode = parent.indexOfChild(llBarcode);
+//        if (llBarcode.getChildCount() > ZERO) {
+//            llBarcode.removeAllViews();
+//        }
+        parent.removeView(ll);
+        llBarcode.addView(mScannerView, idLLBarcodeMain);
+//        mScannerView.setFlash(true);
+        mScannerView.startCamera();
 
-//                ViewGroup llBarcodeMain = (ViewGroup) parent.getChildAt(idLLBarcode);
-
-                if (llBarcode.getChildCount() > ZERO) {
-                    llBarcode.removeAllViews();
-                }
-
-                llBarcode.addView(mScannerView);
-//                ViewStub llBarcodeMain = (ViewStub) dialogBarcode.findViewById(R.id.ll_dialog_barcode);
-//                parent.removeViewAt(idLLBarcode);
-//                parent.removeView(llBarcode);
-//                parent.addView(mScannerView, idLLBarcode);
-//                llBarcode.addView(mScannerView);
-//                if(!mScannerView.isShown()){
-//                    mScannerView.resumeCameraPreview();
-//                }
-                mScannerView.startCamera();
-            }
-
-               /* ViewGroup parent = (ViewGroup) view.getParent();
-                int index = parent.indexOfChild(llBarcode);
-                parent.removeView(llBarcode);
-                parent.addView(mScannerView, index);*/
-
-
-        });
+//            }
+//
+//        });
         dialogBarcode.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
                 isScannerBarcode = false;
+                /*((MainActivity) getContextView()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mScannerView.setFlash(!mScannerView.getFlash());
+                    }
+                });*/
                 listener.setRootViewAgain();
                 if (isOKText)
                     listener.fillToSearchText(textBarcode);

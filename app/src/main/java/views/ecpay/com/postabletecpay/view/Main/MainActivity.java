@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.view.Main;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,6 +27,9 @@ import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
+import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.REQUEST_BARCODE;
+import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.RESPONSE_BARCODE;
+
 public class MainActivity extends AppCompatActivity implements
         MainPageFragment.OnFragmentInteractionListener,
         PayAdapter.OnInterationBillInsidePayAdapter,
@@ -42,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public static BottomNavigationView navigation;
     private String mEdong;
-
+//    private ZXingScannerView mScannerView;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -113,6 +117,11 @@ public class MainActivity extends AppCompatActivity implements
         }*/
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+//        mScannerView = new ZXingScannerView(this);
+//        setContentView(mScannerView);
+//        mScannerView.setResultHandler(this);
+//        mScannerView.startCamera();
     }
 
     @Override
@@ -127,6 +136,28 @@ public class MainActivity extends AppCompatActivity implements
 
         if (fragmentVisibling instanceof PayFragment)
             ((PayFragment) fragmentVisibling).onPauseScannerBarcode();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUEST_BARCODE && resultCode == RESPONSE_BARCODE & data!=null)
+        {
+//check fragment
+            Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+            if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+                return;
+            }
+
+            if (fragmentVisibling instanceof PayFragment)
+                ((PayFragment) fragmentVisibling).onPauseScannerBarcode();
+        }
     }
 
     private void getBundle() {
