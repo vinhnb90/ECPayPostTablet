@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_gravity="center_horizontal|center_vertical"
+    android:layout_width="match_parent"
+    android:layout_height="500dp"
+    android:layout_margin="20dp"
+
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardCornerRadius="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent">
+
+        <TextView
+            android:id="@+id/tv_db_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:background="@color/colorTextBlack"
+            android:gravity="center_horizontal"
+            android:padding="5dp"
+            android:text="Vui lòng căn chỉnh mã vạch vào hình chữ nhật."
+            android:textColor="@color/colorTextWhite"
+            android:textSize="22dp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/rv_db_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal"
+            android:weightSum="6">
+
+            <Button
+                android:id="@+id/btn_dialog_barcode_cancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_corner_left_bottom"
+                android:text="Refresh" />
+
+            <TextView
+                android:id="@+id/tv_dialog_barcode_text"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:layout_toLeftOf="@+id/btn_dialog_barcode_ok"
+                android:layout_toRightOf="@+id/btn_dialog_barcode_cancel"
+                android:layout_weight="4"
+                android:background="@color/colorTextBlack"
+                android:gravity="center_horizontal|center_vertical"
+                android:hint="Kết quả....."
+                android:inputType="text"
+                android:textColorHint="@color/colorTextWhite"
+                android:scrollHorizontally="true"
+                android:textColor="@color/colorTextWhite"
+                android:textSize="22sp" />
+
+            <Button
+                android:id="@+id/btn_dialog_barcode_ok"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_conrner_right_bottom"
+                android:text="OK" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_dialog_barcode"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/rv_db_1"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/tv_db_1"
+            android:orientation="vertical"></LinearLayout>
+
+    </RelativeLayout>
+
+
+</android.support.v7.widget.CardView>

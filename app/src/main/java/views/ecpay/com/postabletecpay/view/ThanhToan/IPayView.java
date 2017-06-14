@@ -64,4 +64,6 @@ public interface IPayView extends ICommonView {
     void showRecyclerFragment();
 
     void showTextNoData();
+
+    void showDialogBarcode();
 }

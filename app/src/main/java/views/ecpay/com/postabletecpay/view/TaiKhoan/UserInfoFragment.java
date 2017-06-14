@@ -96,7 +96,7 @@ public class UserInfoFragment extends Fragment implements IUserInfoView {
         if (context instanceof OnFragmentInteractionListener) {
             listener = (OnFragmentInteractionListener) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+            throw new RuntimeException(context.toString() + " must implement OnPayFragmentInteractionListener");
         }
     }
 

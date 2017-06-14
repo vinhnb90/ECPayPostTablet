@@ -122,11 +122,6 @@ public class PayPresenter implements IPayPresenter {
                 indexEnd = mAdapterList.size();
             for (; indexBegin < indexEnd; indexBegin++)
                 fitter.add(mAdapterList.get(indexBegin));
-
-            if (fitter.size() == ZERO) {
-                mIPayView.showTextNoData();
-                return;
-            }
         } else {
             if (pageIndex > totalPage)
                 return;
@@ -341,6 +336,11 @@ public class PayPresenter implements IPayPresenter {
         // Nếu hóa đơn không do TNV thanh toán  Thông báo lỗi
         // Nếu hóa đơn không ở trạng thái đã thanh toán sang EVN hoặc chờ xử lý chấm nợ  Thông báo lỗi
         callAPICheckTrans(edong, reasonDeleteBill);
+    }
+
+    @Override
+    public void callShowDialogBarcode() {
+        mIPayView.showDialogBarcode();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)

@@ -57,6 +57,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr3'
     compile 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr3'
+    compile 'me.dm7.barcodescanner:zxing:1.8.4'
     compile files('libs/commons-codec-1.9.jar')
     compile files('libs/commons-io-2.5.jar')
     compile files('libs/ksoap2-android-assembly-2.5.8-jar-with-dependencies.jar')
