@@ -1570,7 +1570,7 @@ public class Common {
                 FileOutputStream fos = new FileOutputStream(theFile);
                 bos = new BufferedOutputStream(fos);
                 bos.write(bytes);
-            }finally {
+            } finally {
                 if(bos != null) {
                     try  {
                         bos.flush();

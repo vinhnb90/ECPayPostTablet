@@ -558,24 +558,26 @@ public class MainPagePresenter implements IMainPagePresenter{
                 byte[] zipByteCustomer = org.apache.commons.codec.binary.Base64.decodeBase64(sDataCustomer.getBytes());
 
                 try {
+//                    String sCustomer = android.util.Base64.encodeToString(zipByteCustomer, android.util.Base64.DEFAULT);
+//                    Log.i("sCustomer", sCustomer);
                     File file = new File(Common.PATH_FOLDER_DATA + bookCmis + "_CUSTOMER.zip");
                     Common.writeBytesToFile(file, zipByteCustomer);
-//                    if(file.exists()) {
-//                        File fileText = new File(Common.PATH_FOLDER_DOWNLOAD,"full.txt");
-//                        if(fileText.exists())
-//                            fileText.delete();
-//                        if(Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + ".zip")) {
-//                            StringBuilder text = new StringBuilder();
-//                            try {
-//                                BufferedReader br = new BufferedReader(new FileReader(fileText));
-//                                String line;
-//
-//                                while ((line = br.readLine()) != null) {
-//                                    text.append(line);
-//                                    text.append('\n');
-//                                }
-//                                br.close();
-//
+                    if(file.exists()) {
+                        File fileText = new File(Common.PATH_FOLDER_DATA,bookCmis + "_CUSTOMER");
+                        if(fileText.exists())
+                            fileText.delete();
+                        if(Common.unpackZip(Common.PATH_FOLDER_DATA, bookCmis + "_CUSTOMER.zip")) {
+                            StringBuilder text = new StringBuilder();
+                            try {
+                                BufferedReader br = new BufferedReader(new FileReader(fileText));
+                                String line;
+
+                                while ((line = br.readLine()) != null) {
+                                    text.append(line);
+                                    text.append('\n');
+                                }
+                                br.close();
+
 //                                JSONObject ja = new JSONObject(text.toString());
 //                                GsonBuilder gsonBuilder = new GsonBuilder();
 //                                Gson gson = gsonBuilder.create();
@@ -594,14 +596,15 @@ public class MainPagePresenter implements IMainPagePresenter{
 //                                        }
 //                                    }
 //                                }
-//                            }
-//                            catch (IOException e) {
+                            }
+                            catch (IOException e) {
+                                e.printStackTrace();
+                            }
+//                            catch (JSONException e) {
 //                                e.printStackTrace();
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
 //                            }
-//                        }
-//                    }
+                        }
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
