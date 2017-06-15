@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.google.zxing.Result;
 
+import org.apache.log4j.chainsaw.Main;
+
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
@@ -27,6 +29,7 @@ import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
+import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.REQUEST_BARCODE;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.RESPONSE_BARCODE;
 
@@ -161,8 +164,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void getBundle() {
-//        mEdong = getIntent().getExtras().getString(KEY_EDONG, "");
-        mEdong = "01214500702";
+        mEdong = getIntent().getExtras().getString(KEY_EDONG, "");
     }
 
     public static void updateNavigationBarState(int actionId) {
@@ -250,18 +252,9 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
-//        ((PayFragment) fragmentVisibling).showDialogDeleteBillOnline();
-//        ((PayFragment) fragmentVisibling).refreshRecyclerListFragment();
     }
     //endregion
 
-    //region  PayFragment.CallbackBarcodeDialog
-  /*  @Override
-    public void processOnDismissBarcodeDialog(String textBarcode) {
-
-    }*/
-
-    //endregion
     //region ZXingScannerView.ResultHandler
     @Override
     public void handleResult(Result result) {
@@ -297,12 +290,5 @@ public class MainActivity extends AppCompatActivity implements
 
     }*/
 
-  /*  @Override
-    public void showBarcodeCamera(View view) {
-        mScannerView = new ZXingScannerView(this);
-        setContentView(mScannerView);
-        mScannerView.setResultHandler(this);
-        mScannerView.startCamera();
-    }*/
     //endregion
 }

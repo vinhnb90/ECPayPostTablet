@@ -35,6 +35,7 @@ import android.widget.TextView;
 import org.apache.log4j.chainsaw.Main;
 
 import java.util.List;
+import java.util.Scanner;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -52,11 +53,11 @@ import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
 import views.ecpay.com.postabletecpay.presenter.PayPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
-import views.ecpay.com.postabletecpay.view.Barcode.BarcodeActivity;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
+import static views.ecpay.com.postabletecpay.util.commons.Common.NEGATIVE_ONE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_SPACE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.UNIT_MONEY;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
@@ -70,11 +71,10 @@ public class PayFragment extends Fragment implements
     public static final int FIRST_PAGE_INDEX = 1;
     public static final int PAGE_INCREMENT = 1;
     public static final int ROWS_ON_PAGE = 10;
-    private ZXingScannerView mScannerView;
+    private static ZXingScannerView mScannerView;
     private String textBarcode = Common.TEXT_EMPTY;
     private boolean isScannerBarcode = false;
     private boolean isOKText = false;
-    private int idLLBarcode = 0;
     @Nullable
     @BindView(R.id.et_frag_thanh_toan_search)
     EditText etSearch;
@@ -222,6 +222,7 @@ public class PayFragment extends Fragment implements
     private Dialog dialogPayingOnline, dialogDeleteBillOnline, dialogBarcode;
     public static final int REQUEST_BARCODE = 999;
     public static final int RESPONSE_BARCODE = 1000;
+
     public enum VISIBLE_BUTTON_DELETE_DIALOG {
         SHOW_ALL(0),
         HIDE_ALL(1),
@@ -388,18 +389,12 @@ public class PayFragment extends Fragment implements
     @OnClick(R.id.ibtn_frag_thanhtoan_qrcode)
     public void clickBarcode(View view) {
         isScannerBarcode = true;
-        /*((MainActivity)getContext()).runOnUiThread(new Runnable() {
+        ((MainActivity) getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 mIPayPresenter.callShowDialogBarcode();
             }
-        });*/
-
-        Intent intent = new Intent((MainActivity)getContext(), BarcodeActivity.class);
-
-        startActivityForResult(intent, REQUEST_BARCODE);
-        mIPayPresenter.callShowDialogBarcode();
-//        listener.showBarcodeCamera(view);
+        });
     }
 
     //endregion
@@ -910,7 +905,7 @@ public class PayFragment extends Fragment implements
     public void showTextNoData() {
         if (rvKH == null || tvNoData == null)
             return;
-        Common.runAnimationClickViewScale(tvNoData, R.anim.scale_view_pull, Common.TIME_DELAY_ANIM);
+        Common.runAnimationClickViewScale(tvNoData, R.anim.twinking_view, Common.TIME_DELAY_ANIM);
         rvKH.setVisibility(View.GONE);
         tvNoData.setVisibility(View.VISIBLE);
     }
@@ -936,47 +931,31 @@ public class PayFragment extends Fragment implements
         unbinder.unbind();
         unbinder = ButterKnife.bind(this, dialogBarcode);
 
-//        ((MainActivity) getContextView()).runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
+
         if (llBarcode == null)
             return;
-        LinearLayout ll = (LinearLayout) dialogBarcode.findViewById(R.id.ll_dialog_barcode_main);
-
-
+        TextView textView = new TextView(getContext());
         mScannerView = new ZXingScannerView(getContext());
         mScannerView.setResultHandler((MainActivity) getContext());
+
+        LinearLayout ll = (LinearLayout) dialogBarcode.findViewById(R.id.ll_dialog_barcode_main);
         ViewGroup parent = (ViewGroup) ll.getParent();
 
-        int idLLBarcodeMain = parent.indexOfChild(ll);
-//
-//        if (llBarcode.getChildCount() > ZERO) {
-//            llBarcode.removeAllViews();
-//        }
-        parent.removeView(ll);
-        llBarcode.addView(mScannerView, idLLBarcodeMain);
-//        mScannerView.setFlash(true);
+
+        llBarcode.removeView(ll);
+        llBarcode.addView(mScannerView);
         mScannerView.startCamera();
 
-//            }
-//
-//        });
         dialogBarcode.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
                 isScannerBarcode = false;
-                /*((MainActivity) getContextView()).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mScannerView.setFlash(!mScannerView.getFlash());
-                    }
-                });*/
+
+                mScannerView.stopCamera();
                 listener.setRootViewAgain();
                 if (isOKText)
                     listener.fillToSearchText(textBarcode);
-//                        callbackBarcodeDialog.processOnDismissBarcodeDialog(tvTextBarcode.getText().toString().trim());
-                else
-                    mScannerView.stopCamera();
+
             }
         });
         dialogBarcode.show();
@@ -1091,7 +1070,9 @@ public class PayFragment extends Fragment implements
     //endregion
 
     public void onPauseScannerBarcode() {
-        if (mScannerView == null || isScannerBarcode == false)
+        if (mScannerView == null
+                || isScannerBarcode == false
+                )
             return;
 
         mScannerView.stopCamera();
@@ -1109,6 +1090,7 @@ public class PayFragment extends Fragment implements
         void setRootViewAgain();
 
         void refreshCamera(final ZXingScannerView mScannerView);
+
     }
 
     public interface CallbackPayingOnlineDialog {
