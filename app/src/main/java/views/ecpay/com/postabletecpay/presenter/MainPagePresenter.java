@@ -258,40 +258,43 @@ public class MainPagePresenter implements IMainPagePresenter {
             return;
         }
 
-        ConfigInfo configInfo;
-        String versionApp = "";
-        try {
-            versionApp = iMainPageView.getContextView().getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
 
-        try {
-            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp, "PD16");
-        } catch (Exception e) {
-            iMainPageView.showTextMessage(e.getMessage());
-            return;
-        }
-
-
-        String signatureEncrypted = "";
-        try {
-            String dataSign = Common.getDataSignRSA(
-                    configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
-                    configInfo.getDiskDriver(), "PD16", configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
-            Log.d(TAG, "setupInfoRequest: " + dataSign);
-            signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
-            Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
-        } catch (Exception e) {
-        }
-        configInfo.setSignatureEncrypted(signatureEncrypted);
 
         Cursor c = mainPageModel.getAllBookCmis();
         if (c.moveToFirst()) {
             do {
-                bookCmis = c.getString(0);
 
+                ConfigInfo configInfo;
+                String versionApp = "";
+                try {
+                    versionApp = iMainPageView.getContextView().getPackageManager()
+                            .getPackageInfo(context.getPackageName(), 0).versionName;
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp, "PD16");
+                } catch (Exception e) {
+                    iMainPageView.showTextMessage(e.getMessage());
+                    return;
+                }
+
+
+                String signatureEncrypted = "";
+                try {
+                    String dataSign = Common.getDataSignRSA(
+                            configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
+                            configInfo.getDiskDriver(), "PD16", configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
+                    Log.d(TAG, "setupInfoRequest: " + dataSign);
+                    signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
+                    Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
+                } catch (Exception e) {
+                }
+                configInfo.setSignatureEncrypted(signatureEncrypted);
+
+                bookCmis = c.getString(0);
+//cái này chạy sẽ tạo ra được cái file đó
                 String jsonRequestZipData = SoapAPI.getJsonRequestSynDataZip(
                         configInfo.getAGENT(),
                         configInfo.getAgentEncypted(),
@@ -377,41 +380,46 @@ public class MainPagePresenter implements IMainPagePresenter {
             return;
         }
 
-        ConfigInfo configInfo;
-        String versionApp = "";
-        try {
-            versionApp = iMainPageView.getContextView().getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp, "PD16");
-        } catch (Exception e) {
-            iMainPageView.showTextMessage(e.getMessage());
-            return;
-        }
-
-
-        String signatureEncrypted = "";
-        try {
-            String dataSign = Common.getDataSignRSA(
-                    configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
-                    configInfo.getDiskDriver(), "PD16", configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
-            Log.d(TAG, "setupInfoRequest: " + dataSign);
-            signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
-            Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
-        } catch (Exception e) {
-        }
-        configInfo.setSignatureEncrypted(signatureEncrypted);
 
         Cursor c = mainPageModel.getAllBookCmis();
         if (c.moveToFirst()) {
             do {
+
+                //đến đoạn này.. nó check ko có file exist nên nhảy ra luôn ko thể call api đc. chỗ này chỉnh thế nào chạy đc a
                 bookCmis = c.getString(0);
                 File fileBookCmis = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + ".zip");
                 if (fileBookCmis.exists()) {
+
+                    ConfigInfo configInfo;
+                    String versionApp = "";
+                    try {
+                        versionApp = iMainPageView.getContextView().getPackageManager()
+                                .getPackageInfo(context.getPackageName(), 0).versionName;
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.SYNC_DATA.toString(), versionApp, "PD16");
+                    } catch (Exception e) {
+                        iMainPageView.showTextMessage(e.getMessage());
+                        return;
+                    }
+
+
+                    String signatureEncrypted = "";
+                    try {
+                        String dataSign = Common.getDataSignRSA(
+                                configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
+                                configInfo.getDiskDriver(), "PD16", configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
+                        Log.d(TAG, "setupInfoRequest: " + dataSign);
+                        signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
+                        Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
+                    } catch (Exception e) {
+                    }
+                    configInfo.setSignatureEncrypted(signatureEncrypted);
+
+
                     String jsonRequestData = SoapAPI.getJsonRequestSynData(
                             configInfo.getAGENT(),
                             configInfo.getAgentEncypted(),
@@ -502,7 +510,7 @@ public class MainPagePresenter implements IMainPagePresenter {
                                 String line;
 
                                 while ((line = br.readLine()) != null) {
-                                    text.append(line);
+                                    text.append(line);//chỗ tạo file đây
                                     text.append('\n');
                                 }
                                 br.close();
@@ -561,59 +569,59 @@ public class MainPagePresenter implements IMainPagePresenter {
             if (response == null)
                 return;
 
-//            String sData = response.getBodyListDataResponse().getFile_data();
-//            if(sData != null && !sData.isEmpty()) {
-//                byte[] zipByte = org.apache.commons.codec.binary.Base64.decodeBase64(sData.getBytes());
-//
-//                try {
-//                    File file = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + ".zip");
-//                    Common.writeBytesToFile(file, zipByte);
-//                    if(file.exists()) {
-//                        File fileText = new File(Common.PATH_FOLDER_DOWNLOAD,"full.txt");
-//                        if(fileText.exists())
-//                            fileText.delete();
-//                        if(Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + ".zip")) {
-//                            StringBuilder text = new StringBuilder();
-//                            try {
-//                                BufferedReader br = new BufferedReader(new FileReader(fileText));
-//                                String line;
-//
-//                                while ((line = br.readLine()) != null) {
-//                                    text.append(line);
-//                                    text.append('\n');
-//                                }
-//                                br.close();
-//
-//                                JSONObject ja = new JSONObject(text.toString());
-//                                GsonBuilder gsonBuilder = new GsonBuilder();
-//                                Gson gson = gsonBuilder.create();
-//                                FileGenResponse fileGenResponse = gson.fromJson(ja.toString(), FileGenResponse.class);
-//                                for(ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
-//                                    if(mainPageModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0){
-//                                        if(mainPageModel.insertCustomer(listCustomerResponse) != -1) {
-//                                            Log.i("INFO", "TEST");
-//                                        }
-//                                    }
-//                                }
-//                                for(ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
-//                                    if(mainPageModel.checkBillExist(Integer.parseInt(listBillResponse.getBodyBillResponse().getBillId())) == 0) {
-//                                        if(mainPageModel.insertBill(listBillResponse) != -1) {
-//                                            Log.i("INFO", "TEST");
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                            catch (IOException e) {
-//                                e.printStackTrace();
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
+            String sData = response.getBodyListDataResponse().getCustomer();
+            if(sData != null && !sData.isEmpty()) {
+                byte[] zipByte = org.apache.commons.codec.binary.Base64.decodeBase64(sData.getBytes());
+
+                try {
+                    File file = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + ".zip");
+                    Common.writeBytesToFile(file, zipByte);
+                    if(file.exists()) {
+                        File fileText = new File(Common.PATH_FOLDER_DOWNLOAD,"full.txt");
+                        if(fileText.exists())
+                            fileText.delete();
+                        if(Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + ".zip")) {
+                            StringBuilder text = new StringBuilder();
+                            try {
+                                BufferedReader br = new BufferedReader(new FileReader(fileText));
+                                String line;
+
+                                while ((line = br.readLine()) != null) {
+                                    text.append(line);
+                                    text.append('\n');
+                                }
+                                br.close();
+
+                                JSONObject ja = new JSONObject(text.toString());
+                                GsonBuilder gsonBuilder = new GsonBuilder();
+                                Gson gson = gsonBuilder.create();
+                                FileGenResponse fileGenResponse = gson.fromJson(ja.toString(), FileGenResponse.class);
+                                for(ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
+                                    if(mainPageModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0){
+                                        if(mainPageModel.insertCustomer(listCustomerResponse) != -1) {
+                                            Log.i("INFO", "TEST");
+                                        }
+                                    }
+                                }
+                                for(ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
+                                    if(mainPageModel.checkBillExist(Integer.parseInt(listBillResponse.getBodyBillResponse().getBillId())) == 0) {
+                                        if(mainPageModel.insertBill(listBillResponse) != -1) {
+                                            Log.i("INFO", "TEST");
+                                        }
+                                    }
+                                }
+                            }
+                            catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         @Override

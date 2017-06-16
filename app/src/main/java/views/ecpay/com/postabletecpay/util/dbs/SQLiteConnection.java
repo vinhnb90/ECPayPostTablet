@@ -428,7 +428,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         List<PayAdapter.BillEntityAdapter> billList = new ArrayList<>();
 
         database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode ='" + code + "'";
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode ='" + code + "' ORDER BY date(term) DESC";
         Cursor mCursor = database.rawQuery(query, null);
 
         mCursor.moveToFirst();
@@ -692,7 +692,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (TextUtils.isEmpty(edong))
             return null;
 
-        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " ORDER BY date(term) DESC ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
         return selectAllBillsOfAllCustomerCheckedWithQuery(edong, query);
     }
 
@@ -700,7 +700,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (TextUtils.isEmpty(edong))
             return null;
 
-        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " and status = " + statusBilling.getCode() + ") AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " and status = " + statusBilling.getCode() + " ORDER BY date(term) DESC ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
         return selectAllBillsOfAllCustomerCheckedWithQuery(edong, query);
     }
 

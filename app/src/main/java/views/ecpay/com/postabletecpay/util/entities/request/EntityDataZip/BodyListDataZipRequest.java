@@ -27,12 +27,6 @@ public class BodyListDataZipRequest {
     @SerializedName("book-cmis")
     @Expose
     private String bookCmis;
-    @SerializedName("from-id-changed")
-    @Expose
-    private long fromIdChanged;
-    @SerializedName("from-date-changed")
-    @Expose
-    private long fromDateChanged;
 
     public long getAuditNumber() {
         return auditNumber;
@@ -82,19 +76,4 @@ public class BodyListDataZipRequest {
         this.bookCmis = bookCmis;
     }
 
-    public long getFromIdChanged() {
-        return fromIdChanged;
-    }
-
-    public void setFromIdChanged(long fromIdChanged) {
-        this.fromIdChanged = fromIdChanged;
-    }
-
-    public long getFromDateChanged() {
-        return fromDateChanged;
-    }
-
-    public void setFromDateChanged(long fromDateChanged) {
-        this.fromDateChanged = fromDateChanged;
-    }
 }

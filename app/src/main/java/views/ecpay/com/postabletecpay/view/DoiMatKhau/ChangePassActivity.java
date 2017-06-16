@@ -45,7 +45,7 @@ public class ChangePassActivity extends ActionBarActivity implements IChangePass
     EditText etPassNew;
     @BindView(R.id.etNhapLaiMatKhauMoi)
     EditText etPassRetype;
-    @BindView(R.id.btn_ac_frag_user_info_change_pass)
+    @BindView(R.id.btn_ac_change_pass)
     Button btDoiMatKhau;
     @BindView(R.id.pbar_ac_change_pass_change)
     ProgressBar pbarChangePass;
@@ -96,7 +96,7 @@ public class ChangePassActivity extends ActionBarActivity implements IChangePass
         }, TIME_DELAY_ANIM);
     }
 
-    @OnClick(R.id.btn_ac_frag_user_info_change_pass)
+    @OnClick(R.id.btn_ac_change_pass)
     public void clickChangePass(View view) {
         Common.runAnimationClickViewScale(view, R.anim.scale_view_pull, TIME_DELAY_ANIM);
 

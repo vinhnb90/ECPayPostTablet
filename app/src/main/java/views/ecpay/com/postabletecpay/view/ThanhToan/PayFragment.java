@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,7 +20,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -32,10 +30,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.apache.log4j.chainsaw.Main;
-
 import java.util.List;
-import java.util.Scanner;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,7 +40,6 @@ import butterknife.OnPageChange;
 import butterknife.OnTextChanged;
 import butterknife.Optional;
 import butterknife.Unbinder;
-import me.dm7.barcodescanner.core.BarcodeScannerView;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
@@ -57,9 +51,6 @@ import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
-import static views.ecpay.com.postabletecpay.util.commons.Common.NEGATIVE_ONE;
-import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_SPACE;
-import static views.ecpay.com.postabletecpay.util.commons.Common.UNIT_MONEY;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
 
 /**
@@ -641,7 +632,7 @@ public class PayFragment extends Fragment implements
     @Override
     public void showCountBillsAndTotalMoneyFragment(int size, long totalMoneyAllBills) {
         tvTotalBills.setText(String.valueOf(size));
-        tvTotalBillsMoney.setText(String.valueOf(totalMoneyAllBills) + Common.TEXT_SPACE + Common.UNIT_MONEY);
+        tvTotalBillsMoney.setText(Common.convertLongToMoney(totalMoneyAllBills));
     }
 
     @Override
@@ -672,7 +663,7 @@ public class PayFragment extends Fragment implements
             return;
 
         tvTotalBillsDialog.setText(String.valueOf(totalBillsInDialog));
-        tvTotalBillsMoneyDialog.setText(String.valueOf(totalMoneyInDialog) + Common.TEXT_SPACE + Common.UNIT_MONEY);
+        tvTotalBillsMoneyDialog.setText(Common.convertLongToMoney(totalMoneyInDialog));
     }
 
     @Override
@@ -811,7 +802,7 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
-    public void showInfoBillDeleteDialog(String customerPayCode, String tenKH, String monthBill, double moneyBill) {
+    public void showInfoBillDeleteDialog(String customerPayCode, String tenKH, String monthBill, long moneyBill) {
         boolean fail = TextUtils.isEmpty(customerPayCode) ||
                 TextUtils.isEmpty(tenKH) ||
                 TextUtils.isEmpty(monthBill) ||
@@ -821,7 +812,7 @@ public class PayFragment extends Fragment implements
         tvCodeCustomerDeleteDialog.setText(customerPayCode);
         tvNameCustomerDeleteDialog.setText(tenKH);
         tvTermBillDeleteDialog.setText(monthBill);
-        tvAmountBillDeleteDialog.setText(String.valueOf(moneyBill) + TEXT_SPACE + UNIT_MONEY);
+        tvAmountBillDeleteDialog.setText(Common.convertLongToMoney(moneyBill));
     }
 
 

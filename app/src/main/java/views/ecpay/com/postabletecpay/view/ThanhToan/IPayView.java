@@ -47,7 +47,7 @@ public interface IPayView extends ICommonView {
 
     void showDialogDeleteBillOnline(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside);
 
-    void showInfoBillDeleteDialog(String customerPayCode, String tenKH, String monthBill, double moneyBill);
+    void showInfoBillDeleteDialog(String customerPayCode, String tenKH, String monthBill, long moneyBill);
 
     void showDeleteBillOnlineProcess();
 

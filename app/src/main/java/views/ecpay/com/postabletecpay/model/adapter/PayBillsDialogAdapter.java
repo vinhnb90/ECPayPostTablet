@@ -50,7 +50,7 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
         holder.getTvCode().setText(billChecked.getCode());
         holder.getTvTerm().setText(Common.convertDateToDate(billChecked.getTerm(), Common.DATE_TIME_TYPE.yyyymmdd, Common.DATE_TIME_TYPE.mmyyyy));
         holder.getTvName().setText(billChecked.getName());
-        holder.getTvAmount().setText(String.valueOf(billChecked.getAmount()) +Common.TEXT_SPACE + Common.UNIT_MONEY);
+        holder.getTvAmount().setText(Common.convertLongToMoney(billChecked.getAmount()));
 
         String status = Common.STATUS_BILLING.findCodeMessage(billChecked.getStatus()).getMessage();
         if(billChecked.getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())

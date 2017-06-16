@@ -371,7 +371,7 @@ public class PayPresenter implements IPayPresenter {
 
         PayAdapter.PayEntityAdapter infoCustomer = mAdapterList.get(posCustomerListDeleteOnline);
 
-        Double amount = billDeleteOnline.getMoneyBill();
+        Long amount = billDeleteOnline.getMoneyBill();
         String customerCode = infoCustomer.getMaKH();
         long billId = billDeleteOnline.getBillId();
         String requestDate = billDeleteOnline.getRequestDate();

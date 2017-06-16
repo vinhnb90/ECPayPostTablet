@@ -56,7 +56,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/tvText3"
+            android:id="@+id/tv_dialog_help_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -72,7 +72,7 @@
             android:background="@drawable/bg_button"
             android:textColor="@color/colorTextWhite"
             android:layout_centerHorizontal="true"
-            android:layout_below="@+id/tvText3"
+            android:layout_below="@+id/tv_dialog_help_content"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="30dp"/>
 

@@ -18,8 +18,6 @@ import android.widget.Toast;
 
 import com.google.zxing.Result;
 
-import org.apache.log4j.chainsaw.Main;
-
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
@@ -43,13 +41,11 @@ public class MainActivity extends AppCompatActivity implements
         BaoCaoFragment.OnFragmentInteractionListener,
         ZXingScannerView.ResultHandler,
         UserInfoFragment.OnFragmentInteractionListener
-//        ,
-//        PayFragment.CallbackBarcodeDialog
 {
 
-    public static BottomNavigationView navigation;
+    public static BottomNavigationView sNavigation;
     private String mEdong;
-//    private ZXingScannerView mScannerView;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -105,10 +101,10 @@ public class MainActivity extends AppCompatActivity implements
         fragmentTransaction.replace(R.id.frameLayout, MainPageFragment.newInstance(mEdong));
         fragmentTransaction.commit();
 
-        navigation = (BottomNavigationView) findViewById(R.id.navigation_ac_main);
+        sNavigation = (BottomNavigationView) findViewById(R.id.navigation_ac_main);
 
 
-       /* BottomNavigationMenuView menuView = (BottomNavigationMenuView) navigation.getChildAt(0);
+       /* BottomNavigationMenuView menuView = (BottomNavigationMenuView) sNavigation.getChildAt(0);
         for (int i = 0; i < menuView.getChildCount(); i++) {
             final View iconView = menuView.getChildAt(i).findViewById(android.support.design.R.id.icon);
             menuView.getChildAt(i).get
@@ -119,12 +115,8 @@ public class MainActivity extends AppCompatActivity implements
             iconView.setLayoutParams(layoutParams);
         }*/
 
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        sNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-//        mScannerView = new ZXingScannerView(this);
-//        setContentView(mScannerView);
-//        mScannerView.setResultHandler(this);
-//        mScannerView.startCamera();
     }
 
     @Override
@@ -152,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == REQUEST_BARCODE && resultCode == RESPONSE_BARCODE & data!=null)
         {
-//check fragment
+            //check fragment
             Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
             if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
                 return;
@@ -168,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public static void updateNavigationBarState(int actionId) {
-        Menu menu = navigation.getMenu();
+        Menu menu = sNavigation.getMenu();
         for (int i = 0, size = menu.size(); i < size; i++) {
             MenuItem menuItem = menu.getItem(i);
             menuItem.setChecked(menuItem.getItemId() == actionId);
@@ -208,7 +200,6 @@ public class MainActivity extends AppCompatActivity implements
         if (fragmentVisibling instanceof PayFragment)
             ((PayFragment) fragmentVisibling).processDialogDeleteBillOnline(edong, code, bill, posCustomerInside);
     }
-
     //endregion
 
     //region PayBillsDialogAdapter.OnInteractionBillDialogRecycler
@@ -224,7 +215,6 @@ public class MainActivity extends AppCompatActivity implements
             ((PayFragment) fragmentVisibling).showBillCheckedDialog(mEdong, pos, isChecked);
 
     }
-
     //endregion
 
     //region PayFragment.CallbackPayingOnlineDialog

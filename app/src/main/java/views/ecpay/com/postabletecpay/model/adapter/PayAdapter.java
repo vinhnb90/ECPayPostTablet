@@ -81,7 +81,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         holder.tvTenKH.setText(entityAdapter.getTenKH());
         holder.tvDiaChi.setText(entityAdapter.getDiaChi());
         holder.tvLoTrinh.setText(entityAdapter.getLoTrinh());
-        holder.tvTongTien.setText(entityAdapter.getTongTien() + Common.TEXT_SPACE + Common.UNIT_MONEY);
+        holder.tvTongTien.setText(Common.convertLongToMoney(entityAdapter.getTongTien()));
         holder.tvMaKH.setText(code);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -271,7 +271,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     public static class BillEntityAdapter {
 
         private String monthBill;
-        private double moneyBill;
+        private long moneyBill;
         private boolean isPrint;
         private int status;
         private boolean isChecked;
@@ -285,7 +285,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         public BillEntityAdapter() {
         }
 
-        public BillEntityAdapter(String monthBill, double moneyBill, boolean isPrint, int status, boolean isChecked, String requestDate, int billId, String customerPayCode, String billingBy) {
+        public BillEntityAdapter(String monthBill, long moneyBill, boolean isPrint, int status, boolean isChecked, String requestDate, int billId, String customerPayCode, String billingBy) {
             this.monthBill = monthBill;
             this.moneyBill = moneyBill;
             this.isPrint = isPrint;
@@ -305,11 +305,11 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             this.monthBill = monthBill;
         }
 
-        public double getMoneyBill() {
+        public long getMoneyBill() {
             return moneyBill;
         }
 
-        public void setMoneyBill(double moneyBill) {
+        public void setMoneyBill(long moneyBill) {
             this.moneyBill = moneyBill;
         }
 
@@ -420,7 +420,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                 holder.ibtnDelete.setVisibility(View.VISIBLE);
             }
             holder.tvDate.setText(entity.getMonthBill());
-            holder.tvMoneyBill.setText((int) entity.getMoneyBill() + Common.TEXT_SPACE + Common.UNIT_MONEY);
+            holder.tvMoneyBill.setText(Common.convertLongToMoney(entity.getMoneyBill()));
             holder.tvStatusBill.setText(Common.STATUS_BILLING.findCodeMessage(entity.getStatus()).getMessage());
 
             if (Common.STATUS_BILLING.findCodeMessage(entity.getStatus()).getCode() == Common.STATUS_BILLING.DANG_CHO_HUY.getCode()) {

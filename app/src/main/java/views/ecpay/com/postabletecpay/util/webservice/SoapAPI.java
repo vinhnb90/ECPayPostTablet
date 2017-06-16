@@ -480,7 +480,7 @@ public class SoapAPI {
 
     public static String getJsonRequestCheckTrainOnline(String agent, String agentEncypted, String commandId,
                                                         long auditNumber, String macAdressHexValue, String diskDriver,
-                                                        String signatureEncrypted, String edong, Double amount, String customerCode,
+                                                        String signatureEncrypted, String edong, Long amount, String customerCode,
                                                         Long billId, String requestDate, String accountId) {
 
         boolean hasNull =
@@ -1196,9 +1196,9 @@ public class SoapAPI {
         public AsyncSoapDeleteBillOnline(String edong, String causeDeleteBill, String code, Long billId, AsyncSoapDeleteBillOnlineCallBack callBack) throws Exception {
             this.callBack = callBack;
             this.edong = edong;
-             this.causeDeleteBill = causeDeleteBill;
-             this.code = code;
-             this.billId = billId;
+            this.causeDeleteBill = causeDeleteBill;
+            this.code = code;
+            this.billId = billId;
 
         }
 
@@ -1493,8 +1493,8 @@ public class SoapAPI {
         @Override
         protected void onPostExecute(ListDataResponse listDataResponse) {
             super.onPostExecute(listDataResponse);
-            if (!isEndCallSoap)
-                callBack.onPost(listDataResponse);
+            isEndCallSoap = true;
+            callBack.onPost(listDataResponse);
         }
 
         public static abstract class AsyncSoapSynchronizeDataCallBack {
@@ -1601,15 +1601,15 @@ public class SoapAPI {
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             String message = values[0];
-            if (isEndCallSoap)
-                callBack.onUpdate(message);
+            isEndCallSoap = true;
+            callBack.onUpdate(message);
         }
 
         @Override
         protected void onPostExecute(ListDataZipResponse listDataZipResponse) {
             super.onPostExecute(listDataZipResponse);
-            if (!isEndCallSoap)
-                callBack.onPost(listDataZipResponse);
+            isEndCallSoap = true;
+            callBack.onPost(listDataZipResponse);
             progressDialog.dismiss();
         }
 

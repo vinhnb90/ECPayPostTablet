@@ -43,21 +43,30 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.security.PrivateKey;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Currency;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.zip.ZipEntry;
@@ -71,12 +80,31 @@ import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.AlgorithmRSA.AsymmetricCryptography;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
+
+import static java.lang.System.lineSeparator;
 
 /**
  * Created by macbook on 5/5/17.
  */
 
 public class Common {
+
+
+    public static String convertLongToMoney(long balance) {
+
+        Locale locale = new Locale("vi", "VN");
+        Currency currency = Currency.getInstance("VND");
+
+        DecimalFormatSymbols df = DecimalFormatSymbols.getInstance(locale);
+        df.setCurrency(currency);
+        NumberFormat numberFormat = NumberFormat.getCurrencyInstance(locale);
+        numberFormat.setCurrency(currency);
+        System.out.println("Formatted currency: " + numberFormat.format(balance));
+
+        return numberFormat.format(balance);
+
+    }
 
     //region param account
     public enum TYPE_ACCOUNT {
@@ -473,8 +501,7 @@ public class Common {
             return message;
         }
 
-        public static String getMessageServerNotify(String nameCustomer, String term, String message)
-        {
+        public static String getMessageServerNotify(String nameCustomer, String term, String message) {
             return "Gặp vấn đề với hóa đơn của khách hàng " + nameCustomer + " tại kỳ " + term
                     + "\nnhư sau: " + message;
         }
@@ -697,6 +724,7 @@ public class Common {
     public static final String PATH_FOLDER_DB = PATH_FOLDER_ROOT + "DB" + File.separator;
     public static final String PATH_FOLDER_CONFIG = PATH_FOLDER_ROOT + "Config" + File.separator;
     public static final String PATH_FOLDER_DOWNLOAD = PATH_FOLDER_ROOT + "Download" + File.separator;
+    public static final String PATH_FOLDER_HELP = PATH_FOLDER_ROOT + "Help" + File.separator;
     //endregion
 
     //region info connect API SOAP
@@ -705,8 +733,10 @@ public class Common {
 
     //region config file and system
     private static ConfigInfo cfgInfo;
-    public static final String[] CFG_COLUMN = {"PUBLIC_KEY", "PRIVATE_KEY", "AGENT", "PASS_WORD", "PC_CODE"};
     public static final String CONFIG_FILENAME = "config.cfg";
+    public static final String[] CFG_COLUMN = {"PUBLIC_KEY", "PRIVATE_KEY", "AGENT", "PASS_WORD", "PC_CODE"};
+    public static final String HELP_FILENAME = "help.txt";
+    public static final String[] HELP_COLUMN = {"INFO_HELP"};
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
 
@@ -734,6 +764,32 @@ public class Common {
             throw new Exception(MESSAGE_NOTIFY.ERR_WIFI.toString());
 
         return macAddress;
+    }
+
+    public static String makeRootFolderAndGetDataHelp(Context context) throws Exception {
+        if (context == null)
+            return TEXT_EMPTY;
+        if (!isExternalStorageWritable())
+            return TEXT_EMPTY;
+
+        File folderHelp = new File(PATH_FOLDER_HELP);
+        if (!folderHelp.exists()) {
+            folderHelp.mkdir();
+        }
+
+        File fileHelp = new File(PATH_FOLDER_HELP + Common.HELP_FILENAME);
+        String result = Common.TEXT_EMPTY;
+
+        if (!fileHelp.exists()) {
+            try {
+                fileHelp.createNewFile();
+            } catch (IOException e) {
+                throw e;
+            }
+//            if (!Common.createFileHelp(fileHelp)) return TEXT_EMPTY;
+        }
+        result = Common.getDataFileHelp();
+        return result;
     }
 
     public static void makeRootFolderAndGetDataConfig(Context context) throws Exception {
@@ -776,7 +832,6 @@ public class Common {
                 Common.cfgInfo = new ConfigInfo();
                 Common.createFileConfig(Common.cfgInfo, fileConfig);
             }
-
         } catch (Exception ex) {
             throw new Exception(Common.MESSAGE_NOTIFY.ERR_CREATE_FOLDER.toString());
         }
@@ -795,6 +850,15 @@ public class Common {
             }
             if (allFilesConfig != null)
                 scanFile(ctx, allFilesConfig);
+
+            // Load help folder
+            File fileHelp = new File(Common.PATH_FOLDER_HELP);
+            String[] allFilesHelp = fileHelp.list();
+            for (int i = 0; i < allFilesHelp.length; i++) {
+                allFilesHelp[i] = Common.PATH_FOLDER_HELP + allFilesHelp[i];
+            }
+            if (allFilesHelp != null)
+                scanFile(ctx, allFilesHelp);
 
             // Load db folder
             File file_db = new File(Common.PATH_FOLDER_DB);
@@ -853,6 +917,41 @@ public class Common {
         return false;
     }
 
+    public static boolean createFileHelp(File helpFile) {
+
+
+        if (helpFile == null)
+            return false;
+        FileOutputStream fos;
+        XmlSerializer serializer = Xml.newSerializer();
+        String[] tagValue = new String[]{TEXT_EMPTY};
+        try {
+            helpFile.createNewFile();
+            helpFile.setWritable(true);
+            helpFile.setReadable(true);
+            fos = new FileOutputStream(helpFile, false);
+
+            serializer.setOutput(fos, "UTF-8");
+            serializer.startDocument(null, Boolean.valueOf(true));
+            serializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
+            serializer.startTag(null, "HelpData");
+
+            for (int i = 0; i < Common.HELP_COLUMN.length; i++) {
+                serializer.startTag(null, Common.HELP_COLUMN[i]);
+                serializer.text(tagValue[i]);
+                serializer.endTag(null, Common.HELP_COLUMN[i]);
+            }
+            serializer.endTag(null, "HelpData");
+            serializer.endDocument();
+
+            serializer.flush();
+            fos.close();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static boolean createFileConfig(final ConfigInfo cfg, File cfgFile) {
         if (cfg == null || cfgFile == null)
             return false;
@@ -885,6 +984,108 @@ public class Common {
             return false;
         }
     }
+
+
+    public static String getDataFileHelp() {
+        File file = new File(PATH_FOLDER_HELP + Common.HELP_FILENAME);
+        StringBuilder result = new StringBuilder();
+        String sCurrentLine = Common.TEXT_EMPTY;
+
+        BufferedReader br = null;
+        FileReader fr = null;
+
+        try {
+
+            InputStream inputStream= new FileInputStream(file);
+
+            fr = new FileReader(file);
+            br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+
+
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                result.append(sCurrentLine);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    result.append(lineSeparator());
+                } else
+                    result.append(System.getProperty("line.separator"));
+            }
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            try {
+
+                if (br != null)
+                    br.close();
+
+                if (fr != null)
+                    fr.close();
+
+            } catch (IOException ex) {
+
+                ex.printStackTrace();
+
+            }
+
+        }
+
+/*
+        try {
+            InputStream inputStream= new FileInputStream(new File(PATH_FOLDER_HELP + Common.HELP_FILENAME));
+            Reader reader = new InputStreamReader(inputStream,"UTF-8");
+            InputSource is = new InputSource(reader);
+            is.setEncoding("UTF-8");
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(is);
+            doc.getDocumentElement().normalize();
+
+//            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+//            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+//            FileInputStream in = new FileInputStream(new File(PATH_FOLDER_HELP + Common.HELP_FILENAME));
+//            Document doc = dBuilder.parse(in, "UTF-16");
+
+
+//            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//            DocumentBuilder db = dbf.newDocumentBuilder();
+//            Document doc = db.parse(new File(PATH_FOLDER_HELP + Common.HELP_FILENAME));
+//            doc.getDocumentElement().normalize();
+
+
+//            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//            DocumentBuilder db = dbf.newDocumentBuilder();
+//            InputStream inputStream = new FileInputStream(new File(PATH_FOLDER_HELP + Common.HELP_FILENAME));
+//            Document doc =  db.parse(new InputSource(new InputStreamReader(inputStream, "UTF-8")));
+//            doc.getDocumentElement().normalize();
+
+
+            NodeList nodeList = doc.getElementsByTagName("HelpData");
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
+
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element elm = (Element) node;
+                    NodeList heplElement = elm.getElementsByTagName(Common.HELP_COLUMN[0]);
+                    if (heplElement != null && heplElement.item(0) != null) {
+                        Element sub_elm = (Element) heplElement.item(0);
+                        result = sub_elm.getTextContent();
+                    }
+                }
+            }
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e2) {
+            e2.printStackTrace();
+        } catch (ParserConfigurationException e1) {
+            e1.printStackTrace();
+        }*/
+        return result.toString();
+    }
+
 
     public static ConfigInfo getDataFileConfig() {
         ConfigInfo cfgInfo = new ConfigInfo();
@@ -1359,8 +1560,6 @@ public class Common {
 
     //region method utils
     //delay animations when view is clicked
-    public static final String UNIT_MONEY = "đ";
-
     public static final int TIME_DELAY_ANIM = 250;
 
     public enum TEXT_DIALOG {
@@ -1566,23 +1765,22 @@ public class Common {
                 FileOutputStream fos = new FileOutputStream(theFile);
                 bos = new BufferedOutputStream(fos);
                 bos.write(bytes);
-            }finally {
-                if(bos != null) {
-                    try  {
+            } finally {
+                if (bos != null) {
+                    try {
                         bos.flush();
                         bos.close();
-                    } catch(Exception e){}
+                    } catch (Exception e) {
+                    }
                 }
             }
         }
     }
 
-    public static boolean unpackZip(String path, String zipname)
-    {
+    public static boolean unpackZip(String path, String zipname) {
         InputStream is;
         ZipInputStream zis;
-        try
-        {
+        try {
             String filename;
             is = new FileInputStream(path + zipname);
             zis = new ZipInputStream(new BufferedInputStream(is));
@@ -1590,8 +1788,7 @@ public class Common {
             byte[] buffer = new byte[1024];
             int count;
 
-            while ((ze = zis.getNextEntry()) != null)
-            {
+            while ((ze = zis.getNextEntry()) != null) {
                 // zapis do souboru
                 filename = ze.getName();
 
@@ -1606,8 +1803,7 @@ public class Common {
                 FileOutputStream fout = new FileOutputStream(path + filename);
 
                 // cteni zipu a zapis
-                while ((count = zis.read(buffer)) != -1)
-                {
+                while ((count = zis.read(buffer)) != -1) {
                     fout.write(buffer, 0, count);
                 }
 
@@ -1616,9 +1812,7 @@ public class Common {
             }
 
             zis.close();
-        }
-        catch(IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
             return false;
         }

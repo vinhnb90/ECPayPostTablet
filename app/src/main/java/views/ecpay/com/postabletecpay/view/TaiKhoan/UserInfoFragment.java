@@ -53,11 +53,11 @@ public class UserInfoFragment extends Fragment implements IUserInfoView {
     TextView tvDiaChi;
     @BindView(R.id.tvSoTaiKhoan)
     TextView tvSoTaiKhoan;
-    @BindView(R.id.tvSoDuKhaDung)
+    @BindView(R.id.tv_frag_taikhoan_sodu)
     TextView tvSoDuKhaDung;
     @BindView(R.id.tvLoaiTaiKhoan)
     TextView tvLoaiTaiKhoan;
-    @BindView(R.id.btn_ac_frag_user_info_change_pass)
+    @BindView(R.id.btn_frag_tai_khoan_change_pass)
     Button btDoiMatKhau;
     @BindView(R.id.btn_frag_user_info_logout)
     Button btDangXuat;
@@ -107,14 +107,14 @@ public class UserInfoFragment extends Fragment implements IUserInfoView {
     }
 
     //region onCLick
-    @OnClick(R.id.btn_ac_frag_user_info_change_pass)
+    @OnClick(R.id.btn_frag_tai_khoan_change_pass)
     public void clickChangePass(View v) {
         Common.runAnimationClickViewScale(v, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(UserInfoFragment.this.getActivity(), ChangePassActivity.class));
+                startActivity(new Intent(UserInfoFragment.this.getActivity(), ChangePassActivity.class).putExtra(KEY_EDONG, mEdong));
             }
         }, Common.TIME_DELAY_ANIM);
     }
@@ -132,8 +132,7 @@ public class UserInfoFragment extends Fragment implements IUserInfoView {
     }
 
     @OnClick(R.id.ibtn_frag_user_info_back)
-    public void clickBack(View v)
-    {
+    public void clickBack(View v) {
         Common.runAnimationClickViewScale(v, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -182,7 +181,8 @@ public class UserInfoFragment extends Fragment implements IUserInfoView {
         tvEmail.setText(email);
         tvDiaChi.setText(address);
         tvSoTaiKhoan.setText(numberAccount);
-        tvSoDuKhaDung.setText(String.valueOf(balance));
+        String balanceText = Common.convertLongToMoney(balance);
+        tvSoDuKhaDung.setText(balanceText);
         tvLoaiTaiKhoan.setText(Common.TYPE_ACCOUNT.findCodeMessage(typeAccount).getTypeString());
     }
 

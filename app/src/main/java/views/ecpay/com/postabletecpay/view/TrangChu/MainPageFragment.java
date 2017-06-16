@@ -37,13 +37,9 @@ import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
-import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_BILL;
-import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_EMPTY;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
-import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_SLASH;
-import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_SPACE;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_EMPTY;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;
-import static views.ecpay.com.postabletecpay.util.commons.Common.UNIT_MONEY;
 
 /**
  * Created by macbook on 4/28/17.
@@ -101,7 +97,7 @@ public class MainPageFragment extends Fragment implements
         iMainPagePresenter = new MainPagePresenter(this);
         iMainPagePresenter.synchronizePC();
         iMainPagePresenter.synchronizeFileGen();
-//        iMainPagePresenter.synchronizeData();
+        iMainPagePresenter.synchronizeData();
     }
 
     @Override
@@ -186,6 +182,7 @@ public class MainPageFragment extends Fragment implements
                         break;
 
                     case HELP:
+                        showDialogHelp();
                         break;
 
                     case EXIT:
@@ -241,13 +238,13 @@ public class MainPageFragment extends Fragment implements
     //region IMainPageView
     @Override
     public void showMainPageInfo(String userName, long balance, int totalBills, int totalMoney) {
-        if(userName == null)
+        if (userName == null)
             userName = TEXT_EMPTY;
 
         tvUsername.setText(userName);
-        tvSoDuKhaDung.setText(String.valueOf(balance) + TEXT_SPACE + UNIT_MONEY);
+        tvSoDuKhaDung.setText(Common.convertLongToMoney(balance));
         tvSoHoaDon.setText(String.valueOf(totalBills));
-        tvTongTien.setText(String.valueOf(totalMoney) + TEXT_SPACE + UNIT_MONEY);
+        tvTongTien.setText(Common.convertLongToMoney(totalMoney));
 
     }
 
@@ -290,7 +287,41 @@ public class MainPageFragment extends Fragment implements
                 dialog.dismiss();
             }
         });
+        ibClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
 
+    private void showDialogHelp() {
+        final Dialog dialog = new Dialog(this.getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_help);
+        dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        ImageButton ibClose = (ImageButton) dialog.findViewById(R.id.ibtn_dialog_help_close);
+
+        Button btOK = (Button) dialog.findViewById(R.id.btn_dialog_help_ok);
+        TextView tvHelp = (TextView) dialog.findViewById(R.id.tv_dialog_help_content);
+        ibClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        btOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        tvHelp.setText(Common.getDataFileHelp());
         dialog.show();
     }
 }
