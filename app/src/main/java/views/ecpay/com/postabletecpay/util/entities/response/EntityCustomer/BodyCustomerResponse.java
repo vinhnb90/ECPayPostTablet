@@ -1,16 +1,16 @@
-package views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen;
+package views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by macbook on 6/10/17.
+ * Created by macbook on 6/15/17.
  */
 
 public class BodyCustomerResponse {
     @SerializedName("id")
     @Expose
-    private String id;
+    private long id;
     @SerializedName("pcCode")
     @Expose
     private String pcCode;
@@ -26,15 +26,15 @@ public class BodyCustomerResponse {
     @SerializedName("name")
     @Expose
     private String name;
-    @SerializedName("nameNoSign")
+    @SerializedName("nameNosign")
     @Expose
-    private String nameNoSign;
+    private String nameNosign;
     @SerializedName("address")
     @Expose
     private String address;
-    @SerializedName("addressNoSign")
+    @SerializedName("addressNosign")
     @Expose
-    private String addressNoSign;
+    private String addressNosign;
     @SerializedName("phoneByEVN")
     @Expose
     private String phoneByEVN;
@@ -49,7 +49,7 @@ public class BodyCustomerResponse {
     private String electricityMeter;
     @SerializedName("inning")
     @Expose
-    private String inning;
+    private int inning;
     @SerializedName("road")
     @Expose
     private String road;
@@ -64,25 +64,25 @@ public class BodyCustomerResponse {
     private String trade;
     @SerializedName("countPeriod")
     @Expose
-    private String countPeriod;
+    private int countPeriod;
     @SerializedName("team")
     @Expose
     private String team;
     @SerializedName("type")
     @Expose
-    private String type;
+    private int type;
     @SerializedName("status")
     @Expose
-    private String status;
+    private int status;
     @SerializedName("createdDate")
     @Expose
     private String createdDate;
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -126,12 +126,12 @@ public class BodyCustomerResponse {
         this.name = name;
     }
 
-    public String getNameNoSign() {
-        return nameNoSign;
+    public String getNameNosign() {
+        return nameNosign;
     }
 
-    public void setNameNoSign(String nameNoSign) {
-        this.nameNoSign = nameNoSign;
+    public void setNameNosign(String nameNosign) {
+        this.nameNosign = nameNosign;
     }
 
     public String getAddress() {
@@ -142,12 +142,12 @@ public class BodyCustomerResponse {
         this.address = address;
     }
 
-    public String getAddressNoSign() {
-        return addressNoSign;
+    public String getAddressNosign() {
+        return addressNosign;
     }
 
-    public void setAddressNoSign(String addressNoSign) {
-        this.addressNoSign = addressNoSign;
+    public void setAddressNosign(String addressNosign) {
+        this.addressNosign = addressNosign;
     }
 
     public String getPhoneByEVN() {
@@ -182,11 +182,11 @@ public class BodyCustomerResponse {
         this.electricityMeter = electricityMeter;
     }
 
-    public String getInning() {
+    public int getInning() {
         return inning;
     }
 
-    public void setInning(String inning) {
+    public void setInning(int inning) {
         this.inning = inning;
     }
 
@@ -222,11 +222,11 @@ public class BodyCustomerResponse {
         this.trade = trade;
     }
 
-    public String getCountPeriod() {
+    public int getCountPeriod() {
         return countPeriod;
     }
 
-    public void setCountPeriod(String countPeriod) {
+    public void setCountPeriod(int countPeriod) {
         this.countPeriod = countPeriod;
     }
 
@@ -238,19 +238,19 @@ public class BodyCustomerResponse {
         this.team = team;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 

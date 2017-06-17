@@ -16,6 +16,8 @@ import java.util.List;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPCResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.BodyBillResponse;
@@ -901,7 +903,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public Cursor getAllBookCmis() {
         database = this.getReadableDatabase();
-        String query = "SELECT bookCmis FROM " + TABLE_NAME_BOOK_CMIS;
+        String query = "SELECT bookCmis, pcCodeExt FROM " + TABLE_NAME_BOOK_CMIS;
         return database.rawQuery(query, null);
     }
     //endregion
@@ -934,6 +936,65 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_CUSTOMER, null, initialValues);
+        return rowAffect;
+    }
+
+    public long insertCustomer(CustomerResponse customerResponse) {
+        ContentValues initialValues = new ContentValues();
+
+        views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.BodyCustomerResponse bodyCustomerResponse = customerResponse.getBodyCustomerResponse();
+        views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.FooterCustomerResponse footerCustomerResponse = customerResponse.getFooterCustomerResponse();
+
+        initialValues.put("code", bodyCustomerResponse.getCustomerCode());
+        initialValues.put("name", bodyCustomerResponse.getName());
+        initialValues.put("address", bodyCustomerResponse.getAddress());
+        initialValues.put("pcCode", bodyCustomerResponse.getPcCode());
+        initialValues.put("pcCodeExt", bodyCustomerResponse.getPcCodeExt());
+        initialValues.put("phoneByevn", bodyCustomerResponse.getPhoneByEVN());
+        initialValues.put("phoneByecp", bodyCustomerResponse.getPhoneByECP());
+        initialValues.put("bookCmis", bodyCustomerResponse.getBookCmis());
+        initialValues.put("electricityMeter", bodyCustomerResponse.getElectricityMeter());
+        initialValues.put("inning", bodyCustomerResponse.getInning());
+        initialValues.put("status", bodyCustomerResponse.getStatus());
+        initialValues.put("bankAccount", "");
+        initialValues.put("idNumber", bodyCustomerResponse.getId());
+        initialValues.put("bankName", "");
+        initialValues.put("edongKey", MainActivity.mEdong);
+        initialValues.put("isShowBill", 0);
+        initialValues.put("idChanged", footerCustomerResponse.getIdChanged());
+        initialValues.put("dateChanged", footerCustomerResponse.getDateChanged());
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.insert(TABLE_NAME_CUSTOMER, null, initialValues);
+        return rowAffect;
+    }
+
+    public long updateCustomer(CustomerResponse customerResponse) {
+        ContentValues initialValues = new ContentValues();
+
+        views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.BodyCustomerResponse bodyCustomerResponse = customerResponse.getBodyCustomerResponse();
+        views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.FooterCustomerResponse footerCustomerResponse = customerResponse.getFooterCustomerResponse();
+
+        initialValues.put("name", bodyCustomerResponse.getName());
+        initialValues.put("address", bodyCustomerResponse.getAddress());
+        initialValues.put("pcCode", bodyCustomerResponse.getPcCode());
+        initialValues.put("pcCodeExt", bodyCustomerResponse.getPcCodeExt());
+        initialValues.put("phoneByevn", bodyCustomerResponse.getPhoneByEVN());
+        initialValues.put("phoneByecp", bodyCustomerResponse.getPhoneByECP());
+        initialValues.put("bookCmis", bodyCustomerResponse.getBookCmis());
+        initialValues.put("electricityMeter", bodyCustomerResponse.getElectricityMeter());
+        initialValues.put("inning", bodyCustomerResponse.getInning());
+        initialValues.put("status", bodyCustomerResponse.getStatus());
+        initialValues.put("bankAccount", "");
+        initialValues.put("idNumber", bodyCustomerResponse.getId());
+        initialValues.put("bankName", "");
+        initialValues.put("edongKey", MainActivity.mEdong);
+        initialValues.put("isShowBill", 0);
+        initialValues.put("idChanged", footerCustomerResponse.getIdChanged());
+        initialValues.put("dateChanged", footerCustomerResponse.getDateChanged());
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.update(TABLE_NAME_CUSTOMER, initialValues, "code = ?", new String[]{bodyCustomerResponse.getCustomerCode()});
         return rowAffect;
     }
 
@@ -1019,6 +1080,153 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
+        return rowAffect;
+    }
+
+    public long insertBill(BillResponse listBillResponse) {
+        ContentValues initialValues = new ContentValues();
+
+        views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BodyBillResponse bodyBillResponse = listBillResponse.getBodyBillResponse();
+        views.ecpay.com.postabletecpay.util.entities.response.EntityBill.FooterBillResponse footerBillResponse = listBillResponse.getFooterBillResponse();
+
+        initialValues.put("customerCode", bodyBillResponse.getCustomerCode());
+        initialValues.put("customerPayCode", "");
+        initialValues.put("billId", bodyBillResponse.getBillId());
+        initialValues.put("term", bodyBillResponse.getTerm());
+        initialValues.put("strTerm", "");
+        initialValues.put("amount", bodyBillResponse.getAmount());
+        initialValues.put("period", bodyBillResponse.getPeriod());
+        initialValues.put("issueDate", bodyBillResponse.getIssueDate());
+        initialValues.put("strIssueDate", "");
+        initialValues.put("status", bodyBillResponse.getStatus());
+        initialValues.put("seri", bodyBillResponse.getSeri());
+        initialValues.put("pcCode", bodyBillResponse.getPcCode());
+        initialValues.put("handoverCode", bodyBillResponse.getHandOverCode());
+        initialValues.put("cashierCode", bodyBillResponse.getCashierCode());
+        initialValues.put("bookCmis", bodyBillResponse.getBookCmis());
+        initialValues.put("fromDate", bodyBillResponse.getFromDate());
+        initialValues.put("toDate", bodyBillResponse.getToDate());
+        initialValues.put("strFromDate", "");
+        initialValues.put("strToDate", "");
+        initialValues.put("home", bodyBillResponse.getHome());
+        initialValues.put("tax", bodyBillResponse.getTax());
+        initialValues.put("billNum", bodyBillResponse.getBillNum());
+        initialValues.put("currency", bodyBillResponse.getCurrency());
+        initialValues.put("priceDetails", bodyBillResponse.getPriceDetail());
+        initialValues.put("numeDetails", bodyBillResponse.getNumeDetail());
+        initialValues.put("amountDetails", bodyBillResponse.getAmountDetail());
+        initialValues.put("oldIndex", bodyBillResponse.getOldIndex());
+        initialValues.put("newIndex", bodyBillResponse.getNewIndex());
+        initialValues.put("nume", bodyBillResponse.getNume());
+        initialValues.put("amountNotTax", bodyBillResponse.getAmountNotTax());
+        initialValues.put("amountTax", bodyBillResponse.getAmountTax());
+        initialValues.put("multiple", bodyBillResponse.getMultiple());
+        initialValues.put("billType", bodyBillResponse.getBillType());
+        initialValues.put("typeIndex", bodyBillResponse.getTypeIndex());
+        initialValues.put("groupTypeIndex", bodyBillResponse.getGroupTypeIndex());
+        initialValues.put("createdDate", bodyBillResponse.getCreatedDate());
+        initialValues.put("idChanged", footerBillResponse.getIdChanged());
+        initialValues.put("dateChanged", footerBillResponse.getDateChanged());
+        initialValues.put("edong", bodyBillResponse.getEdong());
+        initialValues.put("pcCodeExt", "");
+        initialValues.put("code", "");
+        initialValues.put("name", "");
+        initialValues.put("nameNosign", "");
+        initialValues.put("phoneByevn", "");
+        initialValues.put("phoneByecp", "");
+        initialValues.put("electricityMeter", "");
+        initialValues.put("inning", "");
+        initialValues.put("road", "");
+        initialValues.put("station", "");
+        initialValues.put("taxCode", bodyBillResponse.getTax());
+        initialValues.put("trade", "");
+        initialValues.put("countPeriod", "");
+        initialValues.put("team", "");
+        initialValues.put("type", bodyBillResponse.getBillType());
+        initialValues.put("lastQuery", "");
+        initialValues.put("groupType", !bodyBillResponse.getGroupTypeIndex().isEmpty() ? Integer.parseInt(bodyBillResponse.getGroupTypeIndex()) : 0);
+        initialValues.put("billingChannel", "");
+        initialValues.put("billingType", bodyBillResponse.getBillingType());
+        initialValues.put("billingBy", "");
+        initialValues.put("cashierPay", bodyBillResponse.getCashierCode());
+        initialValues.put("edongKey", bodyBillResponse.getEdong());
+        initialValues.put("isChecked", 0);
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
+        return rowAffect;
+    }
+
+    public long updateBill(BillResponse listBillResponse) {
+        ContentValues initialValues = new ContentValues();
+
+        views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BodyBillResponse bodyBillResponse = listBillResponse.getBodyBillResponse();
+        views.ecpay.com.postabletecpay.util.entities.response.EntityBill.FooterBillResponse footerBillResponse = listBillResponse.getFooterBillResponse();
+
+        initialValues.put("customerCode", bodyBillResponse.getCustomerCode());
+        initialValues.put("customerPayCode", "");
+        initialValues.put("term", bodyBillResponse.getTerm());
+        initialValues.put("strTerm", "");
+        initialValues.put("amount", bodyBillResponse.getAmount());
+        initialValues.put("period", bodyBillResponse.getPeriod());
+        initialValues.put("issueDate", bodyBillResponse.getIssueDate());
+        initialValues.put("strIssueDate", "");
+        initialValues.put("status", bodyBillResponse.getStatus());
+        initialValues.put("seri", bodyBillResponse.getSeri());
+        initialValues.put("pcCode", bodyBillResponse.getPcCode());
+        initialValues.put("handoverCode", bodyBillResponse.getHandOverCode());
+        initialValues.put("cashierCode", bodyBillResponse.getCashierCode());
+        initialValues.put("bookCmis", bodyBillResponse.getBookCmis());
+        initialValues.put("fromDate", bodyBillResponse.getFromDate());
+        initialValues.put("toDate", bodyBillResponse.getToDate());
+        initialValues.put("strFromDate", "");
+        initialValues.put("strToDate", "");
+        initialValues.put("home", bodyBillResponse.getHome());
+        initialValues.put("tax", bodyBillResponse.getTax());
+        initialValues.put("billNum", bodyBillResponse.getBillNum());
+        initialValues.put("currency", bodyBillResponse.getCurrency());
+        initialValues.put("priceDetails", bodyBillResponse.getPriceDetail());
+        initialValues.put("numeDetails", bodyBillResponse.getNumeDetail());
+        initialValues.put("amountDetails", bodyBillResponse.getAmountDetail());
+        initialValues.put("oldIndex", bodyBillResponse.getOldIndex());
+        initialValues.put("newIndex", bodyBillResponse.getNewIndex());
+        initialValues.put("nume", bodyBillResponse.getNume());
+        initialValues.put("amountNotTax", bodyBillResponse.getAmountNotTax());
+        initialValues.put("amountTax", bodyBillResponse.getAmountTax());
+        initialValues.put("multiple", bodyBillResponse.getMultiple());
+        initialValues.put("billType", bodyBillResponse.getBillType());
+        initialValues.put("typeIndex", bodyBillResponse.getTypeIndex());
+        initialValues.put("groupTypeIndex", bodyBillResponse.getGroupTypeIndex());
+        initialValues.put("createdDate", bodyBillResponse.getCreatedDate());
+        initialValues.put("idChanged", footerBillResponse.getIdChanged());
+        initialValues.put("dateChanged", footerBillResponse.getDateChanged());
+        initialValues.put("edong", bodyBillResponse.getEdong());
+        initialValues.put("pcCodeExt", "");
+        initialValues.put("code", "");
+        initialValues.put("name", "");
+        initialValues.put("nameNosign", "");
+        initialValues.put("phoneByevn", "");
+        initialValues.put("phoneByecp", "");
+        initialValues.put("electricityMeter", "");
+        initialValues.put("inning", "");
+        initialValues.put("road", "");
+        initialValues.put("station", "");
+        initialValues.put("taxCode", bodyBillResponse.getTax());
+        initialValues.put("trade", "");
+        initialValues.put("countPeriod", "");
+        initialValues.put("team", "");
+        initialValues.put("type", bodyBillResponse.getBillType());
+        initialValues.put("lastQuery", "");
+        initialValues.put("groupType", !bodyBillResponse.getGroupTypeIndex().isEmpty() ? Integer.parseInt(bodyBillResponse.getGroupTypeIndex()) : 0);
+        initialValues.put("billingChannel", "");
+        initialValues.put("billingType", bodyBillResponse.getBillingType());
+        initialValues.put("billingBy", "");
+        initialValues.put("cashierPay", bodyBillResponse.getCashierCode());
+        initialValues.put("edongKey", bodyBillResponse.getEdong());
+        initialValues.put("isChecked", 0);
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.update(TABLE_NAME_BILL, initialValues, "billId=?", new String[]{String.valueOf(bodyBillResponse.getBillId())});
         return rowAffect;
     }
 

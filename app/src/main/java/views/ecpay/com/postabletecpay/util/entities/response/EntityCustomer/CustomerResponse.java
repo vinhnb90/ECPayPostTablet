@@ -1,13 +1,13 @@
-package views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen;
+package views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by macbook on 6/10/17.
+ * Created by macbook on 6/15/17.
  */
 
-public class ListCustomerResponse {
+public class CustomerResponse {
     @SerializedName("header")
     @Expose
     private HeaderCustomerResponse headerCustomerResponse;

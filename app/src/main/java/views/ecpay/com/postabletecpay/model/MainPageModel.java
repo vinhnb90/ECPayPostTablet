@@ -3,6 +3,8 @@ package views.ecpay.com.postabletecpay.model;
 import android.content.Context;
 import android.database.Cursor;
 
+import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPCResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListBillResponse;
@@ -67,12 +69,28 @@ public class MainPageModel extends CommonModel {
         return sqLiteConnection.insertCustomer(listCustomerResponse);
     }
 
+    public long insertCustomer(CustomerResponse customerResponse) {
+        return sqLiteConnection.insertCustomer(customerResponse);
+    }
+
+    public long updateCustomer(CustomerResponse customerResponse) {
+        return sqLiteConnection.updateCustomer(customerResponse);
+    }
+
     public  long checkBillExist(int billId) {
         return sqLiteConnection.checkBillExist(billId);
     }
 
     public long insertBill(ListBillResponse listBillResponse) {
         return sqLiteConnection.insertBill(listBillResponse);
+    }
+
+    public long insertBill(BillResponse listBillResponse) {
+        return sqLiteConnection.insertBill(listBillResponse);
+    }
+
+    public long updateBill(BillResponse listBillResponse) {
+        return sqLiteConnection.updateBill(listBillResponse);
     }
 
     public long getMaxIdChanged() {

@@ -16,7 +16,7 @@ public class FileGenRequestAdapter extends TypeAdapter<FileGenResponse> {
     @Override
     public void write(JsonWriter out, FileGenResponse value) throws IOException {
 
-//        ArrayList<ListCustomerResponse> customerResponse = value.getCustomerResponse();
+//        ArrayList<ListCustomerRespons> customerResponse = value.getCustomerResponse();
 //        ArrayList<ListBillResponse> billResponse = value.getBillResponse();
 //        int id_change = value.getId_changed();
 //        String date_change = value.getDate_changed();
@@ -25,7 +25,7 @@ public class FileGenRequestAdapter extends TypeAdapter<FileGenResponse> {
 //        //write headerLoginRequest
 //        if (customerResponse != null) {
 //            out.name("customers").beginArray();
-//            for(ListCustomerResponse list : customerResponse.getCusList()){
+//            for(ListCustomerRespons list : customerResponse.getCusList()){
 //                HeaderCustomerResponse headerCustomerResponse = list.getHeaderCustomerResponse();
 //                BodyCustomerResponse bodyCustomerResponse = list.getBodyCustomerResponse();
 //                FooterCustomerResponse footerCustomerResponse = list.getFooterCustomerResponse();

@@ -1348,8 +1348,6 @@ public class SoapAPI {
 
             ListEVNReponse listEVNReponse = null;
             final GsonBuilder gsonBuilder = new GsonBuilder();
-//            gsonBuilder.registerTypeAdapter(ListEVNReponse.class, new EVNRe());
-//            gsonBuilder.setPrettyPrinting();
             final Gson gson = gsonBuilder.create();
 
             listEVNReponse = gson.fromJson(data, ListEVNReponse.class);
@@ -1463,8 +1461,6 @@ public class SoapAPI {
 
             ListDataResponse listDataResponse = null;
             final GsonBuilder gsonBuilder = new GsonBuilder();
-//            gsonBuilder.registerTypeAdapter(ListEVNReponse.class, new LoginResponseAdapter());
-//            gsonBuilder.setPrettyPrinting();
             final Gson gson = gsonBuilder.create();
 
             listDataResponse = gson.fromJson(data, ListDataResponse.class);

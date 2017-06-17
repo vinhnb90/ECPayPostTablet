@@ -156,10 +156,10 @@ public class PayPresenter implements IPayPresenter {
         mIPayView.showSearchOnlineProcess();
 
         //check wifi and network
-        if (!Common.isConnectingWifi(context) && !isErr) {
-            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
-            isErr = true;
-        }
+//        if (!Common.isConnectingWifi(context) && !isErr) {
+//            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
+//            isErr = true;
+//        }
         if (!Common.isNetworkConnected(context) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
             isErr = true;
@@ -366,10 +366,10 @@ public class PayPresenter implements IPayPresenter {
         boolean isHasWifi = Common.isConnectingWifi(mIPayView.getContextView());
         boolean isHasNetwork = Common.isNetworkConnected(mIPayView.getContextView());
 
-        if (!isHasWifi) {
-            mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
-            return;
-        }
+//        if (!isHasWifi) {
+//            mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
+//            return;
+//        }
         if (!isHasNetwork) {
             mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
             return;
@@ -644,12 +644,12 @@ public class PayPresenter implements IPayPresenter {
             boolean isHasWifi = Common.isConnectingWifi(mIPayView.getContextView());
             boolean isHasNetwork = Common.isNetworkConnected(mIPayView.getContextView());
 
-            if (!isHasWifi) {
-                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
-
-                soapSearchOnline.setEndCallSoap(true);
-                soapSearchOnline.cancel(true);
-            }
+//            if (!isHasWifi) {
+//                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
+//
+//                soapSearchOnline.setEndCallSoap(true);
+//                soapSearchOnline.cancel(true);
+//            }
             if (!isHasNetwork) {
                 mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
 
@@ -776,11 +776,11 @@ public class PayPresenter implements IPayPresenter {
             boolean isHasWifi = Common.isConnectingWifi(mIPayView.getContextView());
             boolean isHasNetwork = Common.isNetworkConnected(mIPayView.getContextView());
 
-            if (!isHasWifi) {
-                mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
-                soapSearchOnline.setEndCallSoap(true);
-                soapSearchOnline.cancel(true);
-            }
+//            if (!isHasWifi) {
+//                mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
+//                soapSearchOnline.setEndCallSoap(true);
+//                soapSearchOnline.cancel(true);
+//            }
             if (!isHasNetwork) {
                 mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
 
@@ -855,11 +855,11 @@ public class PayPresenter implements IPayPresenter {
             boolean isHasWifi = Common.isConnectingWifi(mIPayView.getContextView());
             boolean isHasNetwork = Common.isNetworkConnected(mIPayView.getContextView());
 
-            if (!isHasWifi) {
-                mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
-                soapDeleteBillOnline.setEndCallSoap(true);
-                soapDeleteBillOnline.cancel(true);
-            }
+//            if (!isHasWifi) {
+//                mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
+//                soapDeleteBillOnline.setEndCallSoap(true);
+//                soapDeleteBillOnline.cancel(true);
+//            }
             if (!isHasNetwork) {
                 mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
 
@@ -935,11 +935,11 @@ public class PayPresenter implements IPayPresenter {
         boolean isHasWifi = Common.isConnectingWifi(mIPayView.getContextView());
         boolean isHasNetwork = Common.isNetworkConnected(mIPayView.getContextView());
 
-        if (!isHasWifi) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
-            soapDeleteBillOnline.setEndCallSoap(true);
-            soapDeleteBillOnline.cancel(true);
-        }
+//        if (!isHasWifi) {
+//            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
+//            soapDeleteBillOnline.setEndCallSoap(true);
+//            soapDeleteBillOnline.cancel(true);
+//        }
         if (!isHasNetwork) {
             mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
 
@@ -1072,12 +1072,12 @@ public class PayPresenter implements IPayPresenter {
             boolean isHasWifi = Common.isConnectingWifi(mIPayView.getContextView());
             boolean isHasNetwork = Common.isNetworkConnected(mIPayView.getContextView());
 
-            if (!isHasWifi) {
-                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
-
-                soapBillOnline.setEndCallSoap(true);
-                soapBillOnline.cancel(true);
-            }
+//            if (!isHasWifi) {
+//                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
+//
+//                soapBillOnline.setEndCallSoap(true);
+//                soapBillOnline.cancel(true);
+//            }
             if (!isHasNetwork) {
                 mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
 

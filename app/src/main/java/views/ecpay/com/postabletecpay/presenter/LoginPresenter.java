@@ -67,10 +67,10 @@ public class LoginPresenter implements ILoginPresenter {
         }
 
         //check wifi and network
-        if (!Common.isConnectingWifi(context) && !isErr) {
-            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
-            isErr = true;
-        }
+//        if (!Common.isConnectingWifi(context) && !isErr) {
+//            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
+//            isErr = true;
+//        }
         if (!Common.isNetworkConnected(context) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
             isErr = true;
@@ -209,16 +209,16 @@ public class LoginPresenter implements ILoginPresenter {
             mILoginView.showPbarLogin();
 
             //check wifi
-            boolean isHasWifi = Common.isConnectingWifi(mILoginView.getContextView());
+//            boolean isHasWifi = Common.isConnectingWifi(mILoginView.getContextView());
             boolean isHasNetwork = Common.isNetworkConnected(mILoginView.getContextView());
 
-            if (!isHasWifi) {
-                mILoginView.hidePbarLogin();
-                mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
-
-                soapLogin.setEndCallSoap(true);
-                soapLogin.cancel(true);
-            }
+//            if (!isHasWifi) {
+//                mILoginView.hidePbarLogin();
+//                mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
+//
+//                soapLogin.setEndCallSoap(true);
+//                soapLogin.cancel(true);
+//            }
 
             if (!isHasNetwork) {
                 mILoginView.hidePbarLogin();

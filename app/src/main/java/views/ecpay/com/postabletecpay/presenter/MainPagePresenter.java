@@ -25,6 +25,10 @@ import views.ecpay.com.postabletecpay.model.MainPageModel;
 import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.BodyCustomerResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.FooterCustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityDataZip.ListDataZipResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
@@ -90,10 +94,10 @@ public class MainPagePresenter implements IMainPagePresenter{
             isErr = true;
         }
 
-        if (!Common.isConnectingWifi(context) && !isErr) {
-            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
-            isErr = true;
-        }
+//        if (!Common.isConnectingWifi(context) && !isErr) {
+//            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
+//            isErr = true;
+//        }
         if (!Common.isNetworkConnected(context) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
             isErr = true;
@@ -179,6 +183,7 @@ public class MainPagePresenter implements IMainPagePresenter{
 
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onPost(ListEVNReponse response) {
             try {
@@ -206,6 +211,7 @@ public class MainPagePresenter implements IMainPagePresenter{
                         }
                     }
 //                }
+                synchronizeFileGen();
             } catch(Exception ex) {
                 iMainPageView.showTextMessage(ex.getMessage());
             }
@@ -240,10 +246,10 @@ public class MainPagePresenter implements IMainPagePresenter{
             isErr = true;
         }
 
-        if (!Common.isConnectingWifi(context) && !isErr) {
-            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
-            isErr = true;
-        }
+//        if (!Common.isConnectingWifi(context) && !isErr) {
+//            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
+//            isErr = true;
+//        }
         if (!Common.isNetworkConnected(context) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
             isErr = true;
@@ -263,7 +269,7 @@ public class MainPagePresenter implements IMainPagePresenter{
         }
 
         try {
-            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp, "PD16");
+            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp, mainPageModel.getPcCode());
         } catch (Exception e) {
             iMainPageView.showTextMessage(e.getMessage());
             return;
@@ -274,7 +280,7 @@ public class MainPagePresenter implements IMainPagePresenter{
         try {
             String dataSign = Common.getDataSignRSA(
                     configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
-                    configInfo.getDiskDriver(), "PD16", configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
+                    configInfo.getDiskDriver(), mainPageModel.getPcCode(), configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
             Log.d(TAG, "setupInfoRequest: " + dataSign);
             signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
             Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
@@ -295,7 +301,7 @@ public class MainPagePresenter implements IMainPagePresenter{
                         configInfo.getMacAdressHexValue(),
                         configInfo.getDiskDriver(),
                         configInfo.getSignatureEncrypted(),
-                        mainPageModel.getPcCode(),
+                        c.getString(1),
                         c.getString(0),
                         configInfo.getAccountId());
 
@@ -359,10 +365,10 @@ public class MainPagePresenter implements IMainPagePresenter{
             isErr = true;
         }
 
-        if (!Common.isConnectingWifi(context) && !isErr) {
-            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
-            isErr = true;
-        }
+//        if (!Common.isConnectingWifi(context) && !isErr) {
+//            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
+//            isErr = true;
+//        }
         if (!Common.isNetworkConnected(context) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
             isErr = true;
@@ -382,7 +388,7 @@ public class MainPagePresenter implements IMainPagePresenter{
         }
 
         try {
-            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.SYNC_DATA.toString(), versionApp, "PD16");
+            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.SYNC_DATA.toString(), versionApp, mainPageModel.getPcCode());
         } catch (Exception e) {
             iMainPageView.showTextMessage(e.getMessage());
             return;
@@ -393,7 +399,7 @@ public class MainPagePresenter implements IMainPagePresenter{
         try {
             String dataSign = Common.getDataSignRSA(
                     configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
-                    configInfo.getDiskDriver(), "PD16", configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
+                    configInfo.getDiskDriver(), mainPageModel.getPcCode(), configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
             Log.d(TAG, "setupInfoRequest: " + dataSign);
             signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
             Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
@@ -526,6 +532,7 @@ public class MainPagePresenter implements IMainPagePresenter{
                                 e.printStackTrace();
                             }
                         }
+                        synchronizeData();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -558,54 +565,27 @@ public class MainPagePresenter implements IMainPagePresenter{
                 byte[] zipByteCustomer = org.apache.commons.codec.binary.Base64.decodeBase64(sDataCustomer.getBytes());
 
                 try {
-//                    String sCustomer = android.util.Base64.encodeToString(zipByteCustomer, android.util.Base64.DEFAULT);
-//                    Log.i("sCustomer", sCustomer);
-                    File file = new File(Common.PATH_FOLDER_DATA + bookCmis + "_CUSTOMER.zip");
-                    Common.writeBytesToFile(file, zipByteCustomer);
-                    if(file.exists()) {
-                        File fileText = new File(Common.PATH_FOLDER_DATA,bookCmis + "_CUSTOMER");
-                        if(fileText.exists())
-                            fileText.delete();
-                        if(Common.unpackZip(Common.PATH_FOLDER_DATA, bookCmis + "_CUSTOMER.zip")) {
-                            StringBuilder text = new StringBuilder();
-                            try {
-                                BufferedReader br = new BufferedReader(new FileReader(fileText));
-                                String line;
+                    String sCustomer = Common.decompress(zipByteCustomer);
 
-                                while ((line = br.readLine()) != null) {
-                                    text.append(line);
-                                    text.append('\n');
-                                }
-                                br.close();
-
-//                                JSONObject ja = new JSONObject(text.toString());
-//                                GsonBuilder gsonBuilder = new GsonBuilder();
-//                                Gson gson = gsonBuilder.create();
-//                                FileGenResponse fileGenResponse = gson.fromJson(ja.toString(), FileGenResponse.class);
-//                                for(ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
-//                                    if(mainPageModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0){
-//                                        if(mainPageModel.insertCustomer(listCustomerResponse) != -1) {
-//                                            Log.i("INFO", "TEST");
-//                                        }
-//                                    }
-//                                }
-//                                for(ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
-//                                    if(mainPageModel.checkBillExist(Integer.parseInt(listBillResponse.getBodyBillResponse().getBillId())) == 0) {
-//                                        if(mainPageModel.insertBill(listBillResponse) != -1) {
-//                                            Log.i("INFO", "TEST");
-//                                        }
-//                                    }
-//                                }
+                    JSONArray jsonArray = new JSONArray(sCustomer);
+                    for(int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject ja = jsonArray.getJSONObject(i);
+                        GsonBuilder gsonBuilder = new GsonBuilder();
+                        Gson gson = gsonBuilder.create();
+                        CustomerResponse customerResponse = gson.fromJson(ja.toString(), CustomerResponse.class);
+                        if(mainPageModel.checkCustomerExist(customerResponse.getBodyCustomerResponse().getCustomerCode()) == 0){
+                            if(mainPageModel.insertCustomer(customerResponse) != -1) {
+                                Log.i("INFO", "SUCCESS");
                             }
-                            catch (IOException e) {
-                                e.printStackTrace();
+                        } else {
+                            if(mainPageModel.updateCustomer(customerResponse) != -1) {
+                                Log.i("INFO", "SUCCESS");
                             }
-//                            catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
                         }
                     }
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -614,9 +594,28 @@ public class MainPagePresenter implements IMainPagePresenter{
                 byte[] zipByteBill = org.apache.commons.codec.binary.Base64.decodeBase64(sDataBill.getBytes());
 
                 try {
-                    File file = new File(Common.PATH_FOLDER_DATA + bookCmis + "_BILL.zip");
-                    Common.writeBytesToFile(file, zipByteBill);
+                    String sCustomer = Common.decompress(zipByteBill);
+
+                    JSONArray jsonArray = new JSONArray(sCustomer);
+                    for(int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject ja = jsonArray.getJSONObject(i);
+                        GsonBuilder gsonBuilder = new GsonBuilder();
+                        Gson gson = gsonBuilder.create();
+                        BillResponse billResponse = gson.fromJson(ja.toString(), BillResponse.class);
+                        billResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
+                        if(mainPageModel.checkBillExist(billResponse.getBodyBillResponse().getId()) == 0){
+                            if(mainPageModel.insertBill(billResponse) != -1) {
+                                Log.i("INFO", "SUCCESS");
+                            }
+                        } else {
+                            if(mainPageModel.updateBill(billResponse) != -1) {
+                                Log.i("INFO", "SUCCESS");
+                            }
+                        }
+                    }
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }

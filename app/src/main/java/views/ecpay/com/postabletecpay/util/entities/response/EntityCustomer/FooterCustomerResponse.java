@@ -1,25 +1,25 @@
-package views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen;
+package views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by macbook on 6/10/17.
+ * Created by macbook on 6/15/17.
  */
 
-public class FooterBillResponse {
+public class FooterCustomerResponse {
     @SerializedName("idChanged")
     @Expose
-    private String idChanged;
+    private int idChanged;
     @SerializedName("dateChanged")
     @Expose
     private String dateChanged;
 
-    public String getIdChanged() {
+    public int getIdChanged() {
         return idChanged;
     }
 
-    public void setIdChanged(String idChanged) {
+    public void setIdChanged(int idChanged) {
         this.idChanged = idChanged;
     }
 

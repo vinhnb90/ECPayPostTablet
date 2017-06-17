@@ -48,6 +48,7 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -60,6 +61,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -695,7 +697,7 @@ public class Common {
     public static final String PATH_FOLDER_DB = PATH_FOLDER_ROOT + "DB" + File.separator;
     public static final String PATH_FOLDER_CONFIG = PATH_FOLDER_ROOT + "Config" + File.separator;
     public static final String PATH_FOLDER_DOWNLOAD = PATH_FOLDER_ROOT + "Download" + File.separator;
-    public static final String PATH_FOLDER_DATA = PATH_FOLDER_ROOT + "Data" + File.separator;
+//    public static final String PATH_FOLDER_DATA = PATH_FOLDER_ROOT + "Data" + File.separator;
     //endregion
 
     //region info connect API SOAP
@@ -758,10 +760,10 @@ public class Common {
                 folderDownload.mkdir();
             }
 
-            File folderData = new File(PATH_FOLDER_DATA);
-            if (!folderData.exists()) {
-                folderData.mkdir();
-            }
+//            File folderData = new File(PATH_FOLDER_DATA);
+//            if (!folderData.exists()) {
+//                folderData.mkdir();
+//            }
 
             File folderConfig = new File(PATH_FOLDER_CONFIG);
             if (!folderConfig.exists()) {
@@ -970,6 +972,11 @@ public class Common {
             return false;
         }
         return false;
+
+//        ConnectivityManager cm =
+//                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+//        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
     //endregion
 
@@ -1630,5 +1637,20 @@ public class Common {
         return true;
     }
     //endregion
+
+    public static String decompress(byte[] compressed) throws IOException {
+        final int BUFFER_SIZE = 32;
+        ByteArrayInputStream is = new ByteArrayInputStream(compressed);
+        GZIPInputStream gis = new GZIPInputStream(is, BUFFER_SIZE);
+        StringBuilder string = new StringBuilder();
+        byte[] data = new byte[BUFFER_SIZE];
+        int bytesRead;
+        while ((bytesRead = gis.read(data)) != -1) {
+            string.append(new String(data, 0, bytesRead));
+        }
+        gis.close();
+        is.close();
+        return string.toString();
+    }
 
 }
