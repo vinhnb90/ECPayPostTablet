@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName;
 public class BodyCustomerResponse {
     @SerializedName("id")
     @Expose
-    private long id;
+    private String id;
     @SerializedName("pcCode")
     @Expose
     private String pcCode;
@@ -49,7 +49,7 @@ public class BodyCustomerResponse {
     private String electricityMeter;
     @SerializedName("inning")
     @Expose
-    private int inning;
+    private String inning;
     @SerializedName("road")
     @Expose
     private String road;
@@ -64,25 +64,25 @@ public class BodyCustomerResponse {
     private String trade;
     @SerializedName("countPeriod")
     @Expose
-    private int countPeriod;
+    private String countPeriod;
     @SerializedName("team")
     @Expose
     private String team;
     @SerializedName("type")
     @Expose
-    private int type;
+    private String type;
     @SerializedName("status")
     @Expose
-    private int status;
+    private String status;
     @SerializedName("createdDate")
     @Expose
     private String createdDate;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -182,11 +182,11 @@ public class BodyCustomerResponse {
         this.electricityMeter = electricityMeter;
     }
 
-    public int getInning() {
+    public String getInning() {
         return inning;
     }
 
-    public void setInning(int inning) {
+    public void setInning(String inning) {
         this.inning = inning;
     }
 
@@ -222,11 +222,11 @@ public class BodyCustomerResponse {
         this.trade = trade;
     }
 
-    public int getCountPeriod() {
+    public String getCountPeriod() {
         return countPeriod;
     }
 
-    public void setCountPeriod(int countPeriod) {
+    public void setCountPeriod(String countPeriod) {
         this.countPeriod = countPeriod;
     }
 
@@ -238,19 +238,19 @@ public class BodyCustomerResponse {
         this.team = team;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public int getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

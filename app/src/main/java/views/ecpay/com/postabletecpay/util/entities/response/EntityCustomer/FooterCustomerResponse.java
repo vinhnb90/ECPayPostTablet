@@ -10,16 +10,16 @@ import com.google.gson.annotations.SerializedName;
 public class FooterCustomerResponse {
     @SerializedName("idChanged")
     @Expose
-    private int idChanged;
+    private String idChanged;
     @SerializedName("dateChanged")
     @Expose
     private String dateChanged;
 
-    public int getIdChanged() {
+    public String getIdChanged() {
         return idChanged;
     }
 
-    public void setIdChanged(int idChanged) {
+    public void setIdChanged(String idChanged) {
         this.idChanged = idChanged;
     }
 
