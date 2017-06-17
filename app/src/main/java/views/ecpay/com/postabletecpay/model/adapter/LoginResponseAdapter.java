@@ -417,6 +417,7 @@ public class LoginResponseAdapter extends TypeAdapter<LoginResponseReponse> {
         String idNumberPlace = null;
         String name = null;
         String address = null;
+        String phone = null;
         String email = null;
         String birthday = null;
         Integer idAccount = 0;
@@ -459,6 +460,9 @@ public class LoginResponseAdapter extends TypeAdapter<LoginResponseReponse> {
                     break;
                 case "address":
                     address = in.nextString();
+                    break;
+                case "phone":
+                    phone = in.nextString();
                     break;
                 case "email":
                     email = in.nextString();
@@ -526,7 +530,7 @@ public class LoginResponseAdapter extends TypeAdapter<LoginResponseReponse> {
         }
         in.endObject();
 
-        AccountLoginResponse account = new AccountLoginResponse(status, idNumber, idNumberDate, idNumberPlace, name, address, email, birthday, idAccount, edong, parentId, parentEdong, pin, type, balance, lockMoney, changedPIN, session, verified, mac, ip, loginTime, logoutTime, strLoginTime, strLogoutTime, strType);
+        AccountLoginResponse account = new AccountLoginResponse(status, idNumber, idNumberDate, idNumberPlace, name, address, phone, email, birthday, idAccount, edong, parentId, parentEdong, pin, type, balance, lockMoney, changedPIN, session, verified, mac, ip, loginTime, logoutTime, strLoginTime, strLogoutTime, strType);
         return account;
     }
 }

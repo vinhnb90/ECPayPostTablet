@@ -19,12 +19,14 @@ import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.IUserInfoPresenter;
 import views.ecpay.com.postabletecpay.presenter.UserInfoPresenter;
+import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
 import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;
 
 /**
  * Created by macbook on 4/28/17.
@@ -120,15 +122,28 @@ public class UserInfoFragment extends Fragment implements IUserInfoView {
     }
 
     @OnClick(R.id.btn_frag_user_info_logout)
-    public void clickLogout(View v) {
-        Common.runAnimationClickViewScale(v, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
-        Handler handler = new Handler();
+    public void clickLogout(View view) {
+
+        Common.runAnimationClickViewScale(view, R.anim.scale_view_pull, TIME_DELAY_ANIM);
+        final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(UserInfoFragment.this.getActivity(), LoginActivity.class));
+                IActionClickYesNoDialog clickYesNoDialog = new IActionClickYesNoDialog() {
+                    @Override
+                    public void doClickNo() {
+                        startActivity(new Intent(UserInfoFragment.this.getActivity(), LoginActivity.class));
+                    }
+
+                    @Override
+                    public void doClickYes() {
+
+                    }
+                };
+
+                Common.showDialog(getActivity(), clickYesNoDialog, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), Common.TEXT_DIALOG.MESSAGE_EXIT.toString());
             }
-        }, Common.TIME_DELAY_ANIM);
+        }, TIME_DELAY_ANIM);
     }
 
     @OnClick(R.id.ibtn_frag_user_info_back)

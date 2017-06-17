@@ -73,6 +73,9 @@ public class PayFragment extends Fragment implements
     @BindView(R.id.ibtn_frag_thanhtoan_qrcode)
     ImageButton btnBarcode;
     @Nullable
+    @BindView(R.id.ibtn_frag_thanhtoan_back)
+    ImageButton btnBack;
+    @Nullable
     @BindView(R.id.ll_frag_thanh_toan_count)
     LinearLayout llCount;
     @Nullable
@@ -386,6 +389,12 @@ public class PayFragment extends Fragment implements
                 mIPayPresenter.callShowDialogBarcode();
             }
         });
+    }
+
+    @Optional
+    @OnClick(R.id.ibtn_frag_thanhtoan_back)
+    public void clickBack(View view) {
+        listener.showMainPageFragment();
     }
 
     //endregion
@@ -1082,6 +1091,7 @@ public class PayFragment extends Fragment implements
 
         void refreshCamera(final ZXingScannerView mScannerView);
 
+        void showMainPageFragment();
     }
 
     public interface CallbackPayingOnlineDialog {

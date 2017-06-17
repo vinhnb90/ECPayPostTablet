@@ -108,11 +108,11 @@ public class Common {
 
     //region param account
     public enum TYPE_ACCOUNT {
-        ADMIN_IT(1, "Admin IT"),
+        ADMIN_IT(-1, "Admin IT"),
         ADMIN_KD(0, "Admin Kinh Doanh"),
-        TNV_THUONG(0, "Thu nhân viên thường"),
-        TNV_DA_NANG(0, "Thu nhân viên đa năng"),
-        NV_QLY(0, "Nhân viên quản lý");
+        TNV_THUONG(1, "TNV thường"),
+        TNV_DA_NANG(2, "TNV quầy đa năng"),
+        NV_QLY(3, "Nhân viên quản lý");
 
         private final int type;
         private String typeString;
@@ -340,10 +340,10 @@ public class Common {
                 return "Kiểm tra kết nối internet của wifi!";
 
             if (LOGIN_ERR_USER == this)
-                return "Tên đăng nhập là chữ thường, chữ hoa, các kí tự đặc biệt, tối đa 20 kí tự và không để trống!";
+                return "Tên đăng nhập là chữ thường, chữ hoa, các kí tự đặc biệt, từ 6 tới 18 kí tự và không để trống!";
 
             if (LOGIN_ERR_PASS == this)
-                return "Mật khẩu là chữ thường, chữ hoa, các kí tự đặc biệt, tối đa 8 kí tự và không để trống!";
+                return "Mật khẩu là chữ thường, chữ hoa, các kí tự đặc biệt, từ 6 tới 18 kí tự và không để trống!";
 
             if (ERR_CREATE_FOLDER == this)
                 return "Xảy ra vấn đề khi tạo thư mục chứa tài nguyên trên SDCard!";
@@ -367,13 +367,13 @@ public class Common {
                 return "Quá thời gian kết nối cho phép tới máy chủ " + TIME_OUT_CONNECT / 1000 + " s";
 
             if (CHANGE_PASS_ERR_PASS_OLD == this)
-                return "Mật khẩu cũ không được để trống, tối đa 8 kí tự!";
+                return "Mật khẩu cũ không hợp lệ, số kí tự giới hạn từ 6 tới 18 kí tự!";
 
             if (CHANGE_PASS_ERR_PASS_NEW == this)
-                return "Mật khẩu mới không được để trống, tối đa 8 kí tự!";
+                return "Mật khẩu mới không hợp lệ, số kí tự giới hạn từ 6 tới 18 kí tự!";
 
             if (CHANGE_PASS_ERR_PASS_RETYPE == this)
-                return "Mật khẩu mới nhập lại không được để trống, tối đa 8 kí tự!";
+                return "Mật khẩu mới nhập lại không hợp lệ, số kí tự giới hạn từ 6 tới 18 kí tự!";
 
             if (CHANGE_PASS_ERR_PASS_NEW_NOT_EQUAL_PASS_OLD == this)
                 return "Mật khẩu mới không trùng với mật khẩu cũ!";
@@ -1001,8 +1001,6 @@ public class Common {
             fr = new FileReader(file);
             br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
 
-
-
             while ((sCurrentLine = br.readLine()) != null) {
                 result.append(sCurrentLine);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -1178,7 +1176,9 @@ public class Common {
     //endregion
 
     //region method process ecrypt and decrypt data
-    public static int LENGTH_USER_NAME = 20;
+    public static int MAX_LENGTH = 18;
+    public static int MIN_LENGTH = 6;
+
     public static int LENGTH_PASS = 8;
 
     public static Long createAuditNumber(String dateTimeNow) {
@@ -1561,7 +1561,7 @@ public class Common {
     //region method utils
     //delay animations when view is clicked
     public static final int TIME_DELAY_ANIM = 250;
-
+    public static final int LONG_TIME_DELAY_ANIM = 1000;
     public enum TEXT_DIALOG {
         OK,
         CANCLE,

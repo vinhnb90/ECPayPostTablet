@@ -275,6 +275,16 @@ public class MainActivity extends AppCompatActivity implements
         mScannerView.resumeCameraPreview(this);
     }
 
+    @Override
+    public void showMainPageFragment() {
+        Fragment fragment = MainPageFragment.newInstance(mEdong);
+        if (fragment != null) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frameLayout, fragment);
+            fragmentTransaction.commit();
+        }
+    }
+
    /* @Override
     public void processOnDismissBarcodeDialog(String textBarcode) {
 

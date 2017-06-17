@@ -607,6 +607,7 @@ public class SoapAPI {
         private static final String METHOD_PARAM = "message";
         private AsyncSoapLoginCallBack callBack;
         private boolean isEndCallSoap = false;
+        private LoginResponseReponse loginResponseReponse;
 
         public AsyncSoapLogin(AsyncSoapLoginCallBack callBack) throws Exception {
             this.callBack = callBack;
@@ -651,7 +652,7 @@ public class SoapAPI {
                 return null;
             }
 
-            LoginResponseReponse loginResponseReponse = new Gson().fromJson(data, LoginResponseReponse.class);
+            loginResponseReponse = new Gson().fromJson(data, LoginResponseReponse.class);
             return loginResponseReponse;
         }
 
@@ -693,6 +694,10 @@ public class SoapAPI {
 
         public void setEndCallSoap(boolean endCallSoap) {
             isEndCallSoap = endCallSoap;
+        }
+
+        public LoginResponseReponse getLoginResponseReponse() {
+            return loginResponseReponse;
         }
     }
 

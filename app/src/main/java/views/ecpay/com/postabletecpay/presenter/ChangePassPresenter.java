@@ -3,6 +3,7 @@ package views.ecpay.com.postabletecpay.presenter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 
@@ -19,6 +20,8 @@ import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
 import views.ecpay.com.postabletecpay.view.DoiMatKhau.IChangePassView;
 
 import static android.content.Context.MODE_PRIVATE;
+import static views.ecpay.com.postabletecpay.util.commons.Common.LONG_TIME_DELAY_ANIM;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;
 
 /**
  * Created by VinhNB on 5/20/2017.
@@ -26,7 +29,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class ChangePassPresenter implements IChangePassPresenter {
 
-    public ChangePassPresenter(IChangePassView mIChangePassView){
+    public ChangePassPresenter(IChangePassView mIChangePassView) {
         this.mIChangePassView = mIChangePassView;
         mChangePassModel = new ChangePassModel(mIChangePassView.getContextView());
 
@@ -35,11 +38,12 @@ public class ChangePassPresenter implements IChangePassPresenter {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void validateInputChangePass(String edong, String passOld, String passNew, String passRetype) {
-        if (passOld == null || passOld.isEmpty() || passOld.trim().equals("")) {
+
+        if (passOld == null || passOld.isEmpty() || passOld.trim().equals("") || passOld.length() > Common.MAX_LENGTH || passOld.length() < Common.MIN_LENGTH) {
             mIChangePassView.showText(Common.MESSAGE_NOTIFY.CHANGE_PASS_ERR_PASS_OLD.toString());
             return;
         }
-        if (passNew == null || passNew.isEmpty() || passNew.trim().equals("")) {
+        if (passNew == null || passNew.isEmpty() || passNew.trim().equals("") || passNew.length() > Common.MAX_LENGTH || passNew.length() < Common.MIN_LENGTH) {
             mIChangePassView.showText(Common.MESSAGE_NOTIFY.CHANGE_PASS_ERR_PASS_NEW.toString());
             return;
         }
@@ -55,10 +59,6 @@ public class ChangePassPresenter implements IChangePassPresenter {
         String userName = mChangePassModel.getManagerSharedPref()
                 .getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
                 .getString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, "");
-
-        String pass = mChangePassModel.getManagerSharedPref()
-                .getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
-                .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
 
         ConfigInfo configInfo = null;
         String versionApp = "";
@@ -78,7 +78,7 @@ public class ChangePassPresenter implements IChangePassPresenter {
         //encrypt pinLogin by Triple DES CBC
         String pinLoginEncrypted;
         try {
-            pinLoginEncrypted = SecurityUtils.tripleDesc(mIChangePassView.getContextView(), pass.trim(), configInfo.getPRIVATE_KEY().trim(), configInfo.getPUBLIC_KEY().trim());
+            pinLoginEncrypted = SecurityUtils.tripleDesc(mIChangePassView.getContextView(), passOld.trim(), configInfo.getPRIVATE_KEY().trim(), configInfo.getPUBLIC_KEY().trim());
             passNew = passRetype = SecurityUtils.tripleDesc(mIChangePassView.getContextView(), passNew.trim(), configInfo.getPRIVATE_KEY().trim(), configInfo.getPUBLIC_KEY().trim());
         } catch (Exception e) {
             mIChangePassView.showText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
@@ -144,7 +144,7 @@ public class ChangePassPresenter implements IChangePassPresenter {
 
     @Override
     public void callInfo(String mEdong) {
-        if(TextUtils.isEmpty(mEdong))
+        if (TextUtils.isEmpty(mEdong))
             return;
         Account account = mChangePassModel.getAccountInfo(mEdong);
         mIChangePassView.showInfo(account.getName(), mEdong);
@@ -206,6 +206,15 @@ public class ChangePassPresenter implements IChangePassPresenter {
             }
 
             mIChangePassView.showText(Common.MESSAGE.CHANGE_PASS_SUCSSES.getMessage());
+
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                  mIChangePassView.showLoginForm();
+                }
+            }, LONG_TIME_DELAY_ANIM);
+
         }
 
         @Override

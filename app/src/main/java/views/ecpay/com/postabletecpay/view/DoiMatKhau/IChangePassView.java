@@ -14,4 +14,6 @@ public interface IChangePassView extends ICommonView {
     void hideText();
 
     void showInfo(String name, String mEdong);
+
+    void showLoginForm();
 }

@@ -82,7 +82,7 @@ public class MainPagePresenter implements IMainPagePresenter {
         Context context = iMainPageView.getContextView();
         Boolean isErr = false;
 
-        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.LENGTH_USER_NAME) && !isErr) {
+        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.MAX_LENGTH) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_USER.toString();
             isErr = true;
         }
@@ -236,7 +236,7 @@ public class MainPagePresenter implements IMainPagePresenter {
         Context context = iMainPageView.getContextView();
         Boolean isErr = false;
 
-        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.LENGTH_USER_NAME) && !isErr) {
+        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.MAX_LENGTH) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_USER.toString();
             isErr = true;
         }
@@ -358,7 +358,7 @@ public class MainPagePresenter implements IMainPagePresenter {
         Context context = iMainPageView.getContextView();
         Boolean isErr = false;
 
-        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.LENGTH_USER_NAME) && !isErr) {
+        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.MAX_LENGTH) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_USER.toString();
             isErr = true;
         }

@@ -23,8 +23,6 @@ public class UserInfoPresenter implements IUserInfoPresenter {
     @Override
     public void getInfoUser(String edong) {
         Account account = userInfoModel.getAccountInfo(edong);
-        String phone = "?";
-
-        iUserInfoView.showInfoUser(account.getEdong(), account.getBirthday(), account.getName(), account.getIdNumber(), phone, account.getEmail(), account.getAddress(), account.getEdong(), account.getBalance(),account.getType());
+        iUserInfoView.showInfoUser(account.getEdong(), account.getBirthday(), account.getName(), account.getIdNumber(), account.getPhone(), account.getEmail(), account.getAddress(), account.getEdong(), account.getBalance(), account.getType());
     }
 }

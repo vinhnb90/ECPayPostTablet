@@ -18,7 +18,7 @@
             android:background="@drawable/bg_bill" />
 
         <ImageButton
-            android:id="@+id/ibtn_frag_user_info_back"
+            android:id="@+id/ibtn_frag_thanhtoan_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -31,7 +31,7 @@
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/ibtn_frag_user_info_back"
+            android:layout_alignBaseline="@+id/ibtn_frag_thanhtoan_back"
             android:layout_centerHorizontal="true"
             android:layout_margin="15dp"
             android:text="DANH SÁCH HOÁ ĐƠN"

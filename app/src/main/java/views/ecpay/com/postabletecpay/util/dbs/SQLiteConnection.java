@@ -56,7 +56,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     private String TABLE_NAME_BILL = "TBL_BILL";
     private String TABLE_NAME_LICH_SU_TTOAN = "TBL_LICH_SU_TTOAN";
 
-    private String CREATE_TABLE_ACCOUNT = "CREATE TABLE `" + TABLE_NAME_ACCOUNT + "` (`edong` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `address` TEXT, `email` TEXT, `birthday` TEXT, `session` TEXT, `balance` NUMERIC, `lockMoney` NUMERIC, `changePIN` INTEGER, `verified` INTEGER, `mac` TEXT, `ip` TEXT, `strLoginTime` TEXT, `strLogoutTime` TEXT, `type` INTEGER, `status` TEXT, `idNumber` TEXT, `idNumberDate` TEXT, `idNumberPlace` TEXT, `parentEdong` TEXT )";
+    private String CREATE_TABLE_ACCOUNT = "CREATE TABLE `" + TABLE_NAME_ACCOUNT + "` (`edong` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `address` TEXT, `phone` TEXT, `email` TEXT, `birthday` TEXT, `session` TEXT, `balance` NUMERIC, `lockMoney` NUMERIC, `changePIN` INTEGER, `verified` INTEGER, `mac` TEXT, `ip` TEXT, `strLoginTime` TEXT, `strLogoutTime` TEXT, `type` INTEGER, `status` TEXT, `idNumber` TEXT, `idNumberDate` TEXT, `idNumberPlace` TEXT, `parentEdong` TEXT )";
 
 
     private String CREATE_TABLE_EVN_PC = "CREATE TABLE " + TABLE_NAME_EVN_PC + " ( pcId NOT NULL PRIMARY KEY, strPcId TEXT, parentId INTEGER, " +
@@ -167,6 +167,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("edong", account.getEdong());
         initialValues.put("name", account.getName());
         initialValues.put("address", account.getAddress());
+        initialValues.put("phone", account.getPhone());
         initialValues.put("email", account.getEmail());
         initialValues.put("birthday", account.getBirthday());
         initialValues.put("session", account.getSession());
@@ -205,6 +206,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                                 "edong",
                                 "name",
                                 "address",
+                                "phone",
                                 "email",
                                 "birthday",
                                 "session",
@@ -234,6 +236,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edong"))),
                     stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name"))),
                     stringConvertNull(mCursor.getString(mCursor.getColumnIndex("address"))),
+                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phone"))),
                     stringConvertNull(mCursor.getString(mCursor.getColumnIndex("email"))),
                     stringConvertNull(mCursor.getString(mCursor.getColumnIndex("birthday"))),
                     stringConvertNull(mCursor.getString(mCursor.getColumnIndex("session"))),

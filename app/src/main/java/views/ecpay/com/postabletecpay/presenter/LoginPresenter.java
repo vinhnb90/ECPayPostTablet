@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 
 import com.google.gson.Gson;
@@ -32,6 +33,7 @@ import views.ecpay.com.postabletecpay.view.DangNhap.ILoginView;
 import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
 
 import static android.content.Context.MODE_PRIVATE;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT;
 
 /**
  * Created by VinhNB on 5/11/2017.
@@ -39,6 +41,23 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class LoginPresenter implements ILoginPresenter {
     private LoginModel mLoginModel;
+    private SoapAPI.AsyncSoapLogin soapLogin;
+    private Handler handlerDelay = new Handler();
+    private Runnable runnableCountTimeLogin = new Runnable() {
+        @Override
+        public void run() {
+            if (soapLogin != null && soapLogin.isEndCallSoap())
+                return;
+            //Do something after 100ms
+            LoginResponseReponse loginResponseReponse = soapLogin.getLoginResponseReponse();
+
+            if (loginResponseReponse == null && !soapLogin.isEndCallSoap()) {
+                //call time out
+                soapLogin.callCountdown(soapLogin);
+            }
+        }
+    };
+
 
     public LoginPresenter(ILoginView mILoginView) {
         if (mILoginView == null)
@@ -57,11 +76,11 @@ public class LoginPresenter implements ILoginPresenter {
         Context context = mILoginView.getContextView();
         Boolean isErr = false;
 
-        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.LENGTH_USER_NAME) && !isErr) {
+        if ((userName == null || userName.isEmpty() || userName.trim().equals("")) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_USER.toString();
             isErr = true;
         }
-        if ((pass == null || pass.isEmpty() || pass.trim().equals("") || pass.length() > Common.LENGTH_PASS) && !isErr) {
+        if ((pass == null || pass.isEmpty() || pass.trim().equals("")) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_PASS.toString();
             isErr = true;
         }
@@ -123,9 +142,35 @@ public class LoginPresenter implements ILoginPresenter {
 
         if (jsonRequestLogin != null) {
             try {
-                final SoapAPI.AsyncSoapLogin soapLogin;
 
-                soapLogin = new SoapAPI.AsyncSoapLogin(soapLoginCallBack);
+                if (soapLogin == null) {
+                    //if null then create new
+                    soapLogin = new SoapAPI.AsyncSoapLogin(soapLoginCallBack);
+                } else if (soapLogin.getStatus() == AsyncTask.Status.PENDING) {
+                    //if running not yet then run
+
+                } else if (soapLogin.getStatus() == AsyncTask.Status.RUNNING) {
+                    //if is running
+                    soapLogin.setEndCallSoap(true);
+                    soapLogin.cancel(true);
+
+                    handlerDelay.removeCallbacks(runnableCountTimeLogin);
+                    soapLogin = new SoapAPI.AsyncSoapLogin(soapLoginCallBack);
+                } else {
+                    //if running or finish
+                    handlerDelay.removeCallbacks(runnableCountTimeLogin);
+
+                    soapLogin = new SoapAPI.AsyncSoapLogin(soapLoginCallBack);
+                }
+
+                soapLogin.execute(jsonRequestLogin);
+
+                //thread time out
+                //sleep
+                handlerDelay.postDelayed(runnableCountTimeLogin, TIME_OUT_CONNECT);
+
+
+                /*soapLogin = new SoapAPI.AsyncSoapLogin(soapLoginCallBack);
 
                 if (soapLogin.getStatus() != AsyncTask.Status.RUNNING) {
                     soapLogin.execute(jsonRequestLogin);
@@ -150,7 +195,7 @@ public class LoginPresenter implements ILoginPresenter {
                     });
 
                     soapLoginThread.start();
-                }
+                }*/
             } catch (Exception e) {
                 mILoginView.showTextMessage(e.getMessage());
                 return;
@@ -283,6 +328,7 @@ public class LoginPresenter implements ILoginPresenter {
                         accountLoginResponse.getEdong(),
                         accountLoginResponse.getName(),
                         accountLoginResponse.getAddress(),
+                        accountLoginResponse.getPhone(),
                         accountLoginResponse.getEmail(),
                         accountLoginResponse.getBirthday(),
                         accountLoginResponse.getSession(),

@@ -87,7 +87,7 @@
             android:background="@drawable/bg_edittext_border"
             android:drawableLeft="@mipmap/ic_tick"
             android:hint="Mật khẩu cũ"
-            android:maxLength="8"
+            android:maxLength="18"
             android:inputType="textPassword" />
 
         <EditText
@@ -99,7 +99,7 @@
             android:background="@drawable/bg_edittext_border"
             android:drawableLeft="@mipmap/ic_matkhau"
             android:hint="Mật khẩu mới"
-            android:maxLength="8"
+            android:maxLength="18"
             android:inputType="textPassword" />
 
         <EditText
@@ -112,7 +112,7 @@
             android:drawableLeft="@mipmap/ic_matkhau"
             android:hint="Nhập lại mật khẩu mới"
             android:imeOptions="actionDone"
-            android:maxLength="8"
+            android:maxLength="18"
             android:inputType="textPassword" />
     </LinearLayout>
 
