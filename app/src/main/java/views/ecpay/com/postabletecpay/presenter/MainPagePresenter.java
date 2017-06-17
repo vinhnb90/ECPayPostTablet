@@ -203,15 +203,21 @@ public class MainPagePresenter implements IMainPagePresenter{
                 ListBookCmisResponse listBookCmisResponse;
                 String dataBookCmis = response.getBodyListEVNResponse().getListBookCmissResponse();
                 JSONArray jaBookCmis = new JSONArray(dataBookCmis);
-//                if(mainPageModel.deleteAllBookCmis() != -1) {
-                    for (int i = 0; i < jaBookCmis.length(); i++){
-                        listBookCmisResponse = gson.fromJson(jaBookCmis.getString(i), ListBookCmisResponse.class);
-                        if(mainPageModel.checkBookCmisExist(listBookCmisResponse.getBookCmis()) == 0) {
-                            mainPageModel.insertBookCmis(listBookCmisResponse);
-                        }
+                for (int i = 0; i < jaBookCmis.length(); i++){
+                    listBookCmisResponse = gson.fromJson(jaBookCmis.getString(i), ListBookCmisResponse.class);
+                    if(mainPageModel.checkBookCmisExist(listBookCmisResponse.getBookCmis()) == 0) {
+                        mainPageModel.insertBookCmis(listBookCmisResponse);
                     }
-//                }
-                synchronizeFileGen();
+                }
+
+                String path = Common.PATH_FOLDER_DOWNLOAD;
+                File directory = new File(path);
+                File[] allFiles = directory.listFiles();
+                if(allFiles.length == 0) {
+                    synchronizeFileGen();
+                } else {
+                    synchronizeData();
+                }
             } catch(Exception ex) {
                 iMainPageView.showTextMessage(ex.getMessage());
             }
@@ -532,7 +538,6 @@ public class MainPagePresenter implements IMainPagePresenter{
                                 e.printStackTrace();
                             }
                         }
-                        synchronizeData();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

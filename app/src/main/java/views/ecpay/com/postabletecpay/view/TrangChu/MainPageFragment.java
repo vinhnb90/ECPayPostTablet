@@ -100,8 +100,6 @@ public class MainPageFragment extends Fragment implements
         super.onCreate(savedInstanceState);
         iMainPagePresenter = new MainPagePresenter(this);
         iMainPagePresenter.synchronizePC();
-//        iMainPagePresenter.synchronizeFileGen();
-//        iMainPagePresenter.synchronizeData();
     }
 
     @Override

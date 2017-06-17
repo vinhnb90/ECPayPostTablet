@@ -437,7 +437,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         mCursor.moveToFirst();
         do {
-            int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId")));
+            int billId  = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId")));
             int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
             int status = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")));
             boolean isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))) == 0 ? false : true;
