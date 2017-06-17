@@ -297,4 +297,8 @@ public class PayModel extends CommonModel {
 
         return sqLiteConnection.SelectTraceNumberBill(edong, code, billId);
     }
+
+    public String getPcCode(){
+        return sqLiteConnection.getPcCode();
+    }
 }

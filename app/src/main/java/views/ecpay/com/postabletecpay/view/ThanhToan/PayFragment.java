@@ -350,7 +350,8 @@ public class PayFragment extends Fragment implements
     @Optional
     @OnClick(R.id.btn_dialog_thanhtoan_pay)
     public void clickPayPayingOnlineDialog(View view) {
-        if(Common.isNetworkConnected(PayFragment.this.getActivity())) {
+        if(Common.isConnectingWifi(PayFragment.this.getActivity())) {
+//      if(Common.isNetworkConnected(PayFragment.this.getActivity())) {
             mIPayPresenter.callPayingBillOnline(mEdong);
         } else {
             mIPayPresenter.callPayingBillOffline(mEdong);

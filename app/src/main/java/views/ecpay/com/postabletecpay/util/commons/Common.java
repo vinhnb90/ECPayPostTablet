@@ -537,6 +537,42 @@ public class Common {
         }
     }
 
+    public enum CODE_REPONSE_BILL_OFFLINE {
+        e01("01", "Hệ thống chưa hoàn tất xử lý giao dịch!"),
+        e021("021", "Phải thanh toán kỳ hoá đơn xa nhất, mã KH: "),
+        e022("022", "Phải thanh toán liên tục các kỳ hoá đơn, mã KH: "),
+        e03("03", "Số dư không đủ để thanh toán"),
+        e04("043", "Kiểm tra kết nối mạng hoặc liên hệ với đội kỹ thuật!"),
+        e051("051", "Hoá đơn đã thanh toán bởi nguồn khác"),
+        e052("052", "Hoá đơn đã thanh toán bởi số ví khác"),
+        ex00("00", "Thanh toán hoá đơn thất bại");
+
+        CODE_REPONSE_BILL_OFFLINE(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+        private String message;
+
+        public static CODE_REPONSE_BILL_OFFLINE findCodeMessage(String code) {
+            for (CODE_REPONSE_BILL_OFFLINE v : values()) {
+                if (v.getCode().equals(code)) {
+                    return v;
+                }
+            }
+            return CODE_REPONSE_BILL_OFFLINE.ex00;
+        }
+    }
+
     public enum CODE_REPONSE_DELETE_BILL_ONLINE {
         e000("000", "Thành công"),
         e2006("2006", "Không tìm thấy giao dịch tương ứng"),

@@ -287,20 +287,16 @@ public class PayPresenter implements IPayPresenter {
             return;
         }
 
-        totalBillsChooseDialogTemp = totalBillsChooseDialog;
+        //Cảnh báo khi giao dịch thanh toán chưa kết thúc
+        //Kiểm tra kỳ hoá đơn thanh toán
+        //Kiểm tra số dư khả dụng của tài khoản thanh toán
+        //Kiểm tra địa bàn thanh toán
+        if(mPayModel.getPcCode().substring(0, 2).toUpperCase().equals("PD") || mPayModel.getPcCode().substring(0, 2).toUpperCase().equals("PE")) {
+            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e04.getMessage());
+            return;
+        }
+        //Kiểm tra trạng thái hoá đơn thanh toán
 
-        mIPayView.showPayingRViewDialogStart();
-
-        Context context = mIPayView.getContextView();
-        String versionApp = Common.getVersionApp(context);
-
-        int index = 0;
-
-        //stop all thread
-        int maxIndex = billOnlineAsyncList.size();
-
-        //start count billDeleteOnline pay
-        countBillPayedSuccess = 0;
     }
 
     @Override

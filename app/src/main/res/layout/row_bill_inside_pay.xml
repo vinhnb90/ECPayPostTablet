@@ -49,10 +49,9 @@
 
         <ImageButton
             android:id="@+id/btn_row_bill_inside_pay_delete"
-            android:layout_width="50dp"
+            android:layout_width="30dp"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
-            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:background="@android:color/transparent"
             android:elevation="5dp"
@@ -60,10 +59,9 @@
 
         <ImageButton
             android:id="@+id/btn_row_bill_inside_pay_print"
-            android:layout_width="50dp"
+            android:layout_width="30dp"
             android:layout_height="match_parent"
             android:layout_alignBaseline="@+id/btn_row_bill_inside_pay_delete"
-            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_toLeftOf="@+id/btn_row_bill_inside_pay_delete"
             android:background="@android:color/transparent"
