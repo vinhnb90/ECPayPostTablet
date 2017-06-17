@@ -519,7 +519,7 @@ public class MainPagePresenter implements IMainPagePresenter{
                                 }
                                 for(ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
                                     listBillResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
-                                    if(mainPageModel.checkBillExist(Integer.parseInt(listBillResponse.getBodyBillResponse().getBillId())) == 0) {
+                                    if(mainPageModel.checkBillExist(listBillResponse.getBodyBillResponse().getBillId()) == 0) {
                                         if(mainPageModel.insertBill(listBillResponse) != -1) {
                                             Log.i("INFO", "TEST");
                                         }

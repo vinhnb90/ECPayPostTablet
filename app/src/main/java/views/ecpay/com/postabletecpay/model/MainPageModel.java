@@ -77,7 +77,7 @@ public class MainPageModel extends CommonModel {
         return sqLiteConnection.updateCustomer(customerResponse);
     }
 
-    public  long checkBillExist(int billId) {
+    public  long checkBillExist(String billId) {
         return sqLiteConnection.checkBillExist(billId);
     }
 

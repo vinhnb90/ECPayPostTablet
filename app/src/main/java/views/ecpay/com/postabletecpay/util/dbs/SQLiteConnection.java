@@ -1230,9 +1230,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return rowAffect;
     }
 
-    public long checkBillExist(int billId) {
+    public long checkBillExist(String billId) {
         database = this.getReadableDatabase();
-        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE billId = " + billId;
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE billId = '" + billId + "'";
         Cursor mCursor = database.rawQuery(query, null);
         if (mCursor.moveToFirst())
             return mCursor.getInt(0);
