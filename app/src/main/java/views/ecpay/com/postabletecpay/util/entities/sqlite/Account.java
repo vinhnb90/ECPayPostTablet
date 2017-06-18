@@ -8,6 +8,7 @@ public class Account {
     private String edong;
     private String name;
     private String address;
+    private String phone;
     private String email;
     private String birthday;
     private String session;
@@ -27,10 +28,15 @@ public class Account {
     private String idNumberPlace;
     private String parentEdong;
 
-    public Account(String edong, String name, String address, String email, String birthday, String session, Long balance, Integer lockMoney, boolean changePIN, int verified, String mac, String ip, String strLoginTime, String strLogoutTime, Integer type, String status, String idNumber, String idNumberDate, String idNumberPlace, String parentEdong) {
+
+
+    public Account(String edong, String name, String address,
+                   String phone,
+                   String email, String birthday, String session, Long balance, Integer lockMoney, boolean changePIN, int verified, String mac, String ip, String strLoginTime, String strLogoutTime, Integer type, String status, String idNumber, String idNumberDate, String idNumberPlace, String parentEdong) {
         this.edong = edong;
         this.name = name;
         this.address = address;
+        this.phone = phone;
         this.email = email;
         this.birthday = birthday;
         this.session = session;
@@ -72,6 +78,14 @@ public class Account {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getEmail() {

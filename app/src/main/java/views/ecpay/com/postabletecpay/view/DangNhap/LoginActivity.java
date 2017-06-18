@@ -135,6 +135,8 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
         try {
             Common.makeRootFolderAndGetDataConfig(this);
+            Common.makeRootFolderAndGetDataHelp(this);
+
         } catch (Exception e) {
             showTextMessage(e.getMessage());
             return;

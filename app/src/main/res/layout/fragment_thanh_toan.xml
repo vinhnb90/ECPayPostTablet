@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -18,7 +18,7 @@
             android:background="@drawable/bg_bill" />
 
         <ImageButton
-            android:id="@+id/ibtn_frag_user_info_back"
+            android:id="@+id/ibtn_frag_thanhtoan_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -31,7 +31,7 @@
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/ibtn_frag_user_info_back"
+            android:layout_alignBaseline="@+id/ibtn_frag_thanhtoan_back"
             android:layout_centerHorizontal="true"
             android:layout_margin="15dp"
             android:text="DANH SÁCH HOÁ ĐƠN"
@@ -175,8 +175,8 @@
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:background="@drawable/bg_circle_gray"
-                        app:srcCompat="@drawable/ic_cancel_white"
-                        android:visibility="gone" />
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_cancel_white" />
 
                     <ImageButton
                         android:id="@+id/ibtn_frag_thanhtoan_action_research_online"
@@ -185,8 +185,8 @@
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:background="@drawable/bg_circle_green"
-                        app:srcCompat="@drawable/ic_refresh"
-                        android:visibility="visible" />
+                        android:visibility="visible"
+                        app:srcCompat="@drawable/ic_refresh" />
                 </LinearLayout>
 
                 <ProgressBar
@@ -352,27 +352,48 @@
 
 
             <Button
-                android:layout_below="@+id/ll_frag_thanh_toan_count"
                 android:id="@+id/btn_frag_thanh_toan_paying"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ll_frag_thanh_toan_count"
                 android:layout_margin="10dp"
                 android:background="@drawable/bg_button"
                 android:text="THANH TOÁN"
-                android:textColor="@color/colorTextWhite"
-                android:layout_height="wrap_content" />
+                android:textColor="@color/colorTextWhite" />
 
         </RelativeLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:layout_margin="10dp"
-            android:layout_above="@+id/rlBottom"
-            android:id="@+id/rv_frag_thanh_toan_customer"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent"
-            android:layout_alignParentTop="true"
+            android:layout_above="@+id/rlBottom"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"></android.support.v7.widget.RecyclerView>
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:background="@android:color/transparent"
+            android:gravity="center_horizontal|center_vertical"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_frag_thanh_toan_customer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:background="@android:color/transparent"
+                android:visibility="visible"></android.support.v7.widget.RecyclerView>
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/tv_frag_thanh_toan_no_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="Không có khách hàng"
+                android:textSize="35sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
 
     </RelativeLayout>
 

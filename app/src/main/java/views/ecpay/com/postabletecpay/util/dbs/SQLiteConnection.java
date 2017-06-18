@@ -59,7 +59,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     private String TABLE_NAME_BILL = "TBL_BILL";
     private String TABLE_NAME_LICH_SU_TTOAN = "TBL_LICH_SU_TTOAN";
 
-    private String CREATE_TABLE_ACCOUNT = "CREATE TABLE `" + TABLE_NAME_ACCOUNT + "` (`edong` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `address` TEXT, `email` TEXT, `birthday` TEXT, `session` TEXT, `balance` NUMERIC, `lockMoney` NUMERIC, `changePIN` INTEGER, `verified` INTEGER, `mac` TEXT, `ip` TEXT, `strLoginTime` TEXT, `strLogoutTime` TEXT, `type` INTEGER, `status` TEXT, `idNumber` TEXT, `idNumberDate` TEXT, `idNumberPlace` TEXT, `parentEdong` TEXT )";
+    private String CREATE_TABLE_ACCOUNT = "CREATE TABLE `" + TABLE_NAME_ACCOUNT + "` (`edong` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `address` TEXT, `phone` TEXT, `email` TEXT, `birthday` TEXT, `session` TEXT, `balance` NUMERIC, `lockMoney` NUMERIC, `changePIN` INTEGER, `verified` INTEGER, `mac` TEXT, `ip` TEXT, `strLoginTime` TEXT, `strLogoutTime` TEXT, `type` INTEGER, `status` TEXT, `idNumber` TEXT, `idNumberDate` TEXT, `idNumberPlace` TEXT, `parentEdong` TEXT )";
 
 
     private String CREATE_TABLE_EVN_PC = "CREATE TABLE " + TABLE_NAME_EVN_PC + " ( pcId NOT NULL PRIMARY KEY, strPcId TEXT, parentId INTEGER, " +
@@ -89,8 +89,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             "`taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, " +
             "`billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `requestDate` TEXT,`edongKey` TEXT NOT NULL, " +
             "`isChecked` INTEGER default 0," +
-            "`traceNumber` INTERGER " +
-            "`statusCancelBillOnline` INTERGER" +
+            "`traceNumber` INTERGER, " +
             "`causeCancelBillOnline` TEXT)";
 
     private String CREATE_TABLE_LICH_SU_TTOAN = "CREATE TABLE " + TABLE_NAME_LICH_SU_TTOAN + "(ID INTEGER AUTO INCREMENT, " +
@@ -171,6 +170,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("edong", account.getEdong());
         initialValues.put("name", account.getName());
         initialValues.put("address", account.getAddress());
+        initialValues.put("phone", account.getPhone());
         initialValues.put("email", account.getEmail());
         initialValues.put("birthday", account.getBirthday());
         initialValues.put("session", account.getSession());
@@ -209,6 +209,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                                 "edong",
                                 "name",
                                 "address",
+                                "phone",
                                 "email",
                                 "birthday",
                                 "session",
@@ -238,6 +239,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edong"))),
                     stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name"))),
                     stringConvertNull(mCursor.getString(mCursor.getColumnIndex("address"))),
+                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phone"))),
                     stringConvertNull(mCursor.getString(mCursor.getColumnIndex("email"))),
                     stringConvertNull(mCursor.getString(mCursor.getColumnIndex("birthday"))),
                     stringConvertNull(mCursor.getString(mCursor.getColumnIndex("session"))),
@@ -432,7 +434,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         List<PayAdapter.BillEntityAdapter> billList = new ArrayList<>();
 
         database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode ='" + code + "'";
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode ='" + code + "' ORDER BY date(term) DESC";
         Cursor mCursor = database.rawQuery(query, null);
 
         mCursor.moveToFirst();
@@ -455,11 +457,11 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             bill.setCustomerPayCode(customerPayCode);
             bill.setMoneyBill(amount);
             bill.setMonthBill(term);
-            bill.setPayed(status == 0 ? false : true);
+            bill.setStatus(status);
             bill.setChecked(isChecked);
-            if (billingBy.equals(edong) || bill.isPayed())
-                bill.setPrint(true);
-            else bill.setPrint(false);
+            if (bill.getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())
+                bill.setPrint(false);
+            else bill.setPrint(true);
 
             bill.setRequestDate(dateRequest);
 
@@ -696,7 +698,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (TextUtils.isEmpty(edong))
             return null;
 
-        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " ORDER BY date(term) DESC ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
         return selectAllBillsOfAllCustomerCheckedWithQuery(edong, query);
     }
 
@@ -704,7 +706,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (TextUtils.isEmpty(edong))
             return null;
 
-        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " and status = " + statusBilling.getCode() + ") AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " and status = " + statusBilling.getCode() + " ORDER BY date(term) DESC ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
         return selectAllBillsOfAllCustomerCheckedWithQuery(edong, query);
     }
 
@@ -768,6 +770,25 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         contentValues.put("requestDate", dateNow);
         contentValues.put("traceNumber", traceNumber);
         return database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, customerCode, String.valueOf(billId)});
+    }
+
+    public Long SelectTraceNumberBill(String edong, String code, Long billId) {
+        database = this.getReadableDatabase();
+        String query = "SELECT traceNumber FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and billId = " + billId;
+        Cursor mCursor = database.rawQuery(query, null);
+        if (mCursor.moveToFirst())
+            return longConvertNull(mCursor.getLong(mCursor.getColumnIndex("traceNumber")));
+
+        return 0l;
+    }
+
+    public void updateBillReasonDelete(String edong, String code, Long billId, String reasonDeleteBill, Common.STATUS_BILLING statusBilling) {
+        database = this.getReadableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("causeCancelBillOnline", reasonDeleteBill);
+        contentValues.put("status", statusBilling.getCode());
+
+        database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, code, String.valueOf(billId)});
     }
 
     //endregion
@@ -1257,16 +1278,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             return c.getString(0);
         }
         return "";
-    }
-
-    public Long SelectTraceNumberBill(String edong, String code, Long billId) {
-        database = this.getReadableDatabase();
-        String query = "SELECT traceNumber FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and billId = " + billId;
-        Cursor mCursor = database.rawQuery(query, null);
-        if (mCursor.moveToFirst())
-            return longConvertNull(mCursor.getLong(mCursor.getColumnIndex("traceNumber")));
-
-        return 0l;
     }
     //endregion
 

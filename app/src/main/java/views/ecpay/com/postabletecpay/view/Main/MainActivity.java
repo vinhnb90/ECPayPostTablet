@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.view.Main;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,6 +16,9 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.google.zxing.Result;
+
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
@@ -24,18 +28,22 @@ import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
+import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.REQUEST_BARCODE;
+import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.RESPONSE_BARCODE;
 
 public class MainActivity extends AppCompatActivity implements
         MainPageFragment.OnFragmentInteractionListener,
         PayAdapter.OnInterationBillInsidePayAdapter,
         PayBillsDialogAdapter.OnInteractionBillDialogRecycler,
-        PayFragment.OnFragmentInteractionListener,
+        PayFragment.OnPayFragmentInteractionListener,
         PayFragment.CallbackPayingOnlineDialog,
         PayFragment.CallbackDeleteBillOnlineDialog,
         BaoCaoFragment.OnFragmentInteractionListener,
-        UserInfoFragment.OnFragmentInteractionListener {
+        ZXingScannerView.ResultHandler,
+        UserInfoFragment.OnFragmentInteractionListener
+{
 
-    public static BottomNavigationView navigation;
+    public static BottomNavigationView sNavigation;
     public static String mEdong;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -93,8 +101,58 @@ public class MainActivity extends AppCompatActivity implements
         fragmentTransaction.replace(R.id.frameLayout, MainPageFragment.newInstance(mEdong));
         fragmentTransaction.commit();
 
-        navigation = (BottomNavigationView) findViewById(R.id.navigation_ac_main);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        sNavigation = (BottomNavigationView) findViewById(R.id.navigation_ac_main);
+
+
+       /* BottomNavigationMenuView menuView = (BottomNavigationMenuView) sNavigation.getChildAt(0);
+        for (int i = 0; i < menuView.getChildCount(); i++) {
+            final View iconView = menuView.getChildAt(i).findViewById(android.support.design.R.id.icon);
+            menuView.getChildAt(i).get
+            final ViewGroup.LayoutParams layoutParams = iconView.getLayoutParams();
+            final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, displayMetrics);
+            layoutParams.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, displayMetrics);
+            iconView.setLayoutParams(layoutParams);
+        }*/
+
+        sNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        //check fragment
+        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+            return;
+        }
+
+        if (fragmentVisibling instanceof PayFragment)
+            ((PayFragment) fragmentVisibling).onPauseScannerBarcode();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUEST_BARCODE && resultCode == RESPONSE_BARCODE & data!=null)
+        {
+            //check fragment
+            Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+            if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+                return;
+            }
+
+            if (fragmentVisibling instanceof PayFragment)
+                ((PayFragment) fragmentVisibling).onPauseScannerBarcode();
+        }
     }
 
     private void getBundle() {
@@ -102,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public static void updateNavigationBarState(int actionId) {
-        Menu menu = navigation.getMenu();
+        Menu menu = sNavigation.getMenu();
         for (int i = 0, size = menu.size(); i < size; i++) {
             MenuItem menuItem = menu.getItem(i);
             menuItem.setChecked(menuItem.getItemId() == actionId);
@@ -124,8 +182,8 @@ public class MainActivity extends AppCompatActivity implements
         if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
             return;
         }
-
-        ((PayFragment) fragmentVisibling).showBillCheckedFragment(edong, code, bill, posCustomer);
+        if (fragmentVisibling instanceof PayFragment)
+            ((PayFragment) fragmentVisibling).showBillCheckedFragment(edong, code, bill, posCustomer);
     }
 
     @Override
@@ -139,10 +197,9 @@ public class MainActivity extends AppCompatActivity implements
         if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
             return;
         }
-
-        ((PayFragment) fragmentVisibling).processDialogDeleteBillOnline(edong, code, bill, posCustomerInside);
+        if (fragmentVisibling instanceof PayFragment)
+            ((PayFragment) fragmentVisibling).processDialogDeleteBillOnline(edong, code, bill, posCustomerInside);
     }
-
     //endregion
 
     //region PayBillsDialogAdapter.OnInteractionBillDialogRecycler
@@ -154,11 +211,10 @@ public class MainActivity extends AppCompatActivity implements
         if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
             return;
         }
-
-        ((PayFragment) fragmentVisibling).showBillCheckedDialog(mEdong, pos, isChecked);
+        if (fragmentVisibling instanceof PayFragment)
+            ((PayFragment) fragmentVisibling).showBillCheckedDialog(mEdong, pos, isChecked);
 
     }
-
     //endregion
 
     //region PayFragment.CallbackPayingOnlineDialog
@@ -169,9 +225,10 @@ public class MainActivity extends AppCompatActivity implements
         if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
             return;
         }
-
-        ((PayFragment) fragmentVisibling).bindViewAgain();
-        ((PayFragment) fragmentVisibling).refreshRecyclerListFragment();
+        if (fragmentVisibling instanceof PayFragment) {
+            ((PayFragment) fragmentVisibling).bindViewAgain();
+            ((PayFragment) fragmentVisibling).refreshRecyclerListFragment();
+        }
     }
 
     //endregion
@@ -185,8 +242,53 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
-//        ((PayFragment) fragmentVisibling).showDialogDeleteBillOnline();
-//        ((PayFragment) fragmentVisibling).refreshRecyclerListFragment();
     }
+    //endregion
+
+    //region ZXingScannerView.ResultHandler
+    @Override
+    public void handleResult(Result result) {
+        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragmentVisibling instanceof PayFragment)
+            ((PayFragment) fragmentVisibling).fillResultToTextBarcodeDialog(result.getText());
+    }
+
+    @Override
+    public void fillToSearchText(String textBarcode) {
+        if (TextUtils.isEmpty(textBarcode))
+            return;
+        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragmentVisibling instanceof PayFragment)
+            ((PayFragment) fragmentVisibling).fillResultToSearchText(textBarcode);
+    }
+
+    @Override
+    public void setRootViewAgain() {
+        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragmentVisibling instanceof PayFragment) {
+            ((PayFragment) fragmentVisibling).bindViewAgain();
+        }
+    }
+
+    @Override
+    public void refreshCamera(ZXingScannerView mScannerView) {
+        mScannerView.resumeCameraPreview(this);
+    }
+
+    @Override
+    public void showMainPageFragment() {
+        Fragment fragment = MainPageFragment.newInstance(mEdong);
+        if (fragment != null) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frameLayout, fragment);
+            fragmentTransaction.commit();
+        }
+    }
+
+   /* @Override
+    public void processOnDismissBarcodeDialog(String textBarcode) {
+
+    }*/
+
     //endregion
 }

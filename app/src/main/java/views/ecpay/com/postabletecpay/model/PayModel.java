@@ -298,7 +298,20 @@ public class PayModel extends CommonModel {
         return sqLiteConnection.SelectTraceNumberBill(edong, code, billId);
     }
 
-    public String getPcCode(){
+    public String getPcCode() {
         return sqLiteConnection.getPcCode();
+    }
+
+    public void updateBillReasonDelete(String edong, String code, Long billId, String reasonDeleteBill, Common.STATUS_BILLING statusBilling) {
+        boolean failInput =
+                TextUtils.isEmpty(edong) ||
+                        TextUtils.isEmpty(code) ||
+                        TextUtils.isEmpty(reasonDeleteBill) ||
+                        statusBilling == null;
+
+        if (failInput)
+            return;
+
+        sqLiteConnection.updateBillReasonDelete(edong, code, billId, reasonDeleteBill, statusBilling);
     }
 }

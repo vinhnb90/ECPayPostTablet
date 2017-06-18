@@ -49,7 +49,7 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.TAG;
  * Created by VinhNB on 5/23/2017.
  */
 
-public class MainPagePresenter implements IMainPagePresenter{
+public class MainPagePresenter implements IMainPagePresenter {
     private IMainPageView iMainPageView;
     private MainPageModel mainPageModel;
     private SharePrefManager mSharedPrefLogin;
@@ -76,16 +76,18 @@ public class MainPagePresenter implements IMainPagePresenter{
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void synchronizePC() {
-        String userName = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
-                .getString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, "");
-        String pass = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
-                .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
+        String userName =
+                mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
+                        .getString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, "");
+        String pass =
+                mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
+                        .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
 
         String textMessage = "";
         Context context = iMainPageView.getContextView();
         Boolean isErr = false;
 
-        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.LENGTH_USER_NAME) && !isErr) {
+        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.MAX_LENGTH) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_USER.toString();
             isErr = true;
         }
@@ -186,6 +188,9 @@ public class MainPagePresenter implements IMainPagePresenter{
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onPost(ListEVNReponse response) {
+            if (response == null)
+                return;
+
             try {
                 GsonBuilder gsonBuilder = new GsonBuilder();
                 Gson gson = gsonBuilder.create();
@@ -193,9 +198,9 @@ public class MainPagePresenter implements IMainPagePresenter{
                 ListEvnPCResponse listEvnPCResponse;
                 String dataEvnPC = response.getBodyListEVNResponse().getListEvnPCLoginResponse();
                 JSONArray jaEvnPC = new JSONArray(dataEvnPC);
-                for (int i = 0; i < jaEvnPC.length(); i++){
+                for (int i = 0; i < jaEvnPC.length(); i++) {
                     listEvnPCResponse = gson.fromJson(jaEvnPC.getString(i), ListEvnPCResponse.class);
-                    if(mainPageModel.deleteAllPC() != -1) {
+                    if (mainPageModel.deleteAllPC() != -1) {
                         mainPageModel.insertEvnPC(listEvnPCResponse);
                     }
                 }
@@ -203,9 +208,9 @@ public class MainPagePresenter implements IMainPagePresenter{
                 ListBookCmisResponse listBookCmisResponse;
                 String dataBookCmis = response.getBodyListEVNResponse().getListBookCmissResponse();
                 JSONArray jaBookCmis = new JSONArray(dataBookCmis);
-                for (int i = 0; i < jaBookCmis.length(); i++){
+                for (int i = 0; i < jaBookCmis.length(); i++) {
                     listBookCmisResponse = gson.fromJson(jaBookCmis.getString(i), ListBookCmisResponse.class);
-                    if(mainPageModel.checkBookCmisExist(listBookCmisResponse.getBookCmis()) == 0) {
+                    if (mainPageModel.checkBookCmisExist(listBookCmisResponse.getBookCmis()) == 0) {
                         mainPageModel.insertBookCmis(listBookCmisResponse);
                     }
                 }
@@ -213,12 +218,12 @@ public class MainPagePresenter implements IMainPagePresenter{
                 String path = Common.PATH_FOLDER_DOWNLOAD;
                 File directory = new File(path);
                 File[] allFiles = directory.listFiles();
-                if(allFiles.length == 0) {
+                if (allFiles.length == 0) {
                     synchronizeFileGen();
                 } else {
                     synchronizeData();
                 }
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 iMainPageView.showTextMessage(ex.getMessage());
             }
         }
@@ -234,16 +239,17 @@ public class MainPagePresenter implements IMainPagePresenter{
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void synchronizeFileGen() {
-        String userName = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
-                .getString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, "");
-        String pass = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
-                .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
-
+        String userName =
+                mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
+                        .getString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, "");
+        String pass =
+                mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
+                        .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
         String textMessage = "";
         Context context = iMainPageView.getContextView();
         Boolean isErr = false;
 
-        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.LENGTH_USER_NAME) && !isErr) {
+        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.MAX_LENGTH) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_USER.toString();
             isErr = true;
         }
@@ -264,6 +270,7 @@ public class MainPagePresenter implements IMainPagePresenter{
             iMainPageView.showTextMessage(textMessage);
             return;
         }
+
 
         ConfigInfo configInfo;
         String versionApp = "";
@@ -295,7 +302,7 @@ public class MainPagePresenter implements IMainPagePresenter{
         configInfo.setSignatureEncrypted(signatureEncrypted);
 
         Cursor c = mainPageModel.getAllBookCmis();
-        if(c.moveToFirst()) {
+        if (c.moveToFirst()) {
             do {
                 bookCmis = c.getString(0);
 
@@ -362,7 +369,7 @@ public class MainPagePresenter implements IMainPagePresenter{
         Context context = iMainPageView.getContextView();
         Boolean isErr = false;
 
-        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.LENGTH_USER_NAME) && !isErr) {
+        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.MAX_LENGTH) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_USER.toString();
             isErr = true;
         }
@@ -414,11 +421,13 @@ public class MainPagePresenter implements IMainPagePresenter{
         configInfo.setSignatureEncrypted(signatureEncrypted);
 
         Cursor c = mainPageModel.getAllBookCmis();
-        if(c.moveToFirst()) {
+        if (c.moveToFirst()) {
             do {
+
                 bookCmis = c.getString(0);
                 File fileBookCmis = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + ".zip");
-                if(fileBookCmis.exists()) {
+                if (fileBookCmis.exists()) {
+
                     String jsonRequestData = SoapAPI.getJsonRequestSynData(
                             configInfo.getAGENT(),
                             configInfo.getAgentEncypted(),
@@ -489,25 +498,28 @@ public class MainPagePresenter implements IMainPagePresenter{
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onPost(ListDataZipResponse response) {
+            if (response == null)
+                return;
+
             String sData = response.getBodyListDataResponse().getFile_data();
-            if(sData != null && !sData.isEmpty()) {
+            if (sData != null && !sData.isEmpty()) {
                 byte[] zipByte = org.apache.commons.codec.binary.Base64.decodeBase64(sData.getBytes());
 
                 try {
                     File file = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + ".zip");
                     Common.writeBytesToFile(file, zipByte);
-                    if(file.exists()) {
-                        File fileText = new File(Common.PATH_FOLDER_DOWNLOAD,"full.txt");
-                        if(fileText.exists())
+                    if (file.exists()) {
+                        File fileText = new File(Common.PATH_FOLDER_DOWNLOAD, "full.txt");
+                        if (fileText.exists())
                             fileText.delete();
-                        if(Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + ".zip")) {
+                        if (Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + ".zip")) {
                             StringBuilder text = new StringBuilder();
                             try {
                                 BufferedReader br = new BufferedReader(new FileReader(fileText));
                                 String line;
 
                                 while ((line = br.readLine()) != null) {
-                                    text.append(line);
+                                    text.append(line);//chỗ tạo file đây
                                     text.append('\n');
                                 }
                                 br.close();
@@ -516,23 +528,23 @@ public class MainPagePresenter implements IMainPagePresenter{
                                 GsonBuilder gsonBuilder = new GsonBuilder();
                                 Gson gson = gsonBuilder.create();
                                 FileGenResponse fileGenResponse = gson.fromJson(ja.toString(), FileGenResponse.class);
-                                for(ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
-                                    if(mainPageModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0){
-                                        if(mainPageModel.insertCustomer(listCustomerResponse) != -1) {
+                                for (ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
+                                    if (mainPageModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
+                                        if (mainPageModel.insertCustomer(listCustomerResponse) != -1) {
                                             Log.i("INFO", "TEST");
                                         }
                                     }
                                 }
-                                for(ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
+
+                                for (ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
                                     listBillResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
-                                    if(mainPageModel.checkBillExist(listBillResponse.getBodyBillResponse().getBillId()) == 0) {
-                                        if(mainPageModel.insertBill(listBillResponse) != -1) {
+                                    if (mainPageModel.checkBillExist(listBillResponse.getBodyBillResponse().getBillId()) == 0) {
+                                        if (mainPageModel.insertBill(listBillResponse) != -1) {
                                             Log.i("INFO", "TEST");
                                         }
                                     }
                                 }
-                            }
-                            catch (IOException e) {
+                            } catch (IOException e) {
                                 e.printStackTrace();
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -566,24 +578,24 @@ public class MainPagePresenter implements IMainPagePresenter{
         @Override
         public void onPost(ListDataResponse response) {
             String sDataCustomer = response.getBodyListDataResponse().getCustomer();
-            if(sDataCustomer != null && !sDataCustomer.isEmpty()) {
+            if (sDataCustomer != null && !sDataCustomer.isEmpty()) {
                 byte[] zipByteCustomer = org.apache.commons.codec.binary.Base64.decodeBase64(sDataCustomer.getBytes());
 
                 try {
                     String sCustomer = Common.decompress(zipByteCustomer);
 
                     JSONArray jsonArray = new JSONArray(sCustomer);
-                    for(int i = 0; i < jsonArray.length(); i++) {
+                    for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject ja = jsonArray.getJSONObject(i);
                         GsonBuilder gsonBuilder = new GsonBuilder();
                         Gson gson = gsonBuilder.create();
                         CustomerResponse customerResponse = gson.fromJson(ja.toString(), CustomerResponse.class);
-                        if(mainPageModel.checkCustomerExist(customerResponse.getBodyCustomerResponse().getCustomerCode()) == 0){
-                            if(mainPageModel.insertCustomer(customerResponse) != -1) {
+                        if (mainPageModel.checkCustomerExist(customerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
+                            if (mainPageModel.insertCustomer(customerResponse) != -1) {
                                 Log.i("INFO", "SUCCESS");
                             }
                         } else {
-                            if(mainPageModel.updateCustomer(customerResponse) != -1) {
+                            if (mainPageModel.updateCustomer(customerResponse) != -1) {
                                 Log.i("INFO", "SUCCESS");
                             }
                         }
@@ -595,25 +607,25 @@ public class MainPagePresenter implements IMainPagePresenter{
                 }
             }
             String sDataBill = response.getBodyListDataResponse().getBill();
-            if(sDataBill  != null && !sDataBill .isEmpty()) {
+            if (sDataBill != null && !sDataBill.isEmpty()) {
                 byte[] zipByteBill = org.apache.commons.codec.binary.Base64.decodeBase64(sDataBill.getBytes());
 
                 try {
                     String sCustomer = Common.decompress(zipByteBill);
 
                     JSONArray jsonArray = new JSONArray(sCustomer);
-                    for(int i = 0; i < jsonArray.length(); i++) {
+                    for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject ja = jsonArray.getJSONObject(i);
                         GsonBuilder gsonBuilder = new GsonBuilder();
                         Gson gson = gsonBuilder.create();
                         BillResponse billResponse = gson.fromJson(ja.toString(), BillResponse.class);
                         billResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
-                        if(mainPageModel.checkBillExist(billResponse.getBodyBillResponse().getId()) == 0){
-                            if(mainPageModel.insertBill(billResponse) != -1) {
+                        if (mainPageModel.checkBillExist(billResponse.getBodyBillResponse().getId()) == 0) {
+                            if (mainPageModel.insertBill(billResponse) != -1) {
                                 Log.i("INFO", "SUCCESS");
                             }
                         } else {
-                            if(mainPageModel.updateBill(billResponse) != -1) {
+                            if (mainPageModel.updateBill(billResponse) != -1) {
                                 Log.i("INFO", "SUCCESS");
                             }
                         }

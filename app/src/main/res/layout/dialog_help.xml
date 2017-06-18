@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="15dp"
+        android:background="@android:drawable/dialog_holo_light_frame">
+
+        <ImageView
+            android:id="@+id/ivLogo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="130dp"
+            android:layout_marginRight="130dp"
+            android:layout_marginTop="20dp"
+            android:adjustViewBounds="true"
+            android:src="@drawable/logoecpay" />
+
+        <TextView
+            android:id="@+id/tvText1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivLogo"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"
+            android:text="HƯỚNG DẪN"
+            android:textAllCaps="true"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/btn_dialog_help_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/bg_button"
+            android:text="OK"
+            android:textColor="@color/colorTextWhite" />
+
+
+        <TextView
+            android:id="@+id/tv_dialog_help_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/btn_dialog_help_ok"
+            android:layout_below="@+id/tvText1"
+            android:layout_marginTop="5dp"
+            android:maxLines="30"
+            android:padding="10dp"
+            android:scrollbars="vertical"
+            android:text="Email: hotro@ecpay.vn
+Email: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vn"
+            android:textSize="16sp" />
+
+
+    </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/ibtn_dialog_help_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@null"
+        android:src="@mipmap/ic_close_blue" />
+
+
+</RelativeLayout>
+
+    <!--<?xml version="1.0" encoding="utf-8"?>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="20dp"
+            android:background="@android:drawable/dialog_holo_light_frame">
+
+            <ImageView
+                android:id="@+id/ivLogo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="130dp"
+                android:layout_marginRight="130dp"
+                android:layout_marginTop="20dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/logoecpay" />
+
+            <TextView
+                android:id="@+id/tvText1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ivLogo"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:gravity="center_horizontal"
+                android:text="HƯỚNG DẪN"
+                android:textAllCaps="true"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/llText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvText1"
+                android:layout_centerHorizontal="true"
+                android:orientation="horizontal">
+
+
+            </LinearLayout>
+
+            <Button
+                android:layout_alignParentBottom="true"
+                android:id="@+id/btn_dialog_help_ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/scrollv_dialog_help"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="30dp"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/bg_button"
+                android:text="OK"
+                android:textColor="@color/colorTextWhite" />
+
+            <ScrollView
+                android:layout_above="@+id/btn_dialog_help_ok"
+                android:id="@+id/scrollv_dialog_help"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/llText"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/tv_dialog_help_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="5dp"
+                    android:text="Email: hotro@ecpay.vn
+    Email: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vnEmail: hotro@ecpay.vn"
+
+                    android:textSize="16sp" />
+
+            </ScrollView>
+
+
+
+        </RelativeLayout>
+
+        <ImageButton
+            android:id="@+id/ibClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@null"
+            android:src="@mipmap/ic_close_blue" />
+
+    </RelativeLayout>-->

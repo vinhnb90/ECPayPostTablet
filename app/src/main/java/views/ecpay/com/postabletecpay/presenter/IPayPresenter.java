@@ -35,4 +35,6 @@ public interface IPayPresenter {
     void callFillInfoBillDeleteDialog(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside);
 
     void callDeleteOnlineSoap(String edong, String reasonDeleteBill);
+
+    void callShowDialogBarcode();
 }

@@ -43,22 +43,31 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.security.PrivateKey;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Currency;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.zip.GZIPInputStream;
@@ -73,6 +82,9 @@ import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.AlgorithmRSA.AsymmetricCryptography;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
+
+import static java.lang.System.lineSeparator;
 
 /**
  * Created by macbook on 5/5/17.
@@ -80,13 +92,29 @@ import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 
 public class Common {
 
+
+    public static String convertLongToMoney(long balance) {
+
+        Locale locale = new Locale("vi", "VN");
+        Currency currency = Currency.getInstance("VND");
+
+        DecimalFormatSymbols df = DecimalFormatSymbols.getInstance(locale);
+        df.setCurrency(currency);
+        NumberFormat numberFormat = NumberFormat.getCurrencyInstance(locale);
+        numberFormat.setCurrency(currency);
+        System.out.println("Formatted currency: " + numberFormat.format(balance));
+
+        return numberFormat.format(balance);
+
+    }
+
     //region param account
     public enum TYPE_ACCOUNT {
-        ADMIN_IT(1, "Admin IT"),
+        ADMIN_IT(-1, "Admin IT"),
         ADMIN_KD(0, "Admin Kinh Doanh"),
-        TNV_THUONG(0, "Thu nhân viên thường"),
-        TNV_DA_NANG(0, "Thu nhân viên đa năng"),
-        NV_QLY(0, "Nhân viên quản lý");
+        TNV_THUONG(1, "TNV thường"),
+        TNV_DA_NANG(2, "TNV quầy đa năng"),
+        NV_QLY(3, "Nhân viên quản lý");
 
         private final int type;
         private String typeString;
@@ -246,7 +274,8 @@ public class Common {
     public enum STATUS_BILLING {
         CHUA_THANH_TOAN(0, "Chưa thanh toán"),
         DA_THANH_TOAN(1, "Đã thanh toán"),
-        HUY_HOA_DON(2, "Đã bị hủy hóa đơn");
+        HUY_HOA_DON(2, "Đã bị hủy hóa đơn"),
+        DANG_CHO_HUY(3, "Đang chờ hủy");
 
         STATUS_BILLING(int code, String message) {
             this.code = code;
@@ -278,6 +307,7 @@ public class Common {
     //region Description key
     public static final String TAG = "TAG";
     public static final String KEY_EDONG = "EDONG";
+
     //endregion
 
     //region info error message android
@@ -312,10 +342,10 @@ public class Common {
                 return "Kiểm tra kết nối internet của wifi!";
 
             if (LOGIN_ERR_USER == this)
-                return "Tên đăng nhập là chữ thường, chữ hoa, các kí tự đặc biệt, tối đa 20 kí tự và không để trống!";
+                return "Tên đăng nhập là chữ thường, chữ hoa, các kí tự đặc biệt, từ 6 tới 18 kí tự và không để trống!";
 
             if (LOGIN_ERR_PASS == this)
-                return "Mật khẩu là chữ thường, chữ hoa, các kí tự đặc biệt, tối đa 8 kí tự và không để trống!";
+                return "Mật khẩu là chữ thường, chữ hoa, các kí tự đặc biệt, từ 6 tới 18 kí tự và không để trống!";
 
             if (ERR_CREATE_FOLDER == this)
                 return "Xảy ra vấn đề khi tạo thư mục chứa tài nguyên trên SDCard!";
@@ -339,13 +369,13 @@ public class Common {
                 return "Quá thời gian kết nối cho phép tới máy chủ " + TIME_OUT_CONNECT / 1000 + " s";
 
             if (CHANGE_PASS_ERR_PASS_OLD == this)
-                return "Mật khẩu cũ không được để trống, tối đa 8 kí tự!";
+                return "Mật khẩu cũ không hợp lệ, số kí tự giới hạn từ 6 tới 18 kí tự!";
 
             if (CHANGE_PASS_ERR_PASS_NEW == this)
-                return "Mật khẩu mới không được để trống, tối đa 8 kí tự!";
+                return "Mật khẩu mới không hợp lệ, số kí tự giới hạn từ 6 tới 18 kí tự!";
 
             if (CHANGE_PASS_ERR_PASS_RETYPE == this)
-                return "Mật khẩu mới nhập lại không được để trống, tối đa 8 kí tự!";
+                return "Mật khẩu mới nhập lại không hợp lệ, số kí tự giới hạn từ 6 tới 18 kí tự!";
 
             if (CHANGE_PASS_ERR_PASS_NEW_NOT_EQUAL_PASS_OLD == this)
                 return "Mật khẩu mới không trùng với mật khẩu cũ!";
@@ -473,8 +503,7 @@ public class Common {
             return message;
         }
 
-        public static String getMessageServerNotify(String nameCustomer, String term, String message)
-        {
+        public static String getMessageServerNotify(String nameCustomer, String term, String message) {
             return "Gặp vấn đề với hóa đơn của khách hàng " + nameCustomer + " tại kỳ " + term
                     + "\nnhư sau: " + message;
         }
@@ -733,7 +762,8 @@ public class Common {
     public static final String PATH_FOLDER_DB = PATH_FOLDER_ROOT + "DB" + File.separator;
     public static final String PATH_FOLDER_CONFIG = PATH_FOLDER_ROOT + "Config" + File.separator;
     public static final String PATH_FOLDER_DOWNLOAD = PATH_FOLDER_ROOT + "Download" + File.separator;
-//    public static final String PATH_FOLDER_DATA = PATH_FOLDER_ROOT + "Data" + File.separator;
+    //    public static final String PATH_FOLDER_DATA = PATH_FOLDER_ROOT + "Data" + File.separator;
+    public static final String PATH_FOLDER_HELP = PATH_FOLDER_ROOT + "Help" + File.separator;
     //endregion
 
     //region info connect API SOAP
@@ -742,8 +772,10 @@ public class Common {
 
     //region config file and system
     private static ConfigInfo cfgInfo;
-    public static final String[] CFG_COLUMN = {"PUBLIC_KEY", "PRIVATE_KEY", "AGENT", "PASS_WORD", "PC_CODE"};
     public static final String CONFIG_FILENAME = "config.cfg";
+    public static final String[] CFG_COLUMN = {"PUBLIC_KEY", "PRIVATE_KEY", "AGENT", "PASS_WORD", "PC_CODE"};
+    public static final String HELP_FILENAME = "help.txt";
+    public static final String[] HELP_COLUMN = {"INFO_HELP"};
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
 
@@ -771,6 +803,32 @@ public class Common {
             throw new Exception(MESSAGE_NOTIFY.ERR_WIFI.toString());
 
         return macAddress;
+    }
+
+    public static String makeRootFolderAndGetDataHelp(Context context) throws Exception {
+        if (context == null)
+            return TEXT_EMPTY;
+        if (!isExternalStorageWritable())
+            return TEXT_EMPTY;
+
+        File folderHelp = new File(PATH_FOLDER_HELP);
+        if (!folderHelp.exists()) {
+            folderHelp.mkdir();
+        }
+
+        File fileHelp = new File(PATH_FOLDER_HELP + Common.HELP_FILENAME);
+        String result = Common.TEXT_EMPTY;
+
+        if (!fileHelp.exists()) {
+            try {
+                fileHelp.createNewFile();
+            } catch (IOException e) {
+                throw e;
+            }
+//            if (!Common.createFileHelp(fileHelp)) return TEXT_EMPTY;
+        }
+        result = Common.getDataFileHelp();
+        return result;
     }
 
     public static void makeRootFolderAndGetDataConfig(Context context) throws Exception {
@@ -818,7 +876,6 @@ public class Common {
                 Common.cfgInfo = new ConfigInfo();
                 Common.createFileConfig(Common.cfgInfo, fileConfig);
             }
-
         } catch (Exception ex) {
             throw new Exception(Common.MESSAGE_NOTIFY.ERR_CREATE_FOLDER.toString());
         }
@@ -837,6 +894,15 @@ public class Common {
             }
             if (allFilesConfig != null)
                 scanFile(ctx, allFilesConfig);
+
+            // Load help folder
+            File fileHelp = new File(Common.PATH_FOLDER_HELP);
+            String[] allFilesHelp = fileHelp.list();
+            for (int i = 0; i < allFilesHelp.length; i++) {
+                allFilesHelp[i] = Common.PATH_FOLDER_HELP + allFilesHelp[i];
+            }
+            if (allFilesHelp != null)
+                scanFile(ctx, allFilesHelp);
 
             // Load db folder
             File file_db = new File(Common.PATH_FOLDER_DB);
@@ -895,6 +961,41 @@ public class Common {
         return false;
     }
 
+    public static boolean createFileHelp(File helpFile) {
+
+
+        if (helpFile == null)
+            return false;
+        FileOutputStream fos;
+        XmlSerializer serializer = Xml.newSerializer();
+        String[] tagValue = new String[]{TEXT_EMPTY};
+        try {
+            helpFile.createNewFile();
+            helpFile.setWritable(true);
+            helpFile.setReadable(true);
+            fos = new FileOutputStream(helpFile, false);
+
+            serializer.setOutput(fos, "UTF-8");
+            serializer.startDocument(null, Boolean.valueOf(true));
+            serializer.setFeature("http://xmlpull.org/v1/doc/features.html#indent-output", true);
+            serializer.startTag(null, "HelpData");
+
+            for (int i = 0; i < Common.HELP_COLUMN.length; i++) {
+                serializer.startTag(null, Common.HELP_COLUMN[i]);
+                serializer.text(tagValue[i]);
+                serializer.endTag(null, Common.HELP_COLUMN[i]);
+            }
+            serializer.endTag(null, "HelpData");
+            serializer.endDocument();
+
+            serializer.flush();
+            fos.close();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static boolean createFileConfig(final ConfigInfo cfg, File cfgFile) {
         if (cfg == null || cfgFile == null)
             return false;
@@ -927,6 +1028,106 @@ public class Common {
             return false;
         }
     }
+
+
+    public static String getDataFileHelp() {
+        File file = new File(PATH_FOLDER_HELP + Common.HELP_FILENAME);
+        StringBuilder result = new StringBuilder();
+        String sCurrentLine = Common.TEXT_EMPTY;
+
+        BufferedReader br = null;
+        FileReader fr = null;
+
+        try {
+
+            InputStream inputStream = new FileInputStream(file);
+
+            fr = new FileReader(file);
+            br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                result.append(sCurrentLine);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    result.append(lineSeparator());
+                } else
+                    result.append(System.getProperty("line.separator"));
+            }
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            try {
+
+                if (br != null)
+                    br.close();
+
+                if (fr != null)
+                    fr.close();
+
+            } catch (IOException ex) {
+
+                ex.printStackTrace();
+
+            }
+
+        }
+
+/*
+        try {
+            InputStream inputStream= new FileInputStream(new File(PATH_FOLDER_HELP + Common.HELP_FILENAME));
+            Reader reader = new InputStreamReader(inputStream,"UTF-8");
+            InputSource is = new InputSource(reader);
+            is.setEncoding("UTF-8");
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(is);
+            doc.getDocumentElement().normalize();
+
+//            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+//            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+//            FileInputStream in = new FileInputStream(new File(PATH_FOLDER_HELP + Common.HELP_FILENAME));
+//            Document doc = dBuilder.parse(in, "UTF-16");
+
+
+//            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//            DocumentBuilder db = dbf.newDocumentBuilder();
+//            Document doc = db.parse(new File(PATH_FOLDER_HELP + Common.HELP_FILENAME));
+//            doc.getDocumentElement().normalize();
+
+
+//            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//            DocumentBuilder db = dbf.newDocumentBuilder();
+//            InputStream inputStream = new FileInputStream(new File(PATH_FOLDER_HELP + Common.HELP_FILENAME));
+//            Document doc =  db.parse(new InputSource(new InputStreamReader(inputStream, "UTF-8")));
+//            doc.getDocumentElement().normalize();
+
+
+            NodeList nodeList = doc.getElementsByTagName("HelpData");
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
+
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element elm = (Element) node;
+                    NodeList heplElement = elm.getElementsByTagName(Common.HELP_COLUMN[0]);
+                    if (heplElement != null && heplElement.item(0) != null) {
+                        Element sub_elm = (Element) heplElement.item(0);
+                        result = sub_elm.getTextContent();
+                    }
+                }
+            }
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e2) {
+            e2.printStackTrace();
+        } catch (ParserConfigurationException e1) {
+            e1.printStackTrace();
+        }*/
+        return result.toString();
+    }
+
 
     public static ConfigInfo getDataFileConfig() {
         ConfigInfo cfgInfo = new ConfigInfo();
@@ -1024,7 +1225,9 @@ public class Common {
     //endregion
 
     //region method process ecrypt and decrypt data
-    public static int LENGTH_USER_NAME = 20;
+    public static int MAX_LENGTH = 18;
+    public static int MIN_LENGTH = 6;
+
     public static int LENGTH_PASS = 8;
 
     public static Long createAuditNumber(String dateTimeNow) {
@@ -1406,9 +1609,8 @@ public class Common {
 
     //region method utils
     //delay animations when view is clicked
-    public static final String UNIT_MONEY = "đ";
-
     public static final int TIME_DELAY_ANIM = 250;
+    public static final int LONG_TIME_DELAY_ANIM = 1000;
 
     public enum TEXT_DIALOG {
         OK,
@@ -1614,22 +1816,21 @@ public class Common {
                 bos = new BufferedOutputStream(fos);
                 bos.write(bytes);
             } finally {
-                if(bos != null) {
-                    try  {
+                if (bos != null) {
+                    try {
                         bos.flush();
                         bos.close();
-                    } catch(Exception e){}
+                    } catch (Exception e) {
+                    }
                 }
             }
         }
     }
 
-    public static boolean unpackZip(String path, String zipname)
-    {
+    public static boolean unpackZip(String path, String zipname) {
         InputStream is;
         ZipInputStream zis;
-        try
-        {
+        try {
             String filename;
             is = new FileInputStream(path + zipname);
             zis = new ZipInputStream(new BufferedInputStream(is));
@@ -1637,8 +1838,7 @@ public class Common {
             byte[] buffer = new byte[1024];
             int count;
 
-            while ((ze = zis.getNextEntry()) != null)
-            {
+            while ((ze = zis.getNextEntry()) != null) {
                 // zapis do souboru
                 filename = ze.getName();
 
@@ -1653,8 +1853,7 @@ public class Common {
                 FileOutputStream fout = new FileOutputStream(path + filename);
 
                 // cteni zipu a zapis
-                while ((count = zis.read(buffer)) != -1)
-                {
+                while ((count = zis.read(buffer)) != -1) {
                     fout.write(buffer, 0, count);
                 }
 
@@ -1663,9 +1862,7 @@ public class Common {
             }
 
             zis.close();
-        }
-        catch(IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
@@ -1688,5 +1885,6 @@ public class Common {
         is.close();
         return string.toString();
     }
+
 
 }

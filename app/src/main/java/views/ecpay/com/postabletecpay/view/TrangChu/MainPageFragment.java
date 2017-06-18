@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,13 +38,9 @@ import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
-import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_BILL;
-import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_EMPTY;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
-import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_SLASH;
-import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_SPACE;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_EMPTY;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;
-import static views.ecpay.com.postabletecpay.util.commons.Common.UNIT_MONEY;
 
 /**
  * Created by macbook on 4/28/17.
@@ -76,12 +73,14 @@ public class MainPageFragment extends Fragment implements
     @BindView(R.id.btBaoCao)
     Button btBaoCao;
 
-    private String[] arrPopupMenu = {"Thông tin tài khoản", "Đổi mật khẩu", "Hướng dẫn", "Đóng"};
+    private String[] arrPopupMenu = {"Thông tin tài khoản", "Đổi mật khẩu", "Hướng dẫn", "Phiên bản", "Đóng"};
 
     private final static int INFO_USER = 0;
     private final static int CHANGE_PASS = 1;
     private final static int HELP = 2;
-    private final static int EXIT = 3;
+    private final static int VERSION = 3;
+    private final static int EXIT = 4;
+
 
     private IMainPagePresenter iMainPagePresenter;
 
@@ -125,7 +124,7 @@ public class MainPageFragment extends Fragment implements
         if (context instanceof OnFragmentInteractionListener) {
             listener = (OnFragmentInteractionListener) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+            throw new RuntimeException(context.toString() + " must implement OnPayFragmentInteractionListener");
         }
     }
 
@@ -162,7 +161,8 @@ public class MainPageFragment extends Fragment implements
         menu.add(INFO_USER, arrPopupMenu[0]).setIcon(getResources().getDrawable(R.drawable.ic_chevron_right_black_24dp));
         menu.add(CHANGE_PASS, arrPopupMenu[1]).setIcon(getResources().getDrawable(R.drawable.ic_chevron_right_black_24dp));
         menu.add(HELP, arrPopupMenu[2]).setIcon(getResources().getDrawable(R.drawable.ic_chevron_right_black_24dp));
-        menu.add(EXIT, arrPopupMenu[3]);
+        menu.add(VERSION, arrPopupMenu[3]);
+        menu.add(EXIT, arrPopupMenu[4]);
 
         menu.setOnItemSelectedListener(new PopupMenu.OnItemSelectedListener() {
             @Override
@@ -184,6 +184,11 @@ public class MainPageFragment extends Fragment implements
                         break;
 
                     case HELP:
+                        showDialogHelp();
+                        break;
+
+                    case VERSION:
+                        showDialogVesion();
                         break;
 
                     case EXIT:
@@ -239,13 +244,13 @@ public class MainPageFragment extends Fragment implements
     //region IMainPageView
     @Override
     public void showMainPageInfo(String userName, long balance, int totalBills, int totalMoney) {
-        if(userName == null)
+        if (userName == null)
             userName = TEXT_EMPTY;
 
         tvUsername.setText(userName);
-        tvSoDuKhaDung.setText(String.valueOf(balance) + TEXT_SPACE + UNIT_MONEY);
+        tvSoDuKhaDung.setText(Common.convertLongToMoney(balance));
         tvSoHoaDon.setText(String.valueOf(totalBills));
-        tvTongTien.setText(String.valueOf(totalMoney) + TEXT_SPACE + UNIT_MONEY);
+        tvTongTien.setText(Common.convertLongToMoney(totalMoney));
 
     }
 
@@ -282,6 +287,73 @@ public class MainPageFragment extends Fragment implements
             }
         });
 
+        btOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        ibClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void showDialogHelp() {
+        final Dialog dialog = new Dialog(this.getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_help);
+        dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        ImageButton ibClose = (ImageButton) dialog.findViewById(R.id.ibtn_dialog_help_close);
+
+        Button btOK = (Button) dialog.findViewById(R.id.btn_dialog_help_ok);
+        TextView tvHelp = (TextView) dialog.findViewById(R.id.tv_dialog_help_content);
+        ibClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        btOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            tvHelp.setText(Html.fromHtml(Common.getDataFileHelp(), Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            tvHelp.setText(Html.fromHtml(Common.getDataFileHelp()));
+        }
+
+        dialog.show();
+    }
+
+    private void showDialogVesion() {
+        final Dialog dialog = new Dialog(this.getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_version);
+        dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        ImageButton ibClose = (ImageButton) dialog.findViewById(R.id.ibtn_dialog_version_close);
+
+        Button btOK = (Button) dialog.findViewById(R.id.btn_dialog_version_button_ok);
+        TextView tvHelp = (TextView) dialog.findViewById(R.id.tv_dialog_version_content);
+        ibClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
         btOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

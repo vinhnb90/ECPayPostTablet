@@ -8,16 +8,23 @@
     android:orientation="vertical"
     tools:sContext="views.ecpay.com.postabletecpay.view.Main.MainActivity">
 
-    <android.support.design.widget.BottomNavigationView
-        android:id="@+id/navigation_ac_main"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <LinearLayout
+        android:id="@+id/ll_navigation"
+        android:background="@color/colorLightGray"
         android:layout_alignParentBottom="true"
-        app:itemBackground="@color/colorLightGray"
-        app:menu="@menu/navigation"/>
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/navigation_ac_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:itemBackground="@color/colorMoreLightGray"
+            app:menu="@menu/navigation"/>
+    </LinearLayout>
+
 
     <RelativeLayout
-        android:layout_above="@+id/navigation_ac_main"
+        android:layout_above="@+id/ll_navigation"
         android:id="@+id/rv_ac_main_request_pay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -84,8 +91,6 @@
                 android:visibility="gone" />
 
         </RelativeLayout>
-
-
 
 
     </RelativeLayout>

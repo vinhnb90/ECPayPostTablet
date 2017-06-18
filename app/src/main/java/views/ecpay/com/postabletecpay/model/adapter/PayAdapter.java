@@ -3,6 +3,7 @@ package views.ecpay.com.postabletecpay.model.adapter;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
 
 import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.BillInsidePayAdapter.IS_DEBT;
@@ -47,6 +49,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     Button btnPrintBill;
 
     private static int positionCustomer;
+    private boolean onBind;
 
     public PayAdapter(Context sContext, IPayView sIPayView, List<PayEntityAdapter> billList) {
         this.sContext = sContext;
@@ -66,16 +69,19 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
     @Override
     public void onBindViewHolder(final PayViewHolder holder, int position) {
+
+        onBind = true;
+
         positionCustomer = position;
         PayEntityAdapter entityAdapter = billList.get(position);
-        String code = entityAdapter.getMaKH();
-        String edong = entityAdapter.getEdong();
+        final String code = entityAdapter.getMaKH();
+        final String edong = entityAdapter.getEdong();
         boolean isPayed = entityAdapter.isPayed();
 
         holder.tvTenKH.setText(entityAdapter.getTenKH());
         holder.tvDiaChi.setText(entityAdapter.getDiaChi());
         holder.tvLoTrinh.setText(entityAdapter.getLoTrinh());
-        holder.tvTongTien.setText(entityAdapter.getTongTien() + Common.TEXT_SPACE + Common.UNIT_MONEY);
+        holder.tvTongTien.setText(Common.convertLongToMoney(entityAdapter.getTongTien()));
         holder.tvMaKH.setText(code);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -87,14 +93,21 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         Common.runAnimationClickViewScale(holder.cardView, R.anim.twinking_view, Common.TIME_DELAY_ANIM);
 
-        List<PayAdapter.BillEntityAdapter> listBill = new ArrayList<>();
-        listBill = payModel.getAllBillOfCustomer(edong, code);
-        holder.billsInsideAdapter.setBillList(edong, code, listBill, positionCustomer);
-        holder.rvBill.invalidate();
+        ((MainActivity)sContext).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                List<PayAdapter.BillEntityAdapter> listBill = new ArrayList<>();
+                listBill = payModel.getAllBillOfCustomer(edong, code);
+                holder.billsInsideAdapter.setBillList(edong, code, listBill, positionCustomer);
+                holder.rvBill.invalidate();
 
-        boolean isShowBill = billList.get(positionCustomer).isShowBill();
-        holder.rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
+                boolean isShowBill = billList.get(positionCustomer).isShowBill();
+                holder.rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
+            }
+        });
 
+
+        onBind = false;
 
     }
 
@@ -144,10 +157,12 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    boolean isShowBill = billList.get(positionCustomer).isShowBill();
+                    if(!onBind) {
+                        boolean isShowBill = billList.get(positionCustomer).isShowBill();
 
-                    billList.get(positionCustomer).setShowBill(isShowBill = !isShowBill);
-                    rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
+                        billList.get(positionCustomer).setShowBill(isShowBill = !isShowBill);
+                        rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
+                    }
                 }
             });
             //set 10 rows and a page
@@ -256,9 +271,9 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     public static class BillEntityAdapter {
 
         private String monthBill;
-        private double moneyBill;
+        private long moneyBill;
         private boolean isPrint;
-        private boolean isPayed;
+        private int status;
         private boolean isChecked;
         private String requestDate;
 
@@ -270,11 +285,11 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         public BillEntityAdapter() {
         }
 
-        public BillEntityAdapter(String monthBill, double moneyBill, boolean isPrint, boolean isPayed, boolean isChecked, String requestDate, int billId, String customerPayCode, String billingBy) {
+        public BillEntityAdapter(String monthBill, long moneyBill, boolean isPrint, int status, boolean isChecked, String requestDate, int billId, String customerPayCode, String billingBy) {
             this.monthBill = monthBill;
             this.moneyBill = moneyBill;
             this.isPrint = isPrint;
-            this.isPayed = isPayed;
+            this.status = status;
             this.isChecked = isChecked;
             this.requestDate = requestDate;
             this.billId = billId;
@@ -290,11 +305,11 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             this.monthBill = monthBill;
         }
 
-        public double getMoneyBill() {
+        public long getMoneyBill() {
             return moneyBill;
         }
 
-        public void setMoneyBill(double moneyBill) {
+        public void setMoneyBill(long moneyBill) {
             this.moneyBill = moneyBill;
         }
 
@@ -306,12 +321,12 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             isPrint = print;
         }
 
-        public boolean isPayed() {
-            return isPayed;
+        public int getStatus() {
+            return status;
         }
 
-        public void setPayed(boolean payed) {
-            isPayed = payed;
+        public void setStatus(int status) {
+            this.status = status;
         }
 
         public boolean isChecked() {
@@ -397,12 +412,23 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         public void onBindViewHolder(BillInsidePayAdapter.BillInsidePayViewHolder holder, int position) {
             BillEntityAdapter entity = billList.get(position);
             holder.cb.setChecked(entity.isChecked());
-            holder.cb.setEnabled(!entity.isPayed);
+            if (entity.getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) {
+                holder.cb.setEnabled(true);
+                holder.ibtnDelete.setVisibility(View.INVISIBLE);
+            } else {
+                holder.cb.setEnabled(false);
+                holder.ibtnDelete.setVisibility(View.VISIBLE);
+            }
             holder.tvDate.setText(entity.getMonthBill());
-            holder.tvMoneyBill.setText((int) entity.getMoneyBill() + Common.TEXT_SPACE + Common.UNIT_MONEY);
-            holder.tvStatusBill.setText(entity.isPayed ? IS_PAY : NOT_PAY_YET);
+            holder.tvMoneyBill.setText(Common.convertLongToMoney(entity.getMoneyBill()));
+            holder.tvStatusBill.setText(Common.STATUS_BILLING.findCodeMessage(entity.getStatus()).getMessage());
+
+            if (Common.STATUS_BILLING.findCodeMessage(entity.getStatus()).getCode() == Common.STATUS_BILLING.DANG_CHO_HUY.getCode()) {
+                holder.tvStatusBill.setTextColor(ContextCompat.getColor(sContext, R.color.colorRed));
+            }else {
+                holder.tvStatusBill.setTextColor(ContextCompat.getColor(sContext, R.color.colorTextGreen));
+            }
             holder.ibtnPrintInside.setVisibility(entity.isPrint ? View.VISIBLE : View.INVISIBLE);
-            holder.ibtnDelete.setVisibility(entity.isPayed ? View.VISIBLE : View.INVISIBLE);
         }
 
         @Override
@@ -442,8 +468,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             }
 
             @OnClick(R.id.btn_row_bill_inside_pay_delete)
-            public void doClickDelete(View view)
-            {
+            public void doClickDelete(View view) {
                 int position = getAdapterPosition();
                 BillEntityAdapter bill = billList.get(position);
 
