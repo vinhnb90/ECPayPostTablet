@@ -61,6 +61,10 @@ public class MainPageModel extends CommonModel {
         return sqLiteConnection.getAllBookCmis();
     }
 
+    public Cursor selectOfflineBill() {
+        return sqLiteConnection.selectOfflineBill();
+    }
+
     public  long checkCustomerExist(String code) {
         return sqLiteConnection.checkCustomerExist(code);
     }

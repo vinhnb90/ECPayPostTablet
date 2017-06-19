@@ -100,6 +100,9 @@ public class MainPageFragment extends Fragment implements
         super.onCreate(savedInstanceState);
         iMainPagePresenter = new MainPagePresenter(this);
         iMainPagePresenter.synchronizePC();
+        if(Common.isNetworkConnected(this.getActivity())) {
+            iMainPagePresenter.postBill();
+        }
     }
 
     @Override

@@ -5,4 +5,5 @@ public interface IMainPagePresenter{
     void callInfoMain(String edong);
     void synchronizeFileGen();
     void synchronizeData();
+    void postBill();
 }

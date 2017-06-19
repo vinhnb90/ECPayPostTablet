@@ -333,6 +333,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return road;
     }
 
+    public Cursor selectOfflineBill() {
+        database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE status = 2";
+        return database.rawQuery(query, null);
+    }
+
     public List<Customer> selectAllCustomer(String edong) {
         return this.selectAllCustomerFitterBy(edong, Common.TYPE_SEARCH.ALL, Common.TEXT_EMPTY);
     }

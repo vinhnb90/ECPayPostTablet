@@ -689,7 +689,8 @@ public class Common {
         CUSTOMER_BILL,
         GET_FILE_GEN,
         CHECK_TRANS,
-        TRANSACTION_CANCELLATION;
+        TRANSACTION_CANCELLATION,
+        PUT_TRANSACTION_OFF;
 
         @Override
         public String toString() {
@@ -711,6 +712,8 @@ public class Common {
                 return "CHECK-TRANS";
             if (this == TRANSACTION_CANCELLATION)
                 return "TRANSACTION-CANCELLATION";
+            if (this == PUT_TRANSACTION_OFF)
+                return "PUT-TRANSACTION-OFF";
             return super.toString();
         }
     }
