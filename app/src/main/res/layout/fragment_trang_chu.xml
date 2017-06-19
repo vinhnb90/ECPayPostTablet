@@ -18,21 +18,21 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_marginLeft="20dp"
                 android:id="@+id/iv_frag_main_avatar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/avatar"
+                android:layout_marginLeft="20dp"
+                android:paddingBottom="10dp"
                 android:paddingTop="10dp"
-                android:paddingBottom="10dp"/>
+                android:src="@drawable/avatar" />
 
             <LinearLayout
-                android:layout_marginLeft="20dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
                 android:gravity="center_vertical"
                 android:orientation="vertical">
 
@@ -42,17 +42,17 @@
                     android:layout_height="wrap_content"
                     android:text="User name"
                     android:textColor="@color/colorTextWhite"
-                    android:textStyle="bold"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:layout_marginTop="20dp"
                     android:id="@+id/tvSoDuKhaDung"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
                     android:text="Số dư khả dụng: 1,000,000 đ"
-                    android:textSize="14sp"
-                    android:textColor="@color/colorTextWhite"/>
+                    android:textColor="@color/colorTextWhite"
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
@@ -64,26 +64,26 @@
                     android:id="@+id/ibtn_frag_main_exit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/ic_thoat"
-                    android:layout_alignParentTop="true"
                     android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="3dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@null"
                     android:scaleX="0.8"
                     android:scaleY="0.8"
-                    android:background="@null"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginRight="3dp"/>
+                    android:src="@mipmap/ic_thoat" />
 
                 <ImageButton
                     android:id="@+id/ibTroGiup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/ic_trogiup"
                     android:layout_alignParentTop="true"
                     android:layout_marginTop="5dp"
+                    android:layout_toLeftOf="@+id/ibtn_frag_main_exit"
                     android:background="@null"
                     android:scaleX="0.8"
                     android:scaleY="0.8"
-                    android:layout_toLeftOf="@+id/ibtn_frag_main_exit"/>
+                    android:src="@mipmap/ic_trogiup" />
             </RelativeLayout>
 
         </LinearLayout>
@@ -104,30 +104,30 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/ic_sohoadon"
+                    android:layout_marginLeft="20dp"
                     android:scaleX="1.5"
                     android:scaleY="1.5"
-                    android:layout_marginLeft="20dp"/>
+                    android:src="@mipmap/ic_sohoadon" />
 
                 <TextView
                     android:id="@+id/tvSoHoaDon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="30000"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
                     android:layout_marginLeft="20dp"
                     android:layout_marginTop="30dp"
-                    android:textColor="@color/colorTextWhite"/>
+                    android:text="30000"
+                    android:textColor="@color/colorTextWhite"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Số hoá đơn"
-                    android:textSize="16sp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginTop="5dp"
-                    android:textColor="@color/colorTextWhite"/>
+                    android:text="Số hoá đơn"
+                    android:textColor="@color/colorTextWhite"
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -140,30 +140,30 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/ic_tongtien"
+                    android:layout_marginRight="20dp"
                     android:scaleX="1.5"
                     android:scaleY="1.5"
-                    android:layout_marginRight="20dp"/>
+                    android:src="@mipmap/ic_tongtien" />
 
                 <TextView
                     android:id="@+id/tv_fragment_thanh_toan_total_bills_money"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1,000,000 đ"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
                     android:layout_marginRight="20dp"
                     android:layout_marginTop="30dp"
-                    android:textColor="@color/colorTextWhite"/>
+                    android:text="1,000,000 đ"
+                    android:textColor="@color/colorTextWhite"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tổng tiền"
-                    android:textSize="16sp"
                     android:layout_marginRight="20dp"
                     android:layout_marginTop="5dp"
-                    android:textColor="@color/colorTextWhite"/>
+                    android:text="Tổng tiền"
+                    android:textColor="@color/colorTextWhite"
+                    android:textSize="16sp" />
 
             </LinearLayout>
 

@@ -11,7 +11,7 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by VinhNB on 5/23/2017.
  */
 
-public class UserInfoPresenter implements IUserInfoPresenter {
+public class UserInfoPresenter implements IUserInfoPresenter, ILogoutPresenter {
     private UserInfoModel userInfoModel;
     private IUserInfoView iUserInfoView;
 
@@ -24,5 +24,10 @@ public class UserInfoPresenter implements IUserInfoPresenter {
     public void getInfoUser(String edong) {
         Account account = userInfoModel.getAccountInfo(edong);
         iUserInfoView.showInfoUser(account.getEdong(), account.getBirthday(), account.getName(), account.getIdNumber(), account.getPhone(), account.getEmail(), account.getAddress(), account.getEdong(), account.getBalance(), account.getType());
+    }
+
+    @Override
+    public void callLogout(String mEdong) {
+
     }
 }

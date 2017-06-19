@@ -410,6 +410,7 @@ public class Common {
         e030("030", "Tài khoản ví chưa đăng ký dịch vụ"),
         e032("032", "Tài khoản bị khóa"),
         e033("033", "Tài khoản ví chưa được duyệt"),
+        e1138("1138", "Tài khoản đang bị lock."),
         e2038("2038", "Không thể login, sai địa chỉ MAC"),
         e2039("2039", "Không thể login, sai địa chỉ IP"),
         e2040("2040", "Không thể login, đã login ở 1 thiết bị khác"),
@@ -518,6 +519,44 @@ public class Common {
                 }
             }
             return CODE_REPONSE_SEARCH_ONLINE.e9999;
+        }
+    }
+
+    public enum CODE_REPONSE_LOGOUT {
+        e000("000", "Thực hiện nghiệp vụ thành công."),
+        e040("040", "Tài khoản ví chưa đăng kí."),
+        e041("041", "Tài khoản ví đã bị hủy."),
+        e042("042", "Tài khoản ví đã bị khóa,"),
+        e043("043", "Tài khoản ví chưa được duyệt."),
+        e050("050", "Tài khoản ví bị từ chối dịch vụ"),
+        e051("051", "Tài khoản ví bị chặn dịch vụ"),
+        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
+
+        e10000("10000", "Lỗi xử lý logout");
+        CODE_REPONSE_LOGOUT(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+
+        private String message;
+
+        public static CODE_REPONSE_LOGOUT findCodeMessage(String code) {
+            for (CODE_REPONSE_LOGOUT v : values()) {
+                if (v.getCode().equals(code)) {
+                    return v;
+                }
+            }
+            return CODE_REPONSE_LOGOUT.e9999;
         }
     }
 
@@ -718,7 +757,8 @@ public class Common {
         CUSTOMER_BILL,
         GET_FILE_GEN,
         CHECK_TRANS,
-        TRANSACTION_CANCELLATION;
+        TRANSACTION_CANCELLATION,
+        LOGOUT;
 
         @Override
         public String toString() {
@@ -740,6 +780,9 @@ public class Common {
                 return "CHECK-TRANS";
             if (this == TRANSACTION_CANCELLATION)
                 return "TRANSACTION-CANCELLATION";
+            if (this == LOGOUT)
+                return "LOGOUT";
+
             return super.toString();
         }
     }
@@ -801,7 +844,6 @@ public class Common {
 
         if (macAddress == null)
             throw new Exception(MESSAGE_NOTIFY.ERR_WIFI.toString());
-
         return macAddress;
     }
 
@@ -1611,6 +1653,7 @@ public class Common {
     //delay animations when view is clicked
     public static final int TIME_DELAY_ANIM = 250;
     public static final int LONG_TIME_DELAY_ANIM = 1000;
+    public static final int MORE_LONG_TIME_DELAY_ANIM = 2000;
 
     public enum TEXT_DIALOG {
         OK,
@@ -1659,6 +1702,13 @@ public class Common {
                 return "yyyy-MM-dd'T'HH:mm:ss";
             return super.toString();
         }
+    }
+
+    public enum STATUS_PROGRESS {
+        BEGIN,
+        ERROR,
+        SUCCESS,
+        FINISH;
     }
 
     public static String getDateTimeNow(Common.DATE_TIME_TYPE formatDate) {

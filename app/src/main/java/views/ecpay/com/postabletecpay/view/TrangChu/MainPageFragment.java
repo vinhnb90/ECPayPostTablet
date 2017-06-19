@@ -3,13 +3,16 @@ package views.ecpay.com.postabletecpay.view.TrangChu;
 import android.app.ActionBar;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,18 +21,22 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Optional;
+import butterknife.Unbinder;
 import views.ecpay.com.postabletecpay.R;
+import views.ecpay.com.postabletecpay.presenter.ILogoutPresenter;
 import views.ecpay.com.postabletecpay.presenter.IMainPagePresenter;
+import views.ecpay.com.postabletecpay.presenter.LogoutPresenter;
 import views.ecpay.com.postabletecpay.presenter.MainPagePresenter;
-import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.commons.Common;
-import views.ecpay.com.postabletecpay.util.commons.Common.TEXT_DIALOG;
 import views.ecpay.com.postabletecpay.util.libs.PopupMenu.MenuItem;
 import views.ecpay.com.postabletecpay.util.libs.PopupMenu.PopupMenu;
 import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
@@ -52,26 +59,56 @@ public class MainPageFragment extends Fragment implements
 
     private OnFragmentInteractionListener listener;
     private String mEdong;
+
+    //main page fragment
+    @Nullable
     @BindView(R.id.iv_frag_main_avatar)
     ImageView ivAvatar;
+    @Nullable
     @BindView(R.id.tvUsername)
     TextView tvUsername;
+    @Nullable
     @BindView(R.id.tvSoDuKhaDung)
     TextView tvSoDuKhaDung;
+    @Nullable
     @BindView(R.id.tvSoHoaDon)
     TextView tvSoHoaDon;
+    @Nullable
     @BindView(R.id.tv_fragment_thanh_toan_total_bills_money)
     TextView tvTongTien;
+    @Nullable
     @BindView(R.id.ibtn_frag_main_exit)
     ImageButton ibtnExit;
+    @Nullable
     @BindView(R.id.ibTroGiup)
     ImageButton ibTroGiup;
+    @Nullable
     @BindView(R.id.btXoaDuLieu)
     Button btXoaDuLieu;
+    @Nullable
     @BindView(R.id.btThanhToan)
     Button btThanhToan;
+    @Nullable
     @BindView(R.id.btBaoCao)
     Button btBaoCao;
+
+    //dialog logout
+    @Nullable
+    @BindView(R.id.rv_diaglog_logout_process)
+    RelativeLayout rvLogoutProcess;
+    @Nullable
+    @BindView(R.id.tv_diaglog_logout_response)
+    TextView tvLogoutResponse;
+    @Nullable
+    @BindView(R.id.pbar_diaglog_logout)
+    ProgressBar pbarLogout;
+    @Nullable
+    @BindView(R.id.btn_dialog_logout_cancel)
+    TextView btnLogoutCancel;
+    @Nullable
+    @BindView(R.id.btn_dialog_logout_ok)
+    TextView btnLogoutOK;
+
 
     private String[] arrPopupMenu = {"Thông tin tài khoản", "Đổi mật khẩu", "Hướng dẫn", "Phiên bản", "Đóng"};
 
@@ -82,7 +119,10 @@ public class MainPageFragment extends Fragment implements
     private final static int EXIT = 4;
 
 
-    private IMainPagePresenter iMainPagePresenter;
+    private IMainPagePresenter mIMainPagePresenter;
+    private ILogoutPresenter mILogoutPresenter;
+    private Unbinder unbinder;
+    private Dialog dialogLogout;
 
     public static MainPageFragment newInstance(String edong) {
         Bundle bundle = new Bundle();
@@ -97,14 +137,15 @@ public class MainPageFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        iMainPagePresenter = new MainPagePresenter(this);
-        iMainPagePresenter.synchronizePC();
+        mIMainPagePresenter = new MainPagePresenter(this);
+        mILogoutPresenter = new LogoutPresenter(this);
+        mIMainPagePresenter.synchronizePC();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trang_chu, container, false);
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         mEdong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
 
@@ -113,7 +154,7 @@ public class MainPageFragment extends Fragment implements
         btThanhToan.setOnClickListener(this);
         btBaoCao.setOnClickListener(this);
 
-        iMainPagePresenter.callInfoMain(mEdong);
+        mIMainPagePresenter.callInfoMain(mEdong);
 
         return view;
     }
@@ -128,7 +169,14 @@ public class MainPageFragment extends Fragment implements
         }
     }
 
-    //region onClick
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    //region onClick fragment
+    @Optional
     @OnClick(R.id.ibtn_frag_main_exit)
     public void onClickExit(View view) {
         Common.runAnimationClickViewScale(view, R.anim.scale_view_pull, TIME_DELAY_ANIM);
@@ -136,24 +184,11 @@ public class MainPageFragment extends Fragment implements
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                IActionClickYesNoDialog clickYesNoDialog = new IActionClickYesNoDialog() {
-                    @Override
-                    public void doClickNo() {
-                        MainPageFragment.this.getActivity().finish();
-                        startActivity(new Intent(MainPageFragment.this.getActivity(), LoginActivity.class));
-                    }
-
-                    @Override
-                    public void doClickYes() {
-
-                    }
-                };
-
-                Common.showDialog(getActivity(), clickYesNoDialog, TEXT_DIALOG.TITLE_DEFAULT.toString(), TEXT_DIALOG.MESSAGE_EXIT.toString());
+                showDialogLogoutMain();
             }
         }, TIME_DELAY_ANIM);
     }
-
+    @Optional
     @OnClick(R.id.iv_frag_main_avatar)
     public void onClickAvatar(View view) {
         final PopupMenu menu = new PopupMenu(MainPageFragment.this.getActivity());
@@ -200,7 +235,7 @@ public class MainPageFragment extends Fragment implements
 
         menu.show(view);
     }
-
+    @Optional
     @Override
     public void onClick(View v) {
         Fragment fragment = null;
@@ -227,6 +262,29 @@ public class MainPageFragment extends Fragment implements
                 showDialogHoTro();
                 break;
         }
+    }
+    //endregion
+
+    //region onClick dialog Logout
+    @Optional
+    @OnClick(R.id.btn_dialog_logout_ok)
+    public void clickLogoutOK(View view) {
+        Common.runAnimationClickViewScale(view, R.anim.scale_view_push, TIME_DELAY_ANIM);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+//                mIMainPagePresenter.callLogout(mEdong);
+                mILogoutPresenter.callLogout(mEdong);
+            }
+        }, TIME_DELAY_ANIM);
+    }
+
+    @Optional
+    @OnClick(R.id.btn_dialog_logout_cancel)
+    public void clickLogoutCancel(View view) {
+        if (dialogLogout != null)
+            dialogLogout.dismiss();
     }
     //endregion
 
@@ -260,8 +318,59 @@ public class MainPageFragment extends Fragment implements
     }
 
     @Override
+    public void showStatusProgressLogout(Common.STATUS_PROGRESS statusProgress) {
+        rvLogoutProcess.setVisibility(View.VISIBLE);
+        tvLogoutResponse.setVisibility(View.VISIBLE);
+        pbarLogout.setVisibility(View.VISIBLE);
+
+        btnLogoutCancel.setEnabled(true);
+        btnLogoutOK.setEnabled(true);
+
+        if (statusProgress == Common.STATUS_PROGRESS.BEGIN) {
+            tvLogoutResponse.setVisibility(View.GONE);
+            btnLogoutOK.setEnabled(false);
+        }
+
+        if (statusProgress == Common.STATUS_PROGRESS.ERROR) {
+            tvLogoutResponse.setVisibility(View.VISIBLE);
+            btnLogoutOK.setEnabled(true);
+        }
+
+        if (statusProgress == Common.STATUS_PROGRESS.SUCCESS) {
+            tvLogoutResponse.setVisibility(View.VISIBLE);
+            btnLogoutOK.setEnabled(false);
+            btnLogoutCancel.setEnabled(false);
+        }
+
+        if (statusProgress == Common.STATUS_PROGRESS.FINISH) {
+            rvLogoutProcess.setVisibility(View.INVISIBLE);
+            btnLogoutOK.setEnabled(true);
+        }
+    }
+
+    @Override
+    public void showMessageLogout(String textMessage) {
+        boolean fail = TextUtils.isEmpty(textMessage) || isHasNullViewLogoutDialog();
+        if (fail)
+            return;
+
+        tvLogoutResponse.setText(textMessage);
+
+    }
+
+    @Override
+    public void showLoginForm() {
+        MainPageFragment.this.getActivity().finish();
+        startActivity(new Intent(MainPageFragment.this.getActivity(), LoginActivity.class));
+    }
+
+    @Override
     public Context getContextView() {
         return getContext();
+    }
+
+    public boolean isHasNullViewLogoutDialog() {
+        return rvLogoutProcess == null || tvLogoutResponse == null || pbarLogout == null || btnLogoutOK == null || btnLogoutCancel == null;
     }
 
     //endregion
@@ -300,6 +409,29 @@ public class MainPageFragment extends Fragment implements
             }
         });
         dialog.show();
+    }
+
+    private void showDialogLogoutMain() {
+        dialogLogout = new Dialog(this.getActivity());
+        dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogLogout.setContentView(R.layout.dialog_logout);
+        dialogLogout.setCanceledOnTouchOutside(true);
+        dialogLogout.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        dialogLogout.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        dialogLogout.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        Window window = dialogLogout.getWindow();
+        window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+
+        unbinder.unbind();
+        unbinder = ButterKnife.bind(this, dialogLogout);
+        this.showStatusProgressLogout(Common.STATUS_PROGRESS.FINISH);
+        dialogLogout.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+            }
+        });
+        dialogLogout.show();
     }
 
     private void showDialogHelp() {

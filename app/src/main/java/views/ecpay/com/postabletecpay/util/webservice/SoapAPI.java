@@ -55,6 +55,10 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.BodyLogi
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.FooterLoginRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.HeaderLoginRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.LoginRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityLogout.BodyLogoutRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityLogout.FooterLogoutRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityLogout.HeaderLogoutRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityLogout.LogoutRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.BodySearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.SearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBillOnline.BillingOnlineRespone;
@@ -65,6 +69,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityDataZip.ListD
 import views.ecpay.com.postabletecpay.util.entities.response.EntityDeleteBillOnline.DeleteBillOnlineRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEVNReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogout.LogoutResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
@@ -411,6 +416,50 @@ public class SoapAPI {
 
 //        String jsonResult = new GsonBuilder().create().toJson(searchOnlineRequest, type);
         String jsonResult = new GsonBuilder().setPrettyPrinting().create().toJson(searchOnlineRequest);
+        return jsonResult;
+    }
+
+    public static String getJsonRequestLogout(String agent, String agentEncypted, String commandId, long auditNumber, String mac,
+                                              String diskDriver, String signatureEncrypted, String session, String accountId) {
+        boolean fail =
+                TextUtils.isEmpty(agent) ||
+                        TextUtils.isEmpty(agentEncypted) ||
+                        TextUtils.isEmpty(commandId) ||
+                        TextUtils.isEmpty(mac) ||
+                        TextUtils.isEmpty(diskDriver) ||
+                        TextUtils.isEmpty(signatureEncrypted) ||
+                        TextUtils.isEmpty(session) ||
+                        TextUtils.isEmpty(accountId);
+
+        if (fail)
+            return null;
+
+        HeaderLogoutRequest headerLogoutRequest = new HeaderLogoutRequest();
+        headerLogoutRequest.setAgent(agent);
+        headerLogoutRequest.setPassword(agentEncypted);
+        headerLogoutRequest.setCommandId(commandId);
+
+        BodyLogoutRequest bodyLogoutRequest = new BodyLogoutRequest();
+        bodyLogoutRequest.setAuditNumber(auditNumber);
+        bodyLogoutRequest.setMac(mac);
+        bodyLogoutRequest.setDiskDrive(diskDriver);
+        bodyLogoutRequest.setSignature(signatureEncrypted);
+        bodyLogoutRequest.setSession(session);
+
+        FooterLogoutRequest footerLogoutRequest = new FooterLogoutRequest();
+        footerLogoutRequest.setAccountIdt(accountId);
+
+        final LogoutRequest logoutRequest = new LogoutRequest();
+        logoutRequest.setHeader(headerLogoutRequest);
+        logoutRequest.setBody(bodyLogoutRequest);
+        logoutRequest.setFooter(footerLogoutRequest);
+
+//        Type type = new TypeToken<SearchOnlineRequest>() {
+//        }.getType();
+//        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+//        String jsonResult = new GsonBuilder().create().toJson(searchOnlineRequest, type);
+        String jsonResult = new GsonBuilder().setPrettyPrinting().create().toJson(logoutRequest);
         return jsonResult;
     }
 
@@ -936,6 +985,130 @@ public class SoapAPI {
 
         public SearchOnlineResponse getSearchOnlineResponse() {
             return searchOnlineResponse;
+        }
+    }
+
+    public static class AsyncSoapLogout extends AsyncTask<String, String, LogoutResponse> {
+
+        //request action to eStore
+        private Common.TYPE_SEARCH typeSearch;
+        private String edong;
+        private static final String METHOD_NAME = "execute";
+        private static final String NAMESPACE = "http://services.ecpay.org/";
+        private static final String URL = ENDPOINT_URL;
+        private static final String SOAP_ACTION = "request action to eStore";
+        private static final String METHOD_PARAM = "message";
+        private AsyncSoapLogoutCallBack callBack;
+        private boolean isEndCallSoap = false;
+        private LogoutResponse logoutResponse;
+
+        public AsyncSoapLogout(String edong, AsyncSoapLogoutCallBack callBack) throws Exception {
+            this.callBack = callBack;
+            this.edong = edong;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            logoutResponse = null;
+            callBack.onPre(this);
+        }
+
+        @Override
+        protected LogoutResponse doInBackground(String... jsons) {
+            String json = jsons[0];
+            Log.d("here", "doInBackground: " + json);
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            request.addProperty(METHOD_PARAM, json);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE ht;
+            SoapPrimitive response = null;
+
+            try {
+                ht = new HttpTransportSE(URL);
+                ht.call(SOAP_ACTION, envelope);
+                response = (SoapPrimitive) envelope.getResponse();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (response == null) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                return null;
+            }
+
+            String data = response.toString();
+            if (data.isEmpty()) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return null;
+            }
+
+            logoutResponse = new Gson().fromJson(data, LogoutResponse.class);
+           /* final GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter(LoginResponseReponse.class, new LoginResponseAdapter());
+//            gsonBuilder.registerTypeAdapter(ResponseLoginResponse.class, new )
+            gsonBuilder.setPrettyPrinting();
+            final Gson gson = gsonBuilder.create();
+
+            billingOnlineRespone = gson.fromJson(data, LoginResponseReponse.class);*/
+
+            return logoutResponse;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            String message = values[0];
+            isEndCallSoap = true;
+            callBack.onUpdate(message);
+        }
+
+        @Override
+        protected void onPostExecute(LogoutResponse logoutResponse) {
+            super.onPostExecute(logoutResponse);
+            isEndCallSoap = true;
+            callBack.onPost(logoutResponse);
+        }
+
+        public static abstract class AsyncSoapLogoutCallBack {
+            public abstract void onPre(final AsyncSoapLogout asyncSoapLogout);
+
+            public abstract void onUpdate(String message);
+
+            public abstract void onPost(LogoutResponse response);
+
+            public abstract void onTimeOut(final AsyncSoapLogout asyncSoapLogout);
+        }
+
+        public void callCountdown(final AsyncSoapLogout soapSearchOnline) {
+            if (soapSearchOnline == null)
+                return;
+
+            callBack.onTimeOut(soapSearchOnline);
+        }
+
+        public boolean isEndCallSoap() {
+            return isEndCallSoap;
+        }
+
+        public void setEndCallSoap(boolean endCallSoap) {
+            isEndCallSoap = endCallSoap;
+        }
+
+        public Common.TYPE_SEARCH getTypeSearch() {
+            return typeSearch;
+        }
+
+        public String getEdong() {
+            return edong;
+        }
+
+        public LogoutResponse getLogoutResponse() {
+            return logoutResponse;
         }
     }
 

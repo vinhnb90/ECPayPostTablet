@@ -1,159 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_margin="20dp"
+android:orientation="vertical"
+app:cardBackgroundColor="@android:color/white"
+app:cardCornerRadius="3dp"
+app:cardElevation="3dp">
+
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_margin="20dp"
-    android:orientation="vertical"
-    app:cardBackgroundColor="@android:color/white"
-    app:cardCornerRadius="3dp"
-    app:cardElevation="3dp">
+    android:background="@color/colorTextWhite">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="Danh sách hoá đơn"
+        android:textColor="@color/colorBlue"
+        android:textSize="22dp"
+        android:textStyle="normal" />
 
     <RelativeLayout
+        android:id="@+id/llTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorTextWhite">
+        android:layout_below="@+id/tvTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/colorLightGray"
+        android:padding="10dp">
 
         <TextView
-            android:id="@+id/tvTitle"
+            android:id="@+id/tv_soHoaDon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:text="Danh sách hoá đơn"
-            android:textColor="@color/colorBlue"
-            android:textSize="22dp"
-            android:textStyle="normal" />
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:text="Số hoá đơn:"
+            android:textColor="@color/colorTextBlack" />
+
+        <TextView
+            android:id="@+id/tv_dialog_thanhtoan_bills_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/tv_soHoaDon"
+            android:text="5"
+            android:textColor="@android:color/holo_red_dark"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_dialog_thanhtoan_total_money_bills"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:text="1.000.000 đ"
+            android:textColor="@color/colorRed"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/tv_dialog_thanhtoan_total_money_bills"
+            android:text="Tổng tiền: "
+            android:textColor="@color/colorTextBlack" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_dialog_thanhtoan_bills"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_below="@+id/llTop"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_dialog_thanhtoan_bills"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/rv_dialog_thanhtoan_request_pay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll_dialog_thanhtoan_bills"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:padding="10dp"
+        android:background="@color/colorTextGreen"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/tv_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="Thanh toán..."
+            android:textColor="@color/colorTextWhite" />
+
 
         <RelativeLayout
-            android:id="@+id/llTop"
+            android:id="@+id/rv_diaglog_thanhtoan_process_bill"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvTitle"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/colorLightGray"
-            android:padding="10dp">
-
+            android:layout_toRightOf="@+id/tv_search"
+            android:layout_height="wrap_content">
             <TextView
-                android:id="@+id/tv_soHoaDon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:text="Số hoá đơn:"
-                android:textColor="@color/colorTextBlack" />
-
-            <TextView
-                android:id="@+id/tv_dialog_thanhtoan_bills_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@+id/tv_soHoaDon"
-                android:text="5"
-                android:textColor="@android:color/holo_red_dark"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_dialog_thanhtoan_total_money_bills"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="10dp"
-                android:text="1.000.000 đ"
-                android:textColor="@color/colorRed"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/tv_dialog_thanhtoan_total_money_bills"
-                android:text="Tổng tiền: "
-                android:textColor="@color/colorTextBlack" />
-
-        </RelativeLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_dialog_thanhtoan_bills"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_below="@+id/llTop"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="20dp">
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rv_dialog_thanhtoan_bills"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </android.support.v7.widget.RecyclerView>
-        </LinearLayout>
-
-        <RelativeLayout
-            android:id="@+id/rv_dialog_thanhtoan_request_pay"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/ll_dialog_thanhtoan_bills"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="20dp"
-            android:padding="10dp"
-            android:background="@color/colorTextGreen"
-            android:visibility="visible">
-
-            <TextView
-                android:id="@+id/tv_search"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:id="@+id/tv_diaglog_thanhtoan_count_bill_payed"
+                android:textColor="@color/colorTextWhite"
                 android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:text="Thanh toán..."
-                android:textColor="@color/colorTextWhite" />
+                tools:text="1/7 Hóa đơn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-
-            <RelativeLayout
-                android:id="@+id/rv_diaglog_thanhtoan_process_bill"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_toRightOf="@+id/tv_search"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/tv_diaglog_thanhtoan_count_bill_payed"
-                    android:textColor="@color/colorTextWhite"
-                    android:layout_alignParentLeft="true"
-                    tools:text="1/7 Hóa đơn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <ProgressBar
-                    android:layout_toRightOf="@+id/tv_diaglog_thanhtoan_count_bill_payed"
-                    android:id="@+id/pbar_diaglog_thanhtoan"
-                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/ll_frag_thanh_toan_action_search"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_toLeftOf="@+id/ll_frag_thanh_toan_action_search"
-
-                    android:indeterminate="true"
-                    android:indeterminateTint="@color/colorTextWhite"
-                    android:indeterminateTintMode="src_atop"
-                    android:visibility="visible" />
-            </RelativeLayout>
-
-
-
-            <TextView
-                android:id="@+id/tv_diaglog_thanhtoan_message"
+            <ProgressBar
+                android:layout_toRightOf="@+id/tv_diaglog_thanhtoan_count_bill_payed"
+                android:id="@+id/pbar_diaglog_thanhtoan"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@+id/ll_frag_thanh_toan_action_search"
@@ -161,49 +143,67 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_toLeftOf="@+id/ll_frag_thanh_toan_action_search"
-                android:layout_toRightOf="@+id/tv_search"
-                android:gravity="right"
 
-                android:lines="1"
-                android:scrollHorizontally="true"
-                android:text="Disconnect"
-                android:textColor="@color/colorTextWhite"
-                android:visibility="gone" />
-
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorTextWhite"
+                android:indeterminateTintMode="src_atop"
+                android:visibility="visible" />
         </RelativeLayout>
 
 
-        <LinearLayout
-            android:id="@+id/llButton"
+
+        <TextView
+            android:id="@+id/tv_diaglog_thanhtoan_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/rv_dialog_thanhtoan_request_pay"
-            android:orientation="horizontal"
-            android:padding="20dp">
+            android:layout_alignBaseline="@+id/ll_frag_thanh_toan_action_search"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/ll_frag_thanh_toan_action_search"
+            android:layout_toRightOf="@+id/tv_search"
+            android:gravity="right"
 
-            <Button
-                android:id="@+id/btn_dialog_thanhtoan_cancel"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_button_gray"
-                android:text="Huỷ"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/btn_dialog_thanhtoan_pay"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/bg_button"
-                android:text="Thanh toán"
-                android:textAllCaps="false"
-                android:textColor="@color/colorTextWhite" />
-
-        </LinearLayout>
+            android:lines="1"
+            android:scrollHorizontally="true"
+            android:text="Disconnect"
+            android:textColor="@color/colorTextWhite"
+            android:visibility="gone" />
 
     </RelativeLayout>
+
+
+    <LinearLayout
+        android:id="@+id/llButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rv_dialog_thanhtoan_request_pay"
+        android:orientation="horizontal"
+        android:padding="20dp">
+
+        <Button
+            android:id="@+id/btn_dialog_thanhtoan_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_gray"
+            android:text="Huỷ"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_dialog_thanhtoan_pay"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button"
+            android:text="Thanh toán"
+            android:textAllCaps="false"
+            android:textColor="@color/colorTextWhite" />
+
+    </LinearLayout>
+
+</RelativeLayout>
 
 
 </android.support.v7.widget.CardView>

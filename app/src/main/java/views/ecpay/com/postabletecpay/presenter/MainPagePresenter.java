@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
@@ -22,13 +23,12 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import views.ecpay.com.postabletecpay.model.MainPageModel;
+import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.BodyCustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.FooterCustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityDataZip.ListDataZipResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
@@ -37,6 +37,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPC
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.FileGenResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListBillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListCustomerResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogout.LogoutResponse;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
@@ -44,21 +45,24 @@ import views.ecpay.com.postabletecpay.view.TrangChu.IMainPageView;
 
 import static android.content.Context.MODE_PRIVATE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TAG;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT;
 
 /**
  * Created by VinhNB on 5/23/2017.
  */
 
 public class MainPagePresenter implements IMainPagePresenter {
-    private IMainPageView iMainPageView;
+    private IMainPageView mIMainPageView;
     private MainPageModel mainPageModel;
     private SharePrefManager mSharedPrefLogin;
 
     private String bookCmis;
+    private SoapAPI.AsyncSoapLogout soapLogout;
+    private Handler handlerDelay = new Handler();
 
-    public MainPagePresenter(IMainPageView iMainPageView) {
-        this.iMainPageView = iMainPageView;
-        mainPageModel = new MainPageModel(iMainPageView.getContextView());
+    public MainPagePresenter(IMainPageView mIMainPageView) {
+        this.mIMainPageView = mIMainPageView;
+        mainPageModel = new MainPageModel(mIMainPageView.getContextView());
         mSharedPrefLogin = mainPageModel.getManagerSharedPref();
     }
 
@@ -69,7 +73,7 @@ public class MainPagePresenter implements IMainPagePresenter {
         int countTotalBill = mainPageModel.getTotalBill(edong);
         int countTotalMoney = mainPageModel.getTotalMoney(edong);
 
-        iMainPageView.showMainPageInfo(account.getName(), account.getBalance(), countTotalBill, countTotalMoney);
+        mIMainPageView.showMainPageInfo(account.getName(), account.getBalance(), countTotalBill, countTotalMoney);
     }
     //endregion
 
@@ -84,7 +88,7 @@ public class MainPagePresenter implements IMainPagePresenter {
                         .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
 
         String textMessage = "";
-        Context context = iMainPageView.getContextView();
+        Context context = mIMainPageView.getContextView();
         Boolean isErr = false;
 
         if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.MAX_LENGTH) && !isErr) {
@@ -105,14 +109,14 @@ public class MainPagePresenter implements IMainPagePresenter {
             isErr = true;
         }
         if (isErr) {
-            iMainPageView.showTextMessage(textMessage);
+            mIMainPageView.showTextMessage(textMessage);
             return;
         }
 
         ConfigInfo configInfo;
         String versionApp = "";
         try {
-            versionApp = iMainPageView.getContextView().getPackageManager()
+            versionApp = mIMainPageView.getContextView().getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -121,7 +125,7 @@ public class MainPagePresenter implements IMainPagePresenter {
         try {
             configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER.toString(), versionApp);
         } catch (Exception e) {
-            iMainPageView.showTextMessage(e.getMessage());
+            mIMainPageView.showTextMessage(e.getMessage());
             return;
         }
 
@@ -153,9 +157,9 @@ public class MainPagePresenter implements IMainPagePresenter {
 
                             //call time out
                             try {
-                                Thread.sleep(Common.TIME_OUT_CONNECT);
+                                Thread.sleep(TIME_OUT_CONNECT);
                             } catch (InterruptedException e) {
-                                iMainPageView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                                mIMainPageView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
                             } finally {
                                 if (listEVNReponse == null) {
                                     soapSynchronizePC.callCountdown(soapSynchronizePC);
@@ -167,7 +171,7 @@ public class MainPagePresenter implements IMainPagePresenter {
                     soapevnThread.start();
                 }
             } catch (Exception e) {
-                iMainPageView.showTextMessage(e.getMessage());
+                mIMainPageView.showTextMessage(e.getMessage());
                 return;
             }
 
@@ -224,7 +228,7 @@ public class MainPagePresenter implements IMainPagePresenter {
                     synchronizeData();
                 }
             } catch (Exception ex) {
-                iMainPageView.showTextMessage(ex.getMessage());
+                mIMainPageView.showTextMessage(ex.getMessage());
             }
         }
 
@@ -246,7 +250,7 @@ public class MainPagePresenter implements IMainPagePresenter {
                 mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
                         .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
         String textMessage = "";
-        Context context = iMainPageView.getContextView();
+        Context context = mIMainPageView.getContextView();
         Boolean isErr = false;
 
         if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.MAX_LENGTH) && !isErr) {
@@ -267,7 +271,7 @@ public class MainPagePresenter implements IMainPagePresenter {
             isErr = true;
         }
         if (isErr) {
-            iMainPageView.showTextMessage(textMessage);
+            mIMainPageView.showTextMessage(textMessage);
             return;
         }
 
@@ -275,7 +279,7 @@ public class MainPagePresenter implements IMainPagePresenter {
         ConfigInfo configInfo;
         String versionApp = "";
         try {
-            versionApp = iMainPageView.getContextView().getPackageManager()
+            versionApp = mIMainPageView.getContextView().getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -284,7 +288,7 @@ public class MainPagePresenter implements IMainPagePresenter {
         try {
             configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp, mainPageModel.getPcCode());
         } catch (Exception e) {
-            iMainPageView.showTextMessage(e.getMessage());
+            mIMainPageView.showTextMessage(e.getMessage());
             return;
         }
 
@@ -322,7 +326,7 @@ public class MainPagePresenter implements IMainPagePresenter {
                     try {
                         final SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeDataZip;
 
-                        soapSynchronizeDataZip = new SoapAPI.AsyncSoapSynchronizeDataZip(callBackFileGen, iMainPageView.getContextView());
+                        soapSynchronizeDataZip = new SoapAPI.AsyncSoapSynchronizeDataZip(callBackFileGen, mIMainPageView.getContextView());
 
                         if (soapSynchronizeDataZip.getStatus() != AsyncTask.Status.RUNNING) {
                             soapSynchronizeDataZip.execute(jsonRequestZipData);
@@ -335,9 +339,9 @@ public class MainPagePresenter implements IMainPagePresenter {
 
                                     //call time out
                                     try {
-                                        Thread.sleep(Common.TIME_OUT_CONNECT);
+                                        Thread.sleep(TIME_OUT_CONNECT);
                                     } catch (InterruptedException e) {
-                                        iMainPageView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                                        mIMainPageView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
                                     } finally {
                                         if (listDataZipResponse == null) {
                                             soapSynchronizeDataZip.callCountdown(soapSynchronizeDataZip);
@@ -349,7 +353,7 @@ public class MainPagePresenter implements IMainPagePresenter {
                             soapDataThread.start();
                         }
                     } catch (Exception e) {
-                        iMainPageView.showTextMessage(e.getMessage());
+                        mIMainPageView.showTextMessage(e.getMessage());
                         return;
                     }
 
@@ -366,7 +370,7 @@ public class MainPagePresenter implements IMainPagePresenter {
                 .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
 
         String textMessage = "";
-        Context context = iMainPageView.getContextView();
+        Context context = mIMainPageView.getContextView();
         Boolean isErr = false;
 
         if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.MAX_LENGTH) && !isErr) {
@@ -387,14 +391,14 @@ public class MainPagePresenter implements IMainPagePresenter {
             isErr = true;
         }
         if (isErr) {
-            iMainPageView.showTextMessage(textMessage);
+            mIMainPageView.showTextMessage(textMessage);
             return;
         }
 
         ConfigInfo configInfo;
         String versionApp = "";
         try {
-            versionApp = iMainPageView.getContextView().getPackageManager()
+            versionApp = mIMainPageView.getContextView().getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -403,7 +407,7 @@ public class MainPagePresenter implements IMainPagePresenter {
         try {
             configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.SYNC_DATA.toString(), versionApp, mainPageModel.getPcCode());
         } catch (Exception e) {
-            iMainPageView.showTextMessage(e.getMessage());
+            mIMainPageView.showTextMessage(e.getMessage());
             return;
         }
 
@@ -447,7 +451,7 @@ public class MainPagePresenter implements IMainPagePresenter {
                         try {
                             final SoapAPI.AsyncSoapSynchronizeData soapSynchronizeData;
 
-                            soapSynchronizeData = new SoapAPI.AsyncSoapSynchronizeData(callBackData, iMainPageView.getContextView());
+                            soapSynchronizeData = new SoapAPI.AsyncSoapSynchronizeData(callBackData, mIMainPageView.getContextView());
 
                             if (soapSynchronizeData.getStatus() != AsyncTask.Status.RUNNING) {
                                 soapSynchronizeData.execute(jsonRequestData);
@@ -460,9 +464,9 @@ public class MainPagePresenter implements IMainPagePresenter {
 
                                         //call time out
                                         try {
-                                            Thread.sleep(Common.TIME_OUT_CONNECT);
+                                            Thread.sleep(TIME_OUT_CONNECT);
                                         } catch (InterruptedException e) {
-                                            iMainPageView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                                            mIMainPageView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
                                         } finally {
                                             if (listDataResponse == null) {
                                                 soapSynchronizeData.callCountdown(soapSynchronizeData);
@@ -474,13 +478,106 @@ public class MainPagePresenter implements IMainPagePresenter {
                                 soapDataThread.start();
                             }
                         } catch (Exception e) {
-                            iMainPageView.showTextMessage(e.getMessage());
+                            mIMainPageView.showTextMessage(e.getMessage());
                             return;
                         }
 
                     }
                 }
             } while (c.moveToNext());
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void callLogout(String mEdong) {
+        String textMessage = "";
+        Context context = mIMainPageView.getContextView();
+        Boolean isErr = false;
+
+        if (mEdong == null || mEdong.isEmpty() || mEdong.trim().equals("") && !isErr) {
+            return;
+        }
+
+        mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.BEGIN);
+
+        //check wifi and network
+//        if (!Common.isConnectingWifi(context) && !isErr) {
+//            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
+//            isErr = true;
+//        }
+        if (!Common.isNetworkConnected(context) && !isErr) {
+            textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
+            isErr = true;
+        }
+        if (isErr) {
+            mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
+            mIMainPageView.showMessageLogout(textMessage);
+            return;
+        }
+
+        //setup info login
+        ConfigInfo configInfo;
+        String versionApp = Common.getVersionApp(context);
+
+        try {
+            configInfo = Common.setupInfoRequest(context, mEdong, Common.COMMAND_ID.LOGOUT.toString(), versionApp);
+        } catch (Exception e) {
+            mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
+            mIMainPageView.showMessageLogout(textMessage);
+            return;
+        }
+
+        String session = new PayModel(context).getSession(mEdong);
+        //create request to server
+        String jsonRequestLogout = SoapAPI.getJsonRequestLogout(
+                configInfo.getAGENT(),
+                configInfo.getAgentEncypted(),
+                configInfo.getCommandId(),
+                configInfo.getAuditNumber(),
+                configInfo.getMacAdressHexValue(),
+                configInfo.getDiskDriver(),
+                configInfo.getSignatureEncrypted(),
+
+                session,
+
+                configInfo.getAccountId());
+
+        if (jsonRequestLogout == null)
+            return;
+
+        try {
+            if (soapLogout == null) {
+                //if null then create new
+                soapLogout = new SoapAPI.AsyncSoapLogout(mEdong, asyncSoapLogoutCallBack);
+            } else if (soapLogout.getStatus() == AsyncTask.Status.PENDING) {
+                //if running not yet then run
+
+            } else if (soapLogout.getStatus() == AsyncTask.Status.RUNNING) {
+                //if is running
+                soapLogout.setEndCallSoap(true);
+                soapLogout.cancel(true);
+
+                handlerDelay.removeCallbacks(runnableCountTimeLogout);
+                soapLogout = new SoapAPI.AsyncSoapLogout(mEdong, asyncSoapLogoutCallBack);
+            } else {
+                //if running or finish
+                handlerDelay.removeCallbacks(runnableCountTimeLogout);
+
+                soapLogout = new SoapAPI.AsyncSoapLogout(mEdong, asyncSoapLogoutCallBack);
+            }
+
+            soapLogout.execute(jsonRequestLogout);
+
+            //thread time out
+            //sleep
+            handlerDelay.postDelayed(runnableCountTimeLogout, TIME_OUT_CONNECT);
+
+        } catch (Exception e) {
+            mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
+            mIMainPageView.showMessageLogout(Common.CODE_REPONSE_LOGOUT.e9999.getMessage());
+            Log.e(TAG, "callLogout: " + Common.CODE_REPONSE_LOGOUT.e10000.getMessage());
+            return;
         }
     }
 
@@ -641,6 +738,99 @@ public class MainPagePresenter implements IMainPagePresenter {
         @Override
         public void onTimeOut(SoapAPI.AsyncSoapSynchronizeData soapSynchronizeInvoices) {
 
+        }
+    };
+
+    private SoapAPI.AsyncSoapLogout.AsyncSoapLogoutCallBack asyncSoapLogoutCallBack = new SoapAPI.AsyncSoapLogout.AsyncSoapLogoutCallBack() {
+        private String edong;
+
+        @Override
+        public void onPre(final SoapAPI.AsyncSoapLogout soapLogout) {
+            edong = soapLogout.getEdong();
+
+            mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.BEGIN);
+
+            //check wifi
+            boolean isHasWifi = Common.isConnectingWifi(mIMainPageView.getContextView());
+            boolean isHasNetwork = Common.isNetworkConnected(mIMainPageView.getContextView());
+
+//            if (!isHasWifi) {
+//                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
+//
+//                soapSearchOnline.setEndCallSoap(true);
+//                soapSearchOnline.cancel(true);
+//            }
+            if (!isHasNetwork) {
+                mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
+                mIMainPageView.showMessageLogout(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+
+                soapLogout.setEndCallSoap(true);
+                soapLogout.cancel(true);
+            }
+        }
+
+        @Override
+        public void onUpdate(final String message) {
+            if (message == null || message.isEmpty() || message.trim().equals(""))
+                return;
+
+            mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
+            mIMainPageView.showMessageLogout(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+
+        }
+
+        @Override
+        public void onPost(LogoutResponse response) {
+            if (response == null) {
+                return;
+            }
+
+            Common.CODE_REPONSE_LOGOUT codeResponse = Common.CODE_REPONSE_LOGOUT.findCodeMessage(response.getFooter().getResponseCode());
+            if (codeResponse != Common.CODE_REPONSE_LOGOUT.e000) {
+                mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
+                mIMainPageView.showMessageLogout(codeResponse.getMessage());
+                return;
+            }
+
+            mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.SUCCESS);
+            mIMainPageView.showMessageLogout(Common.CODE_REPONSE_LOGOUT.e000.getMessage());
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mIMainPageView.showLoginForm();
+                }
+            }, Common.MORE_LONG_TIME_DELAY_ANIM);
+        }
+
+        @Override
+        public void onTimeOut(final SoapAPI.AsyncSoapLogout asyncSoapLogoutCallBack) {
+            asyncSoapLogoutCallBack.cancel(true);
+
+            //thread call asyntask is running. must call in other thread to update UI
+            ((MainActivity) mIMainPageView.getContextView()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (!asyncSoapLogoutCallBack.isEndCallSoap()) {
+                        mIMainPageView.showMessageLogout(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                    }
+                }
+            });
+        }
+    };
+
+    private Runnable runnableCountTimeLogout = new Runnable() {
+        @Override
+        public void run() {
+            if (soapLogout != null && soapLogout.isEndCallSoap())
+                return;
+            //Do something after 100ms
+            LogoutResponse searchOnlineResponse = soapLogout.getLogoutResponse();
+
+            if (searchOnlineResponse == null && !soapLogout.isEndCallSoap()) {
+                //call time out
+                soapLogout.callCountdown(soapLogout);
+            }
         }
     };
     //endregion
