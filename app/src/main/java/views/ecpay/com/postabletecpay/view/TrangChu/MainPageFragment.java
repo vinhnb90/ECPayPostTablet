@@ -103,7 +103,7 @@ public class MainPageFragment extends Fragment implements
         iMainPagePresenter = new MainPagePresenter(this);
         iMainPagePresenter.synchronizePC();
         if(Common.isNetworkConnected(this.getActivity())) {
-            iMainPagePresenter.postBill();
+//            iMainPagePresenter.postBill();
         }
     }
 
