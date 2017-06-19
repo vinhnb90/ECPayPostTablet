@@ -174,44 +174,103 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3">
-        
-        <Button
-            android:id="@+id/btXoaDuLieu"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Xoá dữ liệu"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/colorMain"
-            android:layout_gravity="center_vertical"
-            android:textAllCaps="false"
-            android:background="@drawable/bg_button_white"/>
+        android:layout_weight="3"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btThanhToan"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Thanh toán hoá đơn"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/colorTextWhite"
-            android:layout_gravity="center_vertical"
-            android:textAllCaps="false"
-            android:background="@drawable/bg_button"/>
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btBaoCao"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            <Button
+                android:id="@+id/btXoaDuLieu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_white"
+                android:text="Xoá dữ liệu"
+                android:textAllCaps="false"
+                android:textColor="@color/colorMain" />
+
+            <Button
+                android:id="@+id/btThanhToan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button"
+                android:text="Thanh toán hoá đơn"
+                android:textAllCaps="false"
+                android:textColor="@color/colorTextWhite" />
+
+            <Button
+                android:id="@+id/btBaoCao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_white"
+                android:text="Báo cáo"
+                android:textAllCaps="false"
+                android:textColor="@color/colorMain" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Báo cáo"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:textColor="@color/colorMain"
-            android:layout_gravity="center_vertical"
-            android:textAllCaps="false"
-            android:background="@drawable/bg_button_white"/>
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1.5"
+                android:orientation="horizontal">
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnChuyenViTong"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_white"
+                android:text="Chuyển Ví Tổng"
+                android:textAllCaps="false"
+                android:textColor="@color/colorMain" />
+
+            <Button
+                android:id="@+id/btnDinhDanhThe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_white"
+                android:text="Định Danh Thẻ"
+                android:textAllCaps="false"
+                android:textColor="@color/colorMain" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1.5"
+                android:orientation="horizontal"></LinearLayout>
+        </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>
