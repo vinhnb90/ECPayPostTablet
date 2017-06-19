@@ -91,6 +91,8 @@ public class MainPageFragment extends Fragment implements
     @Nullable
     @BindView(R.id.btBaoCao)
     Button btBaoCao;
+    @BindView(R.id.btnChuyenViTong)
+    Button btnChuyenViTong;
 
     //dialog logout
     @Nullable
@@ -140,6 +142,9 @@ public class MainPageFragment extends Fragment implements
         mIMainPagePresenter = new MainPagePresenter(this);
         mILogoutPresenter = new LogoutPresenter(this);
         mIMainPagePresenter.synchronizePC();
+        if(Common.isNetworkConnected(this.getActivity())) {
+//            mIMainPagePresenter.postBill();
+        }
     }
 
     @Override
@@ -153,6 +158,7 @@ public class MainPageFragment extends Fragment implements
         btXoaDuLieu.setOnClickListener(this);
         btThanhToan.setOnClickListener(this);
         btBaoCao.setOnClickListener(this);
+        btnChuyenViTong.setOnClickListener(this);
 
         mIMainPagePresenter.callInfoMain(mEdong);
 
@@ -244,23 +250,21 @@ public class MainPageFragment extends Fragment implements
                 break;
             case R.id.btThanhToan:
                 fragment = PayFragment.newInstance(mEdong);
-                if (fragment != null) {
-                    FragmentTransaction fragmentTransaction = MainPageFragment.this.getActivity().getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.frameLayout, fragment);
-                    fragmentTransaction.commit();
-                }
                 break;
             case R.id.btBaoCao:
                 fragment = BaoCaoFragment.newInstance();
-                if (fragment != null) {
-                    FragmentTransaction fragmentTransaction = MainPageFragment.this.getActivity().getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.frameLayout, fragment);
-                    fragmentTransaction.commit();
-                }
                 break;
             case R.id.ibTroGiup:
                 showDialogHoTro();
                 break;
+            case R.id.btnChuyenViTong:
+                fragment = ChuyenViTongFragment.newInstance();
+                break;
+        }
+        if (fragment != null) {
+            FragmentTransaction fragmentTransaction = MainPageFragment.this.getActivity().getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frameLayout, fragment);
+            fragmentTransaction.commit();
         }
     }
     //endregion

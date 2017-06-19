@@ -10,4 +10,6 @@ public interface IMainPagePresenter {
     void synchronizeData();
 
     void callLogout(String mEdong);
+
+    void postBill();
 }

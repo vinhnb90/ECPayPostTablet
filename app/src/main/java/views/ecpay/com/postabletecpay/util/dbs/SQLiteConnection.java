@@ -34,6 +34,8 @@ import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 import static android.content.ContentValues.TAG;
+import static views.ecpay.com.postabletecpay.util.commons.Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS;
+import static views.ecpay.com.postabletecpay.util.commons.Common.DATE_TIME_TYPE.yyyymmdd;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ONE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_CONFIG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_DB;
@@ -335,6 +337,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return road;
     }
 
+    public Cursor selectOfflineBill() {
+        database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE status = 2";
+        return database.rawQuery(query, null);
+    }
+
     public List<Customer> selectAllCustomer(String edong) {
         return this.selectAllCustomerFitterBy(edong, Common.TYPE_SEARCH.ALL, Common.TEXT_EMPTY);
     }
@@ -434,12 +442,15 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         List<PayAdapter.BillEntityAdapter> billList = new ArrayList<>();
 
         database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode ='" + code + "' ORDER BY date(term) DESC";
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode ='" + code + "' ORDER BY term DESC";
         Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor.getCount() == 0)
+            return billList;
 
         mCursor.moveToFirst();
         do {
-            int billId  = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId")));
+            int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId")));
             int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
             int status = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")));
             boolean isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))) == 0 ? false : true;
@@ -447,7 +458,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             String billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
 
             String term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
-            term = Common.convertDateToDate(term, Common.DATE_TIME_TYPE.yyyymmdd, Common.DATE_TIME_TYPE.mmyyyy);
+            term = Common.convertDateToDate(term, yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.mmyyyy);
 
             String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
 
@@ -526,7 +537,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("customerCode", billInsideCustomer.getCustomerCode());
         initialValues.put("customerPayCode", billInsideCustomer.getCustomerPayCode());
         initialValues.put("billId", billInsideCustomer.getBillId());
-        initialValues.put("term", billInsideCustomer.getTerm());
+
+        String term = billInsideCustomer.getTerm();
+        //20170414011107000 != 2015-01-01
+        if (term.length() == yyyymmdd.toString().length()) {
+            term = Common.convertDateToDate(term, yyyymmdd, yyyyMMddHHmmssSSS);
+        }
+        initialValues.put("term", term);
         initialValues.put("amount", billInsideCustomer.getAmount());
         initialValues.put("period", billInsideCustomer.getPeriod());
         initialValues.put("issueDate", billInsideCustomer.getIssueDate());
@@ -671,10 +688,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         if (mCursor.moveToFirst()) {
             do {
+                String term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
+                term = Common.convertDateToDate(term, yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.mmyyyy);
+
                 entity = new PayBillsDialogAdapter.Entity(
                         stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode"))),
                         stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name"))),
-                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term"))),
+                        term,
                         longConvertNull(mCursor.getLong(mCursor.getColumnIndex("amount"))),
                         booleanConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))),
                         edong,
@@ -772,7 +792,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, customerCode, String.valueOf(billId)});
     }
 
-    public Long SelectTraceNumberBill(String edong, String code, Long billId) {
+    public Long selectTraceNumberBill(String edong, String code, Long billId) {
         database = this.getReadableDatabase();
         String query = "SELECT traceNumber FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and billId = " + billId;
         Cursor mCursor = database.rawQuery(query, null);
@@ -1039,7 +1059,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("customerCode", bodyBillResponse.getCustomerCode());
         initialValues.put("customerPayCode", "");
         initialValues.put("billId", !bodyBillResponse.getBillId().isEmpty() ? Integer.parseInt(bodyBillResponse.getBillId()) : 0);
-        initialValues.put("term", bodyBillResponse.getTerm());
+        String term = bodyBillResponse.getTerm();
+        //20170414011107000 != 2015-01-01
+        if (term.length() == yyyymmdd.toString().length()) {
+            term = Common.convertDateToDate(term, yyyymmdd, yyyyMMddHHmmssSSS);
+        }
+        initialValues.put("term", term);
         initialValues.put("strTerm", "");
         initialValues.put("amount", !bodyBillResponse.getAmount().equals("") ? Integer.parseInt(bodyBillResponse.getAmount()) : 0);
         initialValues.put("period", bodyBillResponse.getPeriod());
@@ -1113,7 +1138,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("customerCode", bodyBillResponse.getCustomerCode());
         initialValues.put("customerPayCode", "");
         initialValues.put("billId", bodyBillResponse.getBillId());
-        initialValues.put("term", bodyBillResponse.getTerm());
+        String term = bodyBillResponse.getTerm();
+        //20170414011107000 != 2015-01-01
+        if (term.length() == yyyymmdd.toString().length()) {
+            term = Common.convertDateToDate(term, yyyymmdd, yyyyMMddHHmmssSSS);
+        }
+        initialValues.put("term", term);
         initialValues.put("strTerm", "");
         initialValues.put("amount", bodyBillResponse.getAmount());
         initialValues.put("period", bodyBillResponse.getPeriod());
@@ -1186,7 +1216,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         initialValues.put("customerCode", bodyBillResponse.getCustomerCode());
         initialValues.put("customerPayCode", "");
-        initialValues.put("term", bodyBillResponse.getTerm());
+        String term = bodyBillResponse.getTerm();
+        //20170414011107000 != 2015-01-01
+        if (term.length() == yyyymmdd.toString().length()) {
+            term = Common.convertDateToDate(term, yyyymmdd, yyyyMMddHHmmssSSS);
+        }
+        initialValues.put("term", term);
         initialValues.put("strTerm", "");
         initialValues.put("amount", bodyBillResponse.getAmount());
         initialValues.put("period", bodyBillResponse.getPeriod());

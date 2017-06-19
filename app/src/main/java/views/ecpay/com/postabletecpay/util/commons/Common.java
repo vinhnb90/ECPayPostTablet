@@ -758,7 +758,8 @@ public class Common {
         GET_FILE_GEN,
         CHECK_TRANS,
         TRANSACTION_CANCELLATION,
-        LOGOUT;
+        LOGOUT,
+        PUT_TRANSACTION_OFF;
 
         @Override
         public String toString() {
@@ -782,7 +783,8 @@ public class Common {
                 return "TRANSACTION-CANCELLATION";
             if (this == LOGOUT)
                 return "LOGOUT";
-
+            if (this == PUT_TRANSACTION_OFF)
+                return "PUT-TRANSACTION-OFF";
             return super.toString();
         }
     }
@@ -1684,6 +1686,7 @@ public class Common {
     public enum DATE_TIME_TYPE {
         HHmmss,
         yyyymmdd,
+        yyyyMMddHHmmssSSS,
         mmyyyy,
         ddmmyyyy,
         FULL;
@@ -1694,6 +1697,8 @@ public class Common {
                 return "HHmmss";
             if (this == yyyymmdd)
                 return "yyyy-mm-dd";
+            if (this == yyyyMMddHHmmssSSS)
+                return "yyyyMMddHHmmssSSS";
             if (this == mmyyyy)
                 return "mm/yyyy";
             if (this == ddmmyyyy)

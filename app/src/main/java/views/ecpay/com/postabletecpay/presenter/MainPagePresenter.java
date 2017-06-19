@@ -21,12 +21,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import views.ecpay.com.postabletecpay.model.MainPageModel;
 import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.ListTransactionOff;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
@@ -38,6 +40,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.FileG
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListBillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListCustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogout.LogoutResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityPostBill.PostBillResponse;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
@@ -506,23 +509,21 @@ public class MainPagePresenter implements IMainPagePresenter {
 //            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
 //            isErr = true;
 //        }
-        if (!Common.isNetworkConnected(context) && !isErr) {
-            textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
-            isErr = true;
-        }
-        if (isErr) {
-            mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
-            mIMainPageView.showMessageLogout(textMessage);
-            return;
-        }
 
+/*   mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
+        mIMainPageView.showMessageLogout(textMessage);
+        return;
+    }*/
         //setup info login
         ConfigInfo configInfo;
         String versionApp = Common.getVersionApp(context);
 
         try {
             configInfo = Common.setupInfoRequest(context, mEdong, Common.COMMAND_ID.LOGOUT.toString(), versionApp);
-        } catch (Exception e) {
+        } catch (
+                Exception e)
+
+        {
             mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
             mIMainPageView.showMessageLogout(textMessage);
             return;
@@ -545,7 +546,6 @@ public class MainPagePresenter implements IMainPagePresenter {
 
         if (jsonRequestLogout == null)
             return;
-
         try {
             if (soapLogout == null) {
                 //if null then create new
@@ -578,6 +578,128 @@ public class MainPagePresenter implements IMainPagePresenter {
             mIMainPageView.showMessageLogout(Common.CODE_REPONSE_LOGOUT.e9999.getMessage());
             Log.e(TAG, "callLogout: " + Common.CODE_REPONSE_LOGOUT.e10000.getMessage());
             return;
+        }
+    }
+
+
+    @Override
+    public void postBill() {
+        String userName = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
+                .getString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, "");
+        String pass = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
+                .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
+
+        String textMessage = "";
+        Context context = mIMainPageView.getContextView();
+        Boolean isErr = false;
+
+        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.MAX_LENGTH || userName.length() < Common.MIN_LENGTH) && !isErr) {
+            textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_USER.toString();
+            isErr = true;
+        }
+        if ((pass == null || pass.isEmpty() || pass.trim().equals("") || pass.length() > Common.LENGTH_PASS) && !isErr) {
+            textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_PASS.toString();
+            isErr = true;
+        }
+        if (!Common.isNetworkConnected(context) && !isErr) {
+            textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
+            isErr = true;
+        }
+        if (isErr) {
+            mIMainPageView.showTextMessage(textMessage);
+            return;
+        }
+
+        ConfigInfo configInfo;
+        String versionApp = "";
+        try {
+            versionApp = mIMainPageView.getContextView().getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.PUT_TRANSACTION_OFF.toString(), versionApp, mainPageModel.getPcCode());
+        } catch (Exception e) {
+            mIMainPageView.showTextMessage(e.getMessage());
+            return;
+        }
+
+
+        String signatureEncrypted = "";
+        try {
+            String dataSign = Common.getDataSignRSA(
+                    configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
+                    configInfo.getDiskDriver(), mainPageModel.getPcCode(), configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
+            Log.d(TAG, "setupInfoRequest: " + dataSign);
+            signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
+            Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
+        } catch (Exception e) {
+        }
+        configInfo.setSignatureEncrypted(signatureEncrypted);
+
+        ArrayList<ListTransactionOff> lstTransactionOff = new ArrayList<>();
+        Cursor c = mainPageModel.selectOfflineBill();
+        if (c.moveToFirst()) {
+            do {
+                ListTransactionOff listTransactionOff = new ListTransactionOff();
+                listTransactionOff.setCustomer_code(c.getString(c.getColumnIndex("customerCode")));
+                listTransactionOff.setProvide_code(c.getString(c.getColumnIndex("")));
+                listTransactionOff.setAmount(c.getString(c.getColumnIndex("amount")));
+                listTransactionOff.setBill_id(c.getString(c.getColumnIndex("billId")));
+                listTransactionOff.setEdong(c.getString(c.getColumnIndex("edong")));
+                listTransactionOff.setAudit_number(String.valueOf(configInfo.getAuditNumber()));
+                lstTransactionOff.add(listTransactionOff);
+            } while (c.moveToNext());
+        }
+        String jsonRequestData = SoapAPI.getJsonRequestPostBill(
+                configInfo.getAGENT(),
+                configInfo.getAgentEncypted(),
+                configInfo.getCommandId(),
+                configInfo.getAuditNumber(),
+                configInfo.getMacAdressHexValue(),
+                configInfo.getDiskDriver(),
+                configInfo.getSignatureEncrypted(),
+                lstTransactionOff,
+                configInfo.getAccountId());
+
+
+        if (jsonRequestData != null) {
+            try {
+                final SoapAPI.AsyncSoapPostBill soapPostBill;
+
+                soapPostBill = new SoapAPI.AsyncSoapPostBill(callBackPostBill, mIMainPageView.getContextView());
+
+                if (soapPostBill.getStatus() != AsyncTask.Status.RUNNING) {
+                    soapPostBill.execute(jsonRequestData);
+
+                    //thread time out
+                    Thread soapDataThread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            PostBillResponse postBillResponse = null;
+
+                            //call time out
+                            try {
+                                Thread.sleep(Common.TIME_OUT_CONNECT);
+                            } catch (InterruptedException e) {
+                                mIMainPageView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                            } finally {
+                                if (postBillResponse == null) {
+                                    soapPostBill.callCountdown(soapPostBill);
+                                }
+                            }
+                        }
+                    });
+
+                    soapDataThread.start();
+                }
+            } catch (Exception e) {
+                mIMainPageView.showTextMessage(e.getMessage());
+                return;
+            }
+
         }
     }
 
@@ -834,4 +956,28 @@ public class MainPagePresenter implements IMainPagePresenter {
         }
     };
     //endregion
+
+
+    private SoapAPI.AsyncSoapPostBill.AsyncSoapPostBillCallBack callBackPostBill = new SoapAPI.AsyncSoapPostBill.AsyncSoapPostBillCallBack() {
+        @Override
+        public void onPre(SoapAPI.AsyncSoapPostBill soapPostBill) {
+
+        }
+
+        @Override
+        public void onUpdate(String message) {
+
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+        @Override
+        public void onPost(PostBillResponse response) {
+
+        }
+
+        @Override
+        public void onTimeOut(SoapAPI.AsyncSoapPostBill soapPostBill) {
+        }
+    };
 }
+
