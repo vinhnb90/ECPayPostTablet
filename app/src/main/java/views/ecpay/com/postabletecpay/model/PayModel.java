@@ -1,6 +1,7 @@
 package views.ecpay.com.postabletecpay.model;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -313,5 +314,51 @@ public class PayModel extends CommonModel {
             return;
 
         sqLiteConnection.updateBillReasonDelete(edong, code, billId, reasonDeleteBill, statusBilling);
+    }
+
+    public double selectBalance() {
+        return sqLiteConnection.selectBalance();
+    }
+
+    public long updatePayOffine(int billID, int status, String edong) {
+        return sqLiteConnection.updatePayOffine(billID, status, edong);
+    }
+
+    public int insertDebtCollection(String edong, String customerCode, String customerPayCode,int billId, String term,int amount, String period, String issueDate, String strIssueDate
+            , int status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate
+            , String strToDate, String home, float tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex
+            , String newIndex, String nume, int amountNotTax, String amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex
+            , String createdDate, int idChanged, String dateChanged, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp
+            , String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, int type
+            , String lastQuery, int groupType, String billingChannel, String billingType, String billingBy, String cashierPay, int payments
+            , int payStatus, int stateOfDebt, String stateOfCancel, String stateOfReturn, String suspectedProcessingStatus, int stateOfPush
+            , String dateOfPush, int countPrintReceipt, String printInfo) {
+        return sqLiteConnection.insertDebtCollection( edong,  customerCode,  customerPayCode,  billId,  term,  amount,  period,  issueDate,  strIssueDate
+                ,  status,  seri,  pcCode,  handoverCode,  cashierCode,  bookCmis,  fromDate,  toDate,  strFromDate
+                ,  strToDate,  home,  tax,  billNum,  currency,  priceDetails,  numeDetails,  amountDetails,  oldIndex
+                ,  newIndex,  nume,  amountNotTax,  amountTax,  multiple,  billType,  typeIndex,  groupTypeIndex
+                ,  createdDate,  idChanged,  dateChanged,  pcCodeExt,  code,  name,  nameNosign,  phoneByevn,  phoneByecp
+                ,  electricityMeter,  inning,  road,  station,  taxCode,  trade,  countPeriod,  team,  type
+                ,  lastQuery,  groupType,  billingChannel,  billingType,  billingBy,  cashierPay,  payments
+                ,  payStatus,  stateOfDebt,  stateOfCancel,  stateOfReturn,  suspectedProcessingStatus,  stateOfPush
+                ,  dateOfPush,  countPrintReceipt,  printInfo);
+    }
+
+    public Cursor selectBillByID(int billId) {
+        return sqLiteConnection.selectBillByID(billId);
+    }
+
+    public int insertPayLib(int SERI_HDON, String MA_KHANG, String MA_THE, String TEN_KHANG, String DIA_CHI, String THANG_TTOAN, int PHIEN_TTOAN
+            , double SO_TIEN_TTOAN, String SO_GCS, String DIEN_LUC, String SO_HO, String SO_DAU_KY, String SO_CUOI_KY, String SO_CTO, String SDT_ECPAY, String SDT_EVN
+            , int GIAO_THU, String NGAY_GIAO_THU, String TRANG_THAI_TTOAN, String VI_TTOAN, String HTHUC_TTOAN, String TTHAI_TTOAN, String TTHAI_CHAM_NO, String TTHAI_HUY
+            , String TTHAI_XLY_NGHI_NGO, int SO_LAN_IN_BNHAN, String IN_TBAO_DIEN, String NGAY_PSINH, String MA_GIAO_DICH) {
+        return sqLiteConnection.insertPayLib(SERI_HDON, MA_KHANG, MA_THE, TEN_KHANG, DIA_CHI, THANG_TTOAN, PHIEN_TTOAN
+            , SO_TIEN_TTOAN, SO_GCS, DIEN_LUC, SO_HO, SO_DAU_KY, SO_CUOI_KY, SO_CTO, SDT_ECPAY, SDT_EVN
+            , GIAO_THU, NGAY_GIAO_THU, TRANG_THAI_TTOAN, VI_TTOAN, HTHUC_TTOAN, TTHAI_TTOAN, TTHAI_CHAM_NO, TTHAI_HUY
+                , TTHAI_XLY_NGHI_NGO, SO_LAN_IN_BNHAN, IN_TBAO_DIEN, NGAY_PSINH, MA_GIAO_DICH);
+    }
+
+    public Cursor getCustomer(String code) {
+        return sqLiteConnection.getCustomer(code);
     }
 }

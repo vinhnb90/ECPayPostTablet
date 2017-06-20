@@ -1,6 +1,7 @@
 package views.ecpay.com.postabletecpay.presenter;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -12,7 +13,9 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.PayModel;
@@ -290,16 +293,6 @@ public class PayPresenter implements IPayPresenter {
             return;
         }
 
-        //Cảnh báo khi giao dịch thanh toán chưa kết thúc
-        //Kiểm tra kỳ hoá đơn thanh toán
-        //Kiểm tra số dư khả dụng của tài khoản thanh toán
-        //Kiểm tra địa bàn thanh toán
-        if (mPayModel.getPcCode().substring(0, 2).toUpperCase().equals("PD") || mPayModel.getPcCode().substring(0, 2).toUpperCase().equals("PE")) {
-            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e04.getMessage());
-            return;
-        }
-        //Kiểm tra trạng thái hoá đơn thanh toán
-
         //totalBillsChooseDialogTemp đại diện cho tổng các bill được chọn từ list bill dialog thanh toán trước khi nhấn nút thanh toán
         //totalBillsChooseDialog dại diện tổng các bill được chọn tại list bill dialog thanh toán, giảm dần khi xong mỗi hóa đơn
 
@@ -317,13 +310,47 @@ public class PayPresenter implements IPayPresenter {
         //những bill nào đc chọn thì cho thanh toán offline
         int index = 0;
         int maxIndex = listBillDialog.size();
+        double amount = 0d;
+        for (; index < maxIndex; index++) {
+            PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
+            amount += entity.getAmount();
+        }
+
+        //Kiểm tra kỳ hoá đơn thanh toán
+
+        //Kiểm tra số dư khả dụng của tài khoản thanh toán
+        if(mPayModel.selectBalance() < amount) {
+            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e03.getMessage());
+            return;
+        }
+        //Kiểm tra địa bàn thanh toán
+        if (mPayModel.getPcCode().substring(0, 2).toUpperCase().equals("PD") || mPayModel.getPcCode().substring(0, 2).toUpperCase().equals("PE")) {
+            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e04.getMessage());
+            return;
+        }
+        //Thanh toán offline
+        StringBuilder sbMsg = new StringBuilder();
         for (; index < maxIndex; index++) {
             PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
 
-            if (entity.isChecked())
-                payOfflineTheBill(entity, index, edong);
+            if (entity.isChecked()) {
+                if(entity.getStatus() == 0) {
+                    payOfflineTheBill(entity, index, edong);
+                } else if(entity.getStatus() == 3) {
+                    sbMsg.append("\nHoá đơn ");
+                    sbMsg.append(entity.getBillId());
+                    sbMsg.append(" đã được thanh toán bởi nguồn khác");
+                } else if(entity.getStatus() == 4) {
+                    sbMsg.append("\nHoá đơn ");
+                    sbMsg.append(entity.getBillId());
+                    sbMsg.append(" đã được thanh toán bởi số ví khác");
+                }
+            }
         }
 
+        if(!sbMsg.toString().isEmpty()) {
+            mIPayView.showMessageNotifyBillOnlineDialog(sbMsg.toString());
+        }
     }
 
     private void payOfflineTheBill(PayBillsDialogAdapter.Entity entity, int index, final String edong) {
@@ -344,11 +371,47 @@ public class PayPresenter implements IPayPresenter {
             mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage());
 
 
-        /**
-         *
-         * TODO: update sql các kiểu......
-         *
-         */
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy'T'HH:mm:ss");
+        String currentDateandTime = sdf.format(new Date());
+
+        if(mPayModel.updatePayOffine(entity.getBillId(), 2, MainActivity.mEdong) != -1) {
+            Cursor c = mPayModel.selectBillByID(entity.getBillId());
+            if(c.moveToFirst()) {
+                if (mPayModel.insertDebtCollection(
+                        c.getString(c.getColumnIndex("edong")), c.getString(c.getColumnIndex("customerCode")),
+                        c.getString(c.getColumnIndex("customerPayCode")),c.getInt(c.getColumnIndex("billId")), c.getString(c.getColumnIndex("term")),
+                        c.getInt(c.getColumnIndex("amount")), c.getString(c.getColumnIndex("period")), c.getString(c.getColumnIndex("issueDate")),
+                        c.getString(c.getColumnIndex("strIssueDate")), c.getInt(c.getColumnIndex("status")), c.getString(c.getColumnIndex("seri")),
+                        c.getString(c.getColumnIndex("pcCode")), c.getString(c.getColumnIndex("handoverCode")), c.getString(c.getColumnIndex("cashierCode")),
+                        c.getString(c.getColumnIndex("bookCmis")), c.getString(c.getColumnIndex("fromDate")),
+                        c.getString(c.getColumnIndex("toDate")), c.getString(c.getColumnIndex("strFromDate")),
+                        c.getString(c.getColumnIndex("strToDate")), c.getString(c.getColumnIndex("home")),
+                        c.getFloat(c.getColumnIndex("tax")), c.getString(c.getColumnIndex("billNum")), c.getString(c.getColumnIndex("currency")),
+                        c.getString(c.getColumnIndex("priceDetails")), c.getString(c.getColumnIndex("numeDetails")), c.getString(c.getColumnIndex("amountDetails")),
+                        c.getString(c.getColumnIndex("oldIndex")), c.getString(c.getColumnIndex("newIndex")), c.getString(c.getColumnIndex("nume")), c.getInt(c.getColumnIndex("amountNotTax")),
+                        c.getString(c.getColumnIndex("amountTax")), c.getString(c.getColumnIndex("multiple")), c.getString(c.getColumnIndex("billType")),
+                        c.getString(c.getColumnIndex("typeIndex")), c.getString(c.getColumnIndex("groupTypeIndex")), c.getString(c.getColumnIndex("createdDate")),
+                        c.getInt(c.getColumnIndex("idChanged")), c.getString(c.getColumnIndex("dateChanged")), c.getString(c.getColumnIndex("pcCodeExt")),
+                        c.getString(c.getColumnIndex("code")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("nameNosign")),
+                        c.getString(c.getColumnIndex("phoneByevn")), c.getString(c.getColumnIndex("phoneByecp")), c.getString(c.getColumnIndex("electricityMeter")),
+                        c.getString(c.getColumnIndex("inning")), c.getString(c.getColumnIndex("road")), c.getString(c.getColumnIndex("station")), c.getString(c.getColumnIndex("taxCode")),
+                        c.getString(c.getColumnIndex("trade")), c.getString(c.getColumnIndex("countPeriod")), c.getString(c.getColumnIndex("team")), c.getInt(c.getColumnIndex("type")),
+                        c.getString(c.getColumnIndex("lastQuery")), c.getInt(c.getColumnIndex("groupType")), c.getString(c.getColumnIndex("billingChannel")),
+                        c.getString(c.getColumnIndex("billingType")), c.getString(c.getColumnIndex("billingBy")), c.getString(c.getColumnIndex("cashierPay")),
+                        2, 2, 2, "", "", "", 1, currentDateandTime, 0, "") != -1) {
+                    Cursor cCustomer = mPayModel.getCustomer(c.getString(c.getColumnIndex("customerCode")));
+                    if(cCustomer.moveToFirst()) {
+//                        if(mPayModel.insertPayLib(c.getString(c.getColumnIndex("seri"), c.getString(c.getColumnIndex("customerCode")),
+//                                cCustomer.getString(c.getColumnIndex("address")), cCustomer.getString(c.getColumnIndex("name")), "THANG_TTOAN", 0 ) != -1) {
+////                        int SERI_HDON, String MA_KHANG, String MA_THE, String TEN_KHANG, String DIA_CHI, String THANG_TTOAN, int PHIEN_TTOAN
+////            , double SO_TIEN_TTOAN, String SO_GCS, String DIEN_LUC, String SO_HO, String SO_DAU_KY, String SO_CUOI_KY, String SO_CTO, String SDT_ECPAY, String SDT_EVN
+////            , int GIAO_THU, String NGAY_GIAO_THU, String TRANG_THAI_TTOAN, String VI_TTOAN, String HTHUC_TTOAN, String TTHAI_TTOAN, String TTHAI_CHAM_NO, String TTHAI_HUY
+////                                , String TTHAI_XLY_NGHI_NGO, int SO_LAN_IN_BNHAN, String IN_TBAO_DIEN, String NGAY_PSINH, String MA_GIAO_DICH
+//                        }
+                    }
+                }
+            }
+        }
 
         //làm mới thanh đếm số bill thành công
         //refresh lại recyclerview của dialog

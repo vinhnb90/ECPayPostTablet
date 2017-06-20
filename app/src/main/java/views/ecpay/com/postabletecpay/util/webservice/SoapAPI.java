@@ -1729,6 +1729,7 @@ public class SoapAPI {
             super.onPostExecute(listDataResponse);
             isEndCallSoap = true;
             callBack.onPost(listDataResponse);
+            progressDialog.dismiss();
         }
 
         public static abstract class AsyncSoapSynchronizeDataCallBack {

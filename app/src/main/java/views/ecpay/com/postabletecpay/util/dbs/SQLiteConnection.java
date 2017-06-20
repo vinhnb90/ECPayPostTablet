@@ -59,6 +59,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     private String TABLE_NAME_BOOK_CMIS = "TBL_BOOK_CMIS";
     private String TABLE_NAME_CUSTOMER = "TBL_CUSTOMER";
     private String TABLE_NAME_BILL = "TBL_BILL";
+    private String TABLE_NAME_DEBT_COLLECTION = "TBL_DEBT_COLLECTION";
     private String TABLE_NAME_LICH_SU_TTOAN = "TBL_LICH_SU_TTOAN";
 
     private String CREATE_TABLE_ACCOUNT = "CREATE TABLE `" + TABLE_NAME_ACCOUNT + "` (`edong` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `address` TEXT, `phone` TEXT, `email` TEXT, `birthday` TEXT, `session` TEXT, `balance` NUMERIC, `lockMoney` NUMERIC, `changePIN` INTEGER, `verified` INTEGER, `mac` TEXT, `ip` TEXT, `strLoginTime` TEXT, `strLogoutTime` TEXT, `type` INTEGER, `status` TEXT, `idNumber` TEXT, `idNumberDate` TEXT, `idNumberPlace` TEXT, `parentEdong` TEXT )";
@@ -93,6 +94,20 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             "`isChecked` INTEGER default 0," +
             "`traceNumber` INTERGER, " +
             "`causeCancelBillOnline` TEXT)";
+
+    private String CREATE_TABLE_DEBT_COLLECTION = "CREATE TABLE `" + TABLE_NAME_DEBT_COLLECTION + "` ( `customerCode` TEXT, `customerPayCode` TEXT, " +
+            "`billId` INTEGER NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, " +
+            "`strIssueDate` TEXT, `status` INTEGER, `seri` TEXT, `pcCode` TEXT, `handoverCode` TEXT, `cashierCode` TEXT, `bookCmis` TEXT, " +
+            "`fromDate` TEXT, `toDate` TEXT, `strFromDate` TEXT, `strToDate` TEXT, `home` TEXT, `tax` REAL, `billNum` TEXT, `currency` TEXT, " +
+            "`priceDetails` TEXT, `numeDetails` TEXT, `amountDetails` TEXT, `oldIndex` TEXT, `newIndex` TEXT, `nume` TEXT, " +
+            "`amountNotTax` INTEGER, `amountTax` INTEGER, `multiple` TEXT, `billType` TEXT, `typeIndex` TEXT, `groupTypeIndex` TEXT, " +
+            "`createdDate` TEXT, `idChanged` INTEGER, `dateChanged` TEXT, `edong` TEXT, `pcCodeExt` TEXT, `code` TEXT, `name` TEXT, " +
+            "`nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, " +
+            "`taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, " +
+            "`billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `requestDate` TEXT,`edongKey` TEXT NOT NULL, " +
+            "`isChecked` INTEGER default 0, `traceNumber` INTERGER, `causeCancelBillOnline` TEXT, payments INTEGER, payStatus INTEGER, " +
+            "stateOfDebt INTEGER, stateOfCancel TEXT, stateOfReturn TEXT, suspectedProcessingStatus TEXT, stateOfPush INTEGER, dateOfPush TEXT, " +
+            "countPrintReceipt INTEGER, printInfo TEXT)";
 
     private String CREATE_TABLE_LICH_SU_TTOAN = "CREATE TABLE " + TABLE_NAME_LICH_SU_TTOAN + "(ID INTEGER AUTO INCREMENT, " +
             "SERI_HDON INTEGER, " + "MA_KHANG TEXT, " + "MA_THE TEXT, " + "TEN_KHANG TEXT, " + "DIA_CHI TEXT, " + "THANG_TTOAN DATE, " +
@@ -136,6 +151,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             db.execSQL(CREATE_TABLE_EVN_PC);
             db.execSQL(CREATE_TABLE_BOOK_CMIS);
             db.execSQL(CREATE_TABLE_BILL);
+            db.execSQL(CREATE_TABLE_DEBT_COLLECTION);
             db.execSQL(CREATE_TABLE_CUSTOMER);
             db.execSQL(CREATE_TABLE_LICH_SU_TTOAN);
         } catch (Exception e) {
@@ -149,6 +165,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_EVN_PC);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_BOOK_CMIS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_BILL);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_DEBT_COLLECTION);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_CUSTOMER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_LICH_SU_TTOAN);
         onCreate(db);
@@ -199,6 +216,16 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (rowAffect == ERROR_OCCUR) {
             Log.e(TAG, "insertOrUpdateAccount: cannot update or insert data to account table");
         }
+    }
+
+    public double selectBalance() {
+        database = getReadableDatabase();
+        String query = "SELECT balance FROM " + TABLE_NAME_ACCOUNT;
+        Cursor c = database.rawQuery(query, null);
+        if(c.moveToFirst()){
+            return c.getDouble(0);
+        }
+        return 0;
     }
 
     public Account selectAccount(String edong) throws SQLiteException {
@@ -358,6 +385,15 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             mCursor.close();
         }
         return isPayed;
+    }
+
+    public long updatePayOffine(int billID, int status, String edong) {
+        database = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("status", status);
+        contentValues.put("edong", edong);
+        contentValues.put("edongKey", edong);
+        return database.update(TABLE_NAME_BILL, contentValues, "billId = ?", new String[]{String.valueOf(billID)});
     }
 
     public List<Customer> selectAllCustomerFitterBy(String edong, Common.TYPE_SEARCH typeSearch, String infoSearch) {
@@ -811,6 +847,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, code, String.valueOf(billId)});
     }
 
+    public Cursor selectBillByID(int billId) {
+        database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE billId = " + billId;
+        return database.rawQuery(query, null);
+    }
+
     //endregion
 
     //region EVN
@@ -1046,6 +1088,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (mCursor.moveToFirst())
             return mCursor.getInt(0);
         return 0;
+    }
+
+    public Cursor getCustomer(String code){
+        database = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_CUSTOMER + " WHERE code = '" + code + "'";
+        return database.rawQuery(query, null);
     }
     //endregion
 
@@ -1316,4 +1364,143 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
     //endregion
 
+    //region Xử lý bảng danh sách thu
+    public int insertDebtCollection(String edong, String customerCode, String customerPayCode,int billId, String term,int amount, String period, String issueDate, String strIssueDate
+            , int status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate
+            , String strToDate, String home, float tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex
+            , String newIndex, String nume, int amountNotTax, String amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex
+            , String createdDate, int idChanged, String dateChanged, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp
+            , String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, int type
+            , String lastQuery, int groupType, String billingChannel, String billingType, String billingBy, String cashierPay, int payments
+            , int payStatus, int stateOfDebt, String stateOfCancel, String stateOfReturn, String suspectedProcessingStatus, int stateOfPush
+            , String dateOfPush, int countPrintReceipt, String printInfo) {
+
+        if (edong == null || edong.trim().isEmpty())
+            return SQLiteConnection.ERROR_OCCUR;
+
+        ContentValues initialValues = new ContentValues();
+        initialValues.put("customerCode", customerCode);
+        initialValues.put("customerPayCode", customerPayCode);
+        initialValues.put("billId", billId);
+
+        //20170414011107000 != 2015-01-01
+        if (term.length() == yyyymmdd.toString().length()) {
+            term = Common.convertDateToDate(term, yyyymmdd, yyyyMMddHHmmssSSS);
+        }
+        initialValues.put("term", term);
+        initialValues.put("amount", amount);
+        initialValues.put("period", period);
+        initialValues.put("issueDate", issueDate);
+        initialValues.put("strIssueDate", strIssueDate);
+        initialValues.put("status", status);
+        initialValues.put("seri", seri);
+        initialValues.put("pcCode", pcCode);
+        initialValues.put("handoverCode", handoverCode);
+        initialValues.put("cashierCode", cashierCode);
+        initialValues.put("bookCmis", bookCmis);
+        initialValues.put("fromDate", fromDate);
+        initialValues.put("toDate", toDate);
+        initialValues.put("strFromDate", strFromDate);
+        initialValues.put("strToDate", strToDate);
+        initialValues.put("home", home);
+        initialValues.put("tax", tax);
+        initialValues.put("billNum", billNum);
+        initialValues.put("currency", currency);
+        initialValues.put("priceDetails", priceDetails);
+        initialValues.put("numeDetails", numeDetails);
+        initialValues.put("amountDetails", amountDetails);
+        initialValues.put("oldIndex", oldIndex);
+        initialValues.put("newIndex", newIndex);
+        initialValues.put("nume", nume);
+        initialValues.put("amountNotTax", amountNotTax);
+        initialValues.put("amountTax", amountTax);
+        initialValues.put("multiple", multiple);
+        initialValues.put("billType", billType);
+        initialValues.put("typeIndex", typeIndex);
+        initialValues.put("groupTypeIndex", groupTypeIndex);
+        initialValues.put("createdDate", createdDate);
+        initialValues.put("idChanged", idChanged);
+        initialValues.put("dateChanged", dateChanged);
+        initialValues.put("edong", edong);
+        initialValues.put("pcCodeExt", pcCodeExt);
+        initialValues.put("code", code);
+        initialValues.put("name", name);
+        initialValues.put("nameNosign", nameNosign);
+        initialValues.put("phoneByevn", phoneByevn);
+        initialValues.put("phoneByecp", phoneByecp);
+        initialValues.put("electricityMeter", electricityMeter);
+        initialValues.put("inning", inning);
+        initialValues.put("road", road);
+        initialValues.put("station", station);
+        initialValues.put("taxCode", taxCode);
+        initialValues.put("trade", trade);
+        initialValues.put("countPeriod", countPeriod);
+        initialValues.put("team", team);
+        initialValues.put("type", type);
+        initialValues.put("lastQuery", lastQuery);
+        initialValues.put("groupType", groupType);
+        initialValues.put("billingChannel", billingChannel);
+        initialValues.put("billingType", billingType);
+        initialValues.put("billingBy", billingBy);
+        initialValues.put("cashierPay", cashierPay);
+        initialValues.put("edongKey", edong);
+        initialValues.put("payments", payments);
+        initialValues.put("payStatus", payStatus);
+        initialValues.put("stateOfDebt", stateOfDebt);
+        initialValues.put("stateOfCancel", stateOfCancel);
+        initialValues.put("stateOfReturn", stateOfReturn);
+        initialValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
+        initialValues.put("stateOfPush", stateOfPush);
+        initialValues.put("dateOfPush", dateOfPush);
+        initialValues.put("countPrintReceipt", countPrintReceipt);
+        initialValues.put("printInfo", printInfo);
+        database = getWritableDatabase();
+        int rowAffect = (int) database.insert(TABLE_NAME_DEBT_COLLECTION, null, initialValues);
+
+        return rowAffect;
+    }
+    //endregion
+
+    //region Xử lý bảng danh sách thu
+    public int insertPayLib(int SERI_HDON, String MA_KHANG, String MA_THE, String TEN_KHANG, String DIA_CHI, String THANG_TTOAN, int PHIEN_TTOAN
+            , double SO_TIEN_TTOAN, String SO_GCS, String DIEN_LUC, String SO_HO, String SO_DAU_KY, String SO_CUOI_KY, String SO_CTO, String SDT_ECPAY, String SDT_EVN
+            , int GIAO_THU, String NGAY_GIAO_THU, String TRANG_THAI_TTOAN, String VI_TTOAN, String HTHUC_TTOAN, String TTHAI_TTOAN, String TTHAI_CHAM_NO, String TTHAI_HUY
+            , String TTHAI_XLY_NGHI_NGO, int SO_LAN_IN_BNHAN, String IN_TBAO_DIEN, String NGAY_PSINH, String MA_GIAO_DICH) {
+
+        ContentValues initialValues = new ContentValues();
+        initialValues.put("SERI_HDON", SERI_HDON);
+        initialValues.put("MA_KHANG", MA_KHANG);
+        initialValues.put("MA_THE", MA_THE);
+        initialValues.put("TEN_KHANG", TEN_KHANG);
+        initialValues.put("DIA_CHI", DIA_CHI);
+        initialValues.put("THANG_TTOAN", THANG_TTOAN);
+        initialValues.put("PHIEN_TTOAN", PHIEN_TTOAN);
+        initialValues.put("SO_TIEN_TTOAN", SO_TIEN_TTOAN);
+        initialValues.put("SO_GCS", SO_GCS);
+        initialValues.put("DIEN_LUC", DIEN_LUC);
+        initialValues.put("SO_HO", SO_HO);
+        initialValues.put("SO_DAU_KY", SO_DAU_KY);
+        initialValues.put("SO_CUOI_KY", SO_CUOI_KY);
+        initialValues.put("SO_CTO", SO_CTO);
+        initialValues.put("SDT_ECPAY", SDT_ECPAY);
+        initialValues.put("SDT_EVN", SDT_EVN);
+        initialValues.put("GIAO_THU", GIAO_THU);
+        initialValues.put("NGAY_GIAO_THU", NGAY_GIAO_THU);
+        initialValues.put("TRANG_THAI_TTOAN", TRANG_THAI_TTOAN);
+        initialValues.put("VI_TTOAN", VI_TTOAN);
+        initialValues.put("HTHUC_TTOAN", HTHUC_TTOAN);
+        initialValues.put("TTHAI_TTOAN", TTHAI_TTOAN);
+        initialValues.put("TTHAI_CHAM_NO", TTHAI_CHAM_NO);
+        initialValues.put("TTHAI_HUY", TTHAI_HUY);
+        initialValues.put("TTHAI_XLY_NGHI_NGO", TTHAI_XLY_NGHI_NGO);
+        initialValues.put("SO_LAN_IN_BNHAN", SO_LAN_IN_BNHAN);
+        initialValues.put("IN_TBAO_DIEN", IN_TBAO_DIEN);
+        initialValues.put("NGAY_PSINH", NGAY_PSINH);
+        initialValues.put("MA_GIAO_DICH", MA_GIAO_DICH);
+        database = getWritableDatabase();
+        int rowAffect = (int) database.insert(TABLE_NAME_LICH_SU_TTOAN, null, initialValues);
+
+        return rowAffect;
+    }
+    //endregion
 }
