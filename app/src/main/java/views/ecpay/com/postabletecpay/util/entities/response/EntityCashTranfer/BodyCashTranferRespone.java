@@ -26,7 +26,14 @@ public class BodyCashTranferRespone {
 
     @SerializedName("response-settlement")
     @Expose
-    private ResponseSettlement responseSettlement;
+    private String responseSettlement;
+
+
+    @SerializedName("amount")
+    @Expose
+    private Long amount;
+
+
 
     public Long getAuditNumber() {
         return auditNumber;
@@ -60,12 +67,20 @@ public class BodyCashTranferRespone {
         this.signature = signature;
     }
 
-    public ResponseSettlement getResponseSettlement() {
+    public String getResponseSettlement() {
         return responseSettlement;
     }
 
-    public void setResponseSettlement(ResponseSettlement responseSettlement) {
+    public void setResponseSettlement(String responseSettlement) {
         this.responseSettlement = responseSettlement;
+    }
+
+    public Long getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Long amount) {
+        this.amount = amount;
     }
 
     public static class ResponseSettlement

@@ -52,6 +52,20 @@ public class BodyCashTranferRequest implements Serializable
     @Expose
     private String description;
 
+    public String getPartnerCode() {
+        return partnerCode;
+    }
+
+    public void setPartnerCode(String partnerCode) {
+        this.partnerCode = partnerCode;
+    }
+
+    @SerializedName("partner-code")
+    @Expose
+    private String partnerCode = "DT0605";
+
+
+
     public Long getAuditNumber() {
         return auditNumber;
     }

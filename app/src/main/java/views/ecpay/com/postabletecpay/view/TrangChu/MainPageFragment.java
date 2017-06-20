@@ -1,6 +1,7 @@
 package views.ecpay.com.postabletecpay.view.TrangChu;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.text.Html;
 import android.text.TextUtils;
@@ -42,6 +44,7 @@ import views.ecpay.com.postabletecpay.util.libs.PopupMenu.PopupMenu;
 import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
 import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
 import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
+import views.ecpay.com.postabletecpay.view.IBackHandler;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
@@ -261,7 +264,14 @@ public class MainPageFragment extends Fragment implements
                 showDialogHoTro();
                 break;
             case R.id.btnChuyenViTong:
-                fragment = ChuyenViTongFragment.newInstance();
+                fragment = CashTranferFragment.newInstance(mEdong, new IBackHandler() {
+                    @Override
+                    public void onBack(FragmentActivity activity, String eDong) {
+                        FragmentTransaction fragmentTransaction = activity.getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.replace(R.id.frameLayout, MainPageFragment.newInstance(eDong));
+                        fragmentTransaction.commit();
+                    }
+                });
                 break;
         }
         if (fragment != null) {
