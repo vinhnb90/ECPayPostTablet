@@ -314,4 +314,20 @@ public class PayModel extends CommonModel {
 
         sqLiteConnection.updateBillReasonDelete(edong, code, billId, reasonDeleteBill, statusBilling);
     }
+
+    public boolean checkIsHasBillNotPayTermBefore(String edong, String code, int billId) {
+        boolean failInput =
+                TextUtils.isEmpty(edong) ||
+                        TextUtils.isEmpty(code);
+
+        if (failInput)
+            return false;
+
+        //lấy term của hóa đơn
+        String term = sqLiteConnection.getTermBillOfCustomer(edong, code, billId);
+        if(term== null)
+            return false;
+
+        return sqLiteConnection.checkIsHasBillNotPayTermBefore(edong, code, term);
+    }
 }
