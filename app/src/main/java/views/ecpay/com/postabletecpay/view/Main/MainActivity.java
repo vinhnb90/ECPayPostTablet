@@ -18,16 +18,21 @@ import android.widget.Toast;
 
 import com.google.zxing.Result;
 
+import java.util.List;
+
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
+import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
+import static views.ecpay.com.postabletecpay.util.commons.Common.NEGATIVE_ONE;
+import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.REQUEST_BARCODE;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.RESPONSE_BARCODE;
 
@@ -40,17 +45,26 @@ public class MainActivity extends AppCompatActivity implements
         PayFragment.CallbackDeleteBillOnlineDialog,
         BaoCaoFragment.OnFragmentInteractionListener,
         ZXingScannerView.ResultHandler,
-        UserInfoFragment.OnFragmentInteractionListener
-{
+        UserInfoFragment.OnFragmentInteractionListener {
 
     public static BottomNavigationView sNavigation;
     public static String mEdong;
 
-    public enum ID_MENU_BOTTOM{
-        HOME,
-        PAY,
-        REPORT,
-        ACCOUNT;
+    public enum ID_MENU_BOTTOM {
+        HOME(1),
+        PAY(2),
+        REPORT(3),
+        ACCOUNT(4);
+
+        private int index;
+
+        ID_MENU_BOTTOM(int index) {
+            this.index = index;
+        }
+
+        public int getIndex() {
+            return index;
+        }
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -149,8 +163,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_BARCODE && resultCode == RESPONSE_BARCODE & data!=null)
-        {
+        if (requestCode == REQUEST_BARCODE && resultCode == RESPONSE_BARCODE & data != null) {
             //check fragment
             Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
             if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
@@ -164,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void getBundle() {
         mEdong = getIntent().getExtras().getString(KEY_EDONG, "");
+//        mEdong = "01656226909";
     }
 
     public static void updateNavigationBarState(int actionId) {
@@ -176,21 +190,42 @@ public class MainActivity extends AppCompatActivity implements
 
     //region PayAdapter.BillInsidePayAdapter.BillInsidePayViewHolder.OnInterationBillInsidePayAdapter
     @Override
-    public void processCheckedBillFragment(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomer) {
+    public void processCheckedBillFragment(String edong, String code, List<PayAdapter.BillEntityAdapter> billList, int posCustomer) {
         if (TextUtils.isEmpty(edong))
             return;
         if (TextUtils.isEmpty(code))
             return;
-        if (bill == null)
+        if (billList == null || billList.size() == ZERO)
             return;
 
+        PayAdapter.BillEntityAdapter bill = billList.get(posCustomer);
+
+        //TODO check hóa đơn kỳ xa nhất fragment
+        boolean isHasBillNotPayTermBefore = false;
+        int index = posCustomer;
+
+        for (; index < billList.size(); index++) {
+            if (billList.get(index).getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) {
+                isHasBillNotPayTermBefore = true;
+            }
+        }
+
         //check fragment
+        PayFragment payFragment = null;
         Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+        if (fragmentVisibling instanceof PayFragment && fragmentVisibling.isVisible() == true) {
+            payFragment = (PayFragment) fragmentVisibling;
+        }
+
+        if (payFragment == null)
+            return;
+
+        if (isHasBillNotPayTermBefore) {
+            payFragment.showMessageNotifyPayfrag(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage());
             return;
         }
-        if (fragmentVisibling instanceof PayFragment)
-            ((PayFragment) fragmentVisibling).showBillCheckedFragment(edong, code, bill, posCustomer);
+
+        payFragment.showBillCheckedFragment(edong, code, bill, posCustomer);
     }
 
     @Override
@@ -296,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements
     //region OnFragmentInteractionListener
     @Override
     public void switchNavigationBottomMenu(ID_MENU_BOTTOM typeMenu) {
+        sNavigation.getMenu().getItem(typeMenu.getIndex());
     }
     //endregion
-
 }

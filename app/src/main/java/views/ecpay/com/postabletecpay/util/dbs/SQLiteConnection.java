@@ -35,7 +35,7 @@ import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS;
-import static views.ecpay.com.postabletecpay.util.commons.Common.DATE_TIME_TYPE.yyyymmdd;
+import static views.ecpay.com.postabletecpay.util.commons.Common.DATE_TIME_TYPE.yyyyMMdd;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ONE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_CONFIG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_DB;
@@ -494,7 +494,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             String billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
 
             String term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
-            term = Common.convertDateToDate(term, yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.mmyyyy);
+            term = Common.convertDateToDate(term, yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.MMyyyy);
 
             String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
 
@@ -576,8 +576,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         String term = billInsideCustomer.getTerm();
         //20170414011107000 != 2015-01-01
-        if (term.length() == yyyymmdd.toString().length()) {
-            term = Common.convertDateToDate(term, yyyymmdd, yyyyMMddHHmmssSSS);
+        if (term.length() == yyyyMMdd.toString().length()) {
+            term = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
         }
         initialValues.put("term", term);
         initialValues.put("amount", billInsideCustomer.getAmount());
@@ -725,7 +725,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (mCursor.moveToFirst()) {
             do {
                 String term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
-                term = Common.convertDateToDate(term, yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.mmyyyy);
+                term = Common.convertDateToDate(term, yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.MMyyyy);
 
                 entity = new PayBillsDialogAdapter.Entity(
                         stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode"))),
@@ -1109,8 +1109,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("billId", !bodyBillResponse.getBillId().isEmpty() ? Integer.parseInt(bodyBillResponse.getBillId()) : 0);
         String term = bodyBillResponse.getTerm();
         //20170414011107000 != 2015-01-01
-        if (term.length() == yyyymmdd.toString().length()) {
-            term = Common.convertDateToDate(term, yyyymmdd, yyyyMMddHHmmssSSS);
+        if (term.length() == yyyyMMdd.toString().length()) {
+            term = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
         }
         initialValues.put("term", term);
         initialValues.put("strTerm", "");
@@ -1118,7 +1118,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("period", bodyBillResponse.getPeriod());
         initialValues.put("issueDate", bodyBillResponse.getIssueDate());
         initialValues.put("strIssueDate", "");
-        initialValues.put("status", !bodyBillResponse.getStatus().isEmpty() ? Integer.parseInt(bodyBillResponse.getStatus()) : 0);
+        int status = !bodyBillResponse.getStatus().isEmpty() ? Integer.parseInt(bodyBillResponse.getStatus()) : 0;
+        initialValues.put("status", status);
         initialValues.put("seri", bodyBillResponse.getSeri());
         initialValues.put("pcCode", bodyBillResponse.getPcCode());
         initialValues.put("handoverCode", bodyBillResponse.getHandOverCode());
@@ -1170,7 +1171,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("billingBy", "");
         initialValues.put("cashierPay", bodyBillResponse.getCashierCode());
         initialValues.put("edongKey", bodyBillResponse.getEdong());
-        initialValues.put("isChecked", 0);
+
+        //nếu status = 1(đã thanh toán) khi insert vào bill thì bật cờ isChecked = 1 tức được chọn và đã thanh toán
+        initialValues.put("isChecked", (status == 1) ? ONE : ZERO);
 
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
@@ -1188,8 +1191,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("billId", bodyBillResponse.getBillId());
         String term = bodyBillResponse.getTerm();
         //20170414011107000 != 2015-01-01
-        if (term.length() == yyyymmdd.toString().length()) {
-            term = Common.convertDateToDate(term, yyyymmdd, yyyyMMddHHmmssSSS);
+        if (term.length() == yyyyMMdd.toString().length()) {
+            term = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
         }
         initialValues.put("term", term);
         initialValues.put("strTerm", "");
@@ -1197,7 +1200,10 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("period", bodyBillResponse.getPeriod());
         initialValues.put("issueDate", bodyBillResponse.getIssueDate());
         initialValues.put("strIssueDate", "");
-        initialValues.put("status", bodyBillResponse.getStatus());
+
+        int status = Integer.parseInt(bodyBillResponse.getStatus());
+        initialValues.put("status", status);
+
         initialValues.put("seri", bodyBillResponse.getSeri());
         initialValues.put("pcCode", bodyBillResponse.getPcCode());
         initialValues.put("handoverCode", bodyBillResponse.getHandOverCode());
@@ -1249,7 +1255,10 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("billingBy", "");
         initialValues.put("cashierPay", bodyBillResponse.getCashierCode());
         initialValues.put("edongKey", bodyBillResponse.getEdong());
-        initialValues.put("isChecked", 0);
+
+        //nếu status = 1(đã thanh toán) khi insert vào bill thì bật cờ isChecked = 1 tức được chọn và đã thanh toán
+        initialValues.put("isChecked", (status == 1) ? ONE : ZERO);
+
 
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
@@ -1266,8 +1275,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("customerPayCode", "");
         String term = bodyBillResponse.getTerm();
         //20170414011107000 != 2015-01-01
-        if (term.length() == yyyymmdd.toString().length()) {
-            term = Common.convertDateToDate(term, yyyymmdd, yyyyMMddHHmmssSSS);
+        if (term.length() == yyyyMMdd.toString().length()) {
+            term = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
         }
         initialValues.put("term", term);
         initialValues.put("strTerm", "");
@@ -1275,7 +1284,10 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("period", bodyBillResponse.getPeriod());
         initialValues.put("issueDate", bodyBillResponse.getIssueDate());
         initialValues.put("strIssueDate", "");
-        initialValues.put("status", bodyBillResponse.getStatus());
+
+        int status = Integer.parseInt(bodyBillResponse.getStatus());
+        initialValues.put("status", status);
+
         initialValues.put("seri", bodyBillResponse.getSeri());
         initialValues.put("pcCode", bodyBillResponse.getPcCode());
         initialValues.put("handoverCode", bodyBillResponse.getHandOverCode());
@@ -1327,7 +1339,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("billingBy", "");
         initialValues.put("cashierPay", bodyBillResponse.getCashierCode());
         initialValues.put("edongKey", bodyBillResponse.getEdong());
-        initialValues.put("isChecked", 0);
+
+        //nếu status = 1(đã thanh toán) khi insert vào bill thì bật cờ isChecked = 1 tức được chọn và đã thanh toán
+        initialValues.put("isChecked", (status == 1) ? ONE : ZERO);
 
         database = getWritableDatabase();
         int rowAffect = (int) database.update(TABLE_NAME_BILL, initialValues, "billId=?", new String[]{String.valueOf(bodyBillResponse.getBillId())});
@@ -1361,6 +1375,33 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             return c.getString(0);
         }
         return "";
+    }
+
+    public boolean checkIsHasBillNotPayTermBefore(String edong, String code, String term) {
+        database = this.getReadableDatabase();
+
+        String query = "SELECT billId FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode = '" + code + "' and status = "+Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()+" and term < " + term;
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor.getCount() > 0)
+            return true;
+
+        return false;
+    }
+
+    public String getTermBillOfCustomer(String edong, String code, int billId) {
+        database = this.getReadableDatabase();
+
+        String query = "SELECT term FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode = " + code + "' and billID = " + billId;
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor.getCount() == 0)
+            return null;
+
+        if (mCursor.moveToFirst())
+            return stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
+
+        return null;
     }
     //endregion
 

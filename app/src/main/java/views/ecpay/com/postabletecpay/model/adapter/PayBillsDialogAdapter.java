@@ -48,7 +48,7 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
         holder.getCbChoose().setChecked(billChecked.isChecked());
 
         holder.getTvCode().setText(billChecked.getCode());
-        holder.getTvTerm().setText(Common.convertDateToDate(billChecked.getTerm(), Common.DATE_TIME_TYPE.yyyymmdd, Common.DATE_TIME_TYPE.mmyyyy));
+        holder.getTvTerm().setText(Common.convertDateToDate(billChecked.getTerm(), Common.DATE_TIME_TYPE.yyyyMMdd, Common.DATE_TIME_TYPE.MMyyyy));
         holder.getTvName().setText(billChecked.getName());
         holder.getTvAmount().setText(Common.convertLongToMoney(billChecked.getAmount()));
 
@@ -75,6 +75,7 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
     }
 
     public static class Entity {
+        //code: mã khách hàng
         private String code, name, term;
         private Long amount;
         private boolean isChecked;

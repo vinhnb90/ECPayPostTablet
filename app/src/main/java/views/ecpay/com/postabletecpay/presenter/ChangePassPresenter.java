@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.ecpay.client.test.SecurityUtils;
 
@@ -105,7 +106,6 @@ public class ChangePassPresenter implements IChangePassPresenter {
                 passRetype.trim(),
 
                 configInfo.getAccountId());
-
         if (jsonRequestChangePass == null)
             return;
 

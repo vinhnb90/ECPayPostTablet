@@ -855,6 +855,7 @@ public class MainPagePresenter implements IMainPagePresenter {
                     e.printStackTrace();
                 }
             }
+
         }
 
         @Override

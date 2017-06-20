@@ -43,7 +43,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -58,7 +57,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.security.PrivateKey;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -82,7 +80,6 @@ import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.AlgorithmRSA.AsymmetricCryptography;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
-import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
 
 import static java.lang.System.lineSeparator;
 
@@ -91,6 +88,8 @@ import static java.lang.System.lineSeparator;
  */
 
 public class Common {
+
+
 
 
     public static String convertLongToMoney(long balance) {
@@ -577,7 +576,8 @@ public class Common {
 
         ex10000("10000", "Chưa có hóa đơn nào được chọn"),
         ex10001("10001", "Quá trình thanh toán kết thúc"),
-        ex10002("10002", "Vui lòng kiểm tra sự tồn tại của database");
+        ex10002("10002", "Vui lòng kiểm tra sự tồn tại của database"),
+        ex10003("10003", "Tồn tại kỳ trước đó chưa được thanh toán. Vui lòng chọn hóa đơn kỳ trước");
 
         CODE_REPONSE_BILL_ONLINE(String code, String message) {
             this.code = code;
@@ -641,13 +641,14 @@ public class Common {
         }
     }
 
-    public enum CODE_REPONSE_DELETE_BILL_ONLINE {
+  /*  public enum CODE_REPONSE_DELETE_BILL_ONLINE {
         e000("000", "Thành công"),
         e2006("2006", "Không tìm thấy giao dịch tương ứng"),
         e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
 
         ex10000("10000", "Không tồn tại hóa đơn trong cơ sở dữ liệu"),
-        ex10001("10001", "Vui lòng điền lý do hủy");
+        ex10001("10001", "Vui lòng điền lý do hủy"),
+        ex10002("10002", "Thiếu thông tin khi gửi yêu cầu kiểm tra trạng thái hóa đơn");
 
         CODE_REPONSE_DELETE_BILL_ONLINE(String code, String message) {
             this.code = code;
@@ -673,7 +674,7 @@ public class Common {
             }
             return CODE_REPONSE_DELETE_BILL_ONLINE.e9999;
         }
-    }
+    }*/
 
     public enum CODE_REPONSE_API_CHECK_TRAINS {
         eBILLING("BILLING", "Thanh toán thành công"),
@@ -684,7 +685,10 @@ public class Common {
         eERROR("ERROR", "Thanh toán lỗi"),
         eREVERT("REVERT", "Hủy hóa đơn"),
         e2006("2006", "Không tìm thấy giao dịch tương ứng"),
-        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ");
+        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
+        ex10000("10000", "Không tồn tại hóa đơn trong cơ sở dữ liệu"),
+        ex10001("10001", "Vui lòng điền lý do hủy"),
+        ex10002("10002", "Thiếu thông tin khi gửi yêu cầu kiểm tra trạng thái hóa đơn");
 
         CODE_REPONSE_API_CHECK_TRAINS(String code, String message) {
             this.code = code;
@@ -715,7 +719,8 @@ public class Common {
     public enum CODE_REPONSE_TRANSACTION_CANCELLATION {
         e000("000", "Thành công"),
         e2006("2006", "Không tìm thấy giao dịch tương ứng"),
-        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ");
+        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
+        ex10002("10002", "Thiếu thông tin khi gửi yêu cầu hủy hóa đơn");
 
         CODE_REPONSE_TRANSACTION_CANCELLATION(String code, String message) {
             this.code = code;
@@ -759,7 +764,8 @@ public class Common {
         CHECK_TRANS,
         TRANSACTION_CANCELLATION,
         LOGOUT,
-        PUT_TRANSACTION_OFF;
+        PUT_TRANSACTION_OFF,
+        CASH_TRANSFER;
 
         @Override
         public String toString() {
@@ -785,6 +791,8 @@ public class Common {
                 return "LOGOUT";
             if (this == PUT_TRANSACTION_OFF)
                 return "PUT-TRANSACTION-OFF";
+            if (this == CASH_TRANSFER)
+                return "CASH-TRANSFER";
             return super.toString();
         }
     }
@@ -1685,23 +1693,23 @@ public class Common {
 
     public enum DATE_TIME_TYPE {
         HHmmss,
-        yyyymmdd,
+        yyyyMMdd,
         yyyyMMddHHmmssSSS,
-        mmyyyy,
-        ddmmyyyy,
+        MMyyyy,
+        ddMMyyyy,
         FULL;
 
         @Override
         public String toString() {
             if (this == HHmmss)
                 return "HHmmss";
-            if (this == yyyymmdd)
-                return "yyyy-mm-dd";
+            if (this == yyyyMMdd)
+                return "yyyy-MM-dd";
             if (this == yyyyMMddHHmmssSSS)
                 return "yyyyMMddHHmmssSSS";
-            if (this == mmyyyy)
-                return "mm/yyyy";
-            if (this == ddmmyyyy)
+            if (this == MMyyyy)
+                return "MM/yyyy";
+            if (this == ddMMyyyy)
                 return "dd/MM/yyyy";
             if (this == FULL)
                 return "yyyy-MM-dd'T'HH:mm:ss";
@@ -1844,6 +1852,7 @@ public class Common {
             e.printStackTrace();
             return 0;
         }
+
         return dateParse.getTime();
     }
 
@@ -1941,5 +1950,22 @@ public class Common {
         return string.toString();
     }
 
+    public static String[] NAME_VI_TONG = {"-Chọn Ví Tổng-", "Ví tổng Hà Nội", "Ví tổng miền Bắc", "Ví tổng miền Nam", "Ví tổng miền Trung", "Ví tổng Hồ Chí Minh"};
+    public static String[] PHONE_VI_TONG = {"", "01683861612", "0964592623", "01213779477", "0966605945", "01266977026"};
 
+
+    private  static String[] CHARS = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+                                    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "M",
+                                    "N", "L", "O", "P", "Q", "R", "S", "T", "U", "X", "V", "W", "Z", "Y",
+                                    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m",
+                                    "n", "l", "o", "p", "q", "r", "s", "t", "u", "x", "v", "w", "z", "y"};
+    public static String createCapcha(int length)
+    {
+        String result = "";
+        for (int i = 0; i < length; i ++)
+        {
+            result += CHARS[(int)(Math.random() * CHARS.length)];
+        }
+        return  result;
+    }
 }

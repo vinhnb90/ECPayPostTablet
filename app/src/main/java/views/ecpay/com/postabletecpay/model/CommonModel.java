@@ -1,6 +1,7 @@
 package views.ecpay.com.postabletecpay.model;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import views.ecpay.com.postabletecpay.model.sharedPreference.ICommonSharedReference;
 import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
@@ -36,7 +37,17 @@ public abstract class CommonModel implements ICommonSharedReference {
         return account;
     }
 
+    public String getSessionLogin(String mEdong) {
+        if (TextUtils.isEmpty(mEdong))
+            return null;
 
+        return sqLiteConnection.selectSessionAccount(mEdong);
+    }
 
+    public void writeSqliteAccountTable(Account account) {
+        if (account == null)
+            return;
 
+        sqLiteConnection.insertOrUpdateAccount(account);
+    }
 }
