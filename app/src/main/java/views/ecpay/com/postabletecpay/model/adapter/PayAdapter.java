@@ -436,7 +436,6 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             return this.billList.size();
         }
 
-
         public class BillInsidePayViewHolder extends RecyclerView.ViewHolder {
             @BindView(R.id.cb_row_bill_inside_pay)
             CheckBox cb;

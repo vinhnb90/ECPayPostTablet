@@ -162,7 +162,6 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
     }
 
     public static class BillDialogViewHorder extends RecyclerView.ViewHolder {
-
         @BindView(R.id.cb_row_thanhtoan_list_bills_choose)
         CheckBox cbChoose;
         @BindView(R.id.tv_row_thanhtoan_list_bills_code)

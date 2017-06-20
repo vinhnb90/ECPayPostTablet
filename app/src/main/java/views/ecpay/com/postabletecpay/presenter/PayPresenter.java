@@ -1319,7 +1319,6 @@ public class PayPresenter implements IPayPresenter {
                         }
                     }
             );
-
         }
 
         @Override

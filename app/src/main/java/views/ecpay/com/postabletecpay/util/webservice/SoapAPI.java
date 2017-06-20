@@ -781,7 +781,6 @@ public class SoapAPI {
 
     //region class api soap
     public static class AsyncSoapLogin extends AsyncTask<String, String, LoginResponseReponse> {
-
         //request action to eStore
         private static final String METHOD_NAME = "execute";
         private static final String NAMESPACE = "http://services.ecpay.org/";

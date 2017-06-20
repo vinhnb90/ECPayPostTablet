@@ -316,22 +316,6 @@ public class PayModel extends CommonModel {
         sqLiteConnection.updateBillReasonDelete(edong, code, billId, reasonDeleteBill, statusBilling);
     }
 
-    public boolean checkIsHasBillNotPayTermBefore(String edong, String code, int billId) {
-        boolean failInput =
-                TextUtils.isEmpty(edong) ||
-                        TextUtils.isEmpty(code);
-
-        if (failInput)
-            return false;
-
-        //lấy term của hóa đơn
-        String term = sqLiteConnection.getTermBillOfCustomer(edong, code, billId);
-        if(term== null)
-            return false;
-
-        return sqLiteConnection.checkIsHasBillNotPayTermBefore(edong, code, term);
-    }
-
     public double selectBalance() {
         return sqLiteConnection.selectBalance();
     }
@@ -374,8 +358,24 @@ public class PayModel extends CommonModel {
                 , TTHAI_XLY_NGHI_NGO, SO_LAN_IN_BNHAN, IN_TBAO_DIEN, NGAY_PSINH, MA_GIAO_DICH);
     }
 
+
+    public boolean checkIsHasBillNotPayTermBefore(String edong, String code, int billId) {
+        boolean failInput =
+                TextUtils.isEmpty(edong) ||
+                        TextUtils.isEmpty(code);
+
+        if (failInput)
+            return false;
+
+        //lấy term của hóa đơn
+        String term = sqLiteConnection.getTermBillOfCustomer(edong, code, billId);
+        if(term== null)
+            return false;
+
+        return sqLiteConnection.checkIsHasBillNotPayTermBefore(edong, code, term);
+    }
+
     public Cursor getCustomer(String code) {
         return sqLiteConnection.getCustomer(code);
     }
-
 }

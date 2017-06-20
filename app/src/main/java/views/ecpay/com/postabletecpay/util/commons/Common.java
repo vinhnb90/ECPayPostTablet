@@ -57,6 +57,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.security.PrivateKey;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -71,6 +72,7 @@ import java.util.TimeZone;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -80,6 +82,7 @@ import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.AlgorithmRSA.AsymmetricCryptography;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
 
 import static java.lang.System.lineSeparator;
 
