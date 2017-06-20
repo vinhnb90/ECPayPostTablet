@@ -414,7 +414,7 @@ public class PayFragment extends Fragment implements
 //      if(Common.isNetworkConnected(PayFragment.this.getActivity())) {
             mIPayPresenter.callPayingBillOnline(mEdong);
         } else {
-//            mIPayPresenter.callPayingBillOffline(mEdong);
+            mIPayPresenter.callPayingBillOffline(mEdong);
         }
     }
     //endregion

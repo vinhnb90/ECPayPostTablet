@@ -294,12 +294,76 @@ public class PayPresenter implements IPayPresenter {
         //Kiểm tra kỳ hoá đơn thanh toán
         //Kiểm tra số dư khả dụng của tài khoản thanh toán
         //Kiểm tra địa bàn thanh toán
-        if(mPayModel.getPcCode().substring(0, 2).toUpperCase().equals("PD") || mPayModel.getPcCode().substring(0, 2).toUpperCase().equals("PE")) {
+        if (mPayModel.getPcCode().substring(0, 2).toUpperCase().equals("PD") || mPayModel.getPcCode().substring(0, 2).toUpperCase().equals("PE")) {
             mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e04.getMessage());
             return;
         }
         //Kiểm tra trạng thái hoá đơn thanh toán
 
+        //totalBillsChooseDialogTemp đại diện cho tổng các bill được chọn từ list bill dialog thanh toán trước khi nhấn nút thanh toán
+        //totalBillsChooseDialog dại diện tổng các bill được chọn tại list bill dialog thanh toán, giảm dần khi xong mỗi hóa đơn
+
+        //giữ giá trị số bill đc chọn ban đầu
+        totalBillsChooseDialogTemp = totalBillsChooseDialog;
+
+        //ẩn thanh process bar bill
+        mIPayView.hidePayingRViewDialog();
+
+
+        //biến đếm số bill đã thanh toán ok
+        countBillPayedSuccess = 0;
+
+        //listBillDialog là list bill hiển thị trong dialog thanh toán
+        //những bill nào đc chọn thì cho thanh toán offline
+        int index = 0;
+        int maxIndex = listBillDialog.size();
+        for (; index < maxIndex; index++) {
+            PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
+
+            if (entity.isChecked())
+                payOfflineTheBill(entity, index, edong);
+        }
+
+    }
+
+    private void payOfflineTheBill(PayBillsDialogAdapter.Entity entity, int index, final String edong) {
+
+/**
+ *
+ * TODO: Thực hiện thanh toán offline .....
+ *
+ */
+
+        //TODO: Sau khi xong hóa đơn này
+        //Khi thực hiện thanh toán thành công 1 hóa dơn
+        //update text count billDeleteOnline payed success
+        countBillPayedSuccess++;
+
+        //kiểm tra nếu countBillPayedSuccess = tổng số bill được chọn ban đầu ở dialog
+        if (countBillPayedSuccess == totalBillsChooseDialogTemp)
+            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage());
+
+
+        /**
+         *
+         * TODO: update sql các kiểu......
+         *
+         */
+
+        //làm mới thanh đếm số bill thành công
+        //refresh lại recyclerview của dialog
+        listBillDialog.get(index).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN.getCode());
+
+        ((MainActivity) mIPayView.getContextView()).runOnUiThread(
+                new Runnable() {
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                    @Override
+                    public void run() {
+                        totalBillsChooseDialog--;
+                        refreshStatusPaySuccessDialog(edong);
+                    }
+                }
+        );
     }
 
     @Override

@@ -46,6 +46,13 @@ public class MainActivity extends AppCompatActivity implements
     public static BottomNavigationView sNavigation;
     public static String mEdong;
 
+    public enum ID_MENU_BOTTOM{
+        HOME,
+        PAY,
+        REPORT,
+        ACCOUNT;
+    }
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -285,10 +292,11 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-   /* @Override
-    public void processOnDismissBarcodeDialog(String textBarcode) {
 
-    }*/
-
+    //region OnFragmentInteractionListener
+    @Override
+    public void switchNavigationBottomMenu(ID_MENU_BOTTOM typeMenu) {
+    }
     //endregion
+
 }

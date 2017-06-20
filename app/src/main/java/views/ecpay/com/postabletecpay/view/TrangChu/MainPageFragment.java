@@ -42,6 +42,7 @@ import views.ecpay.com.postabletecpay.util.libs.PopupMenu.PopupMenu;
 import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
 import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
 import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
@@ -250,9 +251,11 @@ public class MainPageFragment extends Fragment implements
                 break;
             case R.id.btThanhToan:
                 fragment = PayFragment.newInstance(mEdong);
+                listener.switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.PAY);
                 break;
             case R.id.btBaoCao:
                 fragment = BaoCaoFragment.newInstance();
+                listener.switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.REPORT);
                 break;
             case R.id.ibTroGiup:
                 showDialogHoTro();
@@ -380,6 +383,7 @@ public class MainPageFragment extends Fragment implements
     //endregion
 
     public interface OnFragmentInteractionListener {
+        void switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM pay);
     }
 
     private void showDialogHoTro() {
