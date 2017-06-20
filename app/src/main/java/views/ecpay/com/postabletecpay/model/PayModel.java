@@ -377,4 +377,5 @@ public class PayModel extends CommonModel {
     public Cursor getCustomer(String code) {
         return sqLiteConnection.getCustomer(code);
     }
+
 }
