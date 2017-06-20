@@ -90,6 +90,8 @@ import static java.lang.System.lineSeparator;
 public class Common {
 
 
+
+
     public static String convertLongToMoney(long balance) {
 
         Locale locale = new Locale("vi", "VN");
@@ -762,7 +764,8 @@ public class Common {
         CHECK_TRANS,
         TRANSACTION_CANCELLATION,
         LOGOUT,
-        PUT_TRANSACTION_OFF;
+        PUT_TRANSACTION_OFF,
+        CASH_TRANSFER;
 
         @Override
         public String toString() {
@@ -788,6 +791,8 @@ public class Common {
                 return "LOGOUT";
             if (this == PUT_TRANSACTION_OFF)
                 return "PUT-TRANSACTION-OFF";
+            if (this == CASH_TRANSFER)
+                return "CASH-TRANSFER";
             return super.toString();
         }
     }
@@ -1945,5 +1950,22 @@ public class Common {
         return string.toString();
     }
 
+    public static String[] NAME_VI_TONG = {"-Chọn Ví Tổng-", "Ví tổng Hà Nội", "Ví tổng miền Bắc", "Ví tổng miền Nam", "Ví tổng miền Trung", "Ví tổng Hồ Chí Minh"};
+    public static String[] PHONE_VI_TONG = {"", "01683861612", "0964592623", "01213779477", "0966605945", "01266977026"};
 
+
+    private  static String[] CHARS = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+                                    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "M",
+                                    "N", "L", "O", "P", "Q", "R", "S", "T", "U", "X", "V", "W", "Z", "Y",
+                                    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m",
+                                    "n", "l", "o", "p", "q", "r", "s", "t", "u", "x", "v", "w", "z", "y"};
+    public static String createCapcha(int length)
+    {
+        String result = "";
+        for (int i = 0; i < length; i ++)
+        {
+            result += CHARS[(int)(Math.random() * CHARS.length)];
+        }
+        return  result;
+    }
 }

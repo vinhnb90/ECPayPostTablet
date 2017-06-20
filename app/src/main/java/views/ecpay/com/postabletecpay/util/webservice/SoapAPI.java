@@ -29,6 +29,10 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityBillingOnline.
 import views.ecpay.com.postabletecpay.util.entities.request.EntityBillingOnline.BodyBillingOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityBillingOnline.FooterBillingOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityBillingOnline.HeaderBillingOnlineRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityCashTranfer.BodyCashTranferRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityCashTranfer.CashTranferRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityCashTranfer.FooterCashTranferRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityCashTranfer.HeaderCashTranferRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.BodyChangePassRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.ChangePassRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.FooterChangePassRequest;
@@ -69,6 +73,7 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.PostB
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.BodySearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.SearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBillOnline.BillingOnlineRespone;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityCashTranfer.CashTranferRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCheckTrainOnline.CheckTrainOnlineResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
@@ -87,6 +92,9 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
  */
 
 public class SoapAPI {
+
+
+    static boolean TEST_REQUEST = true;
 
     //region create JSON Request service
     public static String getJsonRequestLogin(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver, String signatureEncrypted, String pinLogin, String accountId, String versionApp) {
@@ -145,7 +153,9 @@ public class SoapAPI {
         return jsonResult;
     }
 
-    public static String getJsonRequestChangePass(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver, String signatureEncrypted, String pinLogin, String session, String passNew, String passRetype, String accountId) {
+    public static String getJsonRequestChangePass(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver,
+                                                  String signatureEncrypted, String pinLogin, String session, String passNew, String passRetype,
+                                                  String accountId) {
         if (agent == null || agent.isEmpty() || agent.trim().equals(""))
             return null;
         if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
@@ -207,6 +217,75 @@ public class SoapAPI {
         return jsonResult;
 
     }
+
+    //region create JSON Request service
+    public static String getJsonCashTranfer(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver,
+                                            String signatureEncrypted, String session, String sendPhone, String receivedPhone, Long amount,
+                                            String description, String accountId){
+        if (agent == null || agent.isEmpty() || agent.trim().equals(""))
+            return null;
+        if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
+            return null;
+        if (commandId == null || commandId.isEmpty() || commandId.trim().equals(""))
+            return null;
+        if (mac == null || mac.isEmpty() || mac.trim().equals(""))
+            return null;
+        if (diskDriver == null || diskDriver.isEmpty() || diskDriver.trim().equals(""))
+            return null;
+        if (signatureEncrypted == null || signatureEncrypted.isEmpty() || signatureEncrypted.trim().equals(""))
+            return null;
+        if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
+            return null;
+        if (session == null || session.isEmpty() || session.trim().equals(""))
+            return null;
+        if (sendPhone == null || sendPhone.isEmpty() || sendPhone.trim().equals(""))
+            return null;
+        if (receivedPhone == null || receivedPhone.isEmpty() || receivedPhone.trim().equals(""))
+            return null;
+
+        HeaderCashTranferRequest header = new HeaderCashTranferRequest();
+        header.setAgent(agent);
+        header.setPassword(agentEncypted);
+        header.setCommandId(commandId);
+
+        BodyCashTranferRequest body = new BodyCashTranferRequest();
+        body.setAuditNumber(auditNumber);
+        body.setMac(mac);
+        body.setDiskDrive(diskDriver);
+        body.setSignature(signatureEncrypted);
+        body.setSession(session);;
+        body.setSendPhone(sendPhone);
+        body.setOtp("");
+        body.setReceivedPhone(receivedPhone);
+        body.setAmount(amount);
+        body.setDescription(description);
+
+        FooterCashTranferRequest footer = new FooterCashTranferRequest();
+        footer.setAccountIdt(accountId);
+
+        final CashTranferRequest request = new CashTranferRequest();
+        request.setHeader(header);
+        request.setBody(body);
+        request.setFooter(footer);
+
+
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        Type type = new TypeToken<CashTranferRequest>() {
+        }.getType();
+        final Gson gson = gsonBuilder.create();
+
+        //Serialised
+        final String jsonResult = gson.toJson(request, type);
+
+        if(TEST_REQUEST)
+        {
+            //Test Deserialised
+            final CashTranferRequest parsedRequest = gson.fromJson(jsonResult, CashTranferRequest.class);
+        }
+
+        return jsonResult;
+    }
+
 
     //region create JSON Request service
     public static String getJsonSyncPC(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver, String signatureEncrypted, String edong, String accountId) {
@@ -911,6 +990,115 @@ public class SoapAPI {
             isEndCallSoap = endCallSoap;
         }
     }
+
+
+    public static class AsyncSoapCashTranfer extends AsyncTask<String, String, CashTranferRespone> {
+
+        //request action to eStore
+        private static final String METHOD_NAME = "execute";
+        private static final String NAMESPACE = "http://services.ecpay.org/";
+        private static final String URL = ENDPOINT_URL;
+        private static final String SOAP_ACTION = "request action to eStore";
+        private static final String METHOD_PARAM = "message";
+        private AsyncSoapCashTranferCallBack callBack;
+        private boolean isEndCallSoap = false;
+
+        public AsyncSoapCashTranfer(AsyncSoapCashTranferCallBack callBack) throws Exception {
+            this.callBack = callBack;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            callBack.onPre(this);
+        }
+
+        @Override
+        protected CashTranferRespone doInBackground(String... jsons) {
+            String json = jsons[0];
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            request.addProperty(METHOD_PARAM, json);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE ht;
+            SoapPrimitive response = null;
+
+            try {
+                ht = new HttpTransportSE(URL);
+                ht.call(SOAP_ACTION, envelope);
+                response = (SoapPrimitive) envelope.getResponse();
+            } catch (Exception e) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "Không nhận được dữ liệu");
+                return null;
+            }
+
+            if (response == null) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                return null;
+            }
+
+            String data = response.toString();
+            if (data.isEmpty()) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return null;
+            }
+
+            CashTranferRespone respone = null;
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+            final Gson gson = gsonBuilder.create();
+            respone = gson.fromJson(data, CashTranferRespone.class);
+
+            return respone;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            String message = values[0];
+            isEndCallSoap = true;
+            callBack.onUpdate(message);
+        }
+
+        @Override
+        protected void onPostExecute(CashTranferRespone respone) {
+            super.onPostExecute(respone);
+            if (respone == null)
+                return;
+            isEndCallSoap = true;
+            callBack.onPost(respone);
+        }
+
+        public static abstract class AsyncSoapCashTranferCallBack {
+            public abstract void onPre(final AsyncSoapCashTranfer soapChangePass);
+
+            public abstract void onUpdate(String message);
+
+            public abstract void onPost(CashTranferRespone response);
+
+            public abstract void onTimeOut(final AsyncSoapCashTranfer soapChangePass);
+        }
+
+        public void callCountdown(final AsyncSoapCashTranfer soapChangePass) {
+            if (soapChangePass == null)
+                return;
+
+            callBack.onTimeOut(soapChangePass);
+        }
+
+        public boolean isEndCallSoap() {
+            return isEndCallSoap;
+        }
+
+        public void setEndCallSoap(boolean endCallSoap) {
+            isEndCallSoap = endCallSoap;
+        }
+    }
+
 
     public static class AsyncSoapSearchOnline extends AsyncTask<String, String, SearchOnlineResponse> {
 
