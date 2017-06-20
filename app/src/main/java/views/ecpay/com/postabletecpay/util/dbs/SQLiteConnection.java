@@ -1425,8 +1425,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("billId", billId);
 
         //20170414011107000 != 2015-01-01
-        if (term.length() == yyyymmdd.toString().length()) {
-            term = Common.convertDateToDate(term, yyyymmdd, yyyyMMddHHmmssSSS);
+        if (term.length() == yyyyMMdd.toString().length()) {
+            term = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
         }
         initialValues.put("term", term);
         initialValues.put("amount", amount);
