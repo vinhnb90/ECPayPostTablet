@@ -38,7 +38,9 @@ import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.NEGATIVE_ONE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PARTNER_CODE_DEFAULT;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PROVIDER_DEFAULT;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_SPACE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT;
+import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
 import static views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection.ERROR_OCCUR;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.PAGE_INCREMENT;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.ROWS_ON_PAGE;
@@ -248,9 +250,9 @@ public class PayPresenter implements IPayPresenter {
             return;
         }
 
-
         //totalBillsChooseDialog will minus - 1 change value when every billDeleteOnline is payed online
         //totalBillsChooseDialogTemp to visible count billDeleteOnline paying succes and will be save value begin
+
         totalBillsChooseDialogTemp = totalBillsChooseDialog;
 
         mIPayView.showPayingRViewDialogStart();
@@ -462,21 +464,20 @@ public class PayPresenter implements IPayPresenter {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void callDeleteOnlineSoap(String edong, String reasonDeleteBill) {
-        boolean fail = this.billDeleteOnline == null || posCustomerListDeleteOnline == NEGATIVE_ONE;
+        boolean fail = this.billDeleteOnline == null || posCustomerListDeleteOnline == NEGATIVE_ONE || TextUtils.isEmpty(reasonDeleteBill);
         if (fail)
             return;
 
         if (TextUtils.isEmpty(reasonDeleteBill)) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_API_CHECK_TRAINS.ex10001.getMessage());
+            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_DELETE_BILL_ONLINE.ex10001.getMessage());
             return;
         }
 
         //TODO validate
         //check bill exist
-        if (posCustomerListDeleteOnline > mAdapterList.size()) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_API_CHECK_TRAINS.ex10000.getMessage());
-            return;
-        }
+        if (posCustomerListDeleteOnline > mAdapterList.size())
+            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_DELETE_BILL_ONLINE.ex10000.getMessage());
+
         // Kiểm tra trạng thái thanh toán hóa đơn (tương đương API CHECK-TRANS)
         // Nếu hóa đơn không do TNV thanh toán  Thông báo lỗi
         // Nếu hóa đơn không ở trạng thái đã thanh toán sang EVN hoặc chờ xử lý chấm nợ  Thông báo lỗi
@@ -501,7 +502,7 @@ public class PayPresenter implements IPayPresenter {
 //            return;
 //        }
         if (!isHasNetwork) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+            mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
             return;
         }
 
@@ -510,7 +511,7 @@ public class PayPresenter implements IPayPresenter {
         try {
             configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.CHECK_TRANS.toString(), versionApp);
         } catch (Exception e) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+            mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
             return;
         }
 
@@ -539,10 +540,8 @@ public class PayPresenter implements IPayPresenter {
 
                 configInfo.getAccountId());
 
-        if (jsonRequestCheckTrainOnline == null) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_API_CHECK_TRAINS.ex10002.getMessage());
+        if (jsonRequestCheckTrainOnline == null)
             return;
-        }
 
         mIPayView.showDeleteBillOnlineProcess();
         mIPayView.showPbarDeleteBillOnline();
@@ -736,15 +735,6 @@ public class PayPresenter implements IPayPresenter {
     public void callProcessDataBillDialogChecked(String edong, int pos, boolean isChecked) {
         if (listBillCheckedFragment.size() <= pos)
             return;
-
-        //TODO check hóa đơn kỳ xa nhất dialog
-        PayBillsDialogAdapter.Entity entity = listBillDialog.get(pos);
-
-        boolean isHasBillNotPayTermBefore = mPayModel.checkIsHasBillNotPayTermBefore(entity.getEdong(), entity.getCode(), entity.getBillId());
-        if (isHasBillNotPayTermBefore) {
-            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage());
-            return;
-        }
 
         listBillDialog.get(pos).setChecked(isChecked);
         refreshTotalBillsAndTotalMoneyInDialogWhenChecked(edong, Common.STATUS_BILLING.CHUA_THANH_TOAN);
@@ -1100,7 +1090,6 @@ public class PayPresenter implements IPayPresenter {
 
             soapDeleteBillOnline.setEndCallSoap(true);
             soapDeleteBillOnline.cancel(true);
-            return;
         }
 
         ConfigInfo configInfo = null;
@@ -1109,7 +1098,7 @@ public class PayPresenter implements IPayPresenter {
         try {
             configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.TRANSACTION_CANCELLATION.toString(), versionApp);
         } catch (Exception e) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+            mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
             return;
         }
 
@@ -1139,10 +1128,8 @@ public class PayPresenter implements IPayPresenter {
 
                 configInfo.getAccountId());
 
-        if (jsonRequestDeleteBillOnline == null) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_TRANSACTION_CANCELLATION.ex10002.getMessage());
+        if (jsonRequestDeleteBillOnline == null)
             return;
-        }
 
         mIPayView.showDeleteBillOnlineProcess();
         mIPayView.showPbarDeleteBillOnline();
@@ -1272,7 +1259,7 @@ public class PayPresenter implements IPayPresenter {
                     @Override
                     public void run() {
                         PayBillsDialogAdapter.Entity entity = listBillDialog.get(positionIndex);
-                        String term = Common.convertDateToDate(entity.getTerm(), Common.DATE_TIME_TYPE.yyyyMMdd, Common.DATE_TIME_TYPE.MMyyyy);
+                        String term = Common.convertDateToDate(entity.getTerm(), Common.DATE_TIME_TYPE.yyyymmdd, Common.DATE_TIME_TYPE.mmyyyy);
                         Toast.makeText(mIPayView.getContextView(), Common.CODE_REPONSE_SEARCH_ONLINE.getMessageServerNotify(entity.getTerm(), term, codeResponse.getMessage()), Toast.LENGTH_SHORT).show();
 
                         //check if not has thread is running then hide process bar paying online
@@ -1302,7 +1289,7 @@ public class PayPresenter implements IPayPresenter {
             }
 
             //update date payed and tract number
-            String dateNow = Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy);
+            String dateNow = Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddmmyyyy);
             Long traceNumber = response.getBodyBillingOnlineRespone().getTraceNumber();
             mPayModel.updateBillRequestDateBill(edong, response.getBodyBillingOnlineRespone().getCustomerCode(), response.getBodyBillingOnlineRespone().getBillId(), dateNow, traceNumber);
 

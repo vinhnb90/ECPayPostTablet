@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -663,9 +662,7 @@ public class SoapAPI {
     public static String getJsonRequestCheckTrainOnline(String agent, String agentEncypted, String commandId,
                                                         long auditNumber, String macAdressHexValue, String diskDriver,
                                                         String signatureEncrypted, String edong, Long amount, String customerCode,
-                                                        Long billId,
-                                                        @Nullable String requestDate,
-                                                        String accountId) {
+                                                        Long billId, String requestDate, String accountId) {
 
         boolean hasNull =
                 TextUtils.isEmpty(agent) ||
@@ -676,6 +673,7 @@ public class SoapAPI {
                         TextUtils.isEmpty(signatureEncrypted) ||
                         TextUtils.isEmpty(edong) ||
                         TextUtils.isEmpty(customerCode) ||
+                        TextUtils.isEmpty(requestDate) ||
                         TextUtils.isEmpty(accountId);
 
         if (hasNull)
@@ -723,8 +721,7 @@ public class SoapAPI {
     public static String getJsonRequestTransationCancellation(String agent, String agentEncypted, String commandId,
                                                               long auditNumber, String macAdressHexValue, String diskDriver,
                                                               String signatureEncrypted, Long amount, String code, Long billId,
-                                                              @Nullable String requestDate,
-                                                              Long traceNumber, String reasonDeleteBill, String accountId) {
+                                                              String requestDate, Long traceNumber, String reasonDeleteBill, String accountId) {
         boolean hasNull =
                 TextUtils.isEmpty(agent) ||
                         TextUtils.isEmpty(agentEncypted) ||
@@ -733,6 +730,7 @@ public class SoapAPI {
                         TextUtils.isEmpty(diskDriver) ||
                         TextUtils.isEmpty(signatureEncrypted) ||
                         TextUtils.isEmpty(code) ||
+                        TextUtils.isEmpty(requestDate) ||
                         TextUtils.isEmpty(reasonDeleteBill) ||
                         TextUtils.isEmpty(accountId);
 

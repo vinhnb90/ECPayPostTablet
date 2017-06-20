@@ -95,7 +95,6 @@ public class MainPageFragment extends Fragment implements
     @Nullable
     @BindView(R.id.btBaoCao)
     Button btBaoCao;
-    @Nullable
     @BindView(R.id.btnChuyenViTong)
     Button btnChuyenViTong;
 

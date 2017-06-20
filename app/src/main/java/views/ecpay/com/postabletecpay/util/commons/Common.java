@@ -43,6 +43,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -57,6 +58,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.security.PrivateKey;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -80,6 +82,7 @@ import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.AlgorithmRSA.AsymmetricCryptography;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
 
 import static java.lang.System.lineSeparator;
 
@@ -576,8 +579,7 @@ public class Common {
 
         ex10000("10000", "Chưa có hóa đơn nào được chọn"),
         ex10001("10001", "Quá trình thanh toán kết thúc"),
-        ex10002("10002", "Vui lòng kiểm tra sự tồn tại của database"),
-        ex10003("10003", "Tồn tại kỳ trước đó chưa được thanh toán. Vui lòng chọn hóa đơn kỳ trước");
+        ex10002("10002", "Vui lòng kiểm tra sự tồn tại của database");
 
         CODE_REPONSE_BILL_ONLINE(String code, String message) {
             this.code = code;
@@ -641,14 +643,13 @@ public class Common {
         }
     }
 
-  /*  public enum CODE_REPONSE_DELETE_BILL_ONLINE {
+    public enum CODE_REPONSE_DELETE_BILL_ONLINE {
         e000("000", "Thành công"),
         e2006("2006", "Không tìm thấy giao dịch tương ứng"),
         e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
 
         ex10000("10000", "Không tồn tại hóa đơn trong cơ sở dữ liệu"),
-        ex10001("10001", "Vui lòng điền lý do hủy"),
-        ex10002("10002", "Thiếu thông tin khi gửi yêu cầu kiểm tra trạng thái hóa đơn");
+        ex10001("10001", "Vui lòng điền lý do hủy");
 
         CODE_REPONSE_DELETE_BILL_ONLINE(String code, String message) {
             this.code = code;
@@ -674,7 +675,7 @@ public class Common {
             }
             return CODE_REPONSE_DELETE_BILL_ONLINE.e9999;
         }
-    }*/
+    }
 
     public enum CODE_REPONSE_API_CHECK_TRAINS {
         eBILLING("BILLING", "Thanh toán thành công"),
@@ -685,10 +686,7 @@ public class Common {
         eERROR("ERROR", "Thanh toán lỗi"),
         eREVERT("REVERT", "Hủy hóa đơn"),
         e2006("2006", "Không tìm thấy giao dịch tương ứng"),
-        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
-        ex10000("10000", "Không tồn tại hóa đơn trong cơ sở dữ liệu"),
-        ex10001("10001", "Vui lòng điền lý do hủy"),
-        ex10002("10002", "Thiếu thông tin khi gửi yêu cầu kiểm tra trạng thái hóa đơn");
+        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ");
 
         CODE_REPONSE_API_CHECK_TRAINS(String code, String message) {
             this.code = code;
@@ -719,8 +717,7 @@ public class Common {
     public enum CODE_REPONSE_TRANSACTION_CANCELLATION {
         e000("000", "Thành công"),
         e2006("2006", "Không tìm thấy giao dịch tương ứng"),
-        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
-        ex10002("10002", "Thiếu thông tin khi gửi yêu cầu hủy hóa đơn");
+        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ");
 
         CODE_REPONSE_TRANSACTION_CANCELLATION(String code, String message) {
             this.code = code;
@@ -1693,23 +1690,23 @@ public class Common {
 
     public enum DATE_TIME_TYPE {
         HHmmss,
-        yyyyMMdd,
+        yyyymmdd,
         yyyyMMddHHmmssSSS,
-        MMyyyy,
-        ddMMyyyy,
+        mmyyyy,
+        ddmmyyyy,
         FULL;
 
         @Override
         public String toString() {
             if (this == HHmmss)
                 return "HHmmss";
-            if (this == yyyyMMdd)
-                return "yyyy-MM-dd";
+            if (this == yyyymmdd)
+                return "yyyy-mm-dd";
             if (this == yyyyMMddHHmmssSSS)
                 return "yyyyMMddHHmmssSSS";
-            if (this == MMyyyy)
-                return "MM/yyyy";
-            if (this == ddMMyyyy)
+            if (this == mmyyyy)
+                return "mm/yyyy";
+            if (this == ddmmyyyy)
                 return "dd/MM/yyyy";
             if (this == FULL)
                 return "yyyy-MM-dd'T'HH:mm:ss";
@@ -1852,7 +1849,6 @@ public class Common {
             e.printStackTrace();
             return 0;
         }
-
         return dateParse.getTime();
     }
 
