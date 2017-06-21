@@ -390,7 +390,9 @@ public class Common {
     }
 
     public enum MESSAGE {
-        CHANGE_PASS_SUCSSES("Đổi mật khẩu thành công"),;
+        CHANGE_PASS_SUCSSES("Đổi mật khẩu thành công"),
+        PUSH_BILL_SUCSSES("Đồng bộ hoá đơn offline thành công"),
+        PUSH_BILL_FAIL("Có lỗi xảy ra khi thực hiện nghiệp vụ");
 
 
         MESSAGE(String message) {

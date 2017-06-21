@@ -16,6 +16,8 @@ import java.util.List;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.EntityDanhSachThu;
+import views.ecpay.com.postabletecpay.util.entities.EntityLichSuThanhToan;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
@@ -856,10 +858,142 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, code, String.valueOf(billId)});
     }
 
-    public Cursor selectBillByID(int billId) {
+    public EntityDanhSachThu selectDebtColectionForDanhSachThu(int billId) {
         database = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE billId = " + billId;
-        return database.rawQuery(query, null);
+        Cursor c = database.rawQuery(query, null);
+        EntityDanhSachThu entityDanhSachThu = new EntityDanhSachThu();
+        if(c.moveToFirst()) {
+            entityDanhSachThu.setEdong(c.getString(c.getColumnIndex("edong")));
+            entityDanhSachThu.setCustomerCode(c.getString(c.getColumnIndex("customerCode")));
+            entityDanhSachThu.setCustomerPayCode(c.getString(c.getColumnIndex("customerPayCode")));
+            entityDanhSachThu.setBillId(c.getInt(c.getColumnIndex("billId")));
+            entityDanhSachThu.setTerm(c.getString(c.getColumnIndex("term")));
+            entityDanhSachThu.setAmount(c.getInt(c.getColumnIndex("amount")));
+            entityDanhSachThu.setPeriod(c.getString(c.getColumnIndex("period")));
+            entityDanhSachThu.setIssueDate(c.getString(c.getColumnIndex("issueDate")));
+            entityDanhSachThu.setStrIssueDate(c.getString(c.getColumnIndex("strIssueDate")));
+            entityDanhSachThu.setStatus(c.getInt(c.getColumnIndex("status")));
+            entityDanhSachThu.setSeri(c.getString(c.getColumnIndex("seri")));
+            entityDanhSachThu.setPcCode(c.getString(c.getColumnIndex("pcCode")));
+            entityDanhSachThu.setHandoverCode(c.getString(c.getColumnIndex("handoverCode")));
+            entityDanhSachThu.setCashierCode(c.getString(c.getColumnIndex("cashierCode")));
+            entityDanhSachThu.setBookCmis(c.getString(c.getColumnIndex("bookCmis")));
+            entityDanhSachThu.setFromDate(c.getString(c.getColumnIndex("fromDate")));
+            entityDanhSachThu.setToDate(c.getString(c.getColumnIndex("toDate")));
+            entityDanhSachThu.setStrFromDate(c.getString(c.getColumnIndex("strFromDate")));
+            entityDanhSachThu.setStrToDate(c.getString(c.getColumnIndex("strToDate")));
+            entityDanhSachThu.setHome(c.getString(c.getColumnIndex("home")));
+            entityDanhSachThu.setTax(c.getFloat(c.getColumnIndex("tax")));
+            entityDanhSachThu.setBillNum(c.getString(c.getColumnIndex("billNum")));
+            entityDanhSachThu.setCurrency(c.getString(c.getColumnIndex("currency")));
+            entityDanhSachThu.setPriceDetails(c.getString(c.getColumnIndex("priceDetails")));
+            entityDanhSachThu.setNumeDetails(c.getString(c.getColumnIndex("numeDetails")));
+            entityDanhSachThu.setAmountDetails(c.getString(c.getColumnIndex("amountDetails")));
+            entityDanhSachThu.setOldIndex(c.getString(c.getColumnIndex("oldIndex")));
+            entityDanhSachThu.setNewIndex(c.getString(c.getColumnIndex("newIndex")));
+            entityDanhSachThu.setNume(c.getString(c.getColumnIndex("nume")));
+            entityDanhSachThu.setAmountNotTax(c.getInt(c.getColumnIndex("amountNotTax")));
+            entityDanhSachThu.setAmountTax(c.getString(c.getColumnIndex("amountTax")));
+            entityDanhSachThu.setMultiple(c.getString(c.getColumnIndex("multiple")));
+            entityDanhSachThu.setBillType(c.getString(c.getColumnIndex("billType")));
+            entityDanhSachThu.setTypeIndex(c.getString(c.getColumnIndex("typeIndex")));
+            entityDanhSachThu.setGroupTypeIndex(c.getString(c.getColumnIndex("groupTypeIndex")));
+            entityDanhSachThu.setCreatedDate(c.getString(c.getColumnIndex("createdDate")));
+            entityDanhSachThu.setIdChanged(c.getInt(c.getColumnIndex("idChanged")));
+            entityDanhSachThu.setDateChanged(c.getString(c.getColumnIndex("dateChanged")));
+            entityDanhSachThu.setPcCodeExt(c.getString(c.getColumnIndex("pcCodeExt")));
+            entityDanhSachThu.setCode(c.getString(c.getColumnIndex("code")));
+            entityDanhSachThu.setName(c.getString(c.getColumnIndex("name")));
+            entityDanhSachThu.setNameNosign(c.getString(c.getColumnIndex("nameNosign")));
+            entityDanhSachThu.setPhoneByevn(c.getString(c.getColumnIndex("phoneByevn")));
+            entityDanhSachThu.setPhoneByecp(c.getString(c.getColumnIndex("phoneByecp")));
+            entityDanhSachThu.setElectricityMeter(c.getString(c.getColumnIndex("electricityMeter")));
+            entityDanhSachThu.setInning(c.getString(c.getColumnIndex("inning")));
+            entityDanhSachThu.setRoad(c.getString(c.getColumnIndex("road")));
+            entityDanhSachThu.setStation(c.getString(c.getColumnIndex("station")));
+            entityDanhSachThu.setTaxCode(c.getString(c.getColumnIndex("taxCode")));
+            entityDanhSachThu.setTrade(c.getString(c.getColumnIndex("trade")));
+            entityDanhSachThu.setCountPeriod(c.getString(c.getColumnIndex("countPeriod")));
+            entityDanhSachThu.setTeam(c.getString(c.getColumnIndex("team")));
+            entityDanhSachThu.setType(c.getInt(c.getColumnIndex("type")));
+            entityDanhSachThu.setLastQuery(c.getString(c.getColumnIndex("lastQuery")));
+            entityDanhSachThu.setGroupType(c.getInt(c.getColumnIndex("groupType")));
+            entityDanhSachThu.setBillingChannel(c.getString(c.getColumnIndex("billingChannel")));
+            entityDanhSachThu.setBillType(c.getString(c.getColumnIndex("billingType")));
+            entityDanhSachThu.setBillingBy(c.getString(c.getColumnIndex("billingBy")));
+            entityDanhSachThu.setCashierPay(c.getString(c.getColumnIndex("cashierPay")));
+        }
+        return entityDanhSachThu;
+    }
+
+    public EntityLichSuThanhToan selectDebtColectionForLichSu(int billId) {
+        database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE billId = " + billId;
+        Cursor c = database.rawQuery(query, null);
+        EntityLichSuThanhToan entityLichSuThanhToan = new EntityLichSuThanhToan();
+        if(c.moveToFirst()) {
+            entityLichSuThanhToan.setEdong(c.getString(c.getColumnIndex("edong")));
+            entityLichSuThanhToan.setCustomerCode(c.getString(c.getColumnIndex("customerCode")));
+            entityLichSuThanhToan.setCustomerPayCode(c.getString(c.getColumnIndex("customerPayCode")));
+            entityLichSuThanhToan.setBillId(c.getInt(c.getColumnIndex("billId")));
+            entityLichSuThanhToan.setTerm(c.getString(c.getColumnIndex("term")));
+            entityLichSuThanhToan.setAmount(c.getInt(c.getColumnIndex("amount")));
+            entityLichSuThanhToan.setPeriod(c.getString(c.getColumnIndex("period")));
+            entityLichSuThanhToan.setIssueDate(c.getString(c.getColumnIndex("issueDate")));
+            entityLichSuThanhToan.setStrIssueDate(c.getString(c.getColumnIndex("strIssueDate")));
+            entityLichSuThanhToan.setStatus(c.getInt(c.getColumnIndex("status")));
+            entityLichSuThanhToan.setSeri(c.getString(c.getColumnIndex("seri")));
+            entityLichSuThanhToan.setPcCode(c.getString(c.getColumnIndex("pcCode")));
+            entityLichSuThanhToan.setHandoverCode(c.getString(c.getColumnIndex("handoverCode")));
+            entityLichSuThanhToan.setCashierCode(c.getString(c.getColumnIndex("cashierCode")));
+            entityLichSuThanhToan.setBookCmis(c.getString(c.getColumnIndex("bookCmis")));
+            entityLichSuThanhToan.setFromDate(c.getString(c.getColumnIndex("fromDate")));
+            entityLichSuThanhToan.setToDate(c.getString(c.getColumnIndex("toDate")));
+            entityLichSuThanhToan.setStrFromDate(c.getString(c.getColumnIndex("strFromDate")));
+            entityLichSuThanhToan.setStrToDate(c.getString(c.getColumnIndex("strToDate")));
+            entityLichSuThanhToan.setHome(c.getString(c.getColumnIndex("home")));
+            entityLichSuThanhToan.setTax(c.getFloat(c.getColumnIndex("tax")));
+            entityLichSuThanhToan.setBillNum(c.getString(c.getColumnIndex("billNum")));
+            entityLichSuThanhToan.setCurrency(c.getString(c.getColumnIndex("currency")));
+            entityLichSuThanhToan.setPriceDetails(c.getString(c.getColumnIndex("priceDetails")));
+            entityLichSuThanhToan.setNumeDetails(c.getString(c.getColumnIndex("numeDetails")));
+            entityLichSuThanhToan.setAmountDetails(c.getString(c.getColumnIndex("amountDetails")));
+            entityLichSuThanhToan.setOldIndex(c.getString(c.getColumnIndex("oldIndex")));
+            entityLichSuThanhToan.setNewIndex(c.getString(c.getColumnIndex("newIndex")));
+            entityLichSuThanhToan.setNume(c.getString(c.getColumnIndex("nume")));
+            entityLichSuThanhToan.setAmountNotTax(c.getInt(c.getColumnIndex("amountNotTax")));
+            entityLichSuThanhToan.setAmountTax(c.getString(c.getColumnIndex("amountTax")));
+            entityLichSuThanhToan.setMultiple(c.getString(c.getColumnIndex("multiple")));
+            entityLichSuThanhToan.setBillType(c.getString(c.getColumnIndex("billType")));
+            entityLichSuThanhToan.setTypeIndex(c.getString(c.getColumnIndex("typeIndex")));
+            entityLichSuThanhToan.setGroupTypeIndex(c.getString(c.getColumnIndex("groupTypeIndex")));
+            entityLichSuThanhToan.setCreatedDate(c.getString(c.getColumnIndex("createdDate")));
+            entityLichSuThanhToan.setIdChanged(c.getInt(c.getColumnIndex("idChanged")));
+            entityLichSuThanhToan.setDateChanged(c.getString(c.getColumnIndex("dateChanged")));
+            entityLichSuThanhToan.setPcCodeExt(c.getString(c.getColumnIndex("pcCodeExt")));
+            entityLichSuThanhToan.setCode(c.getString(c.getColumnIndex("code")));
+            entityLichSuThanhToan.setName(c.getString(c.getColumnIndex("name")));
+            entityLichSuThanhToan.setNameNosign(c.getString(c.getColumnIndex("nameNosign")));
+            entityLichSuThanhToan.setPhoneByevn(c.getString(c.getColumnIndex("phoneByevn")));
+            entityLichSuThanhToan.setPhoneByecp(c.getString(c.getColumnIndex("phoneByecp")));
+            entityLichSuThanhToan.setElectricityMeter(c.getString(c.getColumnIndex("electricityMeter")));
+            entityLichSuThanhToan.setInning(c.getString(c.getColumnIndex("inning")));
+            entityLichSuThanhToan.setRoad(c.getString(c.getColumnIndex("road")));
+            entityLichSuThanhToan.setStation(c.getString(c.getColumnIndex("station")));
+            entityLichSuThanhToan.setTaxCode(c.getString(c.getColumnIndex("taxCode")));
+            entityLichSuThanhToan.setTrade(c.getString(c.getColumnIndex("trade")));
+            entityLichSuThanhToan.setCountPeriod(c.getString(c.getColumnIndex("countPeriod")));
+            entityLichSuThanhToan.setTeam(c.getString(c.getColumnIndex("team")));
+            entityLichSuThanhToan.setType(c.getInt(c.getColumnIndex("type")));
+            entityLichSuThanhToan.setLastQuery(c.getString(c.getColumnIndex("lastQuery")));
+            entityLichSuThanhToan.setGroupType(c.getInt(c.getColumnIndex("groupType")));
+            entityLichSuThanhToan.setBillingChannel(c.getString(c.getColumnIndex("billingChannel")));
+            entityLichSuThanhToan.setBillType(c.getString(c.getColumnIndex("billingType")));
+            entityLichSuThanhToan.setBillingBy(c.getString(c.getColumnIndex("billingBy")));
+            entityLichSuThanhToan.setCashierPay(c.getString(c.getColumnIndex("cashierPay")));
+        }
+        return entityLichSuThanhToan;
     }
 
     //endregion
@@ -1415,95 +1549,88 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     //endregion
 
     //region Xử lý bảng danh sách thu
-    public int insertDebtCollection(String edong, String customerCode, String customerPayCode,int billId, String term,int amount, String period, String issueDate, String strIssueDate
-            , int status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate
-            , String strToDate, String home, float tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex
-            , String newIndex, String nume, int amountNotTax, String amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex
-            , String createdDate, int idChanged, String dateChanged, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp
-            , String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, int type
-            , String lastQuery, int groupType, String billingChannel, String billingType, String billingBy, String cashierPay, int payments
-            , int payStatus, int stateOfDebt, String stateOfCancel, String stateOfReturn, String suspectedProcessingStatus, int stateOfPush
-            , String dateOfPush, int countPrintReceipt, String printInfo) {
+    public int insertDebtCollection(EntityDanhSachThu entityDanhSachThu) {
 
-        if (edong == null || edong.trim().isEmpty())
+        if (entityDanhSachThu.getEdong() == null || entityDanhSachThu.getEdong().trim().isEmpty())
             return SQLiteConnection.ERROR_OCCUR;
 
         ContentValues initialValues = new ContentValues();
-        initialValues.put("customerCode", customerCode);
-        initialValues.put("customerPayCode", customerPayCode);
-        initialValues.put("billId", billId);
+        initialValues.put("customerCode", entityDanhSachThu.getCustomerCode());
+        initialValues.put("customerPayCode", entityDanhSachThu.getCustomerPayCode());
+        initialValues.put("billId", entityDanhSachThu.getBillId());
 
         //20170414011107000 != 2015-01-01
-        if (term.length() == yyyyMMdd.toString().length()) {
-            term = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
+        String term = "";
+        if (entityDanhSachThu.getTerm().length() == yyyyMMdd.toString().length()) {
+            term = Common.convertDateToDate(entityDanhSachThu.getTerm(), yyyyMMdd, yyyyMMddHHmmssSSS);
         }
         initialValues.put("term", term);
-        initialValues.put("amount", amount);
-        initialValues.put("period", period);
-        initialValues.put("issueDate", issueDate);
-        initialValues.put("strIssueDate", strIssueDate);
-        initialValues.put("status", status);
-        initialValues.put("seri", seri);
-        initialValues.put("pcCode", pcCode);
-        initialValues.put("handoverCode", handoverCode);
-        initialValues.put("cashierCode", cashierCode);
-        initialValues.put("bookCmis", bookCmis);
-        initialValues.put("fromDate", fromDate);
-        initialValues.put("toDate", toDate);
-        initialValues.put("strFromDate", strFromDate);
-        initialValues.put("strToDate", strToDate);
-        initialValues.put("home", home);
-        initialValues.put("tax", tax);
-        initialValues.put("billNum", billNum);
-        initialValues.put("currency", currency);
-        initialValues.put("priceDetails", priceDetails);
-        initialValues.put("numeDetails", numeDetails);
-        initialValues.put("amountDetails", amountDetails);
-        initialValues.put("oldIndex", oldIndex);
-        initialValues.put("newIndex", newIndex);
-        initialValues.put("nume", nume);
-        initialValues.put("amountNotTax", amountNotTax);
-        initialValues.put("amountTax", amountTax);
-        initialValues.put("multiple", multiple);
-        initialValues.put("billType", billType);
-        initialValues.put("typeIndex", typeIndex);
-        initialValues.put("groupTypeIndex", groupTypeIndex);
-        initialValues.put("createdDate", createdDate);
-        initialValues.put("idChanged", idChanged);
-        initialValues.put("dateChanged", dateChanged);
-        initialValues.put("edong", edong);
-        initialValues.put("pcCodeExt", pcCodeExt);
-        initialValues.put("code", code);
-        initialValues.put("name", name);
-        initialValues.put("nameNosign", nameNosign);
-        initialValues.put("phoneByevn", phoneByevn);
-        initialValues.put("phoneByecp", phoneByecp);
-        initialValues.put("electricityMeter", electricityMeter);
-        initialValues.put("inning", inning);
-        initialValues.put("road", road);
-        initialValues.put("station", station);
-        initialValues.put("taxCode", taxCode);
-        initialValues.put("trade", trade);
-        initialValues.put("countPeriod", countPeriod);
-        initialValues.put("team", team);
-        initialValues.put("type", type);
-        initialValues.put("lastQuery", lastQuery);
-        initialValues.put("groupType", groupType);
-        initialValues.put("billingChannel", billingChannel);
-        initialValues.put("billingType", billingType);
-        initialValues.put("billingBy", billingBy);
-        initialValues.put("cashierPay", cashierPay);
-        initialValues.put("edongKey", edong);
-        initialValues.put("payments", payments);
-        initialValues.put("payStatus", payStatus);
-        initialValues.put("stateOfDebt", stateOfDebt);
-        initialValues.put("stateOfCancel", stateOfCancel);
-        initialValues.put("stateOfReturn", stateOfReturn);
-        initialValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
-        initialValues.put("stateOfPush", stateOfPush);
-        initialValues.put("dateOfPush", dateOfPush);
-        initialValues.put("countPrintReceipt", countPrintReceipt);
-        initialValues.put("printInfo", printInfo);
+        initialValues.put("amount", entityDanhSachThu.getAmount());
+        initialValues.put("period", entityDanhSachThu.getPeriod());
+        initialValues.put("issueDate", entityDanhSachThu.getIssueDate());
+        initialValues.put("strIssueDate", entityDanhSachThu.getStrIssueDate());
+        initialValues.put("status", entityDanhSachThu.getStatus());
+        initialValues.put("seri", entityDanhSachThu.getSeri());
+        initialValues.put("pcCode", entityDanhSachThu.getPcCode());
+        initialValues.put("handoverCode", entityDanhSachThu.getHandoverCode());
+        initialValues.put("cashierCode", entityDanhSachThu.getCashierCode());
+        initialValues.put("bookCmis", entityDanhSachThu.getBookCmis());
+        initialValues.put("fromDate", entityDanhSachThu.getFromDate());
+        initialValues.put("toDate", entityDanhSachThu.getToDate());
+        initialValues.put("strFromDate", entityDanhSachThu.getStrFromDate());
+        initialValues.put("strToDate", entityDanhSachThu.getStrToDate());
+        initialValues.put("home", entityDanhSachThu.getHome());
+        initialValues.put("tax", entityDanhSachThu.getTax());
+        initialValues.put("billNum", entityDanhSachThu.getBillNum());
+        initialValues.put("currency", entityDanhSachThu.getCurrency());
+        initialValues.put("priceDetails", entityDanhSachThu.getPriceDetails());
+        initialValues.put("numeDetails", entityDanhSachThu.getNumeDetails());
+        initialValues.put("amountDetails", entityDanhSachThu.getAmountDetails());
+        initialValues.put("oldIndex", entityDanhSachThu.getOldIndex());
+        initialValues.put("newIndex", entityDanhSachThu.getNewIndex());
+        initialValues.put("nume", entityDanhSachThu.getNume());
+        initialValues.put("amountNotTax", entityDanhSachThu.getAmountNotTax());
+        initialValues.put("amountTax", entityDanhSachThu.getAmountTax());
+        initialValues.put("multiple", entityDanhSachThu.getMultiple());
+        initialValues.put("billType", entityDanhSachThu.getBillType());
+        initialValues.put("typeIndex", entityDanhSachThu.getTypeIndex());
+        initialValues.put("groupTypeIndex", entityDanhSachThu.getGroupTypeIndex());
+        initialValues.put("createdDate", entityDanhSachThu.getCreatedDate());
+        initialValues.put("idChanged", entityDanhSachThu.getIdChanged());
+        initialValues.put("dateChanged", entityDanhSachThu.getDateChanged());
+        initialValues.put("edong", entityDanhSachThu.getEdong());
+        initialValues.put("pcCodeExt", entityDanhSachThu.getPcCodeExt());
+        initialValues.put("code", entityDanhSachThu.getCode());
+        initialValues.put("name", entityDanhSachThu.getName());
+        initialValues.put("nameNosign", entityDanhSachThu.getNameNosign());
+        initialValues.put("phoneByevn", entityDanhSachThu.getPhoneByevn());
+        initialValues.put("phoneByecp", entityDanhSachThu.getPhoneByecp());
+        initialValues.put("electricityMeter", entityDanhSachThu.getElectricityMeter());
+        initialValues.put("inning", entityDanhSachThu.getInning());
+        initialValues.put("road", entityDanhSachThu.getRoad());
+        initialValues.put("station", entityDanhSachThu.getStation());
+        initialValues.put("taxCode", entityDanhSachThu.getTaxCode());
+        initialValues.put("trade", entityDanhSachThu.getTrade());
+        initialValues.put("countPeriod", entityDanhSachThu.getCountPeriod());
+        initialValues.put("team", entityDanhSachThu.getTeam());
+        initialValues.put("type", entityDanhSachThu.getType());
+        initialValues.put("lastQuery", entityDanhSachThu.getLastQuery());
+        initialValues.put("groupType", entityDanhSachThu.getGroupType());
+        initialValues.put("billingChannel", entityDanhSachThu.getBillingChannel());
+        initialValues.put("billingType", entityDanhSachThu.getBillingType());
+        initialValues.put("billingBy", entityDanhSachThu.getBillingBy());
+        initialValues.put("cashierPay", entityDanhSachThu.getCashierPay());
+        initialValues.put("edongKey", entityDanhSachThu.getEdong());
+        initialValues.put("payments", entityDanhSachThu.getPayments());
+        initialValues.put("payStatus", entityDanhSachThu.getPayStatus());
+        initialValues.put("stateOfDebt", entityDanhSachThu.getStateOfDebt());
+        initialValues.put("stateOfCancel", entityDanhSachThu.getStateOfCancel());
+        initialValues.put("stateOfReturn", entityDanhSachThu.getStateOfReturn());
+        initialValues.put("suspectedProcessingStatus", entityDanhSachThu.getSuspectedProcessingStatus());
+        initialValues.put("stateOfPush", entityDanhSachThu.getStateOfPush());
+        initialValues.put("dateOfPush", entityDanhSachThu.getDateOfPush());
+        initialValues.put("countPrintReceipt", entityDanhSachThu.getCountPrintReceipt());
+        initialValues.put("printInfo", entityDanhSachThu.getPrintInfo());
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_DEBT_COLLECTION, null, initialValues);
 
@@ -1512,99 +1639,92 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     //endregion
 
     //region Xử lý bảng lịch sử
-    public int insertPayLib(String edong, String customerCode, String customerPayCode,int billId, String term,int amount, String period, String issueDate, String strIssueDate
-            , int status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate
-            , String strToDate, String home, float tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex
-            , String newIndex, String nume, int amountNotTax, String amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex
-            , String createdDate, int idChanged, String dateChanged, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp
-            , String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, int type
-            , String lastQuery, int groupType, String billingChannel, String billingType, String billingBy, String cashierPay, int payments
-            , int payStatus, int stateOfDebt, String stateOfCancel, String stateOfReturn, String suspectedProcessingStatus, int stateOfPush
-            , String dateOfPush, int countPrintReceipt, String printInfo, String dateIncurred, int tradingCode) {
+    public int insertPayLib(EntityLichSuThanhToan entityLichSuThanhToan) {
 
         database = getWritableDatabase();
 
-        if (edong == null || edong.trim().isEmpty())
+        if (entityLichSuThanhToan.getEdong() == null || entityLichSuThanhToan.getEdong().trim().isEmpty())
             return SQLiteConnection.ERROR_OCCUR;
 
         ContentValues initialValues = new ContentValues();
-        initialValues.put("customerCode", customerCode);
-        initialValues.put("customerPayCode", customerPayCode);
-        initialValues.put("billId", billId);
+        initialValues.put("customerCode", entityLichSuThanhToan.getCustomerCode());
+        initialValues.put("customerPayCode", entityLichSuThanhToan.getCustomerPayCode());
+        initialValues.put("billId", entityLichSuThanhToan.getBillId());
 
         //20170414011107000 != 2015-01-01
-        if (term.length() == yyyyMMdd.toString().length()) {
-            term = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
+        String term = "";
+        if (entityLichSuThanhToan.getTerm().length() == yyyyMMdd.toString().length()) {
+            term = Common.convertDateToDate(entityLichSuThanhToan.getTerm(), yyyyMMdd, yyyyMMddHHmmssSSS);
         }
         initialValues.put("term", term);
-        initialValues.put("amount", amount);
-        initialValues.put("period", period);
-        initialValues.put("issueDate", issueDate);
-        initialValues.put("strIssueDate", strIssueDate);
-        initialValues.put("status", status);
-        initialValues.put("seri", seri);
-        initialValues.put("pcCode", pcCode);
-        initialValues.put("handoverCode", handoverCode);
-        initialValues.put("cashierCode", cashierCode);
-        initialValues.put("bookCmis", bookCmis);
-        initialValues.put("fromDate", fromDate);
-        initialValues.put("toDate", toDate);
-        initialValues.put("strFromDate", strFromDate);
-        initialValues.put("strToDate", strToDate);
-        initialValues.put("home", home);
-        initialValues.put("tax", tax);
-        initialValues.put("billNum", billNum);
-        initialValues.put("currency", currency);
-        initialValues.put("priceDetails", priceDetails);
-        initialValues.put("numeDetails", numeDetails);
-        initialValues.put("amountDetails", amountDetails);
-        initialValues.put("oldIndex", oldIndex);
-        initialValues.put("newIndex", newIndex);
-        initialValues.put("nume", nume);
-        initialValues.put("amountNotTax", amountNotTax);
-        initialValues.put("amountTax", amountTax);
-        initialValues.put("multiple", multiple);
-        initialValues.put("billType", billType);
-        initialValues.put("typeIndex", typeIndex);
-        initialValues.put("groupTypeIndex", groupTypeIndex);
-        initialValues.put("createdDate", createdDate);
-        initialValues.put("idChanged", idChanged);
-        initialValues.put("dateChanged", dateChanged);
-        initialValues.put("edong", edong);
-        initialValues.put("pcCodeExt", pcCodeExt);
-        initialValues.put("code", code);
-        initialValues.put("name", name);
-        initialValues.put("nameNosign", nameNosign);
-        initialValues.put("phoneByevn", phoneByevn);
-        initialValues.put("phoneByecp", phoneByecp);
-        initialValues.put("electricityMeter", electricityMeter);
-        initialValues.put("inning", inning);
-        initialValues.put("road", road);
-        initialValues.put("station", station);
-        initialValues.put("taxCode", taxCode);
-        initialValues.put("trade", trade);
-        initialValues.put("countPeriod", countPeriod);
-        initialValues.put("team", team);
-        initialValues.put("type", type);
-        initialValues.put("lastQuery", lastQuery);
-        initialValues.put("groupType", groupType);
-        initialValues.put("billingChannel", billingChannel);
-        initialValues.put("billingType", billingType);
-        initialValues.put("billingBy", billingBy);
-        initialValues.put("cashierPay", cashierPay);
-        initialValues.put("edongKey", edong);
-        initialValues.put("payments", payments);
-        initialValues.put("payStatus", payStatus);
-        initialValues.put("stateOfDebt", stateOfDebt);
-        initialValues.put("stateOfCancel", stateOfCancel);
-        initialValues.put("stateOfReturn", stateOfReturn);
-        initialValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
-        initialValues.put("stateOfPush", stateOfPush);
-        initialValues.put("dateOfPush", dateOfPush);
-        initialValues.put("countPrintReceipt", countPrintReceipt);
-        initialValues.put("printInfo", printInfo);
-        initialValues.put("dateIncurred", dateIncurred);
-        initialValues.put("tradingCode", tradingCode);
+        initialValues.put("amount", entityLichSuThanhToan.getAmount());
+        initialValues.put("period", entityLichSuThanhToan.getPeriod());
+        initialValues.put("issueDate", entityLichSuThanhToan.getIssueDate());
+        initialValues.put("strIssueDate", entityLichSuThanhToan.getStrIssueDate());
+        initialValues.put("status", entityLichSuThanhToan.getStatus());
+        initialValues.put("seri", entityLichSuThanhToan.getSeri());
+        initialValues.put("pcCode", entityLichSuThanhToan.getPcCode());
+        initialValues.put("handoverCode", entityLichSuThanhToan.getHandoverCode());
+        initialValues.put("cashierCode", entityLichSuThanhToan.getCashierCode());
+        initialValues.put("bookCmis", entityLichSuThanhToan.getBookCmis());
+        initialValues.put("fromDate", entityLichSuThanhToan.getFromDate());
+        initialValues.put("toDate", entityLichSuThanhToan.getToDate());
+        initialValues.put("strFromDate", entityLichSuThanhToan.getStrFromDate());
+        initialValues.put("strToDate", entityLichSuThanhToan.getStrToDate());
+        initialValues.put("home", entityLichSuThanhToan.getHome());
+        initialValues.put("tax", entityLichSuThanhToan.getTax());
+        initialValues.put("billNum", entityLichSuThanhToan.getBillNum());
+        initialValues.put("currency", entityLichSuThanhToan.getCurrency());
+        initialValues.put("priceDetails", entityLichSuThanhToan.getPriceDetails());
+        initialValues.put("numeDetails", entityLichSuThanhToan.getNumeDetails());
+        initialValues.put("amountDetails", entityLichSuThanhToan.getAmountDetails());
+        initialValues.put("oldIndex", entityLichSuThanhToan.getOldIndex());
+        initialValues.put("newIndex", entityLichSuThanhToan.getNewIndex());
+        initialValues.put("nume", entityLichSuThanhToan.getNume());
+        initialValues.put("amountNotTax", entityLichSuThanhToan.getAmountNotTax());
+        initialValues.put("amountTax", entityLichSuThanhToan.getAmountTax());
+        initialValues.put("multiple", entityLichSuThanhToan.getMultiple());
+        initialValues.put("billType", entityLichSuThanhToan.getBillType());
+        initialValues.put("typeIndex", entityLichSuThanhToan.getTypeIndex());
+        initialValues.put("groupTypeIndex", entityLichSuThanhToan.getGroupTypeIndex());
+        initialValues.put("createdDate", entityLichSuThanhToan.getCreatedDate());
+        initialValues.put("idChanged", entityLichSuThanhToan.getIdChanged());
+        initialValues.put("dateChanged", entityLichSuThanhToan.getDateChanged());
+        initialValues.put("edong", entityLichSuThanhToan.getEdong());
+        initialValues.put("pcCodeExt", entityLichSuThanhToan.getPcCodeExt());
+        initialValues.put("code", entityLichSuThanhToan.getCode());
+        initialValues.put("name", entityLichSuThanhToan.getName());
+        initialValues.put("nameNosign", entityLichSuThanhToan.getNameNosign());
+        initialValues.put("phoneByevn", entityLichSuThanhToan.getPhoneByevn());
+        initialValues.put("phoneByecp", entityLichSuThanhToan.getPhoneByecp());
+        initialValues.put("electricityMeter", entityLichSuThanhToan.getElectricityMeter());
+        initialValues.put("inning", entityLichSuThanhToan.getInning());
+        initialValues.put("road", entityLichSuThanhToan.getRoad());
+        initialValues.put("station", entityLichSuThanhToan.getStation());
+        initialValues.put("taxCode", entityLichSuThanhToan.getTaxCode());
+        initialValues.put("trade", entityLichSuThanhToan.getTrade());
+        initialValues.put("countPeriod", entityLichSuThanhToan.getCountPeriod());
+        initialValues.put("team", entityLichSuThanhToan.getTeam());
+        initialValues.put("type", entityLichSuThanhToan.getType());
+        initialValues.put("lastQuery", entityLichSuThanhToan.getLastQuery());
+        initialValues.put("groupType", entityLichSuThanhToan.getGroupType());
+        initialValues.put("billingChannel", entityLichSuThanhToan.getBillingChannel());
+        initialValues.put("billingType", entityLichSuThanhToan.getBillingType());
+        initialValues.put("billingBy", entityLichSuThanhToan.getBillingBy());
+        initialValues.put("cashierPay", entityLichSuThanhToan.getCashierPay());
+        initialValues.put("edongKey", entityLichSuThanhToan.getEdong());
+        initialValues.put("payments", entityLichSuThanhToan.getPayments());
+        initialValues.put("payStatus", entityLichSuThanhToan.getPayStatus());
+        initialValues.put("stateOfDebt", entityLichSuThanhToan.getStateOfDebt());
+        initialValues.put("stateOfCancel", entityLichSuThanhToan.getStateOfCancel());
+        initialValues.put("stateOfReturn", entityLichSuThanhToan.getStateOfReturn());
+        initialValues.put("suspectedProcessingStatus", entityLichSuThanhToan.getSuspectedProcessingStatus());
+        initialValues.put("stateOfPush", entityLichSuThanhToan.getStateOfPush());
+        initialValues.put("dateOfPush", entityLichSuThanhToan.getDateOfPush());
+        initialValues.put("countPrintReceipt", entityLichSuThanhToan.getCountPrintReceipt());
+        initialValues.put("printInfo", entityLichSuThanhToan.getPrintInfo());
+        initialValues.put("dateIncurred", entityLichSuThanhToan.getDateIncurred());
+        initialValues.put("tradingCode", entityLichSuThanhToan.getTradingCode());
         int rowAffect = (int) database.insert(TABLE_NAME_LICH_SU_TTOAN, null, initialValues);
 
         return rowAffect;

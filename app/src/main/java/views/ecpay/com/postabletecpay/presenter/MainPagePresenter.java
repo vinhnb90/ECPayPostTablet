@@ -645,7 +645,7 @@ public class MainPagePresenter implements IMainPagePresenter {
             do {
                 ListTransactionOff listTransactionOff = new ListTransactionOff();
                 listTransactionOff.setCustomer_code(c.getString(c.getColumnIndex("customerCode")));
-                listTransactionOff.setProvide_code(c.getString(c.getColumnIndex("")));
+                listTransactionOff.setProvide_code(Common.PROVIDER_DEFAULT);
                 listTransactionOff.setAmount(c.getString(c.getColumnIndex("amount")));
                 listTransactionOff.setBill_id(c.getString(c.getColumnIndex("billId")));
                 listTransactionOff.setEdong(c.getString(c.getColumnIndex("edong")));
@@ -653,7 +653,7 @@ public class MainPagePresenter implements IMainPagePresenter {
                 lstTransactionOff.add(listTransactionOff);
             } while (c.moveToNext());
         }
-        String jsonRequestData = SoapAPI.getJsonRequestPostBill(
+        String jsonRequestPushBill = SoapAPI.getJsonRequestPostBill(
                 configInfo.getAGENT(),
                 configInfo.getAgentEncypted(),
                 configInfo.getCommandId(),
@@ -665,14 +665,14 @@ public class MainPagePresenter implements IMainPagePresenter {
                 configInfo.getAccountId());
 
 
-        if (jsonRequestData != null) {
+        if (jsonRequestPushBill != null) {
             try {
                 final SoapAPI.AsyncSoapPostBill soapPostBill;
 
                 soapPostBill = new SoapAPI.AsyncSoapPostBill(callBackPostBill, mIMainPageView.getContextView());
 
                 if (soapPostBill.getStatus() != AsyncTask.Status.RUNNING) {
-                    soapPostBill.execute(jsonRequestData);
+                    soapPostBill.execute(jsonRequestPushBill);
 
                     //thread time out
                     Thread soapDataThread = new Thread(new Runnable() {
@@ -726,47 +726,49 @@ public class MainPagePresenter implements IMainPagePresenter {
 
                 try {
                     File file = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + ".zip");
-                    Common.writeBytesToFile(file, zipByte);
-                    if (file.exists()) {
-                        File fileText = new File(Common.PATH_FOLDER_DOWNLOAD, "full.txt");
-                        if (fileText.exists())
-                            fileText.delete();
-                        if (Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + ".zip")) {
-                            StringBuilder text = new StringBuilder();
-                            try {
-                                BufferedReader br = new BufferedReader(new FileReader(fileText));
-                                String line;
+                    if (!file.exists()) {
+                        Common.writeBytesToFile(file, zipByte);
+                        if (file.exists()) {
+                            File fileText = new File(Common.PATH_FOLDER_DOWNLOAD, "full.txt");
+                            if (fileText.exists())
+                                fileText.delete();
+                            if (Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + ".zip")) {
+                                StringBuilder text = new StringBuilder();
+                                try {
+                                    BufferedReader br = new BufferedReader(new FileReader(fileText));
+                                    String line;
 
-                                while ((line = br.readLine()) != null) {
-                                    text.append(line);//chỗ tạo file đây
-                                    text.append('\n');
-                                }
-                                br.close();
+                                    while ((line = br.readLine()) != null) {
+                                        text.append(line);//chỗ tạo file đây
+                                        text.append('\n');
+                                    }
+                                    br.close();
 
-                                JSONObject ja = new JSONObject(text.toString());
-                                GsonBuilder gsonBuilder = new GsonBuilder();
-                                Gson gson = gsonBuilder.create();
-                                FileGenResponse fileGenResponse = gson.fromJson(ja.toString(), FileGenResponse.class);
-                                for (ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
-                                    if (mainPageModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
-                                        if (mainPageModel.insertCustomer(listCustomerResponse) != -1) {
-                                            Log.i("INFO", "TEST");
+                                    JSONObject ja = new JSONObject(text.toString());
+                                    GsonBuilder gsonBuilder = new GsonBuilder();
+                                    Gson gson = gsonBuilder.create();
+                                    FileGenResponse fileGenResponse = gson.fromJson(ja.toString(), FileGenResponse.class);
+                                    for (ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
+                                        if (mainPageModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
+                                            if (mainPageModel.insertCustomer(listCustomerResponse) != -1) {
+                                                Log.i("INFO", "TEST");
+                                            }
                                         }
                                     }
-                                }
 
-                                for (ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
-                                    listBillResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
-                                    if (mainPageModel.checkBillExist(listBillResponse.getBodyBillResponse().getBillId()) == 0) {
-                                        if (mainPageModel.insertBill(listBillResponse) != -1) {
-                                            Log.i("INFO", "TEST");
+                                    for (ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
+                                        listBillResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
+                                        if (mainPageModel.checkBillExist(listBillResponse.getBodyBillResponse().getBillId()) == 0) {
+                                            if (mainPageModel.insertBill(listBillResponse) != -1) {
+                                                Log.i("INFO", "TEST");
+                                            }
                                         }
                                     }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
                         }
                     }
@@ -972,7 +974,12 @@ public class MainPagePresenter implements IMainPagePresenter {
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onPost(PostBillResponse response) {
-
+            String errorCode = response.getFooterPostBillReponse().getResponse_code();
+            if(errorCode.equals("000")) {
+                mIMainPageView.showTextMessage(Common.MESSAGE.PUSH_BILL_SUCSSES.toString());
+            } else {
+                mIMainPageView.showTextMessage(Common.MESSAGE.PUSH_BILL_FAIL.toString());
+            }
         }
 
         @Override
