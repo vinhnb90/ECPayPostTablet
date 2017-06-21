@@ -357,27 +357,26 @@ public class PayModel extends CommonModel {
             , String lastQuery, int groupType, String billingChannel, String billingType, String billingBy, String cashierPay, int payments
             , int payStatus, int stateOfDebt, String stateOfCancel, String stateOfReturn, String suspectedProcessingStatus, int stateOfPush
             , String dateOfPush, int countPrintReceipt, String printInfo, String dateIncurred, int tradingCode) {
-        return sqLiteConnection.insertPayLib(edong,customerCode,customerPayCode,billId,term,amount,period,issueDate,strIssueDate
-            ,status,seri,pcCode,handoverCode,cashierCode,bookCmis,fromDate,toDate,strFromDate
-            ,strToDate,home,tax,billNum,currency,priceDetails,numeDetails,amountDetails,oldIndex
-            ,newIndex,nume,amountNotTax,amountTax,multiple,billType,typeIndex,groupTypeIndex
-            ,createdDate,idChanged,dateChanged,pcCodeExt,code,name,nameNosign,phoneByevn,phoneByecp
-            ,electricityMeter,inning,road,station,taxCode,trade,countPeriod,team,type
-            ,lastQuery,groupType,billingChannel,billingType,billingBy,cashierPay,payments
-            ,payStatus,stateOfDebt,stateOfCancel,stateOfReturn,suspectedProcessingStatus,stateOfPush
-            ,dateOfPush,countPrintReceipt,printInfo,dateIncurred,tradingCode);
-    }
-
-    public Cursor getCustomer(String code) {
-        return sqLiteConnection.getCustomer(code);
+        return sqLiteConnection.insertPayLib(edong, customerCode, customerPayCode, billId, term, amount, period, issueDate, strIssueDate
+                , status, seri, pcCode, handoverCode, cashierCode, bookCmis, fromDate, toDate, strFromDate
+                , strToDate, home, tax, billNum, currency, priceDetails, numeDetails, amountDetails, oldIndex
+                , newIndex, nume, amountNotTax, amountTax, multiple, billType, typeIndex, groupTypeIndex
+                , createdDate, idChanged, dateChanged, pcCodeExt, code, name, nameNosign, phoneByevn, phoneByecp
+                , electricityMeter, inning, road, station, taxCode, trade, countPeriod, team, type
+                , lastQuery, groupType, billingChannel, billingType, billingBy, cashierPay, payments
+                , payStatus, stateOfDebt, stateOfCancel, stateOfReturn, suspectedProcessingStatus, stateOfPush
+                , dateOfPush, countPrintReceipt, printInfo, dateIncurred, tradingCode);
     }
 
     public boolean checkIsHasBillNotPayTermBefore(String edong, String code, int billId) {
         boolean failInput =
                 TextUtils.isEmpty(edong) ||
                         TextUtils.isEmpty(code);
+
         if (failInput)
             return false;
+
+        //lấy term của hóa đơn
         String term = sqLiteConnection.getTermBillOfCustomer(edong, code, billId);
         if(term== null)
             return false;
@@ -385,4 +384,7 @@ public class PayModel extends CommonModel {
         return sqLiteConnection.checkIsHasBillNotPayTermBefore(edong, code, term);
     }
 
+    public Cursor getCustomer(String code) {
+        return sqLiteConnection.getCustomer(code);
+    }
 }

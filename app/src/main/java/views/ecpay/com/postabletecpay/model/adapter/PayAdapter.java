@@ -436,7 +436,6 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             return this.billList.size();
         }
 
-
         public class BillInsidePayViewHolder extends RecyclerView.ViewHolder {
             @BindView(R.id.cb_row_bill_inside_pay)
             CheckBox cb;
@@ -463,7 +462,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                     BillEntityAdapter bill = billList.get(position);
                     bill.setChecked(checked);
 
-                    interaction.processCheckedBillFragment(edong, code, bill, posCustomerInside);
+                    interaction.processCheckedBillFragment(edong, code, billList, posCustomerInside);
                 }
             }
 
@@ -502,7 +501,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     }
 
     public interface OnInterationBillInsidePayAdapter {
-        void processCheckedBillFragment(String edong, String code, BillEntityAdapter bill, int posCustomer);
+        void processCheckedBillFragment(String edong, String code, List<BillEntityAdapter>  billList, int posCustomer);
 
         void processDeleteBillOnlineFragment(String edong, String code, BillEntityAdapter bill, int posCustomerInside);
     }
