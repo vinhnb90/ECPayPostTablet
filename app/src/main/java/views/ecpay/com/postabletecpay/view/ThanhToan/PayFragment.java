@@ -118,6 +118,9 @@ public class PayFragment extends Fragment implements
     @BindView(R.id.rv_frag_thanhtoan_search_online_progress)
     RelativeLayout rvProgressSearchOnline;
     @Nullable
+    @BindView(R.id.tv_search)
+    TextView tvTitleSearch;
+    @Nullable
     @BindView(R.id.tv_frag_thanh_toan_search_online_message)
     TextView tvMessageNotifySearchOnlne;
     @Nullable
@@ -411,7 +414,7 @@ public class PayFragment extends Fragment implements
     @Optional
     @OnClick(R.id.btn_dialog_thanhtoan_pay)
     public void clickPayPayingOnlineDialog(View view) {
-        if(Common.isConnectingWifi(PayFragment.this.getActivity())) {
+        if (Common.isConnectingWifi(PayFragment.this.getActivity())) {
 //      if(Common.isNetworkConnected(PayFragment.this.getActivity())) {
             mIPayPresenter.callPayingBillOnline(mEdong);
         } else {
@@ -609,7 +612,7 @@ public class PayFragment extends Fragment implements
     public void showSearchOnlineProcess() {
         if (rvProgressSearchOnline.getVisibility() == View.GONE)
             rvProgressSearchOnline.setVisibility(View.VISIBLE);
-
+        tvTitleSearch.setVisibility(View.VISIBLE);
         pbarSearchOnline.setVisibility(View.VISIBLE);
         pbarSearchOnline.setIndeterminate(true);
         ibtnResearchOnline.setVisibility(View.GONE);
@@ -628,6 +631,7 @@ public class PayFragment extends Fragment implements
         if (message == null || message.isEmpty() || message.trim().equals(Common.TEXT_EMPTY))
             return;
 
+        tvTitleSearch.setVisibility(View.VISIBLE);
         pbarSearchOnline.setVisibility(View.GONE);
         ibtnResearchOnline.setVisibility(View.VISIBLE);
         ibtnCancelSearchOnline.setVisibility(View.GONE);
@@ -638,11 +642,14 @@ public class PayFragment extends Fragment implements
 
     /**
      * Show any message without search online on pay fragment
+     *
      * @param message
      */
     public void showMessageNotifyPayfrag(String message) {
         if (TextUtils.isEmpty(message))
             return;
+
+        tvTitleSearch.setVisibility(View.GONE);
         rvProgressSearchOnline.setVisibility(View.VISIBLE);
         pbarSearchOnline.setVisibility(View.GONE);
         ibtnCancelSearchOnline.setVisibility(View.GONE);
@@ -698,7 +705,7 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
-    public void showMessageNotifyBillOnlineDialog(String message) {
+    public void showMessageNotifyBillOnlineDialog(String message, boolean isMutilMessage) {
         if (message == null)
             return;
         if (isHasNullViewPayingOnlineDialog())
@@ -709,7 +716,7 @@ public class PayFragment extends Fragment implements
 
         Common.runAnimationClickViewScale(tvMessageDialog, R.anim.scale_view_pull, TIME_DELAY_ANIM);
         tvMessageDialog.setVisibility(View.VISIBLE);
-        tvMessageDialog.setText(message);
+        tvMessageDialog.setText(isMutilMessage ? tvMessageDialog.getText().toString() + Common.TEXT_ENTER + message : message);
     }
 
     @Override

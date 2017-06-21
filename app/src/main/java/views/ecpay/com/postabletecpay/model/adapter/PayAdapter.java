@@ -462,7 +462,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                     BillEntityAdapter bill = billList.get(position);
                     bill.setChecked(checked);
 
-                    interaction.processCheckedBillFragment(edong, code, billList, posCustomerInside);
+                    interaction.processCheckedBillFragment(edong, code,  posCustomerInside, billList, position);
                 }
             }
 
@@ -501,7 +501,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     }
 
     public interface OnInterationBillInsidePayAdapter {
-        void processCheckedBillFragment(String edong, String code, List<BillEntityAdapter>  billList, int posCustomer);
+        void processCheckedBillFragment(String edong, String code, int posCustomer, List<BillEntityAdapter>  billList, int posBillInside);
 
         void processDeleteBillOnlineFragment(String edong, String code, BillEntityAdapter bill, int posCustomerInside);
     }

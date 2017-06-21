@@ -1392,7 +1392,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     public String getTermBillOfCustomer(String edong, String code, int billId) {
         database = this.getReadableDatabase();
 
-        String query = "SELECT term FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode = " + code + "' and billID = " + billId;
+        String query = "SELECT term FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode = '" + code + "' and billID = " + billId;
         Cursor mCursor = database.rawQuery(query, null);
 
         if (mCursor.getCount() == 0)

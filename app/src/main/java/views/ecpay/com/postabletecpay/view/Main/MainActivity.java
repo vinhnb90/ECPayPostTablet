@@ -32,6 +32,7 @@ import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.NEGATIVE_ONE;
+import static views.ecpay.com.postabletecpay.util.commons.Common.ONE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.REQUEST_BARCODE;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.RESPONSE_BARCODE;
@@ -190,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements
 
     //region PayAdapter.BillInsidePayAdapter.BillInsidePayViewHolder.OnInterationBillInsidePayAdapter
     @Override
-    public void processCheckedBillFragment(String edong, String code, List<PayAdapter.BillEntityAdapter> billList, int posCustomer) {
+    public void processCheckedBillFragment(String edong, String code, int posCustomer, List<PayAdapter.BillEntityAdapter>  billList, int posBillInside) {
         if (TextUtils.isEmpty(edong))
             return;
         if (TextUtils.isEmpty(code))
@@ -198,11 +199,11 @@ public class MainActivity extends AppCompatActivity implements
         if (billList == null || billList.size() == ZERO)
             return;
 
-        PayAdapter.BillEntityAdapter bill = billList.get(posCustomer);
+        PayAdapter.BillEntityAdapter bill = billList.get(posBillInside);
 
         //TODO check hóa đơn kỳ xa nhất fragment
         boolean isHasBillNotPayTermBefore = false;
-        int index = posCustomer;
+        int index = posCustomer + ONE;
 
         for (; index < billList.size(); index++) {
             if (billList.get(index).getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) {
@@ -246,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements
 
     //region PayBillsDialogAdapter.OnInteractionBillDialogRecycler
     @Override
-    public void processDataBillsDialogChecked(int pos, boolean isChecked) {
+    public void processCheckedBillsDialog(int pos, boolean isChecked) {
 
         //check fragment
         Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
@@ -256,6 +257,18 @@ public class MainActivity extends AppCompatActivity implements
         if (fragmentVisibling instanceof PayFragment)
             ((PayFragment) fragmentVisibling).showBillCheckedDialog(mEdong, pos, isChecked);
 
+    }
+
+    @Override
+    public void processClickMessageErrorBillDialog(String messageError) {
+        Toast.makeText(this, messageError, Toast.LENGTH_SHORT).show();
+//        //check fragment
+//        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+//        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+//            return;
+//        }
+//        if (fragmentVisibling instanceof PayFragment)
+//            ((PayFragment) fragmentVisibling).showMessage(mEdong, pos, isChecked);
     }
     //endregion
 

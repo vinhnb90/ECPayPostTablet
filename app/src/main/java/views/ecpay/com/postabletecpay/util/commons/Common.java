@@ -507,8 +507,8 @@ public class Common {
         }
 
         public static String getMessageServerNotify(String nameCustomer, String term, String message) {
-            return "Gặp vấn đề với hóa đơn của khách hàng " + nameCustomer + " tại kỳ " + term
-                    + "\nnhư sau: " + message;
+            return "Hóa đơn khách hàng " + nameCustomer + " kỳ " + term
+                    + ": " + message;
         }
 
         private final String code;
@@ -662,7 +662,7 @@ public class Common {
             return code;
         }
 
-        public String getMessage() {
+        public String getMessageError() {
             return message;
         }
 
@@ -804,6 +804,7 @@ public class Common {
     public static final String TEXT_SPACE = " ";
     public static final String TEXT_EMPTY = "";
     public static final String TEXT_SLASH = "/";
+    public static final String TEXT_ENTER = "/n";
     public static final String TEXT_BILL = "Hóa đơn";
     public static final String TEXT_MULTI_SPACE = TEXT_SPACE.concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE);
     public static final String TEXT_SEARCHING = "Searching online....";
@@ -1435,7 +1436,7 @@ public class Common {
 //            //get and convert mac adress to hex
 //            macAdressHexValue = Common.getMacAddress(context);
 //        } catch (Exception e) {
-//            throw new Exception(e.getMessage());
+//            throw new Exception(e.getMessageError());
 //        }
 //        configInfo.setMacAdressHexValue(macAdressHexValue);
 //
