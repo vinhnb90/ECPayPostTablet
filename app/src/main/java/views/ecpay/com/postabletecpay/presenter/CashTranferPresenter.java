@@ -81,7 +81,6 @@ public class CashTranferPresenter implements ICashTranferPresenter{
             }
 
 
-            Log.e("LOG", "Success " + response.getFooter().getResponseCode() + "");
             if(response.getFooter().getResponseCode().equals("000")) //Success
             {
 
@@ -92,7 +91,6 @@ public class CashTranferPresenter implements ICashTranferPresenter{
                 iCashTranferView.showText(response.getFooter().getDescription());
 
                 iCashTranferView.onBack();
-                Log.e("LOG", "Success");
             }else
             {
                 iCashTranferView.showText(response.getFooter().getDescription());

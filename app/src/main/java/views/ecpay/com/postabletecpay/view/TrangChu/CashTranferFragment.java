@@ -31,6 +31,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.CashTranferModel;
 import views.ecpay.com.postabletecpay.presenter.CashTranferPresenter;
@@ -58,32 +59,46 @@ public class CashTranferFragment extends Fragment implements View.OnClickListene
 
     private String eDong;
 
+    @Nullable
     @BindView(R.id.layout_xac_nhan)
     View viewLayOutXacNhan;
+    @Nullable
     @BindView(R.id.btnNext)
     Button btnNext;
+    @Nullable
     @BindView(R.id.btnBack)
     Button btnBack;
+    @Nullable
     @BindView(R.id.eSoTien)
     EditText eSoTien;
+    @Nullable
     @BindView(R.id.eGhiChu)
     EditText eGhiChu;
+    @Nullable
     @BindView(R.id.eMaXacNhan)
     EditText eMaXacNhan;
+    @Nullable
     @BindView(R.id.txtSendPhone)
     TextView txtSendPhone;
+    @Nullable
     @BindView(R.id.sViTong)
     Spinner sViTong;
+    @Nullable
     @BindView(R.id.txtCaptcha)
     TextView txtCaptcha;
+    @Nullable
     @BindView(R.id.btnRefresh)
     Button btnRefresh;
+    @Nullable
     @BindView(R.id.hHeader)
     RelativeLayout hHeader;
+    @Nullable
     @BindView(R.id.hContent)
     LinearLayout hContent;
+    @Nullable
     @BindView(R.id.hLoading)
     LinearLayout hLoading;
+    @Nullable
     @BindView(R.id.btnBack1)
     ImageButton btnBack1;
 
@@ -92,7 +107,7 @@ public class CashTranferFragment extends Fragment implements View.OnClickListene
     private STATE mState;
     private IBackHandler backHandler;
     private String mViTongString;
-
+    private Unbinder unbinder;
 
     private ICashTranferPresenter cashTranferPresenter;
 
@@ -119,7 +134,7 @@ public class CashTranferFragment extends Fragment implements View.OnClickListene
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chuyen_vi_tong, container, false);
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         eDong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
 
@@ -160,6 +175,13 @@ public class CashTranferFragment extends Fragment implements View.OnClickListene
 
         hLoading.setVisibility(View.GONE);
         return view;
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override

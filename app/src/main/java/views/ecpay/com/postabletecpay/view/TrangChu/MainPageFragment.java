@@ -98,6 +98,9 @@ public class MainPageFragment extends Fragment implements
     @Nullable
     @BindView(R.id.btnChuyenViTong)
     Button btnChuyenViTong;
+    @Nullable
+    @BindView(R.id.btnDinhDanhThe)
+    Button btnDinhDanhThe;
 
     //dialog logout
     @Nullable
@@ -164,6 +167,7 @@ public class MainPageFragment extends Fragment implements
         btThanhToan.setOnClickListener(this);
         btBaoCao.setOnClickListener(this);
         btnChuyenViTong.setOnClickListener(this);
+        btnDinhDanhThe.setOnClickListener(this);
 
         mIMainPagePresenter.callInfoMain(mEdong);
 
@@ -273,6 +277,9 @@ public class MainPageFragment extends Fragment implements
                         fragmentTransaction.commit();
                     }
                 });
+                break;
+            case R.id.btnDinhDanhThe:
+                fragment = SearchCustomerFragment.newInstance(mEdong);
                 break;
         }
         if (fragment != null) {

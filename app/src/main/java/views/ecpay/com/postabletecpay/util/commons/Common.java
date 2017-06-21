@@ -770,7 +770,8 @@ public class Common {
         TRANSACTION_CANCELLATION,
         LOGOUT,
         PUT_TRANSACTION_OFF,
-        CASH_TRANSFER;
+        CASH_TRANSFER,
+        GET_PC_INFO;
 
         @Override
         public String toString() {
@@ -798,6 +799,8 @@ public class Common {
                 return "PUT-TRANSACTION-OFF";
             if (this == CASH_TRANSFER)
                 return "CASH-TRANSFER";
+            if(this == GET_PC_INFO)
+                return  "GET-PC-INFO";
             return super.toString();
         }
     }

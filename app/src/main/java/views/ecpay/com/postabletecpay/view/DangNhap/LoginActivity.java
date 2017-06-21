@@ -2,9 +2,14 @@ package views.ecpay.com.postabletecpay.view.DangNhap;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -23,6 +28,10 @@ import views.ecpay.com.postabletecpay.presenter.ILoginPresenter;
 import views.ecpay.com.postabletecpay.presenter.LoginPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection;
+import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.GetPCInfo.GetPCInfoRespone;
+import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.BaseActivity;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
@@ -84,6 +93,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         tvMessage.setVisibility(View.INVISIBLE);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void showMainScreen(String edong) {
         hidePbarLogin();
@@ -94,11 +104,106 @@ public class LoginActivity extends BaseActivity implements ILoginView {
             return;
         }
 
+        this.LoadPCInfo(edong, "01683861612");
+
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.putExtra(KEY_EDONG, edong);
         startActivity(intent);
         this.finish();
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    protected  void LoadPCInfo(String edong, String phoneName)
+    {
+        Context context = this.getContext();
+        ConfigInfo configInfo;
+        String versionApp = "";
+        try {
+            versionApp = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.GET_PC_INFO.toString(), versionApp);
+        } catch (Exception e) {
+
+            return;
+        }
+
+
+        String json = SoapAPI.getJsonGetPCInfo(
+                configInfo.getAGENT(),
+                configInfo.getAgentEncypted(),
+                configInfo.getCommandId(),
+                configInfo.getAuditNumber(),
+                configInfo.getMacAdressHexValue(),
+                configInfo.getDiskDriver(),
+                configInfo.getSignatureEncrypted(),
+                "",
+                "",
+                "",
+                "",
+                "",
+                configInfo.getAccountId()
+        );
+
+
+        if (json == null)
+            return;
+
+
+        try {
+            final SoapAPI.AsyncSoapGetPCInfo soap = new SoapAPI.AsyncSoapGetPCInfo(phoneName, new SoapAPI.AsyncSoapGetPCInfo.AsyncSoapGetPCInfoCallBack() {
+                @Override
+                public void onPre(SoapAPI.AsyncSoapGetPCInfo soap) {
+
+                }
+
+                @Override
+                public void onUpdate(String message) {
+
+                }
+
+                @Override
+                public void onPost(GetPCInfoRespone response, String phone) {
+                    Log.d("LOG", "phone = " + phone);
+                }
+
+                @Override
+                public void onTimeOut(SoapAPI.AsyncSoapGetPCInfo soap) {
+
+                }
+            });
+
+            if (soap.getStatus() != AsyncTask.Status.RUNNING) {
+                soap.execute(json);
+
+                //thread time out
+                final Thread soapChangePassThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ChangePassResponse changePassResponse = null;
+
+                        //call time out
+                        try {
+                            Thread.sleep(Common.TIME_OUT_CONNECT);
+                        } catch (InterruptedException e) {
+                        } finally {
+                            if (changePassResponse == null) {
+                                soap.callCountdown(soap);
+                            }
+                        }
+                    }
+                });
+
+                soapChangePassThread.start();
+            }
+        } catch (Exception e) {
+            return;
+        }
+    }
+
 
     @Override
     public void showTextUserPass(String userName, String pass) {
