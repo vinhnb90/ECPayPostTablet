@@ -329,6 +329,7 @@ public class PayPresenter implements IPayPresenter {
             return;
         }
         //Thanh toán offline
+        index = 0;
         StringBuilder sbMsg = new StringBuilder();
         for (; index < maxIndex; index++) {
             PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
@@ -399,16 +400,30 @@ public class PayPresenter implements IPayPresenter {
                         c.getString(c.getColumnIndex("lastQuery")), c.getInt(c.getColumnIndex("groupType")), c.getString(c.getColumnIndex("billingChannel")),
                         c.getString(c.getColumnIndex("billingType")), c.getString(c.getColumnIndex("billingBy")), c.getString(c.getColumnIndex("cashierPay")),
                         2, 2, 2, "", "", "", 1, currentDateandTime, 0, "") != -1) {
-                    Cursor cCustomer = mPayModel.getCustomer(c.getString(c.getColumnIndex("customerCode")));
-                    if(cCustomer.moveToFirst()) {
-//                        if(mPayModel.insertPayLib(c.getString(c.getColumnIndex("seri"), c.getString(c.getColumnIndex("customerCode")),
-//                                cCustomer.getString(c.getColumnIndex("address")), cCustomer.getString(c.getColumnIndex("name")), "THANG_TTOAN", 0 ) != -1) {
-////                        int SERI_HDON, String MA_KHANG, String MA_THE, String TEN_KHANG, String DIA_CHI, String THANG_TTOAN, int PHIEN_TTOAN
-////            , double SO_TIEN_TTOAN, String SO_GCS, String DIEN_LUC, String SO_HO, String SO_DAU_KY, String SO_CUOI_KY, String SO_CTO, String SDT_ECPAY, String SDT_EVN
-////            , int GIAO_THU, String NGAY_GIAO_THU, String TRANG_THAI_TTOAN, String VI_TTOAN, String HTHUC_TTOAN, String TTHAI_TTOAN, String TTHAI_CHAM_NO, String TTHAI_HUY
-////                                , String TTHAI_XLY_NGHI_NGO, int SO_LAN_IN_BNHAN, String IN_TBAO_DIEN, String NGAY_PSINH, String MA_GIAO_DICH
-//                        }
-                    }
+                        if(mPayModel.insertPayLib(
+                                c.getString(c.getColumnIndex("edong")), c.getString(c.getColumnIndex("customerCode")),
+                                c.getString(c.getColumnIndex("customerPayCode")),c.getInt(c.getColumnIndex("billId")), c.getString(c.getColumnIndex("term")),
+                                c.getInt(c.getColumnIndex("amount")), c.getString(c.getColumnIndex("period")), c.getString(c.getColumnIndex("issueDate")),
+                                c.getString(c.getColumnIndex("strIssueDate")), c.getInt(c.getColumnIndex("status")), c.getString(c.getColumnIndex("seri")),
+                                c.getString(c.getColumnIndex("pcCode")), c.getString(c.getColumnIndex("handoverCode")), c.getString(c.getColumnIndex("cashierCode")),
+                                c.getString(c.getColumnIndex("bookCmis")), c.getString(c.getColumnIndex("fromDate")),
+                                c.getString(c.getColumnIndex("toDate")), c.getString(c.getColumnIndex("strFromDate")),
+                                c.getString(c.getColumnIndex("strToDate")), c.getString(c.getColumnIndex("home")),
+                                c.getFloat(c.getColumnIndex("tax")), c.getString(c.getColumnIndex("billNum")), c.getString(c.getColumnIndex("currency")),
+                                c.getString(c.getColumnIndex("priceDetails")), c.getString(c.getColumnIndex("numeDetails")), c.getString(c.getColumnIndex("amountDetails")),
+                                c.getString(c.getColumnIndex("oldIndex")), c.getString(c.getColumnIndex("newIndex")), c.getString(c.getColumnIndex("nume")), c.getInt(c.getColumnIndex("amountNotTax")),
+                                c.getString(c.getColumnIndex("amountTax")), c.getString(c.getColumnIndex("multiple")), c.getString(c.getColumnIndex("billType")),
+                                c.getString(c.getColumnIndex("typeIndex")), c.getString(c.getColumnIndex("groupTypeIndex")), c.getString(c.getColumnIndex("createdDate")),
+                                c.getInt(c.getColumnIndex("idChanged")), c.getString(c.getColumnIndex("dateChanged")), c.getString(c.getColumnIndex("pcCodeExt")),
+                                c.getString(c.getColumnIndex("code")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("nameNosign")),
+                                c.getString(c.getColumnIndex("phoneByevn")), c.getString(c.getColumnIndex("phoneByecp")), c.getString(c.getColumnIndex("electricityMeter")),
+                                c.getString(c.getColumnIndex("inning")), c.getString(c.getColumnIndex("road")), c.getString(c.getColumnIndex("station")), c.getString(c.getColumnIndex("taxCode")),
+                                c.getString(c.getColumnIndex("trade")), c.getString(c.getColumnIndex("countPeriod")), c.getString(c.getColumnIndex("team")), c.getInt(c.getColumnIndex("type")),
+                                c.getString(c.getColumnIndex("lastQuery")), c.getInt(c.getColumnIndex("groupType")), c.getString(c.getColumnIndex("billingChannel")),
+                                c.getString(c.getColumnIndex("billingType")), c.getString(c.getColumnIndex("billingBy")), c.getString(c.getColumnIndex("cashierPay")),
+                                2, 2, 2, "", "", "", 1, currentDateandTime, 0, "", currentDateandTime, 6) != -1) {
+                            Log.i("INFO", "");
+                        }
                 }
             }
         }
