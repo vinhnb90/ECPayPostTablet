@@ -1,13 +1,15 @@
 package views.ecpay.com.postabletecpay.util.entities;
 
-import java.util.Date;
+import views.ecpay.com.postabletecpay.util.commons.Common;
+
+import static views.ecpay.com.postabletecpay.util.commons.Common.DATE_TIME_TYPE.yyyyMMdd;
+import static views.ecpay.com.postabletecpay.util.commons.Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS;
 
 /**
- * Created by macbook on 5/5/17.
+ * Created by tima on 6/21/17.
  */
 
-public class EntityLichSuThanhToan {
-
+public class EntityDanhSachThu {
     private String customerCode;
     private String customerPayCode;
     private int billId;
@@ -78,8 +80,6 @@ public class EntityLichSuThanhToan {
     private String dateOfPush;
     private int countPrintReceipt;
     private String printInfo;
-    private String dateIncurred;
-    private int tradingCode;
 
     public String getCustomerCode() {
         return customerCode;
@@ -639,21 +639,5 @@ public class EntityLichSuThanhToan {
 
     public void setPrintInfo(String printInfo) {
         this.printInfo = printInfo;
-    }
-
-    public String getDateIncurred() {
-        return dateIncurred;
-    }
-
-    public void setDateIncurred(String dateIncurred) {
-        this.dateIncurred = dateIncurred;
-    }
-
-    public int getTradingCode() {
-        return tradingCode;
-    }
-
-    public void setTradingCode(int tradingCode) {
-        this.tradingCode = tradingCode;
     }
 }

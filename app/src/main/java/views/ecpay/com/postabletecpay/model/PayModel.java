@@ -10,6 +10,8 @@ import java.util.List;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.EntityDanhSachThu;
+import views.ecpay.com.postabletecpay.util.entities.EntityLichSuThanhToan;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
@@ -324,48 +326,20 @@ public class PayModel extends CommonModel {
         return sqLiteConnection.updatePayOffine(billID, status, edong);
     }
 
-    public int insertDebtCollection(String edong, String customerCode, String customerPayCode,int billId, String term,int amount, String period, String issueDate, String strIssueDate
-            , int status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate
-            , String strToDate, String home, float tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex
-            , String newIndex, String nume, int amountNotTax, String amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex
-            , String createdDate, int idChanged, String dateChanged, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp
-            , String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, int type
-            , String lastQuery, int groupType, String billingChannel, String billingType, String billingBy, String cashierPay, int payments
-            , int payStatus, int stateOfDebt, String stateOfCancel, String stateOfReturn, String suspectedProcessingStatus, int stateOfPush
-            , String dateOfPush, int countPrintReceipt, String printInfo) {
-        return sqLiteConnection.insertDebtCollection( edong,  customerCode,  customerPayCode,  billId,  term,  amount,  period,  issueDate,  strIssueDate
-                ,  status,  seri,  pcCode,  handoverCode,  cashierCode,  bookCmis,  fromDate,  toDate,  strFromDate
-                ,  strToDate,  home,  tax,  billNum,  currency,  priceDetails,  numeDetails,  amountDetails,  oldIndex
-                ,  newIndex,  nume,  amountNotTax,  amountTax,  multiple,  billType,  typeIndex,  groupTypeIndex
-                ,  createdDate,  idChanged,  dateChanged,  pcCodeExt,  code,  name,  nameNosign,  phoneByevn,  phoneByecp
-                ,  electricityMeter,  inning,  road,  station,  taxCode,  trade,  countPeriod,  team,  type
-                ,  lastQuery,  groupType,  billingChannel,  billingType,  billingBy,  cashierPay,  payments
-                ,  payStatus,  stateOfDebt,  stateOfCancel,  stateOfReturn,  suspectedProcessingStatus,  stateOfPush
-                ,  dateOfPush,  countPrintReceipt,  printInfo);
+    public int insertDebtCollection(EntityDanhSachThu entityDanhSachThu) {
+        return sqLiteConnection.insertDebtCollection(entityDanhSachThu);
     }
 
-    public Cursor selectBillByID(int billId) {
-        return sqLiteConnection.selectBillByID(billId);
+    public EntityDanhSachThu selectDebtColectionForDanhSachThu(int billId) {
+        return sqLiteConnection.selectDebtColectionForDanhSachThu(billId);
     }
 
-    public int insertPayLib(String edong, String customerCode, String customerPayCode,int billId, String term,int amount, String period, String issueDate, String strIssueDate
-            , int status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate
-            , String strToDate, String home, float tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex
-            , String newIndex, String nume, int amountNotTax, String amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex
-            , String createdDate, int idChanged, String dateChanged, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp
-            , String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, int type
-            , String lastQuery, int groupType, String billingChannel, String billingType, String billingBy, String cashierPay, int payments
-            , int payStatus, int stateOfDebt, String stateOfCancel, String stateOfReturn, String suspectedProcessingStatus, int stateOfPush
-            , String dateOfPush, int countPrintReceipt, String printInfo, String dateIncurred, int tradingCode) {
-        return sqLiteConnection.insertPayLib(edong, customerCode, customerPayCode, billId, term, amount, period, issueDate, strIssueDate
-                , status, seri, pcCode, handoverCode, cashierCode, bookCmis, fromDate, toDate, strFromDate
-                , strToDate, home, tax, billNum, currency, priceDetails, numeDetails, amountDetails, oldIndex
-                , newIndex, nume, amountNotTax, amountTax, multiple, billType, typeIndex, groupTypeIndex
-                , createdDate, idChanged, dateChanged, pcCodeExt, code, name, nameNosign, phoneByevn, phoneByecp
-                , electricityMeter, inning, road, station, taxCode, trade, countPeriod, team, type
-                , lastQuery, groupType, billingChannel, billingType, billingBy, cashierPay, payments
-                , payStatus, stateOfDebt, stateOfCancel, stateOfReturn, suspectedProcessingStatus, stateOfPush
-                , dateOfPush, countPrintReceipt, printInfo, dateIncurred, tradingCode);
+    public EntityLichSuThanhToan selectDebtColectionForLichSu(int billId) {
+        return sqLiteConnection.selectDebtColectionForLichSu(billId);
+    }
+
+    public int insertPayLib(EntityLichSuThanhToan entityLichSuThanhToan) {
+        return sqLiteConnection.insertPayLib(entityLichSuThanhToan);
     }
 
     public boolean checkIsHasBillNotPayTermBefore(String edong, String code, int billId) {

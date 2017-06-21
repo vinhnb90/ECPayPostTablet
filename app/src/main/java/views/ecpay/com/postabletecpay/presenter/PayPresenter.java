@@ -23,6 +23,8 @@ import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.util.entities.EntityDanhSachThu;
+import views.ecpay.com.postabletecpay.util.entities.EntityLichSuThanhToan;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBillOnline.BillingOnlineRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCheckTrainOnline.CheckTrainOnlineResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityDeleteBillOnline.DeleteBillOnlineRespone;
@@ -374,54 +376,33 @@ public class PayPresenter implements IPayPresenter {
         String currentDateandTime = sdf.format(new Date());
 
         if(mPayModel.updatePayOffine(entity.getBillId(), 2, MainActivity.mEdong) != -1) {
-            Cursor c = mPayModel.selectBillByID(entity.getBillId());
-            if(c.moveToFirst()) {
-                if (mPayModel.insertDebtCollection(
-                        c.getString(c.getColumnIndex("edong")), c.getString(c.getColumnIndex("customerCode")),
-                        c.getString(c.getColumnIndex("customerPayCode")),c.getInt(c.getColumnIndex("billId")), c.getString(c.getColumnIndex("term")),
-                        c.getInt(c.getColumnIndex("amount")), c.getString(c.getColumnIndex("period")), c.getString(c.getColumnIndex("issueDate")),
-                        c.getString(c.getColumnIndex("strIssueDate")), c.getInt(c.getColumnIndex("status")), c.getString(c.getColumnIndex("seri")),
-                        c.getString(c.getColumnIndex("pcCode")), c.getString(c.getColumnIndex("handoverCode")), c.getString(c.getColumnIndex("cashierCode")),
-                        c.getString(c.getColumnIndex("bookCmis")), c.getString(c.getColumnIndex("fromDate")),
-                        c.getString(c.getColumnIndex("toDate")), c.getString(c.getColumnIndex("strFromDate")),
-                        c.getString(c.getColumnIndex("strToDate")), c.getString(c.getColumnIndex("home")),
-                        c.getFloat(c.getColumnIndex("tax")), c.getString(c.getColumnIndex("billNum")), c.getString(c.getColumnIndex("currency")),
-                        c.getString(c.getColumnIndex("priceDetails")), c.getString(c.getColumnIndex("numeDetails")), c.getString(c.getColumnIndex("amountDetails")),
-                        c.getString(c.getColumnIndex("oldIndex")), c.getString(c.getColumnIndex("newIndex")), c.getString(c.getColumnIndex("nume")), c.getInt(c.getColumnIndex("amountNotTax")),
-                        c.getString(c.getColumnIndex("amountTax")), c.getString(c.getColumnIndex("multiple")), c.getString(c.getColumnIndex("billType")),
-                        c.getString(c.getColumnIndex("typeIndex")), c.getString(c.getColumnIndex("groupTypeIndex")), c.getString(c.getColumnIndex("createdDate")),
-                        c.getInt(c.getColumnIndex("idChanged")), c.getString(c.getColumnIndex("dateChanged")), c.getString(c.getColumnIndex("pcCodeExt")),
-                        c.getString(c.getColumnIndex("code")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("nameNosign")),
-                        c.getString(c.getColumnIndex("phoneByevn")), c.getString(c.getColumnIndex("phoneByecp")), c.getString(c.getColumnIndex("electricityMeter")),
-                        c.getString(c.getColumnIndex("inning")), c.getString(c.getColumnIndex("road")), c.getString(c.getColumnIndex("station")), c.getString(c.getColumnIndex("taxCode")),
-                        c.getString(c.getColumnIndex("trade")), c.getString(c.getColumnIndex("countPeriod")), c.getString(c.getColumnIndex("team")), c.getInt(c.getColumnIndex("type")),
-                        c.getString(c.getColumnIndex("lastQuery")), c.getInt(c.getColumnIndex("groupType")), c.getString(c.getColumnIndex("billingChannel")),
-                        c.getString(c.getColumnIndex("billingType")), c.getString(c.getColumnIndex("billingBy")), c.getString(c.getColumnIndex("cashierPay")),
-                        2, 2, 2, "", "", "", 1, currentDateandTime, 0, "") != -1) {
-                        if(mPayModel.insertPayLib(
-                                c.getString(c.getColumnIndex("edong")), c.getString(c.getColumnIndex("customerCode")),
-                                c.getString(c.getColumnIndex("customerPayCode")),c.getInt(c.getColumnIndex("billId")), c.getString(c.getColumnIndex("term")),
-                                c.getInt(c.getColumnIndex("amount")), c.getString(c.getColumnIndex("period")), c.getString(c.getColumnIndex("issueDate")),
-                                c.getString(c.getColumnIndex("strIssueDate")), c.getInt(c.getColumnIndex("status")), c.getString(c.getColumnIndex("seri")),
-                                c.getString(c.getColumnIndex("pcCode")), c.getString(c.getColumnIndex("handoverCode")), c.getString(c.getColumnIndex("cashierCode")),
-                                c.getString(c.getColumnIndex("bookCmis")), c.getString(c.getColumnIndex("fromDate")),
-                                c.getString(c.getColumnIndex("toDate")), c.getString(c.getColumnIndex("strFromDate")),
-                                c.getString(c.getColumnIndex("strToDate")), c.getString(c.getColumnIndex("home")),
-                                c.getFloat(c.getColumnIndex("tax")), c.getString(c.getColumnIndex("billNum")), c.getString(c.getColumnIndex("currency")),
-                                c.getString(c.getColumnIndex("priceDetails")), c.getString(c.getColumnIndex("numeDetails")), c.getString(c.getColumnIndex("amountDetails")),
-                                c.getString(c.getColumnIndex("oldIndex")), c.getString(c.getColumnIndex("newIndex")), c.getString(c.getColumnIndex("nume")), c.getInt(c.getColumnIndex("amountNotTax")),
-                                c.getString(c.getColumnIndex("amountTax")), c.getString(c.getColumnIndex("multiple")), c.getString(c.getColumnIndex("billType")),
-                                c.getString(c.getColumnIndex("typeIndex")), c.getString(c.getColumnIndex("groupTypeIndex")), c.getString(c.getColumnIndex("createdDate")),
-                                c.getInt(c.getColumnIndex("idChanged")), c.getString(c.getColumnIndex("dateChanged")), c.getString(c.getColumnIndex("pcCodeExt")),
-                                c.getString(c.getColumnIndex("code")), c.getString(c.getColumnIndex("name")), c.getString(c.getColumnIndex("nameNosign")),
-                                c.getString(c.getColumnIndex("phoneByevn")), c.getString(c.getColumnIndex("phoneByecp")), c.getString(c.getColumnIndex("electricityMeter")),
-                                c.getString(c.getColumnIndex("inning")), c.getString(c.getColumnIndex("road")), c.getString(c.getColumnIndex("station")), c.getString(c.getColumnIndex("taxCode")),
-                                c.getString(c.getColumnIndex("trade")), c.getString(c.getColumnIndex("countPeriod")), c.getString(c.getColumnIndex("team")), c.getInt(c.getColumnIndex("type")),
-                                c.getString(c.getColumnIndex("lastQuery")), c.getInt(c.getColumnIndex("groupType")), c.getString(c.getColumnIndex("billingChannel")),
-                                c.getString(c.getColumnIndex("billingType")), c.getString(c.getColumnIndex("billingBy")), c.getString(c.getColumnIndex("cashierPay")),
-                                2, 2, 2, "", "", "", 1, currentDateandTime, 0, "", currentDateandTime, 6) != -1) {
-                            Log.i("INFO", "");
-                        }
+            EntityDanhSachThu entityDanhSachThu = mPayModel.selectDebtColectionForDanhSachThu(entity.getBillId());
+            entityDanhSachThu.setPayments(2);
+            entityDanhSachThu.setPayStatus(2);
+            entityDanhSachThu.setStateOfDebt(2);
+            entityDanhSachThu.setStateOfCancel("");
+            entityDanhSachThu.setStateOfReturn("");
+            entityDanhSachThu.setSuspectedProcessingStatus("");
+            entityDanhSachThu.setStateOfPush(1);
+            entityDanhSachThu.setDateOfPush(currentDateandTime);
+            entityDanhSachThu.setCountPrintReceipt(0);
+            entityDanhSachThu.setPrintInfo("");
+            if (mPayModel.insertDebtCollection(entityDanhSachThu) != -1) {
+                EntityLichSuThanhToan entityLichSuThanhToan = mPayModel.selectDebtColectionForLichSu(entity.getBillId());
+                entityLichSuThanhToan.setPayments(2);
+                entityLichSuThanhToan.setPayStatus(2);
+                entityLichSuThanhToan.setStateOfDebt(2);
+                entityLichSuThanhToan.setStateOfCancel("");
+                entityLichSuThanhToan.setStateOfReturn("");
+                entityLichSuThanhToan.setSuspectedProcessingStatus("");
+                entityLichSuThanhToan.setStateOfPush(1);
+                entityLichSuThanhToan.setDateOfPush(currentDateandTime);
+                entityLichSuThanhToan.setCountPrintReceipt(0);
+                entityLichSuThanhToan.setPrintInfo("");
+                entityLichSuThanhToan.setDateIncurred(currentDateandTime);
+                entityLichSuThanhToan.setTradingCode(6);
+                if(mPayModel.insertPayLib(entityLichSuThanhToan) != -1) {
+                    Log.i("INFO", "");
                 }
             }
         }
