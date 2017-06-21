@@ -29,7 +29,7 @@ public interface IPayView extends ICommonView {
 
     void showCountBillsAndTotalMoneyInDialog(int totalBillsInList, long totalMoneyInList);
 
-    void showMessageNotifyBillOnlineDialog(String message);
+    void showMessageNotifyBillOnlineDialog(String message, boolean isMutilMessage);
 
     void showPayingRViewDialogStart();
 

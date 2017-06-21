@@ -368,16 +368,16 @@ public class PayModel extends CommonModel {
             ,dateOfPush,countPrintReceipt,printInfo,dateIncurred,tradingCode);
     }
 
-    public Cursor getCustomer(String code) {
-        return sqLiteConnection.getCustomer(code);
-    }
 
     public boolean checkIsHasBillNotPayTermBefore(String edong, String code, int billId) {
         boolean failInput =
                 TextUtils.isEmpty(edong) ||
                         TextUtils.isEmpty(code);
+
         if (failInput)
             return false;
+
+        //lấy term của hóa đơn
         String term = sqLiteConnection.getTermBillOfCustomer(edong, code, billId);
         if(term== null)
             return false;
@@ -385,4 +385,7 @@ public class PayModel extends CommonModel {
         return sqLiteConnection.checkIsHasBillNotPayTermBefore(edong, code, term);
     }
 
+    public Cursor getCustomer(String code) {
+        return sqLiteConnection.getCustomer(code);
+    }
 }

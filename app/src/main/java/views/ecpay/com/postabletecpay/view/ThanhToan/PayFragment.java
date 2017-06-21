@@ -51,6 +51,7 @@ import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
 
 /**
@@ -116,6 +117,9 @@ public class PayFragment extends Fragment implements
     @Nullable
     @BindView(R.id.rv_frag_thanhtoan_search_online_progress)
     RelativeLayout rvProgressSearchOnline;
+    @Nullable
+    @BindView(R.id.tv_search)
+    TextView tvTitleSearch;
     @Nullable
     @BindView(R.id.tv_frag_thanh_toan_search_online_message)
     TextView tvMessageNotifySearchOnlne;
@@ -410,7 +414,7 @@ public class PayFragment extends Fragment implements
     @Optional
     @OnClick(R.id.btn_dialog_thanhtoan_pay)
     public void clickPayPayingOnlineDialog(View view) {
-        if(Common.isConnectingWifi(PayFragment.this.getActivity())) {
+        if (Common.isConnectingWifi(PayFragment.this.getActivity())) {
 //      if(Common.isNetworkConnected(PayFragment.this.getActivity())) {
             mIPayPresenter.callPayingBillOnline(mEdong);
         } else {
@@ -429,7 +433,7 @@ public class PayFragment extends Fragment implements
 
     @Optional
     @OnClick(R.id.btn_dialog_delete_bill_continued)
-    public void clickContinuedDialog(View view) {
+    public void clickContinuedDeleteBillDialog(View view) {
         mIPayPresenter.callDeleteOnlineSoap(mEdong, etReasonDeleteBillDeleteDialog.getText().toString().trim());
     }
     //endregion
@@ -608,7 +612,7 @@ public class PayFragment extends Fragment implements
     public void showSearchOnlineProcess() {
         if (rvProgressSearchOnline.getVisibility() == View.GONE)
             rvProgressSearchOnline.setVisibility(View.VISIBLE);
-
+        tvTitleSearch.setVisibility(View.VISIBLE);
         pbarSearchOnline.setVisibility(View.VISIBLE);
         pbarSearchOnline.setIndeterminate(true);
         ibtnResearchOnline.setVisibility(View.GONE);
@@ -627,9 +631,30 @@ public class PayFragment extends Fragment implements
         if (message == null || message.isEmpty() || message.trim().equals(Common.TEXT_EMPTY))
             return;
 
+        tvTitleSearch.setVisibility(View.VISIBLE);
         pbarSearchOnline.setVisibility(View.GONE);
         ibtnResearchOnline.setVisibility(View.VISIBLE);
         ibtnCancelSearchOnline.setVisibility(View.GONE);
+        Common.runAnimationClickViewScale(tvMessageNotifySearchOnlne, R.anim.scale_view_pull, TIME_DELAY_ANIM);
+        tvMessageNotifySearchOnlne.setVisibility(View.VISIBLE);
+        tvMessageNotifySearchOnlne.setText(message);
+    }
+
+    /**
+     * Show any message without search online on pay fragment
+     *
+     * @param message
+     */
+    public void showMessageNotifyPayfrag(String message) {
+        if (TextUtils.isEmpty(message))
+            return;
+
+        tvTitleSearch.setVisibility(View.GONE);
+        rvProgressSearchOnline.setVisibility(View.VISIBLE);
+        pbarSearchOnline.setVisibility(View.GONE);
+        ibtnCancelSearchOnline.setVisibility(View.GONE);
+        ibtnResearchOnline.setVisibility(View.GONE);
+        Common.runAnimationClickViewScale(tvMessageNotifySearchOnlne, R.anim.scale_view_pull, TIME_DELAY_ANIM);
         tvMessageNotifySearchOnlne.setVisibility(View.VISIBLE);
         tvMessageNotifySearchOnlne.setText(message);
     }
@@ -680,7 +705,7 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
-    public void showMessageNotifyBillOnlineDialog(String message) {
+    public void showMessageNotifyBillOnlineDialog(String message, boolean isMutilMessage) {
         if (message == null)
             return;
         if (isHasNullViewPayingOnlineDialog())
@@ -689,8 +714,9 @@ public class PayFragment extends Fragment implements
         showPayingRViewDialogStart();
         showPayingRviewDialogFinish();
 
+        Common.runAnimationClickViewScale(tvMessageDialog, R.anim.scale_view_pull, TIME_DELAY_ANIM);
         tvMessageDialog.setVisibility(View.VISIBLE);
-        tvMessageDialog.setText(message);
+        tvMessageDialog.setText(isMutilMessage ? tvMessageDialog.getText().toString() + Common.TEXT_ENTER + message : message);
     }
 
     @Override
@@ -855,6 +881,7 @@ public class PayFragment extends Fragment implements
             return;
         cardMessage.setVisibility(View.VISIBLE);
         pbarBillDeleteDialog.setVisibility(View.GONE);
+        Common.runAnimationClickViewScale(tvMessageBillDeleteDialog, R.anim.scale_view_pull, TIME_DELAY_ANIM);
         tvMessageBillDeleteDialog.setVisibility(View.VISIBLE);
         tvMessageBillDeleteDialog.setText(message);
     }

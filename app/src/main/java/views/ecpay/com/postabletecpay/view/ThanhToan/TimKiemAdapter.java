@@ -24,7 +24,7 @@ public class TimKiemAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return Common.TYPE_ACCOUNT.values().length;
+        return Common.TYPE_SEARCH.values().length;
     }
 
     @Override

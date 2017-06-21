@@ -1121,7 +1121,7 @@ public class Base64
 //        try {
             decoded = decode( source, 0, source.length, Base64.NO_OPTIONS );
 //        } catch( java.io.IOException ex ) {
-//            assert false : "IOExceptions only come from GZipping, which is turned off: " + ex.getMessage();
+//            assert false : "IOExceptions only come from GZipping, which is turned off: " + ex.getMessageError();
 //        }
         return decoded;
     }
