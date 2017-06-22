@@ -574,7 +574,7 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
-    public void showPayRecyclerPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) {
+    public void showPayRecyclerPage(List<PayAdapter.PayEntityAdapter> adapterList,  int indexBegin, int indexEnd, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) {
         btnPre.setEnabled(true);
         btnNext.setEnabled(true);
         tvPage.setText(String.valueOf(pageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
@@ -595,7 +595,7 @@ public class PayFragment extends Fragment implements
             setEnablePreNext(3);
 
 
-        payAdapter = new PayAdapter(this.getContext(), this, adapterList);
+        payAdapter = new PayAdapter(this.getContext(), this, adapterList, indexBegin, indexEnd);
         rvKH.setAdapter(payAdapter);
         rvKH.invalidate();
 
@@ -1019,8 +1019,8 @@ public class PayFragment extends Fragment implements
         }
     }
 
-    public void showBillCheckedFragment(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomer) {
-        mIPayPresenter.callProcessDataBillFragmentChecked(edong, code, bill, posCustomer);
+    public void showBillCheckedFragment(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomer, int indexBegin, int indexEnd) {
+        mIPayPresenter.callProcessDataBillFragmentChecked(edong, code, bill, posCustomer, indexBegin, indexEnd);
     }
 
     public void processDialogDeleteBillOnline(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside) {

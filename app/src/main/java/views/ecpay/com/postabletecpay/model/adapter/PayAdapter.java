@@ -39,7 +39,11 @@ import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.BillInside
 public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     private static Context sContext;
     private static IPayView sIPayView;
+
+    //giá trị billList[0] = mAdapterList[indexBegin] , billList[billList.size()] = mAdapterList[indexEnd]
+    private int indexBegin, indexEnd;
     private PayModel payModel;
+
     private static List<PayEntityAdapter> billList = new ArrayList<>();
     @BindDrawable(R.drawable.bg_button_orange)
     Drawable green;
@@ -51,10 +55,12 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     private static int positionCustomer;
     private boolean onBind;
 
-    public PayAdapter(Context sContext, IPayView sIPayView, List<PayEntityAdapter> billList) {
+    public PayAdapter(Context sContext, IPayView sIPayView, List<PayEntityAdapter> billList, int indexBegin, int indexEnd) {
         this.sContext = sContext;
         this.sIPayView = sIPayView;
         this.billList = billList;
+        this.indexBegin = indexBegin;
+        this.indexEnd = indexEnd;
 
         payModel = new PayModel(sIPayView.getContextView());
     }
@@ -462,7 +468,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                     BillEntityAdapter bill = billList.get(position);
                     bill.setChecked(checked);
 
-                    interaction.processCheckedBillFragment(edong, code,  posCustomerInside, billList, position);
+                    interaction.processCheckedBillFragment(edong, code,  posCustomerInside, billList, position, indexBegin, indexEnd);
                 }
             }
 
@@ -501,7 +507,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     }
 
     public interface OnInterationBillInsidePayAdapter {
-        void processCheckedBillFragment(String edong, String code, int posCustomer, List<BillEntityAdapter>  billList, int posBillInside);
+        void processCheckedBillFragment(String edong, String code, int posCustomer, List<BillEntityAdapter>  billList, int posBillInside, int indexBegin, int indexEnd);
 
         void processDeleteBillOnlineFragment(String edong, String code, BillEntityAdapter bill, int posCustomerInside);
     }

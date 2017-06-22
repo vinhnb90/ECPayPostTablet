@@ -1,7 +1,6 @@
 package views.ecpay.com.postabletecpay.presenter;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -142,7 +141,7 @@ public class PayPresenter implements IPayPresenter {
         listBillCheckedFragment = mPayModel.getAllBillOfCustomerCheckedWithStatusPay(edong, Common.STATUS_BILLING.CHUA_THANH_TOAN);
         refreshTotalBillsAndTotalMoneyInFragment(edong, Common.STATUS_BILLING.CHUA_THANH_TOAN);
 
-        mIPayView.showPayRecyclerPage(fitter, pageIndex, totalPage, infoSearch, isSeachOnline);
+        mIPayView.showPayRecyclerPage(fitter, indexBegin, indexEnd, pageIndex, totalPage, infoSearch, isSeachOnline);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -375,7 +374,7 @@ public class PayPresenter implements IPayPresenter {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy'T'HH:mm:ss");
         String currentDateandTime = sdf.format(new Date());
 
-        if(mPayModel.updatePayOffine(entity.getBillId(), 2, MainActivity.mEdong) != -1) {
+        if (mPayModel.updatePayOffine(entity.getBillId(), 2, MainActivity.mEdong) != -1) {
             EntityDanhSachThu entityDanhSachThu = mPayModel.selectDebtColectionForDanhSachThu(entity.getBillId());
             entityDanhSachThu.setPayments(2);
             entityDanhSachThu.setPayStatus(2);
@@ -401,7 +400,7 @@ public class PayPresenter implements IPayPresenter {
                 entityLichSuThanhToan.setPrintInfo("");
                 entityLichSuThanhToan.setDateIncurred(currentDateandTime);
                 entityLichSuThanhToan.setTradingCode(6);
-                if(mPayModel.insertPayLib(entityLichSuThanhToan) != -1) {
+                if (mPayModel.insertPayLib(entityLichSuThanhToan) != -1) {
                     Log.i("INFO", "");
                 }
             }
@@ -705,21 +704,21 @@ public class PayPresenter implements IPayPresenter {
     }
 
     @Override
-    public void callProcessDataBillFragmentChecked(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomer) {
+    public void callProcessDataBillFragmentChecked(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomer, int indexBegin, int indexEnd) {
         if (TextUtils.isEmpty(edong))
             return;
         if (TextUtils.isEmpty(code))
             return;
         if (bill == null)
             return;
-        if (posCustomer >= mAdapterList.size())
+        if (indexEnd >= mAdapterList.size())
             return;
 
         mPayModel.updateBillIsChecked(edong, code, (int) bill.getBillId(), bill.isChecked());
 
         //show billDeleteOnline or not show billDeleteOnline
         mPayModel.updateCustomerIsShowBill(edong, code, bill.isChecked());
-        mAdapterList.get(posCustomer).setShowBill(bill.isChecked());
+        mAdapterList.get(indexBegin + posCustomer).setShowBill(bill.isChecked());
 
         //show total bills and total money of all bills is checked
         refreshTotalBillsAndTotalMoneyInFragment(edong, Common.STATUS_BILLING.CHUA_THANH_TOAN);

@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements
 
     //region PayAdapter.BillInsidePayAdapter.BillInsidePayViewHolder.OnInterationBillInsidePayAdapter
     @Override
-    public void processCheckedBillFragment(String edong, String code, int posCustomer, List<PayAdapter.BillEntityAdapter>  billList, int posBillInside) {
+    public void processCheckedBillFragment(String edong, String code, int posCustomer, List<PayAdapter.BillEntityAdapter>  billList, int posBillInside,int indexBegin, int indexEnd) {
         if (TextUtils.isEmpty(edong))
             return;
         if (TextUtils.isEmpty(code))
@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
-        payFragment.showBillCheckedFragment(edong, code, bill, posCustomer);
+        payFragment.showBillCheckedFragment(edong, code, bill, posCustomer, indexBegin, indexEnd);
     }
 
     @Override
