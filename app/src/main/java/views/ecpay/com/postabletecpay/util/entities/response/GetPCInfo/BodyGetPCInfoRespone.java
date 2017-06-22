@@ -15,16 +15,16 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ListEvn
 public class BodyGetPCInfoRespone extends BodyRespone {
 
 
-    public List<ListEvnPCLoginResponse> getListEvnPCLoginResponse() {
+    public String getListEvnPCLoginResponse() {
         return listEvnPCLoginResponse;
     }
 
-    public void setListEvnPCLoginResponse(List<ListEvnPCLoginResponse> listEvnPCLoginResponse) {
+    public void setListEvnPCLoginResponse(String listEvnPCLoginResponse) {
         this.listEvnPCLoginResponse = listEvnPCLoginResponse;
     }
 
-    @SerializedName("listEvnPC")
+    @SerializedName("list-pc-info")
     @Expose
-    private List<ListEvnPCLoginResponse> listEvnPCLoginResponse = null;
+    private String listEvnPCLoginResponse = null;
 
 }

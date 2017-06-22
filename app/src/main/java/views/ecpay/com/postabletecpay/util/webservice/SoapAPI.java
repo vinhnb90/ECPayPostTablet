@@ -25,6 +25,8 @@ import views.ecpay.com.postabletecpay.model.adapter.ChangePassRequestAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.EvnRequestAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.LoginRequestAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.request.Base.FooterRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.Base.HeaderRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.Base.Request;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityBillingOnline.BillingOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityBillingOnline.BodyBillingOnlineRequest;
@@ -71,6 +73,8 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.Foote
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.HeaderPostBillRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.ListTransactionOff;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.PostBillRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchCustomer.BodySearchCustomerRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchCustomer.SearchCustomerRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.BodySearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.SearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.GetPCInfo.BodyGetPCInfoRequest;
@@ -88,6 +92,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEVNRe
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogout.LogoutResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityPostBill.PostBillResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchCustomer.SearchCustomerRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.GetPCInfo.GetPCInfoRespone;
 
@@ -349,6 +354,71 @@ public class SoapAPI {
         {
             //Test Deserialised
             final GetPCInfoRequest parsedRequest = gson.fromJson(jsonResult, GetPCInfoRequest.class);
+            Log.d("LOG", "jsonResult = " + jsonResult);
+        }
+
+        return jsonResult;
+    }
+
+    //region create JSON Request service
+    public static String getJsonSearchCustomer(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver,
+                                          String signatureEncrypted, String code, String name, String phone, String address,
+                                          String gcs, String pcCode, int directEvn, String accountId){
+        if (agent == null || agent.isEmpty() || agent.trim().equals(""))
+            return null;
+        if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
+            return null;
+        if (commandId == null || commandId.isEmpty() || commandId.trim().equals(""))
+            return null;
+        if (mac == null || mac.isEmpty() || mac.trim().equals(""))
+            return null;
+        if (diskDriver == null || diskDriver.isEmpty() || diskDriver.trim().equals(""))
+            return null;
+        if (signatureEncrypted == null || signatureEncrypted.isEmpty() || signatureEncrypted.trim().equals(""))
+            return null;
+        if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
+            return null;
+
+
+        HeaderRequest header = new HeaderRequest();
+        header.setAgent(agent);
+        header.setPassword(agentEncypted);
+        header.setCommandId(commandId);
+
+        BodySearchCustomerRequest body = new BodySearchCustomerRequest();
+        body.setAuditNumber(auditNumber);
+        body.setMac(mac);
+        body.setDiskDrive(diskDriver);
+        body.setSignature(signatureEncrypted);
+        body.setCustomerName(name);
+        body.setPcCode(pcCode);
+        body.setCustomerPhone(phone);
+        body.setCustomerAddress(address);
+        body.setBookCmis(gcs);
+        body.setDirectEvn(directEvn);
+        body.setCustomerCode(code);
+
+        FooterRequest footer = new FooterRequest();
+        footer.setAccountIdt(accountId);
+
+        final Request request = new SearchCustomerRequest();
+        request.setHeader(header);
+        request.setBody(body);
+        request.setFooter(footer);
+
+
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        Type type = new TypeToken<SearchCustomerRequest>() {
+        }.getType();
+        final Gson gson = gsonBuilder.create();
+
+        //Serialised
+        final String jsonResult = gson.toJson(request, type);
+
+        if(TEST_REQUEST)
+        {
+            //Test Deserialised
+            final SearchCustomerRequest parsedRequest = gson.fromJson(jsonResult, SearchCustomerRequest.class);
             Log.d("LOG", "jsonResult = " + jsonResult);
         }
 
@@ -1230,6 +1300,7 @@ public class SoapAPI {
             final Gson gson = gsonBuilder.create();
             respone = gson.fromJson(data, GetPCInfoRespone.class);
 
+
             return respone;
         }
 
@@ -1261,6 +1332,115 @@ public class SoapAPI {
         }
 
         public void callCountdown(final AsyncSoapGetPCInfo soap) {
+            if (soap == null)
+                return;
+
+            callBack.onTimeOut(soap);
+        }
+
+        public boolean isEndCallSoap() {
+            return isEndCallSoap;
+        }
+
+        public void setEndCallSoap(boolean endCallSoap) {
+            isEndCallSoap = endCallSoap;
+        }
+    }
+
+
+    public static class AsyncSoapSearchCustomer extends AsyncTask<String, String, SearchCustomerRespone> {
+
+        //request action to eStore
+        private static final String METHOD_NAME = "execute";
+        private static final String NAMESPACE = "http://services.ecpay.org/";
+        private static final String URL = ENDPOINT_URL;
+        private static final String SOAP_ACTION = "request action to eStore";
+        private static final String METHOD_PARAM = "message";
+        private AsyncSoapCallBack callBack;
+        private boolean isEndCallSoap = false;
+
+        public AsyncSoapSearchCustomer( AsyncSoapCallBack callBack) throws Exception {
+            this.callBack = callBack;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            callBack.onPre(this);
+        }
+
+        @Override
+        protected SearchCustomerRespone doInBackground(String... jsons) {
+            String json = jsons[0];
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            request.addProperty(METHOD_PARAM, json);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE ht;
+            SoapPrimitive response = null;
+
+            try {
+                ht = new HttpTransportSE(URL);
+                ht.call(SOAP_ACTION, envelope);
+                response = (SoapPrimitive) envelope.getResponse();
+            } catch (Exception e) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "Không nhận được dữ liệu");
+                return null;
+            }
+
+            if (response == null) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                return null;
+            }
+
+            String data = response.toString();
+            if (data.isEmpty()) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return null;
+            }
+
+            SearchCustomerRespone respone = null;
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+            final Gson gson = gsonBuilder.create();
+            respone = gson.fromJson(data, SearchCustomerRespone.class);
+
+
+            return respone;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            String message = values[0];
+            isEndCallSoap = true;
+            callBack.onUpdate(message);
+        }
+
+        @Override
+        protected void onPostExecute(SearchCustomerRespone respone) {
+            super.onPostExecute(respone);
+            if (respone == null)
+                return;
+            isEndCallSoap = true;
+            callBack.onPost(respone);
+        }
+
+        public static abstract class AsyncSoapCallBack {
+            public abstract void onPre(final AsyncSoapSearchCustomer soap);
+
+            public abstract void onUpdate(String message);
+
+            public abstract void onPost(SearchCustomerRespone response);
+
+            public abstract void onTimeOut(final AsyncSoapSearchCustomer soap);
+        }
+
+        public void callCountdown(final AsyncSoapSearchCustomer soap) {
             if (soap == null)
                 return;
 

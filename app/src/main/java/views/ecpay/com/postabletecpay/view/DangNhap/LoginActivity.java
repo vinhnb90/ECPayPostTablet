@@ -17,6 +17,11 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.List;
 
 import butterknife.BindView;
@@ -30,6 +35,9 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ListEvnPCLoginResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ResponseLoginResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.GetPCInfo.BodyGetPCInfoRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.GetPCInfo.GetPCInfoRespone;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.BaseActivity;
@@ -168,6 +176,19 @@ public class LoginActivity extends BaseActivity implements ILoginView {
                 @Override
                 public void onPost(GetPCInfoRespone response, String phone) {
                     Log.d("LOG", "phone = " + phone);
+
+                    String responseLoginResponseData = ((BodyGetPCInfoRespone)response.getBody()).getListEvnPCLoginResponse();
+                    // định dạng kiểu Object JSON
+                    Type type = new TypeToken<List<ListEvnPCLoginResponse>>() {
+                    }.getType();
+                    List<ListEvnPCLoginResponse> responseLoginResponse = null;
+                    try {
+                        responseLoginResponse = new Gson().fromJson(responseLoginResponseData, type);
+                    } catch (JsonSyntaxException e) {
+                        e.printStackTrace();
+                    }
+
+
                 }
 
                 @Override

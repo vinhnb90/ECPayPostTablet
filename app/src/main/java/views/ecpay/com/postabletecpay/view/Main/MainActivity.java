@@ -29,6 +29,7 @@ import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
+import views.ecpay.com.postabletecpay.view.TrangChu.SearchCustomerFragment;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.NEGATIVE_ONE;
@@ -153,6 +154,8 @@ public class MainActivity extends AppCompatActivity implements
 
         if (fragmentVisibling instanceof PayFragment)
             ((PayFragment) fragmentVisibling).onPauseScannerBarcode();
+        if (fragmentVisibling instanceof SearchCustomerFragment)
+            ((SearchCustomerFragment) fragmentVisibling).onPauseScannerBarcode();
     }
 
     @Override
@@ -173,6 +176,9 @@ public class MainActivity extends AppCompatActivity implements
 
             if (fragmentVisibling instanceof PayFragment)
                 ((PayFragment) fragmentVisibling).onPauseScannerBarcode();
+
+            if (fragmentVisibling instanceof SearchCustomerFragment)
+                ((SearchCustomerFragment) fragmentVisibling).onPauseScannerBarcode();
         }
     }
 
@@ -306,6 +312,8 @@ public class MainActivity extends AppCompatActivity implements
         Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
         if (fragmentVisibling instanceof PayFragment)
             ((PayFragment) fragmentVisibling).fillResultToTextBarcodeDialog(result.getText());
+        if (fragmentVisibling instanceof SearchCustomerFragment)
+            ((SearchCustomerFragment) fragmentVisibling).fillResultToTextBarcodeDialog(result.getText());
     }
 
     @Override
@@ -315,6 +323,8 @@ public class MainActivity extends AppCompatActivity implements
         Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
         if (fragmentVisibling instanceof PayFragment)
             ((PayFragment) fragmentVisibling).fillResultToSearchText(textBarcode);
+        if (fragmentVisibling instanceof SearchCustomerFragment)
+            ((SearchCustomerFragment) fragmentVisibling).fillResultToSearchText(textBarcode);
     }
 
     @Override
@@ -322,6 +332,9 @@ public class MainActivity extends AppCompatActivity implements
         Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
         if (fragmentVisibling instanceof PayFragment) {
             ((PayFragment) fragmentVisibling).bindViewAgain();
+        }
+        if (fragmentVisibling instanceof SearchCustomerFragment) {
+            ((SearchCustomerFragment) fragmentVisibling).bindViewAgain();
         }
     }
 
