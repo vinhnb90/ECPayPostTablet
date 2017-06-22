@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ECPAY.iml" filepath="$PROJECT_DIR$/ECPAY.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ECPAYPosTablet.iml" filepath="$PROJECT_DIR$/ECPAYPosTablet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ECPayPosTablet.iml" filepath="$PROJECT_DIR$/ECPayPosTablet.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/git2.iml" filepath="$PROJECT_DIR$/git2.iml" />
     </modules>
