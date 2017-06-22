@@ -36,6 +36,9 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 public class SearchCustomerFragment extends Fragment implements ISearchCustomer, View.OnClickListener {
 
 
+
+
+
     @Nullable
     @BindView(R.id.recycle_list_customer)
     RecyclerView rvKH;
