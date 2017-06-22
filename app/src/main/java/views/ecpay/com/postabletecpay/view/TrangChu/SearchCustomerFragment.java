@@ -3,6 +3,8 @@ package views.ecpay.com.postabletecpay.view.TrangChu;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +22,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import views.ecpay.com.postabletecpay.R;
+import views.ecpay.com.postabletecpay.model.adapter.CustomerAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.view.Util.ResizeAnimation;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
@@ -30,6 +34,11 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
  */
 
 public class SearchCustomerFragment extends Fragment implements ISearchCustomer, View.OnClickListener {
+
+
+    @Nullable
+    @BindView(R.id.recycle_list_customer)
+    RecyclerView rvKH;
 
     private String eDong;
     private Unbinder unbinder;
@@ -70,6 +79,33 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomer,
         btnExpand.setRotation(180F);
 
         layout_timkiem_nangcao.setVisibility(View.GONE);
+
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        rvKH.setLayoutManager(layoutManager);
+
+        List<Customer> lst = new ArrayList<>();
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+        lst.add(new Customer());
+
+        rvKH.setAdapter(new CustomerAdapter(lst));
+        rvKH.invalidate();
+
 
         return view;
     }
