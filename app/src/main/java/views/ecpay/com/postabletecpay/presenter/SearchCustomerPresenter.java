@@ -13,6 +13,7 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchCustomer.SearchCustomerRespone;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchCustomerBill.SearchCustomerBillRespone;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.TrangChu.ISearchCustomerView;
 
@@ -27,9 +28,9 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
     private ISearchCustomerView searchCustomerView;
     private String mEDong;
 
-    private  SoapAPI.AsyncSoapSearchCustomer.AsyncSoapCallBack callBack = new SoapAPI.AsyncSoapSearchCustomer.AsyncSoapCallBack() {
+    private  SoapAPI.AsyncSoapSearchCustomerBill.AsyncSoapCallBack callBack = new SoapAPI.AsyncSoapSearchCustomerBill.AsyncSoapCallBack() {
         @Override
-        public void onPre(SoapAPI.AsyncSoapSearchCustomer soap) {
+        public void onPre(SoapAPI.AsyncSoapSearchCustomerBill soap) {
 
         }
 
@@ -39,12 +40,12 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
         }
 
         @Override
-        public void onPost(SearchCustomerRespone response) {
+        public void onPost(SearchCustomerBillRespone response) {
             Log.d("LOG", "RESOUN");
         }
 
         @Override
-        public void onTimeOut(SoapAPI.AsyncSoapSearchCustomer soap) {
+        public void onTimeOut(SoapAPI.AsyncSoapSearchCustomerBill soap) {
 
         }
     };
@@ -68,14 +69,32 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
         }
 
         try {
-            configInfo = Common.setupInfoRequest(context, mEDong, Common.COMMAND_ID.SEARCH_CUSTOMER.toString(), versionApp, pcCode);
+            configInfo = Common.setupInfoRequest(context, mEDong, Common.COMMAND_ID.SEARCH_CUSTOMER_BILL.toString(), versionApp);
         } catch (Exception e) {
 
             return;
         }
 
 
-        String json = SoapAPI.getJsonSearchCustomer(
+//        String json = SoapAPI.getJsonSearchCustomer(
+//                configInfo.getAGENT(),
+//                configInfo.getAgentEncypted(),
+//                configInfo.getCommandId(),
+//                configInfo.getAuditNumber(),
+//                configInfo.getMacAdressHexValue(),
+//                configInfo.getDiskDriver(),
+//                configInfo.getSignatureEncrypted(),
+//                maKH,
+//                tenKH,
+//                phoneKH,
+//                dcKH,
+//                gtKH,
+//                pcCode,
+//                directEVN,
+//                configInfo.getAccountId()
+//        );
+
+        String json = SoapAPI.getJsonSearchCustomerBill(
                 configInfo.getAGENT(),
                 configInfo.getAgentEncypted(),
                 configInfo.getCommandId(),
@@ -84,12 +103,6 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
                 configInfo.getDiskDriver(),
                 configInfo.getSignatureEncrypted(),
                 maKH,
-                tenKH,
-                phoneKH,
-                dcKH,
-                gtKH,
-                pcCode,
-                directEVN,
                 configInfo.getAccountId()
         );
 
@@ -100,7 +113,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
 
 
         try {
-            final SoapAPI.AsyncSoapSearchCustomer soapChangePass = new SoapAPI.AsyncSoapSearchCustomer(callBack);
+            final SoapAPI.AsyncSoapSearchCustomerBill soapChangePass = new SoapAPI.AsyncSoapSearchCustomerBill(callBack);
 
             if (soapChangePass.getStatus() != AsyncTask.Status.RUNNING) {
                 soapChangePass.execute(json);
@@ -109,7 +122,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
                 final Thread soapChangePassThread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        ChangePassResponse changePassResponse = null;
+                        SearchCustomerBillRespone changePassResponse = null;
 
                         //call time out
                         try {
@@ -130,5 +143,37 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
             //iCashTranferView.showText(e.getMessage());
             return;
         }
+
+//        try {
+//            final SoapAPI.AsyncSoapSearchCustomer soapChangePass = new SoapAPI.AsyncSoapSearchCustomer(callBack);
+//
+//            if (soapChangePass.getStatus() != AsyncTask.Status.RUNNING) {
+//                soapChangePass.execute(json);
+//
+//                //thread time out
+//                final Thread soapChangePassThread = new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        ChangePassResponse changePassResponse = null;
+//
+//                        //call time out
+//                        try {
+//                            Thread.sleep(Common.TIME_OUT_CONNECT);
+//                        } catch (InterruptedException e) {
+//                            //iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+//                        } finally {
+//                            if (changePassResponse == null) {
+//                                soapChangePass.callCountdown(soapChangePass);
+//                            }
+//                        }
+//                    }
+//                });
+//
+//                soapChangePassThread.start();
+//            }
+//        } catch (Exception e) {
+//            //iCashTranferView.showText(e.getMessage());
+//            return;
+//        }
     }
 }

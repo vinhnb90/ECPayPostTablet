@@ -219,8 +219,8 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
 
         if(v.getId() == R.id.btnSearch2)
         {
-            showDialogBarcode();
-            //searchCustomerPresenter.search("", "Da", "", "", "", "PA0503", 2);
+            //showDialogBarcode();
+            searchCustomerPresenter.search("PD02T324514", "", "", "", "", "PA0503", 2);
             return;
         }
     }

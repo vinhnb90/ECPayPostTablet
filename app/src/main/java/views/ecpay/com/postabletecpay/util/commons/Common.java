@@ -772,7 +772,8 @@ public class Common {
         PUT_TRANSACTION_OFF,
         CASH_TRANSFER,
         GET_PC_INFO,
-        SEARCH_CUSTOMER;
+        SEARCH_CUSTOMER,
+        SEARCH_CUSTOMER_BILL;
 
         @Override
         public String toString() {
@@ -804,6 +805,8 @@ public class Common {
                 return  "GET-PC-INFO";
             if(this == SEARCH_CUSTOMER)
                 return  "CUSTOMER";
+            if(this == SEARCH_CUSTOMER_BILL)
+                return  "CUSTOMER-BILL";
             return super.toString();
         }
     }
