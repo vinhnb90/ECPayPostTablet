@@ -9,9 +9,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import org.apache.log4j.chainsaw.Main;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +43,7 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
+import views.ecpay.com.postabletecpay.view.Util.BarcodeScannerDialog;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 
@@ -59,11 +64,8 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
 
     private ISearchCustomerPresenter searchCustomerPresenter;
 
-    private PayFragment.OnPayFragmentInteractionListener listener;
-    private Dialog dialogBarcode;
     private View rootView;
 
-    private ZXingScannerView mScannerView;
 
     public static SearchCustomerFragment newInstance(String eDong) {
         Bundle bundle = new Bundle();
@@ -83,48 +85,12 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
     @BindView(R.id.btnExpand)
     ImageButton btnExpand;
     @Nullable
-    @BindView(R.id.btnSearch)
-    ImageButton btnSearch;
+    @BindView(R.id.btnScanCode)
+    ImageButton btnScanCode;
     @Nullable
     @BindView(R.id.btnSearch2)
     Button btnSearch2;
 
-
-    //For dialog Barcode
-    private String textBarcode = Common.TEXT_EMPTY;
-    private boolean isScannerBarcode = false;
-    private boolean isOKText = false;
-
-
-
-    @Nullable
-    @BindView(R.id.ll_dialog_barcode)
-    LinearLayout llBarcode;
-    @Nullable
-    @BindView(R.id.tv_dialog_barcode_text)
-    TextView tvTextBarcode;
-    @Optional
-    @OnClick(R.id.btn_dialog_barcode_cancel)
-    public void clickRefreshBarcode(View view) {
-        if (dialogBarcode == null || mScannerView == null || tvTextBarcode == null)
-            return;
-
-        tvTextBarcode.setText(Common.TEXT_EMPTY);
-        mScannerView.setResultHandler((MainActivity) getContext()); // Register ourselves as a handler for scan results.
-        mScannerView.startCamera();
-        listener.refreshCamera(mScannerView);
-    }
-
-    @Optional
-    @OnClick(R.id.btn_dialog_barcode_ok)
-    public void clickOKBarcode(View view) {
-        if (dialogBarcode == null || tvTextBarcode == null)
-            return;
-        isOKText = true;
-        textBarcode = tvTextBarcode.getText().toString().trim();
-        dialogBarcode.dismiss();
-    }
-    //End dialog Barcode
 
     @Nullable
     @Override
@@ -140,7 +106,7 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
 
 
         btnExpand.setOnClickListener(this);
-        btnSearch.setOnClickListener(this);
+        btnScanCode.setOnClickListener(this);
         btnSearch2.setOnClickListener(this);
 
         isCurrentExpand = false;
@@ -153,25 +119,8 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rvKH.setLayoutManager(layoutManager);
 
-        List<Customer> lst = new ArrayList<>();
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
-        lst.add(new Customer());
 
-        rvKH.setAdapter(new CustomerAdapter(lst));
+        rvKH.setAdapter(new CustomerAdapter(this));
         rvKH.invalidate();
 
 
@@ -182,25 +131,6 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-    }
-
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof PayFragment.OnPayFragmentInteractionListener)
-            listener = (PayFragment.OnPayFragmentInteractionListener) activity;
-        else
-            throw new ClassCastException("activity must be implement OnPayFragmentInteractionListener!");
-
-    }
-
-
-    public void bindViewAgain()
-    {
-        if (unbinder != null)
-            unbinder.unbind();
-        unbinder = ButterKnife.bind(this, rootView);
     }
 
     @Override
@@ -219,90 +149,44 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
 
         if(v.getId() == R.id.btnSearch2)
         {
-            //showDialogBarcode();
             searchCustomerPresenter.search("PD02T324514", "", "", "", "", "PA0503", 2);
+            return;
+        }
+        if(v.getId() == R.id.btnScanCode)
+        {
+            this.showDialogBarcode();
             return;
         }
     }
 
     @Override
     public void showDialogBarcode() {
-//        if (this.getActivity() instanceof CallbackBarcodeDialog) {
-//            final CallbackBarcodeDialog callbackBarcodeDialog = (CallbackBarcodeDialog) getContextView();
-
-        dialogBarcode = new Dialog(this.getActivity());
-        dialogBarcode.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        final View view = inflater.inflate(R.layout.dialog_barcode, null);
-        dialogBarcode.setContentView(view);
-        dialogBarcode.setCanceledOnTouchOutside(true);
-        dialogBarcode.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
-        dialogBarcode.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        dialogBarcode.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        Window window = dialogBarcode.getWindow();
-        window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-
-        unbinder.unbind();
-        unbinder = ButterKnife.bind(this, dialogBarcode);
-
-
-        if (llBarcode == null)
-            return;
-        TextView textView = new TextView(getContext());
-        mScannerView = new ZXingScannerView(getContext());
-        mScannerView.setResultHandler((MainActivity) getContext());
-
-        LinearLayout ll = (LinearLayout) dialogBarcode.findViewById(R.id.ll_dialog_barcode_main);
-        ViewGroup parent = (ViewGroup) ll.getParent();
-
-
-        llBarcode.removeView(ll);
-        llBarcode.addView(mScannerView);
-        mScannerView.startCamera();
-
-        dialogBarcode.setOnDismissListener(new DialogInterface.OnDismissListener() {
+        BarcodeScannerDialog dialog = new BarcodeScannerDialog((MainActivity) this.getActivity(), new BarcodeScannerDialog.OnResultListener() {
             @Override
-            public void onDismiss(DialogInterface dialog) {
-                isScannerBarcode = false;
-
-                mScannerView.stopCamera();
-                listener.setRootViewAgain();
-                if (isOKText)
-                    listener.fillToSearchText(textBarcode);
-
+            public void onResult(String text) {
+                Log.d("LOG", "Barcode result = " + text);
             }
         });
-        dialogBarcode.show();
-//        } else
-//            Log.e(TAG, "showDialogBarcode: fragment cannot implement CallbackBarcodeDialog ");
+        dialog.show();
     }
 
-    public void fillResultToSearchText(String textBarcode) {
-        if (TextUtils.isEmpty(textBarcode))
-            return;
-    }
-    public void fillResultToTextBarcodeDialog(String text) {
-        if (TextUtils.isEmpty(text) || tvTextBarcode == null)
-            return;
-        tvTextBarcode.setText(text);
-//        if (TextUtils.isEmpty(text) || etSearch == null)
-//            return;
-//        etSearch.setText(text);
-    }
-
-
-    public void onPauseScannerBarcode() {
-        if (mScannerView == null
-                || isScannerBarcode == false
-                )
-            return;
-
-        mScannerView.stopCamera();
-    }
 
     @Override
     public Context getContextView() {
         return this.getContext();
+    }
+
+    @Override
+    public void refreshView(List<Customer> lst) {
+        CustomerAdapter customerAdapter = (CustomerAdapter)rvKH.getAdapter();
+        customerAdapter.setCustomers(lst);
+        customerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showCustomerInfo(Customer customer) {
+        FragmentTransaction fragmentTransaction = this.getActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.frameLayout, CustomerInfoFragment.newInstance());
+        fragmentTransaction.commit();
     }
 }

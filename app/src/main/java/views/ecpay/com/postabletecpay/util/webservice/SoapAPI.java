@@ -83,6 +83,7 @@ import views.ecpay.com.postabletecpay.util.entities.request.GetPCInfo.BodyGetPCI
 import views.ecpay.com.postabletecpay.util.entities.request.GetPCInfo.FooterGetPCInfoRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.GetPCInfo.GetPCInfoRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.GetPCInfo.HeaderGetPCInfoRequest;
+import views.ecpay.com.postabletecpay.util.entities.response.Base.Respone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBillOnline.BillingOnlineRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCashTranfer.CashTranferRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
@@ -1609,6 +1610,117 @@ public class SoapAPI {
         }
 
         public void callCountdown(final AsyncSoapSearchCustomerBill soap) {
+            if (soap == null)
+                return;
+
+            callBack.onTimeOut(soap);
+        }
+
+        public boolean isEndCallSoap() {
+            return isEndCallSoap;
+        }
+
+        public void setEndCallSoap(boolean endCallSoap) {
+            isEndCallSoap = endCallSoap;
+        }
+    }
+
+    public static class AsyncSoap<T extends Respone> extends AsyncTask<String, String,  T> {
+
+        Class<T> classType;
+
+        //request action to eStore
+        private static final String METHOD_NAME = "execute";
+        private static final String NAMESPACE = "http://services.ecpay.org/";
+        private static final String URL = ENDPOINT_URL;
+        private static final String SOAP_ACTION = "request action to eStore";
+        private static final String METHOD_PARAM = "message";
+        private AsyncSoapCallBack callBack;
+        private boolean isEndCallSoap = false;
+
+        public AsyncSoap( Class<T> type, AsyncSoapCallBack callBack) throws Exception {
+            this.callBack = callBack;
+            this.classType = type;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            callBack.onPre(this);
+        }
+
+        @Override
+        protected T doInBackground(String... jsons) {
+            String json = jsons[0];
+
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            request.addProperty(METHOD_PARAM, json);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE ht;
+            SoapPrimitive response = null;
+
+            try {
+                ht = new HttpTransportSE(URL);
+                ht.call(SOAP_ACTION, envelope);
+                response = (SoapPrimitive) envelope.getResponse();
+            } catch (Exception e) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "Không nhận được dữ liệu");
+                return null;
+            }
+
+            if (response == null) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                return null;
+            }
+
+            String data = response.toString();
+            if (data.isEmpty()) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return null;
+            }
+
+            T respone = null;
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+            final Gson gson = gsonBuilder.create();
+            respone = gson.fromJson(data, classType);
+
+
+            return respone;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            String message = values[0];
+            isEndCallSoap = true;
+            callBack.onUpdate(message);
+        }
+
+        @Override
+        protected void onPostExecute(T respone) {
+            super.onPostExecute(respone);
+            if (respone == null)
+                return;
+            isEndCallSoap = true;
+            callBack.onPost(respone);
+        }
+
+        public static abstract class AsyncSoapCallBack<T extends  Respone> {
+            public abstract void onPre(final AsyncSoap soap);
+
+            public abstract void onUpdate(String message);
+
+            public abstract void onPost(T response);
+
+            public abstract void onTimeOut(final AsyncSoap soap);
+        }
+
+        public void callCountdown(final AsyncSoap soap) {
             if (soap == null)
                 return;
 

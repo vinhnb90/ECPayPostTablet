@@ -30,6 +30,7 @@ import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.SearchCustomerFragment;
+import views.ecpay.com.postabletecpay.view.Util.BarcodeScannerDialog;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.NEGATIVE_ONE;
@@ -48,6 +49,10 @@ public class MainActivity extends AppCompatActivity implements
         BaoCaoFragment.OnFragmentInteractionListener,
         ZXingScannerView.ResultHandler,
         UserInfoFragment.OnFragmentInteractionListener {
+
+
+
+    private  IOnPauseScannerBarcodeListner pauseScannerBarcodeListner;
 
     public static BottomNavigationView sNavigation;
     public static String mEdong;
@@ -154,8 +159,6 @@ public class MainActivity extends AppCompatActivity implements
 
         if (fragmentVisibling instanceof PayFragment)
             ((PayFragment) fragmentVisibling).onPauseScannerBarcode();
-        if (fragmentVisibling instanceof SearchCustomerFragment)
-            ((SearchCustomerFragment) fragmentVisibling).onPauseScannerBarcode();
     }
 
     @Override
@@ -168,6 +171,12 @@ public class MainActivity extends AppCompatActivity implements
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_BARCODE && resultCode == RESPONSE_BARCODE & data != null) {
+
+            if(pauseScannerBarcodeListner != null)
+            {
+                pauseScannerBarcodeListner.pause();
+            }
+
             //check fragment
             Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
             if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
@@ -177,9 +186,15 @@ public class MainActivity extends AppCompatActivity implements
             if (fragmentVisibling instanceof PayFragment)
                 ((PayFragment) fragmentVisibling).onPauseScannerBarcode();
 
-            if (fragmentVisibling instanceof SearchCustomerFragment)
-                ((SearchCustomerFragment) fragmentVisibling).onPauseScannerBarcode();
         }
+    }
+
+    public IOnPauseScannerBarcodeListner getPauseScannerBarcodeListner() {
+        return pauseScannerBarcodeListner;
+    }
+
+    public void setPauseScannerBarcodeListner(IOnPauseScannerBarcodeListner pauseScannerBarcodeListner) {
+        this.pauseScannerBarcodeListner = pauseScannerBarcodeListner;
     }
 
     private void getBundle() {
@@ -312,8 +327,6 @@ public class MainActivity extends AppCompatActivity implements
         Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
         if (fragmentVisibling instanceof PayFragment)
             ((PayFragment) fragmentVisibling).fillResultToTextBarcodeDialog(result.getText());
-        if (fragmentVisibling instanceof SearchCustomerFragment)
-            ((SearchCustomerFragment) fragmentVisibling).fillResultToTextBarcodeDialog(result.getText());
     }
 
     @Override
@@ -323,8 +336,6 @@ public class MainActivity extends AppCompatActivity implements
         Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
         if (fragmentVisibling instanceof PayFragment)
             ((PayFragment) fragmentVisibling).fillResultToSearchText(textBarcode);
-        if (fragmentVisibling instanceof SearchCustomerFragment)
-            ((SearchCustomerFragment) fragmentVisibling).fillResultToSearchText(textBarcode);
     }
 
     @Override
@@ -332,9 +343,6 @@ public class MainActivity extends AppCompatActivity implements
         Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
         if (fragmentVisibling instanceof PayFragment) {
             ((PayFragment) fragmentVisibling).bindViewAgain();
-        }
-        if (fragmentVisibling instanceof SearchCustomerFragment) {
-            ((SearchCustomerFragment) fragmentVisibling).bindViewAgain();
         }
     }
 
@@ -360,4 +368,9 @@ public class MainActivity extends AppCompatActivity implements
         sNavigation.getMenu().getItem(typeMenu.getIndex());
     }
     //endregion
+
+    public  interface  IOnPauseScannerBarcodeListner {
+        public void pause();
+    }
+
 }

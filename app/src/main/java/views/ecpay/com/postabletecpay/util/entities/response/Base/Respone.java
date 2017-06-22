@@ -19,4 +19,10 @@ public abstract class Respone {
     public abstract FooterRespone getFooter();
 
     public abstract void setFooter(FooterRespone footer);
+
+
+    public <T extends BodyRespone> T getBodyByType()
+    {
+        return (T)this.getBody();
+    }
 }

@@ -79,7 +79,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     private String CREATE_TABLE_BOOK_CMIS = "CREATE TABLE " + TABLE_NAME_BOOK_CMIS + "(bookCmis TEXT, pcCode TEXT, pcCodeExt TEXT, inningDate TEXT, email TEXT, status INTEGER, strStatus TEXT, strCreateDate TEXT, strChangeDate TEXT, idChanged INTEGER, id INTEGER, parentPcCode TEXT, countBill INTEGER, countBillPaid INTEGER, countCustomer INTEGER, listCustomer TEXT, listBillUnpaid TEXT, listBillPaid TEXT)";
 
-    private String CREATE_TABLE_CUSTOMER = "CREATE TABLE `" + TABLE_NAME_CUSTOMER + "` ( `code` TEXT NOT NULL PRIMARY KEY, `name` TEXT, " +
+    private String CREATE_TABLE_CUSTOMER = "CREATE TABLE `" + TABLE_NAME_CUSTOMER + "` ( `code` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `cardNo` TEXT, " +
             "`address` TEXT, `pcCode` TEXT, `pcCodeExt` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `bookCmis` TEXT, " +
             "`electricityMeter` TEXT, `inning` TEXT, `status` TEXT, `bankAccount` TEXT, `idNumber` TEXT, `bankName` TEXT , " +
             "`edongKey` TEXT NOT NULL, `isShowBill` INTEGER DEFAULT 0, " +
@@ -459,6 +459,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 String code = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("code")));
                 String name = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name")));
                 String address = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("address")));
+                String cardNo = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cardNo")));
                 String pcCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCode")));
                 String pcCodeExt = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCodeExt")));
                 String phoneByevn = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByevn")));
@@ -476,6 +477,75 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 String idChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idChanged")));
                 String dateChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("dateChanged")));
                 Customer customer = new Customer(code, name, address, pcCode, pcCodeExt, phoneByevn, phoneByecp, bookCmis, electricityMeter, inning, status, bankAccount, idNumber, bankName, edongKey, idChanged, dateChanged, isShowBill);
+                customer.setCardNo(cardNo);
+                customerList.add(customer);
+            }
+            while (mCursor.moveToNext());
+
+            mCursor.close();
+        }
+        return customerList;
+    }
+
+
+    public List<Customer> selectAllCustomerFitter(String _name, String _address, String _phone, String _bookCmis) {
+        List<Customer> customerList = new ArrayList<>();
+
+
+        String query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE ";
+        boolean hasWhere = false;
+        if(_name.length() > 0)
+        {
+            query += (hasWhere ? "and "  : "") + "name like '%" + _name + "%' ";
+            hasWhere = true;
+        }
+
+        if(_address.length() > 0)
+        {
+            query += (hasWhere ? "and "  : "") + "address like '%" + _address + "%' ";
+            hasWhere = true;
+        }
+
+        if(_phone.length() > 0)
+        {
+            query += (hasWhere ? "and "  : "") + "phoneByevn like '%" + _phone + "%' ";
+            hasWhere = true;
+        }
+
+        if(_bookCmis.length() > 0)
+        {
+            query += (hasWhere ? "and "  : "") + "bookCmis like '%" + _bookCmis + "%' ";
+            hasWhere = true;
+        }
+
+        database = this.getWritableDatabase();
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor != null && mCursor.moveToFirst()) {
+            int count = mCursor.getCount();
+            do {
+                String code = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("code")));
+                String name = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name")));
+                String address = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("address")));
+                String cardNo = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cardNo")));
+                String pcCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCode")));
+                String pcCodeExt = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCodeExt")));
+                String phoneByevn = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByevn")));
+                String phoneByecp = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByecp")));
+                String bookCmis = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bookCmis")));
+                String electricityMeter = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("electricityMeter")));
+                String inning = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("inning")));
+                String status = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("status")));
+                String bankAccount = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bankAccount")));
+                String idNumber = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idNumber")));
+                String bankName = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bankName")));
+                String edongKey = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edongKey")));
+                boolean isShowBill = booleanConvertNull(mCursor.getInt(mCursor.getColumnIndex("isShowBill")));
+
+                String idChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idChanged")));
+                String dateChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("dateChanged")));
+                Customer customer = new Customer(code, name, address, pcCode, pcCodeExt, phoneByevn, phoneByecp, bookCmis, electricityMeter, inning, status, bankAccount, idNumber, bankName, edongKey, idChanged, dateChanged, isShowBill);
+                customer.setCardNo(cardNo);
                 customerList.add(customer);
             }
             while (mCursor.moveToNext());
@@ -557,6 +627,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         initialValues.put("code", customer.getCode());
         initialValues.put("name", customer.getName());
+        initialValues.put("cardNo", customer.getCardNo());
         initialValues.put("address", customer.getAddress());
         initialValues.put("pcCode", customer.getPcCode());
         initialValues.put("pcCodeExt", customer.getPcCodeExt());
@@ -1143,6 +1214,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         initialValues.put("code", bodyCustomerResponse.getCustomerCode());
         initialValues.put("name", bodyCustomerResponse.getName());
+        initialValues.put("cardNo", bodyCustomerResponse.getCardNo());
         initialValues.put("address", bodyCustomerResponse.getAddress());
         initialValues.put("pcCode", bodyCustomerResponse.getPcCode());
         initialValues.put("pcCodeExt", bodyCustomerResponse.getPcCodeExt());
@@ -1173,6 +1245,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         initialValues.put("code", bodyCustomerResponse.getCustomerCode());
         initialValues.put("name", bodyCustomerResponse.getName());
+        initialValues.put("cardNo", bodyCustomerResponse.getCardNo());
         initialValues.put("address", bodyCustomerResponse.getAddress());
         initialValues.put("pcCode", bodyCustomerResponse.getPcCode());
         initialValues.put("pcCodeExt", bodyCustomerResponse.getPcCodeExt());
@@ -1204,6 +1277,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("name", bodyCustomerResponse.getName());
         initialValues.put("address", bodyCustomerResponse.getAddress());
         initialValues.put("pcCode", bodyCustomerResponse.getPcCode());
+        initialValues.put("cardNo", bodyCustomerResponse.getCardNo());
         initialValues.put("pcCodeExt", bodyCustomerResponse.getPcCodeExt());
         initialValues.put("phoneByevn", bodyCustomerResponse.getPhoneByEVN());
         initialValues.put("phoneByecp", bodyCustomerResponse.getPhoneByECP());

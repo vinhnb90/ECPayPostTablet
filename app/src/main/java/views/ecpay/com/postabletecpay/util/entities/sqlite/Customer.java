@@ -22,6 +22,7 @@ public class Customer {
     private String edongKey;
     private String idChanged;
     private String dateChanged;
+    private String cardNo;
 
     //extensive
     private boolean isShowBill;
@@ -192,5 +193,13 @@ public class Customer {
 
     public void setShowBill(boolean showBill) {
         isShowBill = showBill;
+    }
+
+    public String getCardNo() {
+        return cardNo;
+    }
+
+    public void setCardNo(String cardNo) {
+        this.cardNo = cardNo;
     }
 }
