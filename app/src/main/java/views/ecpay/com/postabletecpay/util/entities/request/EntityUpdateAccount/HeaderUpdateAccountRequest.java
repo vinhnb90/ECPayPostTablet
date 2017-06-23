@@ -1,16 +1,13 @@
-package views.ecpay.com.postabletecpay.util.entities.request.Base;
+package views.ecpay.com.postabletecpay.util.entities.request.EntityUpdateAccount;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
-
 /**
- * Created by duydatpham on 6/17/17.
+ * Created by tima on 6/22/17.
  */
 
-public class HeaderRequest implements Serializable
-{
+public class HeaderUpdateAccountRequest {
     @SerializedName("agent")
     @Expose
     private String agent;
@@ -19,7 +16,7 @@ public class HeaderRequest implements Serializable
     private String password;
     @SerializedName("command-id")
     @Expose
-    private String commandId;
+    private String command_id;
 
     public String getAgent() {
         return agent;
@@ -37,11 +34,11 @@ public class HeaderRequest implements Serializable
         this.password = password;
     }
 
-    public String getCommandId() {
-        return commandId;
+    public String getCommand_id() {
+        return command_id;
     }
 
-    public void setCommandId(String commandId) {
-        this.commandId = commandId;
+    public void setCommand_id(String command_id) {
+        this.command_id = command_id;
     }
 }

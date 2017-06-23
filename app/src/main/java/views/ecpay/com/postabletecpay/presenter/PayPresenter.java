@@ -336,7 +336,7 @@ public class PayPresenter implements IPayPresenter {
 
             if (entity.isChecked()) {
                 if (entity.getStatus() == 0) {
-                    payOfflineTheBill(entity, index, edong);
+                    payOfflineTheBill(entity, index, edong, amount);
                 } else if (entity.getStatus() == 3) {
                     sbMsg.append("\nHoá đơn ");
                     sbMsg.append(entity.getBillId());
@@ -354,7 +354,7 @@ public class PayPresenter implements IPayPresenter {
         }
     }
 
-    private void payOfflineTheBill(PayBillsDialogAdapter.Entity entity, int index, final String edong) {
+    private void payOfflineTheBill(PayBillsDialogAdapter.Entity entity, int index, final String edong, double amount) {
 
 /**
  *
@@ -377,32 +377,35 @@ public class PayPresenter implements IPayPresenter {
 
         if(mPayModel.updatePayOffine(entity.getBillId(), 2, MainActivity.mEdong) != -1) {
             EntityDanhSachThu entityDanhSachThu = mPayModel.selectDebtColectionForDanhSachThu(entity.getBillId());
-            entityDanhSachThu.setPayments(2);
-            entityDanhSachThu.setPayStatus(2);
-            entityDanhSachThu.setStateOfDebt(2);
+            entityDanhSachThu.setPayments("2");
+            entityDanhSachThu.setPayStatus("2");
+            entityDanhSachThu.setStateOfDebt("2");
             entityDanhSachThu.setStateOfCancel("");
             entityDanhSachThu.setStateOfReturn("");
             entityDanhSachThu.setSuspectedProcessingStatus("");
-            entityDanhSachThu.setStateOfPush(1);
+            entityDanhSachThu.setStateOfPush("1");
             entityDanhSachThu.setDateOfPush(currentDateandTime);
-            entityDanhSachThu.setCountPrintReceipt(0);
+            entityDanhSachThu.setCountPrintReceipt("0");
             entityDanhSachThu.setPrintInfo("");
             if (mPayModel.insertDebtCollection(entityDanhSachThu) != -1) {
                 EntityLichSuThanhToan entityLichSuThanhToan = mPayModel.selectDebtColectionForLichSu(entity.getBillId());
-                entityLichSuThanhToan.setPayments(2);
-                entityLichSuThanhToan.setPayStatus(2);
-                entityLichSuThanhToan.setStateOfDebt(2);
+                entityLichSuThanhToan.setPayments("2");
+                entityLichSuThanhToan.setPayStatus("2");
+                entityLichSuThanhToan.setStateOfDebt("2");
                 entityLichSuThanhToan.setStateOfCancel("");
                 entityLichSuThanhToan.setStateOfReturn("");
                 entityLichSuThanhToan.setSuspectedProcessingStatus("");
-                entityLichSuThanhToan.setStateOfPush(1);
+                entityLichSuThanhToan.setStateOfPush("1");
                 entityLichSuThanhToan.setDateOfPush(currentDateandTime);
-                entityLichSuThanhToan.setCountPrintReceipt(0);
+                entityLichSuThanhToan.setCountPrintReceipt("0");
                 entityLichSuThanhToan.setPrintInfo("");
                 entityLichSuThanhToan.setDateIncurred(currentDateandTime);
-                entityLichSuThanhToan.setTradingCode(6);
+                entityLichSuThanhToan.setTradingCode("6");
                 if(mPayModel.insertPayLib(entityLichSuThanhToan) != -1) {
-                    Log.i("INFO", "");
+                    double balance = mPayModel.selectBalance() - amount;
+                    if(mPayModel.updateBalance(String.valueOf(balance)) != -1) {
+                        Log.i("INFO", "SUCCESS");
+                    }
                 }
             }
         }

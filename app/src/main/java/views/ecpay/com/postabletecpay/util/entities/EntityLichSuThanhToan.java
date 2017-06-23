@@ -68,18 +68,18 @@ public class EntityLichSuThanhToan {
     private String billingBy;
     private String cashierPay;
     private String edongKey;
-    private int payments;
-    private int payStatus;
-    private int stateOfDebt;
+    private String payments;
+    private String payStatus;
+    private String stateOfDebt;
     private String stateOfCancel;
     private String stateOfReturn;
     private String suspectedProcessingStatus;
-    private int stateOfPush;
+    private String stateOfPush;
     private String dateOfPush;
-    private int countPrintReceipt;
+    private String countPrintReceipt;
     private String printInfo;
     private String dateIncurred;
-    private int tradingCode;
+    private String tradingCode;
 
     public String getCustomerCode() {
         return customerCode;
@@ -561,27 +561,27 @@ public class EntityLichSuThanhToan {
         this.edongKey = edongKey;
     }
 
-    public int getPayments() {
+    public String getPayments() {
         return payments;
     }
 
-    public void setPayments(int payments) {
+    public void setPayments(String payments) {
         this.payments = payments;
     }
 
-    public int getPayStatus() {
+    public String getPayStatus() {
         return payStatus;
     }
 
-    public void setPayStatus(int payStatus) {
+    public void setPayStatus(String payStatus) {
         this.payStatus = payStatus;
     }
 
-    public int getStateOfDebt() {
+    public String getStateOfDebt() {
         return stateOfDebt;
     }
 
-    public void setStateOfDebt(int stateOfDebt) {
+    public void setStateOfDebt(String stateOfDebt) {
         this.stateOfDebt = stateOfDebt;
     }
 
@@ -609,11 +609,11 @@ public class EntityLichSuThanhToan {
         this.suspectedProcessingStatus = suspectedProcessingStatus;
     }
 
-    public int getStateOfPush() {
+    public String getStateOfPush() {
         return stateOfPush;
     }
 
-    public void setStateOfPush(int stateOfPush) {
+    public void setStateOfPush(String stateOfPush) {
         this.stateOfPush = stateOfPush;
     }
 
@@ -625,11 +625,11 @@ public class EntityLichSuThanhToan {
         this.dateOfPush = dateOfPush;
     }
 
-    public int getCountPrintReceipt() {
+    public String getCountPrintReceipt() {
         return countPrintReceipt;
     }
 
-    public void setCountPrintReceipt(int countPrintReceipt) {
+    public void setCountPrintReceipt(String countPrintReceipt) {
         this.countPrintReceipt = countPrintReceipt;
     }
 
@@ -649,11 +649,11 @@ public class EntityLichSuThanhToan {
         this.dateIncurred = dateIncurred;
     }
 
-    public int getTradingCode() {
+    public String getTradingCode() {
         return tradingCode;
     }
 
-    public void setTradingCode(int tradingCode) {
+    public void setTradingCode(String tradingCode) {
         this.tradingCode = tradingCode;
     }
 }

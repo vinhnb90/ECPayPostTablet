@@ -1,19 +1,16 @@
-package views.ecpay.com.postabletecpay.util.entities.response.Base;
+package views.ecpay.com.postabletecpay.util.entities.response.EntityUpdateAccount;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by duydatpham on 6/17/17.
+ * Created by tima on 6/22/17.
  */
 
-
-public class BodyRespone {
-
-
+public class BodyUpdateAccountResponse {
     @SerializedName("audit-number")
     @Expose
-    private Long auditNumber;
+    private String auditNumber;
     @SerializedName("mac")
     @Expose
     private String mac;
@@ -24,14 +21,11 @@ public class BodyRespone {
     @Expose
     private String signature;
 
-
-
-
-    public Long getAuditNumber() {
+    public String getAuditNumber() {
         return auditNumber;
     }
 
-    public void setAuditNumber(Long auditNumber) {
+    public void setAuditNumber(String auditNumber) {
         this.auditNumber = auditNumber;
     }
 
@@ -58,5 +52,4 @@ public class BodyRespone {
     public void setSignature(String signature) {
         this.signature = signature;
     }
-
 }

@@ -1,14 +1,13 @@
-package views.ecpay.com.postabletecpay.util.entities.response.Base;
+package views.ecpay.com.postabletecpay.util.entities.response.EntityUpdateAccount;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by duydatpham on 6/17/17.
+ * Created by tima on 6/19/17.
  */
 
-public class FooterRespone {
-
+public class FooterUpdateAccountResponse {
     @SerializedName("account-idt")
     @Expose
     private String accountIdt;

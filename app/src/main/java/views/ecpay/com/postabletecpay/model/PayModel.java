@@ -322,6 +322,10 @@ public class PayModel extends CommonModel {
         return sqLiteConnection.selectBalance();
     }
 
+    public int updateBalance(String balance) {
+        return sqLiteConnection.updateBalance(balance);
+    }
+
     public long updatePayOffine(int billID, int status, String edong) {
         return sqLiteConnection.updatePayOffine(billID, status, edong);
     }

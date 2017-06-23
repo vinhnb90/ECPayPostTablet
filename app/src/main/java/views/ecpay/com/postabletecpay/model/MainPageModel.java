@@ -3,6 +3,8 @@ package views.ecpay.com.postabletecpay.model;
 import android.content.Context;
 import android.database.Cursor;
 
+import views.ecpay.com.postabletecpay.util.entities.EntityDanhSachThu;
+import views.ecpay.com.postabletecpay.util.entities.EntityLichSuThanhToan;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
@@ -65,6 +67,14 @@ public class MainPageModel extends CommonModel {
         return sqLiteConnection.selectOfflineBill();
     }
 
+    public Cursor selectAccount() {
+        return sqLiteConnection.selectAccount();
+    }
+
+    public Cursor selectPushBill(int billId) {
+        return sqLiteConnection.selectPushBill(billId);
+    }
+
     public  long checkCustomerExist(String code) {
         return sqLiteConnection.checkCustomerExist(code);
     }
@@ -103,6 +113,26 @@ public class MainPageModel extends CommonModel {
 
     public String getMaxDateChanged() {
         return sqLiteConnection.getMaxDateChanged();
+    }
+
+    public long updatePayOffine(int billID, int status, String edong) {
+        return sqLiteConnection.updatePayOffine(billID, status, edong);
+    }
+
+    public int insertDebtCollection(EntityDanhSachThu entityDanhSachThu) {
+        return sqLiteConnection.insertDebtCollection(entityDanhSachThu);
+    }
+
+    public EntityDanhSachThu selectDebtColectionForDanhSachThu(int billId) {
+        return sqLiteConnection.selectDebtColectionForDanhSachThu(billId);
+    }
+
+    public EntityLichSuThanhToan selectDebtColectionForLichSu(int billId) {
+        return sqLiteConnection.selectDebtColectionForLichSu(billId);
+    }
+
+    public int insertPayLib(EntityLichSuThanhToan entityLichSuThanhToan) {
+        return sqLiteConnection.insertPayLib(entityLichSuThanhToan);
     }
     //endregion
 }

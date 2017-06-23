@@ -3,6 +3,8 @@ package views.ecpay.com.postabletecpay.util.entities.response.EntityPostBill;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 /**
  * Created by tima on 6/19/17.
  */
@@ -22,7 +24,7 @@ public class BodyPostBillReponse {
     private String signature;
     @SerializedName("List")
     @Expose
-    private ListPostBill listPostBill;
+    private ArrayList<ListPostBill> listPostBill;
 
     public String getAudit_number() {
         return audit_number;
@@ -56,11 +58,11 @@ public class BodyPostBillReponse {
         this.signature = signature;
     }
 
-    public ListPostBill getListPostBill() {
+    public ArrayList<ListPostBill> getListPostBill() {
         return listPostBill;
     }
 
-    public void setListPostBill(ListPostBill listPostBill) {
+    public void setListPostBill(ArrayList<ListPostBill> listPostBill) {
         this.listPostBill = listPostBill;
     }
 }

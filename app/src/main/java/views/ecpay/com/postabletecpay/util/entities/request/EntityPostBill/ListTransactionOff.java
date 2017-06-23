@@ -23,6 +23,9 @@ public class ListTransactionOff {
     @SerializedName("edong")
     @Expose
     private String edong;
+    @SerializedName("pc-code")
+    @Expose
+    private String pc_code;
     @SerializedName("audit-number")
     @Expose
     private String audit_number;
@@ -65,6 +68,14 @@ public class ListTransactionOff {
 
     public void setEdong(String edong) {
         this.edong = edong;
+    }
+
+    public String getPc_code() {
+        return pc_code;
+    }
+
+    public void setPc_code(String pc_code) {
+        this.pc_code = pc_code;
     }
 
     public String getAudit_number() {

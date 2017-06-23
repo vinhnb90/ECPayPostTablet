@@ -70,15 +70,15 @@ public class EntityDanhSachThu {
     private String billingBy;
     private String cashierPay;
     private String edongKey;
-    private int payments;
-    private int payStatus;
-    private int stateOfDebt;
+    private String payments;
+    private String payStatus;
+    private String stateOfDebt;
     private String stateOfCancel;
     private String stateOfReturn;
     private String suspectedProcessingStatus;
-    private int stateOfPush;
+    private String stateOfPush;
     private String dateOfPush;
-    private int countPrintReceipt;
+    private String countPrintReceipt;
     private String printInfo;
 
     public String getCustomerCode() {
@@ -561,27 +561,27 @@ public class EntityDanhSachThu {
         this.edongKey = edongKey;
     }
 
-    public int getPayments() {
+    public String getPayments() {
         return payments;
     }
 
-    public void setPayments(int payments) {
+    public void setPayments(String payments) {
         this.payments = payments;
     }
 
-    public int getPayStatus() {
+    public String getPayStatus() {
         return payStatus;
     }
 
-    public void setPayStatus(int payStatus) {
+    public void setPayStatus(String payStatus) {
         this.payStatus = payStatus;
     }
 
-    public int getStateOfDebt() {
+    public String getStateOfDebt() {
         return stateOfDebt;
     }
 
-    public void setStateOfDebt(int stateOfDebt) {
+    public void setStateOfDebt(String stateOfDebt) {
         this.stateOfDebt = stateOfDebt;
     }
 
@@ -609,11 +609,11 @@ public class EntityDanhSachThu {
         this.suspectedProcessingStatus = suspectedProcessingStatus;
     }
 
-    public int getStateOfPush() {
+    public String getStateOfPush() {
         return stateOfPush;
     }
 
-    public void setStateOfPush(int stateOfPush) {
+    public void setStateOfPush(String stateOfPush) {
         this.stateOfPush = stateOfPush;
     }
 
@@ -625,11 +625,11 @@ public class EntityDanhSachThu {
         this.dateOfPush = dateOfPush;
     }
 
-    public int getCountPrintReceipt() {
+    public String getCountPrintReceipt() {
         return countPrintReceipt;
     }
 
-    public void setCountPrintReceipt(int countPrintReceipt) {
+    public void setCountPrintReceipt(String countPrintReceipt) {
         this.countPrintReceipt = countPrintReceipt;
     }
 

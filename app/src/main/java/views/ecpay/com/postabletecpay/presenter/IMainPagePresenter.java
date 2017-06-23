@@ -12,4 +12,6 @@ public interface IMainPagePresenter {
     void callLogout(String mEdong);
 
     void postBill();
+
+    void updateAccount();
 }

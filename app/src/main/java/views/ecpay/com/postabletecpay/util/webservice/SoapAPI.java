@@ -73,6 +73,10 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.ListT
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.PostBillRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.BodySearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.SearchOnlineRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityUpdateAccount.BodyUpdateAccountRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityUpdateAccount.FooterUpdateAccountRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityUpdateAccount.HeaderUpdateAccountRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityUpdateAccount.UpdateAccountRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.GetPCInfo.BodyGetPCInfoRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.GetPCInfo.FooterGetPCInfoRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.GetPCInfo.GetPCInfoRequest;
@@ -89,6 +93,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginRe
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogout.LogoutResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityPostBill.PostBillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityUpdateAccount.UpdateAccountResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.GetPCInfo.GetPCInfoRespone;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
@@ -567,6 +572,67 @@ public class SoapAPI {
         final Gson gson = gsonBuilder.create();
         //Serialised
         final String jsonResult = gson.toJson(postBillRequest);
+
+        return jsonResult;
+    }
+
+    public static String getJsonRequestUpdateAccount(String agent, String agentEncypted, String commandId, long auditNumber, String mac,
+                                                String diskDriver, String signatureEncrypted, String edong, String edongName, String edongAddress,
+                                                int idSex, String birthDay, int IdNumberType, String idNumber, String idNumberDate, String idNumberPlace,
+                                                int provinceId, int districtId, String email, String description, String session, String partnerCode, String accountId) {
+        if (agent == null || agent.isEmpty() || agent.trim().equals(""))
+            return null;
+        if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
+            return null;
+        if (commandId == null || commandId.isEmpty() || commandId.trim().equals(""))
+            return null;
+        if (mac == null || mac.isEmpty() || mac.trim().equals(""))
+            return null;
+        if (diskDriver == null || diskDriver.isEmpty() || diskDriver.trim().equals(""))
+            return null;
+        if (signatureEncrypted == null || signatureEncrypted.isEmpty() || signatureEncrypted.trim().equals(""))
+            return null;
+        if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
+            return null;
+
+        HeaderUpdateAccountRequest headerUpdateAccountRequest = new HeaderUpdateAccountRequest();
+        headerUpdateAccountRequest.setAgent(agent);
+        headerUpdateAccountRequest.setPassword(agentEncypted);
+        headerUpdateAccountRequest.setCommand_id(commandId);
+
+        BodyUpdateAccountRequest bodyUpdateAccountRequest = new BodyUpdateAccountRequest();
+        bodyUpdateAccountRequest.setAuditNumber(auditNumber);
+        bodyUpdateAccountRequest.setMac(mac);
+        bodyUpdateAccountRequest.setDiskDrive(diskDriver);
+        bodyUpdateAccountRequest.setSignature(signatureEncrypted);
+        bodyUpdateAccountRequest.setEdong(edong);
+        bodyUpdateAccountRequest.setEdongName(edongName);
+        bodyUpdateAccountRequest.setEdongAddress(edongAddress);
+        bodyUpdateAccountRequest.setIdSex(idSex);
+        bodyUpdateAccountRequest.setBirthday(birthDay);
+        bodyUpdateAccountRequest.setIdNumberType(IdNumberType);
+        bodyUpdateAccountRequest.setIdNumber(idNumber);
+        bodyUpdateAccountRequest.setIdNumberDate(idNumberDate);
+        bodyUpdateAccountRequest.setIdNumberPlace(idNumberPlace);
+        bodyUpdateAccountRequest.setProvinceId(provinceId);
+        bodyUpdateAccountRequest.setDistrictId(districtId);
+        bodyUpdateAccountRequest.setEmail(email);
+        bodyUpdateAccountRequest.setDescription(description);
+        bodyUpdateAccountRequest.setSession(session);
+        bodyUpdateAccountRequest.setPartnerCode(partnerCode);
+
+        FooterUpdateAccountRequest footerUpdateAccountRequest = new FooterUpdateAccountRequest();
+        footerUpdateAccountRequest.setAccount_idt(accountId);
+
+        final UpdateAccountRequest updateAccountRequest = new UpdateAccountRequest();
+        updateAccountRequest.setHeaderUpdateAccountRequest(headerUpdateAccountRequest);
+        updateAccountRequest.setBodyUpdateAccountRequest(bodyUpdateAccountRequest);
+        updateAccountRequest.setFooterUpdateAccountRequest(footerUpdateAccountRequest);
+
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.create();
+        //Serialised
+        final String jsonResult = gson.toJson(updateAccountRequest);
 
         return jsonResult;
     }
@@ -2343,6 +2409,118 @@ public class SoapAPI {
                 return;
 
             callBack.onTimeOut(soapPostBill);
+        }
+
+        public boolean isEndCallSoap() {
+            return isEndCallSoap;
+        }
+
+        public void setEndCallSoap(boolean endCallSoap) {
+            isEndCallSoap = endCallSoap;
+        }
+    }
+
+    public static class AsyncSoapUpdateAccount extends AsyncTask<String, String, UpdateAccountResponse> {
+
+        //request action to eStore
+        private static final String METHOD_NAME = "execute";
+        private static final String NAMESPACE = "http://services.ecpay.org/";
+        private static final String URL = ENDPOINT_URL;
+        private static final String SOAP_ACTION = "request action to eStore";
+        private static final String METHOD_PARAM = "message";
+        private AsyncSoapUpdateAccountCallBack callBack;
+        private boolean isEndCallSoap = false;
+        private Context context;
+        private ProgressDialog progressDialog;
+
+        public AsyncSoapUpdateAccount(AsyncSoapUpdateAccountCallBack callBack, Context context) throws Exception {
+            this.callBack = callBack;
+            this.context = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setMessage("Downloading file ...");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.show();
+            callBack.onPre(this);
+        }
+
+        @Override
+        protected UpdateAccountResponse doInBackground(String... jsons) {
+            String json = jsons[0];
+            Log.d("here", "doInBackground: " + json);
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            request.addProperty(METHOD_PARAM, json);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE ht;
+            SoapPrimitive response = null;
+
+            try {
+                ht = new HttpTransportSE(URL);
+                ht.call(SOAP_ACTION, envelope);
+                response = (SoapPrimitive) envelope.getResponse();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (response == null) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                return null;
+            }
+
+            String data = response.toString();
+            if (data.isEmpty()) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return null;
+            }
+
+            UpdateAccountResponse updateAccountResponse = null;
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+            final Gson gson = gsonBuilder.create();
+
+            updateAccountResponse = gson.fromJson(data, UpdateAccountResponse.class);
+
+            return updateAccountResponse;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            String message = values[0];
+            if (isEndCallSoap)
+                callBack.onUpdate(message);
+        }
+
+        @Override
+        protected void onPostExecute(UpdateAccountResponse soapUpdateAccount) {
+            super.onPostExecute(soapUpdateAccount);
+            if (!isEndCallSoap)
+                callBack.onPost(soapUpdateAccount);
+            progressDialog.dismiss();
+        }
+
+        public static abstract class AsyncSoapUpdateAccountCallBack {
+            public abstract void onPre(final AsyncSoapUpdateAccount soapUpdateAccount);
+
+            public abstract void onUpdate(String message);
+
+            public abstract void onPost(UpdateAccountResponse response);
+
+            public abstract void onTimeOut(final AsyncSoapUpdateAccount soapUpdateAccount);
+        }
+
+        public void callCountdown(final AsyncSoapUpdateAccount soapUpdateAccount) {
+            if (soapUpdateAccount == null)
+                return;
+
+            callBack.onTimeOut(soapUpdateAccount);
         }
 
         public boolean isEndCallSoap() {

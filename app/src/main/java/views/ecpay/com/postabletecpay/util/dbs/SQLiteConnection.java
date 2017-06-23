@@ -110,9 +110,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             "`nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, " +
             "`taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, " +
             "`billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `requestDate` TEXT,`edongKey` TEXT NOT NULL, " +
-            "`isChecked` INTEGER default 0, `traceNumber` INTERGER, `causeCancelBillOnline` TEXT, payments INTEGER, payStatus INTEGER, " +
-            "stateOfDebt INTEGER, stateOfCancel TEXT, stateOfReturn TEXT, suspectedProcessingStatus TEXT, stateOfPush INTEGER, dateOfPush TEXT, " +
-            "countPrintReceipt INTEGER, printInfo TEXT)";
+            "`isChecked` INTEGER default 0, `traceNumber` INTERGER, `causeCancelBillOnline` TEXT, payments TEXT, payStatus TEXT, " +
+            "stateOfDebt TEXT, stateOfCancel TEXT, stateOfReturn TEXT, suspectedProcessingStatus TEXT, stateOfPush TEXT, dateOfPush TEXT, " +
+            "countPrintReceipt TEXT, printInfo TEXT)";
 
     private String CREATE_TABLE_LICH_SU_TTOAN = "CREATE TABLE `" + TABLE_NAME_LICH_SU_TTOAN + "` ( `customerCode` TEXT, `customerPayCode` TEXT, " +
             "`billId` INTEGER NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, " +
@@ -124,9 +124,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             "`nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, " +
             "`taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, " +
             "`billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `requestDate` TEXT,`edongKey` TEXT NOT NULL, " +
-            "`isChecked` INTEGER default 0, `traceNumber` INTERGER, `causeCancelBillOnline` TEXT, payments INTEGER, payStatus INTEGER, " +
-            "stateOfDebt INTEGER, stateOfCancel TEXT, stateOfReturn TEXT, suspectedProcessingStatus TEXT, stateOfPush INTEGER, dateOfPush TEXT, " +
-            "countPrintReceipt INTEGER, printInfo TEXT, dateIncurred TEXT, tradingCode INTEGER)";
+            "`isChecked` INTEGER default 0, `traceNumber` INTERGER, `causeCancelBillOnline` TEXT, payments TEXT, payStatus TEXT, " +
+            "stateOfDebt TEXT, stateOfCancel TEXT, stateOfReturn TEXT, suspectedProcessingStatus TEXT, stateOfPush TEXT, dateOfPush TEXT, " +
+            "countPrintReceipt TEXT, printInfo TEXT, dateIncurred TEXT, tradingCode TEXT)";
 
     private SQLiteConnection(Context context) {
         super(context, Common.PATH_FOLDER_DB + databaseName, null, DATABASE_VERSION);
@@ -237,6 +237,19 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             return c.getDouble(0);
         }
         return 0;
+    }
+
+    public Cursor selectAccount() {
+        database = getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME_ACCOUNT;
+        return database.rawQuery(query, null);
+    }
+
+    public int updateBalance(String balance) {
+        database = getWritableDatabase();
+        ContentValues initialValues = new ContentValues();
+        initialValues.put("balance", balance);
+        return database.update(TABLE_NAME_ACCOUNT, initialValues, "balance=", new String[]{balance});
     }
 
     public Account selectAccount(String edong) throws SQLiteException {
@@ -377,7 +390,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public Cursor selectOfflineBill() {
         database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE status = 2";
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE status = 2 OR status = 3 OR status = 4";
+        return database.rawQuery(query, null);
+    }
+
+    public Cursor selectPushBill(int billId) {
+        database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE billId = " + billId;
         return database.rawQuery(query, null);
     }
 

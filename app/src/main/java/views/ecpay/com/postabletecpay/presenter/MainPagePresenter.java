@@ -21,13 +21,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import views.ecpay.com.postabletecpay.model.MainPageModel;
 import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.util.entities.EntityDanhSachThu;
+import views.ecpay.com.postabletecpay.util.entities.EntityLichSuThanhToan;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.ListTransactionOff;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
@@ -40,7 +44,9 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.FileG
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListBillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListCustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogout.LogoutResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityPostBill.ListPostBill;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityPostBill.PostBillResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityUpdateAccount.UpdateAccountResponse;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
@@ -222,14 +228,8 @@ public class MainPagePresenter implements IMainPagePresenter {
                     }
                 }
 
-                String path = Common.PATH_FOLDER_DOWNLOAD;
-                File directory = new File(path);
-                File[] allFiles = directory.listFiles();
-                if (allFiles.length == 0) {
-                    synchronizeFileGen();
-                } else {
-                    synchronizeData();
-                }
+                synchronizeFileGen();
+                synchronizeData();
             } catch (Exception ex) {
                 mIMainPageView.showTextMessage(ex.getMessage());
             }
@@ -649,6 +649,7 @@ public class MainPagePresenter implements IMainPagePresenter {
                 listTransactionOff.setAmount(c.getString(c.getColumnIndex("amount")));
                 listTransactionOff.setBill_id(c.getString(c.getColumnIndex("billId")));
                 listTransactionOff.setEdong(c.getString(c.getColumnIndex("edong")));
+                listTransactionOff.setPc_code(c.getString(c.getColumnIndex("pcCode")));
                 listTransactionOff.setAudit_number(String.valueOf(configInfo.getAuditNumber()));
                 lstTransactionOff.add(listTransactionOff);
             } while (c.moveToNext());
@@ -700,6 +701,127 @@ public class MainPagePresenter implements IMainPagePresenter {
                 return;
             }
 
+        }
+    }
+
+    @Override
+    public void updateAccount() {
+        String userName = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
+                .getString(Common.SHARE_REF_FILE_LOGIN_USER_NAME, "");
+        String pass = mSharedPrefLogin.getSharePref(Common.SHARE_REF_FILE_LOGIN, MODE_PRIVATE)
+                .getString(Common.SHARE_REF_FILE_LOGIN_PASS, "");
+
+        String textMessage = "";
+        Context context = mIMainPageView.getContextView();
+        Boolean isErr = false;
+
+        if ((userName == null || userName.isEmpty() || userName.trim().equals("") || userName.length() > Common.MAX_LENGTH || userName.length() < Common.MIN_LENGTH) && !isErr) {
+            textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_USER.toString();
+            isErr = true;
+        }
+        if ((pass == null || pass.isEmpty() || pass.trim().equals("") || pass.length() > Common.LENGTH_PASS) && !isErr) {
+            textMessage = Common.MESSAGE_NOTIFY.LOGIN_ERR_PASS.toString();
+            isErr = true;
+        }
+        if (!Common.isNetworkConnected(context) && !isErr) {
+            textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
+            isErr = true;
+        }
+        if (isErr) {
+            mIMainPageView.showTextMessage(textMessage);
+            return;
+        }
+
+        ConfigInfo configInfo;
+        String versionApp = "";
+        try {
+            versionApp = mIMainPageView.getContextView().getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            configInfo = Common.setupInfoRequest(context, userName, Common.COMMAND_ID.PUT_TRANSACTION_OFF.toString(), versionApp, mainPageModel.getPcCode());
+        } catch (Exception e) {
+            mIMainPageView.showTextMessage(e.getMessage());
+            return;
+        }
+
+
+        String signatureEncrypted = "";
+        try {
+            String dataSign = Common.getDataSignRSA(
+                    configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
+                    configInfo.getDiskDriver(), mainPageModel.getPcCode(), configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
+            Log.d(TAG, "setupInfoRequest: " + dataSign);
+            signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
+            Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
+        } catch (Exception e) {
+        }
+        configInfo.setSignatureEncrypted(signatureEncrypted);
+
+        Cursor c = mainPageModel.selectAccount();
+        if (c.moveToFirst()) {
+            String jsonRequestUpdateAccount = SoapAPI.getJsonRequestUpdateAccount(
+                    configInfo.getAGENT(),
+                    configInfo.getAgentEncypted(),
+                    configInfo.getCommandId(),
+                    configInfo.getAuditNumber(),
+                    configInfo.getMacAdressHexValue(),
+                    configInfo.getDiskDriver(),
+                    configInfo.getSignatureEncrypted(),
+                    c.getString(c.getColumnIndex("edong")),
+                    c.getString(c.getColumnIndex("name")),
+                    c.getString(c.getColumnIndex("address")),
+                    1,
+                    c.getString(c.getColumnIndex("birthday")),
+                    c.getInt(c.getColumnIndex("type")),
+                    c.getString(c.getColumnIndex("idNumber")),
+                    c.getString(c.getColumnIndex("idNumberDate")),
+                    c.getString(c.getColumnIndex("idNumberPlace")),
+                    0,
+                    0,
+                    c.getString(c.getColumnIndex("email")),
+                    "",
+                    c.getString(c.getColumnIndex("session")),
+                    Common.PARTNER_CODE_DEFAULT,
+                    configInfo.getAccountId());
+
+            if (jsonRequestUpdateAccount != null) {
+                try {
+                    final SoapAPI.AsyncSoapUpdateAccount soapUpdateAccount;
+
+                    soapUpdateAccount = new SoapAPI.AsyncSoapUpdateAccount(callBackUpdateAccount, mIMainPageView.getContextView());
+
+                    if (soapUpdateAccount.getStatus() != AsyncTask.Status.RUNNING) {
+                        soapUpdateAccount.execute(jsonRequestUpdateAccount);
+
+                        //thread time out
+                        Thread soapDataThread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                UpdateAccountResponse updateAccountResponse = null;
+
+                                //call time out
+                                try {
+                                    Thread.sleep(Common.TIME_OUT_CONNECT);
+                                } catch (InterruptedException e) {
+                                    mIMainPageView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                                } finally {
+                                    if (updateAccountResponse == null) {
+                                        soapUpdateAccount.callCountdown(soapUpdateAccount);
+                                    }
+                                }
+                            }
+                        });
+                        soapDataThread.start();
+                    }
+                } catch (Exception e) {
+                    mIMainPageView.showTextMessage(e.getMessage());
+                    return;
+                }
+            }
         }
     }
 
@@ -974,16 +1096,193 @@ public class MainPagePresenter implements IMainPagePresenter {
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onPost(PostBillResponse response) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy'T'HH:mm:ss");
+            String currentDateandTime = sdf.format(new Date());
+
             String errorCode = response.getFooterPostBillReponse().getResponse_code();
             if(errorCode.equals("000")) {
-                mIMainPageView.showTextMessage(Common.MESSAGE.PUSH_BILL_SUCSSES.toString());
+                if(response.getBodyPostBillReponse().getListPostBill() == null) {
+                    mIMainPageView.showTextMessage(Common.MESSAGE.PUSH_BILL_FAIL.getMessage());
+                } else {
+                    for(ListPostBill listPostBill : response.getBodyPostBillReponse().getListPostBill()) {
+                        Cursor c = mainPageModel.selectPushBill(Integer.parseInt(listPostBill.getStrBillId()));
+                        if (c.moveToFirst()) {
+                            //Trong giờ mở cổng kết nối thanh toán từ ECPay sang EVN
+                            if (mainPageModel.updatePayOffine(Integer.parseInt(listPostBill.getStrBillId()), 2, MainActivity.mEdong) != -1) {
+                                EntityDanhSachThu entityDanhSachThu = mainPageModel.selectDebtColectionForDanhSachThu(Integer.parseInt(listPostBill.getStrBillId()));
+                                entityDanhSachThu.setPayments("1");
+                                entityDanhSachThu.setPayStatus("2");
+                                entityDanhSachThu.setStateOfDebt("2");
+                                entityDanhSachThu.setStateOfCancel("");
+                                entityDanhSachThu.setStateOfReturn("");
+                                entityDanhSachThu.setSuspectedProcessingStatus("");
+                                entityDanhSachThu.setStateOfPush("");
+                                entityDanhSachThu.setDateOfPush(currentDateandTime);
+                                entityDanhSachThu.setCountPrintReceipt("0");
+                                entityDanhSachThu.setPrintInfo("");
+                                if (mainPageModel.insertDebtCollection(entityDanhSachThu) != -1) {
+                                    EntityLichSuThanhToan entityLichSuThanhToan = mainPageModel.selectDebtColectionForLichSu(Integer.parseInt(listPostBill.getStrBillId()));
+                                    entityLichSuThanhToan.setPayments("1");
+                                    entityLichSuThanhToan.setPayStatus("2");
+                                    entityLichSuThanhToan.setStateOfDebt("2");
+                                    entityLichSuThanhToan.setStateOfCancel("");
+                                    entityLichSuThanhToan.setStateOfReturn("");
+                                    entityLichSuThanhToan.setSuspectedProcessingStatus("");
+                                    entityLichSuThanhToan.setStateOfPush("");
+                                    entityLichSuThanhToan.setDateOfPush(currentDateandTime);
+                                    entityLichSuThanhToan.setCountPrintReceipt("0");
+                                    entityLichSuThanhToan.setPrintInfo("");
+                                    entityLichSuThanhToan.setDateIncurred(currentDateandTime);
+                                    entityLichSuThanhToan.setTradingCode("3");
+                                    if (mainPageModel.insertPayLib(entityLichSuThanhToan) != -1) {
+
+                                    }
+                                }
+                            }
+                            //Trong giờ đóng cổng kết nối thanh toán từ ECPay sang EVN
+                            if (mainPageModel.updatePayOffine(Integer.parseInt(listPostBill.getStrBillId()), 2, MainActivity.mEdong) != -1) {
+                                EntityDanhSachThu entityDanhSachThu = mainPageModel.selectDebtColectionForDanhSachThu(Integer.parseInt(listPostBill.getStrBillId()));
+                                entityDanhSachThu.setPayments("1");
+                                entityDanhSachThu.setPayStatus("2");
+                                entityDanhSachThu.setStateOfDebt("3");
+                                entityDanhSachThu.setStateOfCancel("");
+                                entityDanhSachThu.setStateOfReturn("");
+                                entityDanhSachThu.setSuspectedProcessingStatus("");
+                                entityDanhSachThu.setStateOfPush("");
+                                entityDanhSachThu.setDateOfPush(currentDateandTime);
+                                entityDanhSachThu.setCountPrintReceipt("0");
+                                entityDanhSachThu.setPrintInfo("");
+                                if (mainPageModel.insertDebtCollection(entityDanhSachThu) != -1) {
+                                    EntityLichSuThanhToan entityLichSuThanhToan = mainPageModel.selectDebtColectionForLichSu(Integer.parseInt(listPostBill.getStrBillId()));
+                                    entityLichSuThanhToan.setPayments("1");
+                                    entityLichSuThanhToan.setPayStatus("2");
+                                    entityLichSuThanhToan.setStateOfDebt("3");
+                                    entityLichSuThanhToan.setStateOfCancel("");
+                                    entityLichSuThanhToan.setStateOfReturn("");
+                                    entityLichSuThanhToan.setSuspectedProcessingStatus("");
+                                    entityLichSuThanhToan.setStateOfPush("");
+                                    entityLichSuThanhToan.setDateOfPush(currentDateandTime);
+                                    entityLichSuThanhToan.setCountPrintReceipt("0");
+                                    entityLichSuThanhToan.setPrintInfo("");
+                                    entityLichSuThanhToan.setDateIncurred(currentDateandTime);
+                                    entityLichSuThanhToan.setTradingCode("4");
+                                    if (mainPageModel.insertPayLib(entityLichSuThanhToan) != -1) {
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             } else {
-                mIMainPageView.showTextMessage(Common.MESSAGE.PUSH_BILL_FAIL.toString());
+                if(response.getBodyPostBillReponse().getListPostBill() == null) {
+                    mIMainPageView.showTextMessage(Common.MESSAGE.PUSH_BILL_FAIL.getMessage());
+                } else {
+                    for(ListPostBill listPostBill : response.getBodyPostBillReponse().getListPostBill()) {
+                        Cursor c = mainPageModel.selectPushBill(Integer.parseInt(listPostBill.getStrBillId()));
+                        if(c.moveToFirst()) {
+                            if(c.getInt(c.getColumnIndex("status")) == 3) {// Hoá đơn thanh toán từ nguồn khác
+                                if(mainPageModel.updatePayOffine(Integer.parseInt(listPostBill.getStrBillId()), 3, "") != -1) {
+                                    EntityLichSuThanhToan entityLichSuThanhToan = mainPageModel.selectDebtColectionForLichSu(Integer.parseInt(listPostBill.getStrBillId()));
+                                    entityLichSuThanhToan.setPayments("");
+                                    entityLichSuThanhToan.setPayStatus("3");
+                                    entityLichSuThanhToan.setStateOfDebt("");
+                                    entityLichSuThanhToan.setStateOfCancel("");
+                                    entityLichSuThanhToan.setStateOfReturn("");
+                                    entityLichSuThanhToan.setSuspectedProcessingStatus("");
+                                    entityLichSuThanhToan.setStateOfPush("");
+                                    entityLichSuThanhToan.setDateOfPush(currentDateandTime);
+                                    entityLichSuThanhToan.setCountPrintReceipt("0");
+                                    entityLichSuThanhToan.setPrintInfo("");
+                                    entityLichSuThanhToan.setDateIncurred(currentDateandTime);
+                                    entityLichSuThanhToan.setTradingCode("2");
+                                    if(mainPageModel.insertPayLib(entityLichSuThanhToan) != -1) {
+
+                                    }
+                                }
+                            } else if(c.getInt(c.getColumnIndex("status")) == 4) {// Hoá đơn thanh toán từ số ví khác
+                                if(mainPageModel.updatePayOffine(Integer.parseInt(listPostBill.getStrBillId()), 4, listPostBill.getEdong()) != -1) {
+                                    EntityLichSuThanhToan entityLichSuThanhToan = mainPageModel.selectDebtColectionForLichSu(Integer.parseInt(listPostBill.getStrBillId()));
+                                    entityLichSuThanhToan.setEdong(listPostBill.getEdong());
+                                    entityLichSuThanhToan.setEdongKey(listPostBill.getEdong());
+                                    entityLichSuThanhToan.setPayments("");
+                                    entityLichSuThanhToan.setPayStatus("4");
+                                    entityLichSuThanhToan.setStateOfDebt("");
+                                    entityLichSuThanhToan.setStateOfCancel("");
+                                    entityLichSuThanhToan.setStateOfReturn("");
+                                    entityLichSuThanhToan.setSuspectedProcessingStatus("");
+                                    entityLichSuThanhToan.setStateOfPush("");
+                                    entityLichSuThanhToan.setDateOfPush(currentDateandTime);
+                                    entityLichSuThanhToan.setCountPrintReceipt("0");
+                                    entityLichSuThanhToan.setPrintInfo("");
+                                    entityLichSuThanhToan.setDateIncurred(currentDateandTime);
+                                    entityLichSuThanhToan.setTradingCode("2");
+                                    if(mainPageModel.insertPayLib(entityLichSuThanhToan) != -1) {
+
+                                    }
+                                }
+                            } else {// Hoá đơn chấm nợ lỗi
+                                if(mainPageModel.updatePayOffine(Integer.parseInt(listPostBill.getStrBillId()), 2, MainActivity.mEdong) != -1) {
+                                    EntityDanhSachThu entityDanhSachThu = mainPageModel.selectDebtColectionForDanhSachThu(Integer.parseInt(listPostBill.getStrBillId()));
+                                    entityDanhSachThu.setPayments("1");
+                                    entityDanhSachThu.setPayStatus("2");
+                                    entityDanhSachThu.setStateOfDebt("4");
+                                    entityDanhSachThu.setStateOfCancel("");
+                                    entityDanhSachThu.setStateOfReturn("");
+                                    entityDanhSachThu.setSuspectedProcessingStatus("");
+                                    entityDanhSachThu.setStateOfPush("");
+                                    entityDanhSachThu.setDateOfPush(currentDateandTime);
+                                    entityDanhSachThu.setCountPrintReceipt("0");
+                                    entityDanhSachThu.setPrintInfo("");
+                                    if (mainPageModel.insertDebtCollection(entityDanhSachThu) != -1) {
+                                        EntityLichSuThanhToan entityLichSuThanhToan = mainPageModel.selectDebtColectionForLichSu(Integer.parseInt(listPostBill.getStrBillId()));
+                                        entityLichSuThanhToan.setPayments("1");
+                                        entityLichSuThanhToan.setPayStatus("2");
+                                        entityLichSuThanhToan.setStateOfDebt("4");
+                                        entityLichSuThanhToan.setStateOfCancel("");
+                                        entityLichSuThanhToan.setStateOfReturn("");
+                                        entityLichSuThanhToan.setSuspectedProcessingStatus("");
+                                        entityLichSuThanhToan.setStateOfPush("");
+                                        entityLichSuThanhToan.setDateOfPush(currentDateandTime);
+                                        entityLichSuThanhToan.setCountPrintReceipt("0");
+                                        entityLichSuThanhToan.setPrintInfo("");
+                                        entityLichSuThanhToan.setDateIncurred(currentDateandTime);
+                                        entityLichSuThanhToan.setTradingCode("5");
+                                        if (mainPageModel.insertPayLib(entityLichSuThanhToan) != -1) {
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
         @Override
         public void onTimeOut(SoapAPI.AsyncSoapPostBill soapPostBill) {
+        }
+    };
+
+    private SoapAPI.AsyncSoapUpdateAccount.AsyncSoapUpdateAccountCallBack callBackUpdateAccount = new SoapAPI.AsyncSoapUpdateAccount.AsyncSoapUpdateAccountCallBack() {
+        @Override
+        public void onPre(SoapAPI.AsyncSoapUpdateAccount soapUpdateAccount) {
+
+        }
+
+        @Override
+        public void onUpdate(String message) {
+
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+        @Override
+        public void onPost(UpdateAccountResponse response) {
+        }
+
+        @Override
+        public void onTimeOut(SoapAPI.AsyncSoapUpdateAccount soapUpdateAccount) {
         }
     };
 }
