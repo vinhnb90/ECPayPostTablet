@@ -150,9 +150,11 @@ public class MainPageFragment extends Fragment implements
         mIMainPagePresenter = new MainPagePresenter(this);
         mILogoutPresenter = new LogoutPresenter(this);
         mIMainPagePresenter.synchronizePC();
+        /*
         if(Common.isNetworkConnected(this.getActivity())) {
             mIMainPagePresenter.postBill();
         }
+        */
     }
 
     @Override

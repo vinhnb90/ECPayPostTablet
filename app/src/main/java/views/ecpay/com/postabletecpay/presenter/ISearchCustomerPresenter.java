@@ -5,5 +5,5 @@ package views.ecpay.com.postabletecpay.presenter;
  */
 
 public interface ISearchCustomerPresenter {
-    public void search(String maKH, String tenKH, String dcKH, String phoneKH, String gtKH, String pcCode, int directEVN);
+    public void search(String maKH, String tenKH, String dcKH, String phoneKH, String gtKH);
 }

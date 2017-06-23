@@ -112,7 +112,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
             return;
         }
 
-        this.LoadPCInfo(edong, "01683861612");
+        //this.LoadPCInfo(edong, "01683861612");
 
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.putExtra(KEY_EDONG, edong);

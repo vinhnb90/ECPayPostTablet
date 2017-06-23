@@ -68,6 +68,8 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityLogout.BodyLog
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogout.FooterLogoutRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogout.HeaderLogoutRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogout.LogoutRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityMapCustomerCard.BodyMapCustomerCardRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityMapCustomerCard.MapCustomerCardRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.BodyPostBillRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.FooterPostBillRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.HeaderPostBillRequest;
@@ -480,6 +482,70 @@ public class SoapAPI {
         {
             //Test Deserialised
             final SearchCustomerBillRequest parsedRequest = gson.fromJson(jsonResult, SearchCustomerBillRequest.class);
+            Log.d("LOG", "jsonResult = " + jsonResult);
+        }
+
+        return jsonResult;
+    }
+    //region create JSON Request service
+    public static String getJsonMapCustomerCard(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver,
+                                                   String signatureEncrypted, String eCard, String cusCode, Long status, String phoneEcpay, String bankAcc,
+                                            String idNumer, String bankName, String accountId){
+        if (agent == null || agent.isEmpty() || agent.trim().equals(""))
+            return null;
+        if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
+            return null;
+        if (commandId == null || commandId.isEmpty() || commandId.trim().equals(""))
+            return null;
+        if (mac == null || mac.isEmpty() || mac.trim().equals(""))
+            return null;
+        if (diskDriver == null || diskDriver.isEmpty() || diskDriver.trim().equals(""))
+            return null;
+        if (signatureEncrypted == null || signatureEncrypted.isEmpty() || signatureEncrypted.trim().equals(""))
+            return null;
+        if (accountId == null || accountId.isEmpty() || accountId.trim().equals(""))
+            return null;
+
+
+        HeaderRequest header = new HeaderRequest();
+        header.setAgent(agent);
+        header.setPassword(agentEncypted);
+        header.setCommandId(commandId);
+
+        BodyMapCustomerCardRequest body = new BodyMapCustomerCardRequest();
+        body.setAuditNumber(auditNumber);
+        body.setMac(mac);
+        body.setDiskDrive(diskDriver);
+        body.setSignature(signatureEncrypted);
+        body.setCustomerCode(cusCode);
+        body.setBankAccountNumber(bankAcc);
+        body.setEcard(eCard);
+        body.setStatus(status);
+        body.setCustomerPhoneEcpay(phoneEcpay);
+        body.setBankName(bankName);
+        body.setIdNumber(idNumer);
+
+        FooterRequest footer = new FooterRequest();
+        footer.setAccountIdt(accountId);
+
+        final Request request = new MapCustomerCardRequest();
+        request.setHeader(header);
+        request.setBody(body);
+        request.setFooter(footer);
+
+
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        Type type = new TypeToken<MapCustomerCardRequest>() {
+        }.getType();
+        final Gson gson = gsonBuilder.create();
+
+        //Serialised
+        final String jsonResult = gson.toJson(request, type);
+
+        if(TEST_REQUEST)
+        {
+            //Test Deserialised
+            final MapCustomerCardRequest parsedRequest = gson.fromJson(jsonResult, MapCustomerCardRequest.class);
             Log.d("LOG", "jsonResult = " + jsonResult);
         }
 

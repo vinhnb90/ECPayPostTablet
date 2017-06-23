@@ -10,7 +10,7 @@
     <color name="colorTextBlack">#000000</color>
     <color name="colorTextGreen">#349e33</color>
     <color name="colorGray">#6e6e6e</color>
-    <color name="colorLightGray">#d1d1d1</color>
+    <color name="colorLightGray">#3c010101</color>
     <color name="colorMoreLightGray">#60d1d1d1</color>
     <color name="colorRed">#ff0000</color>
     <color name="colorLightOrange">#f7ba01</color>

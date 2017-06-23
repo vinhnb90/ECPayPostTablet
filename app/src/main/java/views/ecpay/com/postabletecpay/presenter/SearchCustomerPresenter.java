@@ -17,6 +17,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import views.ecpay.com.postabletecpay.model.CustomerSearchModel;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
@@ -39,6 +40,9 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
 
     private ISearchCustomerView searchCustomerView;
     private String mEDong;
+
+    private CustomerSearchModel customerSearchModel;
+
 
     private  SoapAPI.AsyncSoap.AsyncSoapCallBack<SearchCustomerBillRespone> callBack = new SoapAPI.AsyncSoap.AsyncSoapCallBack<SearchCustomerBillRespone>() {
         @Override
@@ -114,11 +118,31 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
     {
         searchCustomerView = view;
         mEDong = eDong;
+
+        customerSearchModel = new CustomerSearchModel(view.getContextView());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void search(String maKH, String tenKH, String dcKH, String phoneKH, String gtKH, String pcCode, int directEVN) {
+    public void search(String maKH, String tenKH, String dcKH, String phoneKH, String gtKH) {
+        if(maKH != null && maKH.length() > 0)
+        {
+            searchOnline(maKH);
+        }else
+        {
+            this.searchOffline(tenKH, dcKH, phoneKH, gtKH);
+        }
+    }
+
+
+    protected void searchOffline(String tenKH, String dcKH, String phoneKH, String gtKH)
+    {
+        searchCustomerView.refreshView(customerSearchModel.getListCustomer(tenKH, dcKH, phoneKH, gtKH));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    protected void searchOnline(String maKH)
+    {
         Context context = searchCustomerView.getContextView();
         ConfigInfo configInfo;
         String versionApp = "";
@@ -135,24 +159,6 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
             return;
         }
 
-
-//        String json = SoapAPI.getJsonSearchCustomer(
-//                configInfo.getAGENT(),
-//                configInfo.getAgentEncypted(),
-//                configInfo.getCommandId(),
-//                configInfo.getAuditNumber(),
-//                configInfo.getMacAdressHexValue(),
-//                configInfo.getDiskDriver(),
-//                configInfo.getSignatureEncrypted(),
-//                maKH,
-//                tenKH,
-//                phoneKH,
-//                dcKH,
-//                gtKH,
-//                pcCode,
-//                directEVN,
-//                configInfo.getAccountId()
-//        );
 
         String json = SoapAPI.getJsonSearchCustomerBill(
                 configInfo.getAGENT(),
@@ -206,36 +212,5 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
             return;
         }
 
-//        try {
-//            final SoapAPI.AsyncSoapSearchCustomer soapChangePass = new SoapAPI.AsyncSoapSearchCustomer(callBack);
-//
-//            if (soapChangePass.getStatus() != AsyncTask.Status.RUNNING) {
-//                soapChangePass.execute(json);
-//
-//                //thread time out
-//                final Thread soapChangePassThread = new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        ChangePassResponse changePassResponse = null;
-//
-//                        //call time out
-//                        try {
-//                            Thread.sleep(Common.TIME_OUT_CONNECT);
-//                        } catch (InterruptedException e) {
-//                            //iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
-//                        } finally {
-//                            if (changePassResponse == null) {
-//                                soapChangePass.callCountdown(soapChangePass);
-//                            }
-//                        }
-//                    }
-//                });
-//
-//                soapChangePassThread.start();
-//            }
-//        } catch (Exception e) {
-//            //iCashTranferView.showText(e.getMessage());
-//            return;
-//        }
     }
 }

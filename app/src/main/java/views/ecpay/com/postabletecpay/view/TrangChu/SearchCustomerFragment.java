@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -91,6 +92,27 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
     @BindView(R.id.btnSearch2)
     Button btnSearch2;
 
+    @Nullable
+    @BindView(R.id.eSearchCustomer)
+    EditText eSearchCustomer;
+
+    @Nullable
+    @BindView(R.id.eSearchTen)
+    EditText eSearchTen;
+
+    @Nullable
+    @BindView(R.id.eSearchDT)
+    EditText eSearchDT;
+
+    @Nullable
+    @BindView(R.id.eSearchBookCmis)
+    EditText eSearchBookCmis;
+
+    @Nullable
+    @BindView(R.id.eSearchAddress)
+    EditText eSearchAddress;
+
+
 
     @Nullable
     @Override
@@ -133,23 +155,34 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
         unbinder.unbind();
     }
 
+
+    void changeStateViewSearch()
+    {
+        float deg = btnExpand.getRotation() + 180F;
+        btnExpand.animate().rotation(deg).setDuration(1);
+
+        isCurrentExpand = !isCurrentExpand;
+        layout_timkiem_nangcao.setVisibility(isCurrentExpand ? View.VISIBLE : View.GONE);
+    }
+
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btnExpand) {
             //layout_timkiem_nangcao.setVisibility(layout_timkiem_nangcao.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
-
-            float deg = btnExpand.getRotation() + 180F;
-            btnExpand.animate().rotation(deg).setDuration(1);
-
-            isCurrentExpand = !isCurrentExpand;
-            layout_timkiem_nangcao.setVisibility(isCurrentExpand ? View.VISIBLE : View.GONE);
+            this.changeStateViewSearch();
             return;
         }
 
 
         if(v.getId() == R.id.btnSearch2)
         {
-            searchCustomerPresenter.search("PD02T324514", "", "", "", "", "PA0503", 2);
+
+            isCurrentExpand = false;
+            btnExpand.setRotation(180F);
+
+            layout_timkiem_nangcao.setVisibility(View.GONE);
+
+            searchCustomerPresenter.search(eSearchCustomer.getText().toString(), eSearchTen.getText().toString(), eSearchAddress.getText().toString(), eSearchDT.getText().toString(), eSearchBookCmis.getText().toString());
             return;
         }
         if(v.getId() == R.id.btnScanCode)
@@ -186,7 +219,7 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
     @Override
     public void showCustomerInfo(Customer customer) {
         FragmentTransaction fragmentTransaction = this.getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout, CustomerInfoFragment.newInstance());
+        fragmentTransaction.replace(R.id.frameLayout, CustomerInfoFragment.newInstance(customer, eDong));
         fragmentTransaction.commit();
     }
 }

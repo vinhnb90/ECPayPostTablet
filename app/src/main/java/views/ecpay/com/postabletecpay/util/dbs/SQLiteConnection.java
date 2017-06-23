@@ -1298,6 +1298,32 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return rowAffect;
     }
 
+    public long updateCustomer(Customer customer) {
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("name", customer.getName());
+        initialValues.put("address", customer.getAddress());
+        initialValues.put("pcCode", customer.getPcCode());
+        initialValues.put("cardNo", customer.getCardNo());
+        initialValues.put("pcCodeExt", customer.getPcCodeExt());
+        initialValues.put("phoneByevn", customer.getPhoneByevn());
+        initialValues.put("phoneByecp", customer.getPhoneByecp());
+        initialValues.put("bookCmis", customer.getBookCmis());
+        initialValues.put("electricityMeter", customer.getElectricityMeter());
+        initialValues.put("inning", customer.getInning());
+        initialValues.put("status", customer.getStatus());
+        initialValues.put("bankAccount", "");
+        initialValues.put("idNumber", customer.getIdNumber());
+        initialValues.put("bankName", "");
+        initialValues.put("isShowBill", 0);
+        initialValues.put("idChanged", customer.getIdChanged());
+        initialValues.put("dateChanged", customer.getDateChanged());
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.update(TABLE_NAME_CUSTOMER, initialValues, "code = ?", new String[]{customer.getCode()});
+        return rowAffect;
+    }
+
     public long checkCustomerExist(String code) {
         database = this.getReadableDatabase();
         String query = "SELECT COUNT(*) FROM " + TABLE_NAME_CUSTOMER + " WHERE code = '" + code + "'";

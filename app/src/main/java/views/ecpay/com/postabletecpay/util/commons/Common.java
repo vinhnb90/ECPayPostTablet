@@ -773,7 +773,8 @@ public class Common {
         CASH_TRANSFER,
         GET_PC_INFO,
         SEARCH_CUSTOMER,
-        SEARCH_CUSTOMER_BILL;
+        SEARCH_CUSTOMER_BILL,
+        MAP_CUSTOMER_CARD;
 
         @Override
         public String toString() {
@@ -807,6 +808,8 @@ public class Common {
                 return  "CUSTOMER";
             if(this == SEARCH_CUSTOMER_BILL)
                 return  "CUSTOMER-BILL";
+            if(this == MAP_CUSTOMER_CARD)
+                return "MAP-CUSTOMER-CARD";
             return super.toString();
         }
     }
