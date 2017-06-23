@@ -39,6 +39,7 @@ import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.BillInside
 public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     private static Context sContext;
     private static IPayView sIPayView;
+    private static PayModel sPayModel;
 
     //giá trị billList[0] = mAdapterList[indexBegin] , billList[billList.size()] = mAdapterList[indexEnd]
     private int indexBegin, indexEnd;
@@ -61,7 +62,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         this.billList = billList;
         this.indexBegin = indexBegin;
         this.indexEnd = indexEnd;
-
+        sPayModel = new PayModel(sIPayView.getContextView());
         payModel = new PayModel(sIPayView.getContextView());
     }
 
@@ -99,7 +100,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         Common.runAnimationClickViewScale(holder.cardView, R.anim.twinking_view, Common.TIME_DELAY_ANIM);
 
-        ((MainActivity)sContext).runOnUiThread(new Runnable() {
+        ((MainActivity) sContext).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 List<PayAdapter.BillEntityAdapter> listBill = new ArrayList<>();
@@ -122,14 +123,6 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         return billList.size();
     }
 
-    public void refreshData(List<PayEntityAdapter> adapterList) {
-        if (adapterList == null)
-            return;
-
-        this.billList.clear();
-        this.billList.addAll(adapterList);
-        notifyDataSetChanged();
-    }
 
     public class PayViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.tv_row_pay_recycler_customer)
@@ -163,7 +156,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(!onBind) {
+                    if (!onBind) {
                         boolean isShowBill = billList.get(positionCustomer).isShowBill();
 
                         billList.get(positionCustomer).setShowBill(isShowBill = !isShowBill);
@@ -431,7 +424,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
             if (Common.STATUS_BILLING.findCodeMessage(entity.getStatus()).getCode() == Common.STATUS_BILLING.DANG_CHO_HUY.getCode()) {
                 holder.tvStatusBill.setTextColor(ContextCompat.getColor(sContext, R.color.colorRed));
-            }else {
+            } else {
                 holder.tvStatusBill.setTextColor(ContextCompat.getColor(sContext, R.color.colorTextGreen));
             }
             holder.ibtnPrintInside.setVisibility(entity.isPrint ? View.VISIBLE : View.INVISIBLE);
@@ -462,13 +455,113 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             }
 
             @OnCheckedChanged(R.id.cb_row_bill_inside_pay)
-            public void onCheckedChanged(CheckBox checkBox, boolean checked) {
+            public void onCheckedChanged(final CheckBox checkBox, boolean checked) {
                 if (checkBox.isPressed()) {
                     int position = getAdapterPosition();
-                    BillEntityAdapter bill = billList.get(position);
-                    bill.setChecked(checked);
 
-                    interaction.processCheckedBillFragment(edong, code,  posCustomerInside, billList, position, indexBegin, indexEnd);
+                    boolean isNotBillPayedTermBefore = false;
+                    boolean isNotBillOldestPayedTermBefore = false;
+
+                    int index = position;
+                    int indexNotPayedTermOldest = Common.NEGATIVE_ONE;
+
+                    BillEntityAdapter bill = billList.get(position);
+                    String term = bill.getMonthBill();
+                    //TODO check hóa đơn xa nhất
+                    for (; index < billList.size(); index++) {
+                        if (billList.get(index).getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())
+                            indexNotPayedTermOldest = index;
+                    }
+
+                    if (checked) {
+                        //TODO check hóa đơn liên tục fragment khi checked
+                        index = position;
+                        for (; index < billList.size(); index++) {
+                            String termIndex = billList.get(index).getMonthBill();
+                            if (billList.get(index).getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode() && !billList.get(index).isChecked() && !termIndex.equals(term)) {
+                                isNotBillPayedTermBefore = true;
+
+                                if (index == indexNotPayedTermOldest)
+                                    isNotBillOldestPayedTermBefore = true;
+
+                            }
+                        }
+
+                        if (isNotBillPayedTermBefore) {
+                            ((MainActivity) sContext).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    checkBox.setChecked(false);
+                                }
+                            });
+
+//                        String nameCustomer = sPayModel.getCustomerNameByBillId(edong, bill.getBillId());
+                            String customerCode = sPayModel.getCustomerCodeByBillId(edong, bill.getBillId());
+                            if (isNotBillPayedTermBefore && isNotBillOldestPayedTermBefore) {
+                                interaction.processUnCheckedBillFragment(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage() + Common.TEXT_MULTI_SPACE + customerCode);
+                                return;
+                            }
+
+                            if (isNotBillOldestPayedTermBefore) {
+                                interaction.processUnCheckedBillFragment(Common.CODE_REPONSE_BILL_ONLINE.ex10005.getMessage() + Common.TEXT_MULTI_SPACE + customerCode);
+                                return;
+                            }
+                            return;
+                        }
+
+                        bill.setChecked(checked);
+                        interaction.processCheckedBillFragment(edong, code, posCustomerInside, billList, position, indexBegin, indexEnd);
+                    } else {
+                        //TODO check hóa đơn liên tục fragment khi unchecked
+
+                        //find index is checked term newest
+                        int indexTermNewestChecked = Common.NEGATIVE_ONE;
+                        for (index = 0; index < billList.size(); index++) {
+
+                            int status = billList.get(index).getStatus();
+                            boolean isChecked = billList.get(index).isChecked();
+                            if (indexTermNewestChecked != Common.NEGATIVE_ONE)
+                                break;
+                            if (status == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode() && isChecked)
+                                indexTermNewestChecked = index;
+                        }
+
+
+                        index = position;
+                        if (index == indexNotPayedTermOldest)
+                            isNotBillOldestPayedTermBefore = true;
+
+//                        for (; index <= indexTermNewestChecked; index++) {
+                        String termIndex = billList.get(index).getMonthBill();
+
+                        if (billList.get(index).getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) {
+                            if (!termIndex.equals(billList.get(indexTermNewestChecked).getMonthBill()))
+                                isNotBillPayedTermBefore = true;
+
+                        }
+
+//                        }
+
+                        if (isNotBillPayedTermBefore) {
+                            ((MainActivity) sContext).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    checkBox.setChecked(true);
+                                }
+                            });
+                        }
+
+                        String customerCode = sPayModel.getCustomerCodeByBillId(edong, bill.getBillId());
+                        if (isNotBillPayedTermBefore && isNotBillOldestPayedTermBefore) {
+                            interaction.processUnCheckedBillFragment(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage() + Common.TEXT_MULTI_SPACE + customerCode);
+                            return;
+                        }
+
+                        bill.setChecked(checked);
+                        interaction.processCheckedBillFragment(edong, code, posCustomerInside, billList, position, indexBegin, indexEnd);
+
+                        return;
+                    }
                 }
             }
 
@@ -507,8 +600,10 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     }
 
     public interface OnInterationBillInsidePayAdapter {
-        void processCheckedBillFragment(String edong, String code, int posCustomer, List<BillEntityAdapter>  billList, int posBillInside, int indexBegin, int indexEnd);
+        void processCheckedBillFragment(String edong, String code, int posCustomer, List<BillEntityAdapter> billList, int posBillInside, int indexBegin, int indexEnd);
 
         void processDeleteBillOnlineFragment(String edong, String code, BillEntityAdapter bill, int posCustomerInside);
+
+        void processUnCheckedBillFragment(String message);
     }
 }

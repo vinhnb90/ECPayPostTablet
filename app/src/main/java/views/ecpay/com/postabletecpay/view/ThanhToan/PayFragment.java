@@ -46,6 +46,7 @@ import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
 import views.ecpay.com.postabletecpay.presenter.PayPresenter;
+import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
@@ -136,7 +137,7 @@ public class PayFragment extends Fragment implements
     //Dialog pay list bills
     @Nullable
     @BindView(R.id.rv_dialog_thanhtoan_bills)
-    RecyclerView rvListBill;
+    RecyclerView rvListBillDialog;
     @Nullable
     @BindView(R.id.tv_dialog_thanhtoan_total_money_bills)
     TextView tvTotalBillsMoneyDialog;
@@ -220,6 +221,7 @@ public class PayFragment extends Fragment implements
     private Dialog dialogPayingOnline, dialogDeleteBillOnline, dialogBarcode;
     public static final int REQUEST_BARCODE = 999;
     public static final int RESPONSE_BARCODE = 1000;
+
 
     public enum VISIBLE_BUTTON_DELETE_DIALOG {
         SHOW_ALL(0),
@@ -415,11 +417,11 @@ public class PayFragment extends Fragment implements
     @OnClick(R.id.btn_dialog_thanhtoan_pay)
     public void clickPayPayingOnlineDialog(View view) {
 //        if(Common.isConnectingWifi(PayFragment.this.getActivity())) {
-//      if(Common.isNetworkConnected(PayFragment.this.getActivity())) {
-//            mIPayPresenter.callPayingBillOnline(mEdong);
-//        } else {
-            mIPayPresenter.callPayingBillOffline(mEdong);
-//        }
+        if (Common.isNetworkConnected(PayFragment.this.getActivity())) {
+            mIPayPresenter.callPayingBillOnline(mEdong);
+        } else {
+//            mIPayPresenter.callPayingBillOffline(mEdong);
+        }
     }
     //endregion
 
@@ -574,7 +576,7 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
-    public void showPayRecyclerPage(List<PayAdapter.PayEntityAdapter> adapterList,  int indexBegin, int indexEnd, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) {
+    public void showPayRecyclerPage(List<PayAdapter.PayEntityAdapter> adapterList, int indexBegin, int indexEnd, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) {
         btnPre.setEnabled(true);
         btnNext.setEnabled(true);
         tvPage.setText(String.valueOf(pageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
@@ -595,8 +597,13 @@ public class PayFragment extends Fragment implements
             setEnablePreNext(3);
 
 
+        if (payAdapter != null) {
+            rvKH.removeAllViews();
+        }
         payAdapter = new PayAdapter(this.getContext(), this, adapterList, indexBegin, indexEnd);
         rvKH.setAdapter(payAdapter);
+        rvKH.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvKH.setHasFixedSize(true);
         rvKH.invalidate();
 
         if (adapterList.size() == ZERO) {
@@ -627,7 +634,7 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
-    public void showMessageNotifySearchOnline(String message) {
+    public void showMessageNotifySearchOnline(String message, Common.TYPE_DIALOG typeDialog) {
         if (message == null || message.isEmpty() || message.trim().equals(Common.TEXT_EMPTY))
             return;
 
@@ -638,6 +645,19 @@ public class PayFragment extends Fragment implements
         Common.runAnimationClickViewScale(tvMessageNotifySearchOnlne, R.anim.scale_view_pull, TIME_DELAY_ANIM);
         tvMessageNotifySearchOnlne.setVisibility(View.VISIBLE);
         tvMessageNotifySearchOnlne.setText(message);
+
+        IActionClickYesNoDialog yesNoDialog = new IActionClickYesNoDialog() {
+            @Override
+            public void doClickNo() {
+
+            }
+
+            @Override
+            public void doClickYes() {
+                //dismiss
+            }
+        };
+        Common.showDialog(getContext(), yesNoDialog, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), message, false, typeDialog);
     }
 
     /**
@@ -657,6 +677,19 @@ public class PayFragment extends Fragment implements
         Common.runAnimationClickViewScale(tvMessageNotifySearchOnlne, R.anim.scale_view_pull, TIME_DELAY_ANIM);
         tvMessageNotifySearchOnlne.setVisibility(View.VISIBLE);
         tvMessageNotifySearchOnlne.setText(message);
+
+        IActionClickYesNoDialog yesNoDialog = new IActionClickYesNoDialog() {
+            @Override
+            public void doClickNo() {
+
+            }
+
+            @Override
+            public void doClickYes() {
+                //dismiss
+            }
+        };
+        Common.showDialog(getContext(), yesNoDialog, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), message, false, Common.TYPE_DIALOG.LOI);
     }
 
     @Override
@@ -681,16 +714,16 @@ public class PayFragment extends Fragment implements
         setUpRecyclerDialog();
 
 //        if (payBillsDialogAdapter == null) {
-        payBillsDialogAdapter = new PayBillsDialogAdapter(this.getContext(), listBillChecked);
-        rvListBill.setAdapter(payBillsDialogAdapter);
+        payBillsDialogAdapter = new PayBillsDialogAdapter(this.getContext(), listBillChecked, false);
+        rvListBillDialog.setAdapter(payBillsDialogAdapter);
 //        } else
 //            payBillsDialogAdapter.refreshData(listBillChecked);
 
-        rvListBill.invalidate();
+        rvListBillDialog.invalidate();
     }
 
     private void setUpRecyclerDialog() {
-        rvListBill.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvListBillDialog.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     @Override
@@ -704,8 +737,26 @@ public class PayFragment extends Fragment implements
         tvTotalBillsMoneyDialog.setText(Common.convertLongToMoney(totalMoneyInDialog));
     }
 
+
+    public void showMessageNotifyBillOnlineDialog(String message, Common.TYPE_DIALOG typeDialog) {
+        if (message == null)
+            return;
+        IActionClickYesNoDialog yesNoDialog = new IActionClickYesNoDialog() {
+            @Override
+            public void doClickNo() {
+
+            }
+
+            @Override
+            public void doClickYes() {
+                //dismiss
+            }
+        };
+        Common.showDialog(getContext(), yesNoDialog, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), message, false, typeDialog);
+    }
+
     @Override
-    public void showMessageNotifyBillOnlineDialog(String message, boolean isMutilMessage) {
+    public void showMessageNotifyBillOnlineDialog(String message, boolean isMutilMessage, Common.TYPE_DIALOG typeDialog, boolean isShowDialog) {
         if (message == null)
             return;
         if (isHasNullViewPayingOnlineDialog())
@@ -717,6 +768,21 @@ public class PayFragment extends Fragment implements
         Common.runAnimationClickViewScale(tvMessageDialog, R.anim.scale_view_pull, TIME_DELAY_ANIM);
         tvMessageDialog.setVisibility(View.VISIBLE);
         tvMessageDialog.setText(isMutilMessage ? tvMessageDialog.getText().toString() + Common.TEXT_ENTER + message : message);
+
+        if (!isMutilMessage && isShowDialog) {
+            IActionClickYesNoDialog yesNoDialog = new IActionClickYesNoDialog() {
+                @Override
+                public void doClickNo() {
+
+                }
+
+                @Override
+                public void doClickYes() {
+                    //dismiss
+                }
+            };
+            Common.showDialog(getContext(), yesNoDialog, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), tvMessageDialog.getText().toString(), false, typeDialog);
+        }
     }
 
     @Override
@@ -876,7 +942,7 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
-    public void showMessageNotifyDeleteOnlineDialog(String message) {
+    public void showMessageNotifyDeleteOnlineDialog(String message, Common.TYPE_DIALOG typeDialog) {
         if (TextUtils.isEmpty(message))
             return;
         cardMessage.setVisibility(View.VISIBLE);
@@ -884,6 +950,19 @@ public class PayFragment extends Fragment implements
         Common.runAnimationClickViewScale(tvMessageBillDeleteDialog, R.anim.scale_view_pull, TIME_DELAY_ANIM);
         tvMessageBillDeleteDialog.setVisibility(View.VISIBLE);
         tvMessageBillDeleteDialog.setText(message);
+
+        IActionClickYesNoDialog yesNoDialog = new IActionClickYesNoDialog() {
+            @Override
+            public void doClickNo() {
+
+            }
+
+            @Override
+            public void doClickYes() {
+                //dismiss
+            }
+        };
+        Common.showDialog(getContext(), yesNoDialog, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), message, false, typeDialog);
     }
 
     @Override
@@ -994,6 +1073,28 @@ public class PayFragment extends Fragment implements
 //            Log.e(TAG, "showDialogBarcode: fragment cannot implement CallbackBarcodeDialog ");
     }
 
+    @Override
+    public void showPayRecyclerListBillsAndDisableCheckBox(List<PayBillsDialogAdapter.Entity> listBillChecked, boolean isDisableAllCheckbox) {
+        if (listBillChecked == null)
+            return;
+
+        setUpRecyclerDialog();
+
+//        if (payBillsDialogAdapter == null) {
+        payBillsDialogAdapter = new PayBillsDialogAdapter(this.getContext(), listBillChecked, isDisableAllCheckbox);
+        rvListBillDialog.setAdapter(payBillsDialogAdapter);
+//        } else
+//            payBillsDialogAdapter.refreshData(listBillChecked);
+
+        rvListBillDialog.invalidate();
+
+    }
+
+//    @Override
+//    public void disableAllBillCheckboxWhenBillingOnline(boolean isDisableCheckbox) {
+//        ((PayBillsDialogAdapter) rvListBillDialog.getAdapter()).disableAllBillCheckbox(isDisableCheckbox);
+//    }
+
     private boolean isHasNullViewDeleteBillOnlineDialog() {
         return tvCodeCustomerDeleteDialog == null || tvNameCustomerDeleteDialog == null || tvTermBillDeleteDialog == null
                 || tvAmountBillDeleteDialog == null || etReasonDeleteBillDeleteDialog == null || btnContinuedDeleteDialog == null
@@ -1019,8 +1120,8 @@ public class PayFragment extends Fragment implements
         }
     }
 
-    public void showBillCheckedFragment(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomer, int indexBegin, int indexEnd) {
-        mIPayPresenter.callProcessDataBillFragmentChecked(edong, code, bill, posCustomer, indexBegin, indexEnd);
+    public void showBillCheckedFragment(String edong, String code, int posCustomer, PayAdapter.BillEntityAdapter bill, int posBillInside, int indexBegin, int indexEnd) {
+        mIPayPresenter.callProcessDataBillFragmentChecked(edong, code, posCustomer, bill, posBillInside, indexBegin, indexEnd);
     }
 
     public void processDialogDeleteBillOnline(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside) {
