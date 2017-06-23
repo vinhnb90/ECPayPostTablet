@@ -16,7 +16,7 @@ public interface IPayPresenter {
 
     void reseachOnline(String edong);
 
-    void callProcessDataBillFragmentChecked(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomer, int indexBegin, int indexEnd);
+    void callProcessDataBillFragmentChecked(String edong, String code,  int posCustomer, PayAdapter.BillEntityAdapter bill, int posBillInside, int indexBegin, int indexEnd);
 
     void callPayRecyclerDialog(String mEdong);
 

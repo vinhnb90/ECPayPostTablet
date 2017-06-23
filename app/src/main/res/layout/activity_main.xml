@@ -86,7 +86,7 @@
 
                 android:lines="1"
                 android:scrollHorizontally="true"
-                android:text="Disconnect"
+                tools:text="Disconnect"
                 android:textColor="@color/colorTextWhite"
                 android:visibility="gone" />
 

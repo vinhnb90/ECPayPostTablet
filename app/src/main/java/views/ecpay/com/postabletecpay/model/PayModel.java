@@ -361,4 +361,12 @@ public class PayModel extends CommonModel {
     public Cursor getCustomer(String code) {
         return sqLiteConnection.getCustomer(code);
     }
+
+    public String getCustomerNameByBillId(String edong, long billId) {
+        return sqLiteConnection.getCustomerNameByBillId(edong, billId);
+    }
+
+    public String getCustomerCodeByBillId(String edong, long billId) {
+        return sqLiteConnection.getCustomerCodeByBillId(edong, billId);
+    }
 }

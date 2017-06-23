@@ -4,6 +4,7 @@ import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
+import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.ICommonView;
 
 /**
@@ -19,7 +20,7 @@ public interface IPayView extends ICommonView {
 
     void hideSearchOnlineProcess();
 
-    void showMessageNotifySearchOnline(String message);
+    void showMessageNotifySearchOnline(String message, Common.TYPE_DIALOG typeDialog);
 
     void showEditTextSearch(String value);
 
@@ -29,7 +30,7 @@ public interface IPayView extends ICommonView {
 
     void showCountBillsAndTotalMoneyInDialog(int totalBillsInList, long totalMoneyInList);
 
-    void showMessageNotifyBillOnlineDialog(String message, boolean isMutilMessage);
+    void showMessageNotifyBillOnlineDialog(String message, boolean isMutilMessage, Common.TYPE_DIALOG typeDialog, boolean isShowDialog);
 
     void showPayingRViewDialogStart();
 
@@ -55,7 +56,7 @@ public interface IPayView extends ICommonView {
 
     void hideAllProcessDeleteBillOnline();
 
-    void showMessageNotifyDeleteOnlineDialog(String message);
+    void showMessageNotifyDeleteOnlineDialog(String message, Common.TYPE_DIALOG typeDialog);
 
     void visibleButtonDeleteDialog(PayFragment.VISIBLE_BUTTON_DELETE_DIALOG type);
 
@@ -66,4 +67,8 @@ public interface IPayView extends ICommonView {
     void showTextNoData();
 
     void showDialogBarcode();
+
+    void showPayRecyclerListBillsAndDisableCheckBox(List<PayBillsDialogAdapter.Entity> listBillChecked, boolean isDisableAllCheckbox);
+
+//    void disableAllBillCheckboxWhenBillingOnline(boolean isDisableCheckbox);
 }
