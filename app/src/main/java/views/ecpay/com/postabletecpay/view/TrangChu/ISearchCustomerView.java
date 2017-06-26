@@ -13,4 +13,7 @@ public interface ISearchCustomerView extends ICommonView {
     public void refreshView(List<Customer> lst);
     public void showDialogBarcode();
     public void showCustomerInfo(Customer customer);
+    public void showMessage(String message);
+
+
 }

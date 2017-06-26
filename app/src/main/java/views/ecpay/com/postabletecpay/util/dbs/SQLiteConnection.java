@@ -11,8 +11,12 @@ import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import views.ecpay.com.postabletecpay.model.ReportModel;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
@@ -31,6 +35,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListC
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
@@ -318,6 +323,375 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return object = (object == null) ? 0 : object.intValue();
     }
 
+
+    public ReportModel.BillInfo countBillDuocGiao(String edong) {
+        ReportModel.BillInfo bill = new ReportModel.BillInfo();
+        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
+        {
+            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
+            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+
+        return bill;
+
+    }
+
+
+
+    public ReportModel.BillInfo countBillDaThu(String edong) {
+        ReportModel.BillInfo bill = new ReportModel.BillInfo();
+        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status != 0";
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
+        {
+            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
+            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+
+        return bill;
+
+    }
+
+
+
+    public ReportModel.BillInfo countBillHoanTra(String edong) {
+        ReportModel.BillInfo bill = new ReportModel.BillInfo();
+        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status != 0 and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
+        {
+            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
+            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+
+        return bill;
+
+    }
+
+
+    public ReportModel.BillInfo countBillVangLai(String edong) {
+        ReportModel.BillInfo bill = new ReportModel.BillInfo();
+        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " bill WHERE bill.edongKey = '" + edong +
+                "' and bill.status != 0 and  NOT EXISTS (SELECT * FROM " + TABLE_NAME_CUSTOMER + " customer WHERE bill.customerCode = customer.code)";
+//                "                  FROM employees" +
+//                "                  WHERE departments.department_id = employees.department_id)";
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
+        {
+            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
+            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+
+        return bill;
+
+    }
+
+
+    private String getCustomerCodeByCardNo(String cardNo) {
+        String query = "SELECT code FROM " + TABLE_NAME_CUSTOMER + " WHERE cardNo like '%" + cardNo + "%'";
+        Cursor mCursor = database.rawQuery(query, null);
+
+
+        String code = null;
+
+        int count = mCursor.getCount();
+        if (count != ZERO && mCursor.moveToFirst()) {
+            mCursor.moveToFirst();
+            code = mCursor.getString(mCursor.getColumnIndex("code"));
+        }
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return code;
+    }
+
+    public List<Bill> getBillThuByCodeAndDate(String edong, boolean isMaKH, String customerCode, Calendar dateFrom, Calendar dateTo)
+    {
+        List<Bill> lst = new ArrayList<>();
+
+
+        String query;
+
+        if(isMaKH)
+        {
+            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
+                    "' and status != 0 and customerCode like '%" + customerCode + "%'";
+        }else
+        {
+            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
+                    "' and status != 0 and name like '%" + customerCode + "%'";
+        }
+
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor != null && mCursor.moveToFirst()) {
+            int count = mCursor.getCount();
+            do {
+                String _requestDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
+                if(_requestDate.length() == 0)
+                {
+                    continue;
+                }
+
+                String[] arr = _requestDate.split("/");
+                if (arr.length != 3)
+                {
+                    continue;
+                }
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(intConvertNull(Integer.parseInt(arr[2])), intConvertNull(Integer.parseInt(arr[1])) - 1, intConvertNull(Integer.parseInt(arr[0])));
+
+                if((dateFrom != null && calendar.before(dateFrom)) || (dateTo != null && calendar.after(dateTo)))
+                {
+                    continue;
+                }
+
+
+
+                String _customerCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode")));
+                String _customerPayCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerPayCode")));
+                String _billId = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billId")));
+                String _term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
+                int _amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
+                String _period = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("period")));
+                String _issueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("issueDate")));
+                String _strIssueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strIssueDate")));
+                int _status = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")));
+                String _seri = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("seri")));
+                String _pcCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCode")));
+                String _handoverCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("handoverCode")));
+                String _cashierCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierCode")));
+                String _bookCmis = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bookCmis")));
+                String _fromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("fromDate")));
+                String _toDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("toDate")));
+                String _strFromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strFromDate")));
+                String _strToDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strToDate")));
+                String _home = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("home")));
+                String _tax = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("tax")));
+                String _billNum = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billNum")));
+                String _currency = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("currency")));
+                String _priceDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("priceDetails")));
+                String _numeDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("numeDetails")));
+                String _amountDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("amountDetails")));
+                String _oldIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("oldIndex")));
+                String _newIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("newIndex")));
+                String _nume = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nume")));
+                int _amountNotTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountNotTax")));
+                int _amountTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountTax")));
+                String _multiple = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("multiple")));
+                String _billType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billType")));
+                String _typeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("typeIndex")));
+                String _groupTypeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("groupTypeIndex")));
+                String _createdDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("createdDate")));
+                int _idChanged = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("idChanged")));
+                String _dateChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("dateChanged")));
+                String _edong = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edong")));
+                String _pcCodeExt = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCodeExt")));
+                String _code = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("code")));
+                String _name = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name")));
+                String _nameNosign = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nameNosign")));
+                String _phoneByevn = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByevn")));
+                String _phoneByecp = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByecp")));
+                String _electricityMeter = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("electricityMeter")));
+                String _inning = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("inning")));
+                String _road = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("road")));
+                String _station = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("station")));
+                String _taxCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("taxCode")));
+                String _trade = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("trade")));
+                String _countPeriod = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("countPeriod")));
+                String _team = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("team")));
+                int _type = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("type")));
+                String _lastQuery = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("lastQuery")));
+                int _groupType = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("groupType")));
+                String _billingChannel = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingChannel")));
+                String _billingType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingType")));
+                String _billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
+                String _cashierPay = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierPay")));
+                String _edongKey = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edongKey")));
+                int _isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked")));
+                long _traceNumber = longConvertNull(mCursor.getLong(mCursor.getColumnIndex("customerPayCode")));
+
+                Bill bill = new Bill(_customerCode, _customerPayCode, _billId, _term, _amount, _period, _issueDate, _strIssueDate, _status, _seri, _pcCode, _handoverCode, _cashierCode, _bookCmis, _fromDate, _toDate, _strFromDate, _strToDate, _home, _tax, _billNum, _currency, _priceDetails, _numeDetails, _amountDetails, _oldIndex, _newIndex, _nume, _amountNotTax, _amountTax, _multiple, _billType, _typeIndex, _groupTypeIndex, _createdDate, _idChanged, _dateChanged, _edong, _pcCodeExt, _code, _name, _nameNosign, _phoneByevn, _phoneByecp, _electricityMeter, _inning, _road, _station, _taxCode, _trade, _countPeriod, _team, _type, _lastQuery, _groupType, _billingChannel, _billingType, _billingBy, _cashierPay, _requestDate, _edongKey, _isChecked, _traceNumber);
+                bill.setRequestDateCal(calendar);
+                lst.add(bill);
+
+            }
+            while (mCursor.moveToNext());
+
+            mCursor.close();
+        }
+
+
+        if (lst.size() > 1)
+        {
+            Collections.sort(lst, new Comparator<Bill>() {
+                @Override
+                public int compare(Bill bill, Bill t1) {
+                    if(bill.getRequestDateCal().before(t1.getRequestDateCal()))
+                        return -1;
+                    return 1;
+                }
+            });
+        }
+
+        return lst;
+    }
+
+
+    public List<Bill> getBillHoanTraByCodeAndDate(String edong, boolean isMaKH, String customerCode, Calendar dateFrom, Calendar dateTo)
+    {
+        List<Bill> lst = new ArrayList<>();
+
+
+        String query;
+
+        if(isMaKH)
+        {
+            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
+                    "' and status != 0 and customerCode like '%" + customerCode + "%' and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
+        }else
+        {
+            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
+                    "' and status != 0 and name like '%" + customerCode + "%' and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
+        }
+
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor != null && mCursor.moveToFirst()) {
+            int count = mCursor.getCount();
+            do {
+                String _requestDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
+                if(_requestDate.length() == 0)
+                {
+                    continue;
+                }
+
+                String[] arr = _requestDate.split("/");
+                if (arr.length != 3)
+                {
+                    continue;
+                }
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(intConvertNull(Integer.parseInt(arr[2])), intConvertNull(Integer.parseInt(arr[1])) - 1, intConvertNull(Integer.parseInt(arr[0])));
+
+                if((dateFrom != null && calendar.before(dateFrom)) || (dateTo != null && calendar.after(dateTo)))
+                {
+                    continue;
+                }
+
+
+
+                String _customerCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode")));
+                String _customerPayCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerPayCode")));
+                String _billId = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billId")));
+                String _term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
+                int _amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
+                String _period = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("period")));
+                String _issueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("issueDate")));
+                String _strIssueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strIssueDate")));
+                int _status = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")));
+                String _seri = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("seri")));
+                String _pcCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCode")));
+                String _handoverCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("handoverCode")));
+                String _cashierCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierCode")));
+                String _bookCmis = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bookCmis")));
+                String _fromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("fromDate")));
+                String _toDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("toDate")));
+                String _strFromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strFromDate")));
+                String _strToDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strToDate")));
+                String _home = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("home")));
+                String _tax = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("tax")));
+                String _billNum = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billNum")));
+                String _currency = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("currency")));
+                String _priceDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("priceDetails")));
+                String _numeDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("numeDetails")));
+                String _amountDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("amountDetails")));
+                String _oldIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("oldIndex")));
+                String _newIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("newIndex")));
+                String _nume = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nume")));
+                int _amountNotTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountNotTax")));
+                int _amountTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountTax")));
+                String _multiple = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("multiple")));
+                String _billType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billType")));
+                String _typeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("typeIndex")));
+                String _groupTypeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("groupTypeIndex")));
+                String _createdDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("createdDate")));
+                int _idChanged = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("idChanged")));
+                String _dateChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("dateChanged")));
+                String _edong = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edong")));
+                String _pcCodeExt = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCodeExt")));
+                String _code = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("code")));
+                String _name = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name")));
+                String _nameNosign = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nameNosign")));
+                String _phoneByevn = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByevn")));
+                String _phoneByecp = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByecp")));
+                String _electricityMeter = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("electricityMeter")));
+                String _inning = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("inning")));
+                String _road = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("road")));
+                String _station = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("station")));
+                String _taxCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("taxCode")));
+                String _trade = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("trade")));
+                String _countPeriod = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("countPeriod")));
+                String _team = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("team")));
+                int _type = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("type")));
+                String _lastQuery = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("lastQuery")));
+                int _groupType = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("groupType")));
+                String _billingChannel = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingChannel")));
+                String _billingType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingType")));
+                String _billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
+                String _cashierPay = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierPay")));
+                String _edongKey = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edongKey")));
+                int _isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked")));
+                long _traceNumber = longConvertNull(mCursor.getLong(mCursor.getColumnIndex("customerPayCode")));
+
+                Bill bill = new Bill(_customerCode, _customerPayCode, _billId, _term, _amount, _period, _issueDate, _strIssueDate, _status, _seri, _pcCode, _handoverCode, _cashierCode, _bookCmis, _fromDate, _toDate, _strFromDate, _strToDate, _home, _tax, _billNum, _currency, _priceDetails, _numeDetails, _amountDetails, _oldIndex, _newIndex, _nume, _amountNotTax, _amountTax, _multiple, _billType, _typeIndex, _groupTypeIndex, _createdDate, _idChanged, _dateChanged, _edong, _pcCodeExt, _code, _name, _nameNosign, _phoneByevn, _phoneByecp, _electricityMeter, _inning, _road, _station, _taxCode, _trade, _countPeriod, _team, _type, _lastQuery, _groupType, _billingChannel, _billingType, _billingBy, _cashierPay, _requestDate, _edongKey, _isChecked, _traceNumber);
+                bill.setRequestDateCal(calendar);
+                lst.add(bill);
+
+            }
+            while (mCursor.moveToNext());
+
+            mCursor.close();
+        }
+
+
+        if (lst.size() > 1)
+        {
+            Collections.sort(lst, new Comparator<Bill>() {
+                @Override
+                public int compare(Bill bill, Bill t1) {
+                    if(bill.getRequestDateCal().before(t1.getRequestDateCal()))
+                        return -1;
+                    return 1;
+                }
+            });
+        }
+
+        return lst;
+    }
+
     public int countBill(String edong) {
         if (edong == null)
             return 0;
@@ -488,34 +862,42 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
 
-    public List<Customer> selectAllCustomerFitter(String _name, String _address, String _phone, String _bookCmis) {
+    public List<Customer> selectAllCustomerFitter(String _maKH, String _name, String _address, String _phone, String _bookCmis) {
         List<Customer> customerList = new ArrayList<>();
 
 
         String query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE ";
-        boolean hasWhere = false;
-        if(_name.length() > 0)
+        if(_maKH.length() != 0)
         {
-            query += (hasWhere ? "and "  : "") + "name like '%" + _name + "%' ";
-            hasWhere = true;
-        }
+            query += "code like '%" + _maKH + "%' or ";
+            query += "cardNo like '%" + _maKH + "%' ";
+        }else
+        {
+            boolean hasWhere = false;
 
-        if(_address.length() > 0)
-        {
-            query += (hasWhere ? "and "  : "") + "address like '%" + _address + "%' ";
-            hasWhere = true;
-        }
+            if(_name.length() > 0)
+            {
+                query += (hasWhere ? "and "  : "") + "name like '%" + _name + "%' ";
+                hasWhere = true;
+            }
 
-        if(_phone.length() > 0)
-        {
-            query += (hasWhere ? "and "  : "") + "phoneByevn like '%" + _phone + "%' ";
-            hasWhere = true;
-        }
+            if(_address.length() > 0)
+            {
+                query += (hasWhere ? "and "  : "") + "address like '%" + _address + "%' ";
+                hasWhere = true;
+            }
 
-        if(_bookCmis.length() > 0)
-        {
-            query += (hasWhere ? "and "  : "") + "bookCmis like '%" + _bookCmis + "%' ";
-            hasWhere = true;
+            if(_phone.length() > 0)
+            {
+                query += (hasWhere ? "and "  : "") + "phoneByevn like '%" + _phone + "%' ";
+                hasWhere = true;
+            }
+
+            if(_bookCmis.length() > 0)
+            {
+                query += (hasWhere ? "and "  : "") + "bookCmis like '%" + _bookCmis + "%' ";
+                hasWhere = true;
+            }
         }
 
         database = this.getWritableDatabase();

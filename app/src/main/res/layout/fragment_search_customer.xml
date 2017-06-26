@@ -255,15 +255,6 @@
                     android:background="@drawable/bg_button_white"
                     android:text="Tìm Kiếm" />
 
-                <Button
-                    android:id="@+id/btnDangKy"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_button_white"
-                    android:text="Đăng Ký" />
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -62,8 +62,11 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
             BodySearchCustomerBillRespone body = (BodySearchCustomerBillRespone) response.getBody();
 
             if (body.getCustomer() == null || body.getCustomer().length() == 0) {
+                searchCustomerView.showMessage(response.getFooter().getDescription());
                 return;
             }
+
+            searchCustomerView.showMessage(response.getFooter().getDescription());
 
             String responseData = body.getCustomer();
             // định dạng kiểu Object JSON
@@ -124,20 +127,27 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void search(String maKH, String tenKH, String dcKH, String phoneKH, String gtKH) {
-        if(maKH != null && maKH.length() > 0)
+    public void search(boolean isSearchOnline, String maKH, String tenKH, String dcKH, String phoneKH, String gtKH) {
+        if(isSearchOnline)
         {
             searchOnline(maKH);
         }else
         {
-            this.searchOffline(tenKH, dcKH, phoneKH, gtKH);
+            this.searchOffline(maKH, tenKH, dcKH, phoneKH, gtKH);
         }
     }
 
 
-    protected void searchOffline(String tenKH, String dcKH, String phoneKH, String gtKH)
+    protected void searchOffline(String maxKH, String tenKH, String dcKH, String phoneKH, String gtKH)
     {
-        searchCustomerView.refreshView(customerSearchModel.getListCustomer(tenKH, dcKH, phoneKH, gtKH));
+        List<Customer> lst = customerSearchModel.getListCustomer(maxKH, tenKH, dcKH, phoneKH, gtKH);
+        searchCustomerView.refreshView(lst);
+
+        if(lst.size() == 0)
+        {
+            searchCustomerView.showMessage("Không Tồn Tại Khách Hàng Thoả Mãn Điều Kiện Tìm Kiếm");
+        }
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -196,7 +206,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
                         try {
                             Thread.sleep(Common.TIME_OUT_CONNECT);
                         } catch (InterruptedException e) {
-                            //iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                            searchCustomerView.showMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
                         } finally {
                             if (changePassResponse == null) {
                                 soapChangePass.callCountdown(soapChangePass);
@@ -208,7 +218,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
                 soapChangePassThread.start();
             }
         } catch (Exception e) {
-            //iCashTranferView.showText(e.getMessage());
+            searchCustomerView.showMessage(e.getMessage());
             return;
         }
 

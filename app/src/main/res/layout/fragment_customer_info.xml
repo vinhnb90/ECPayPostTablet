@@ -48,7 +48,6 @@
                 android:layout_alignParentBottom="false"
                 android:layout_centerHorizontal="false"
                 android:layout_centerVertical="true"
-                android:background="@color/colorLightGray"
                 android:gravity="center"
                 android:orientation="vertical">
 

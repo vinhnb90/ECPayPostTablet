@@ -1,5 +1,7 @@
 package views.ecpay.com.postabletecpay.util.entities.sqlite;
 
+import java.util.Calendar;
+
 /**
  * Created by VinhNB on 5/22/2017.
  */
@@ -70,6 +72,13 @@ public class Bill {
     private int isChecked;
     private long traceNumber;
 
+    //extenal :: NO SAVE IN DATABASE
+    private Calendar requestDateCal;
+
+    public Bill()
+    {
+
+    }
 
     public Bill(String customerCode, String customerPayCode, String billId, String term, Integer amount, String period, String issueDate, String strIssueDate, Integer status, String seri, String pcCode, String handoverCode, String cashierCode, String bookCmis, String fromDate, String toDate, String strFromDate, String strToDate, String home, String tax, String billNum, String currency, String priceDetails, String numeDetails, String amountDetails, String oldIndex, String newIndex, String nume, Integer amountNotTax, Integer amountTax, String multiple, String billType, String typeIndex, String groupTypeIndex, String createdDate, Integer idChanged, String dateChanged, String edong, String pcCodeExt, String code, String name, String nameNosign, String phoneByevn, String phoneByecp, String electricityMeter, String inning, String road, String station, String taxCode, String trade, String countPeriod, String team, Integer type, String lastQuery, Integer groupType, String billingChannel, String billingType, String billingBy, String cashierPay, String requestDate, String edongKey, int isChecked, long traceNumber) {
         this.customerCode = customerCode;
@@ -639,5 +648,13 @@ public class Bill {
 
     public void setTraceNumber(long traceNumber) {
         this.traceNumber = traceNumber;
+    }
+
+    public Calendar getRequestDateCal() {
+        return requestDateCal;
+    }
+
+    public void setRequestDateCal(Calendar requestDateCal) {
+        this.requestDateCal = requestDateCal;
     }
 }

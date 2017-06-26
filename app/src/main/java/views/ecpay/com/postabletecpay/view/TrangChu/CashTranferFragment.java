@@ -305,12 +305,22 @@ public class CashTranferFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void showError(String message) {
-        Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
+        try{
+            Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
+        }catch (Exception e)
+        {
+
+        }
     }
 
     @Override
     public void showText(String message) {
-        Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
+        try{
+            Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
+        }catch (Exception e)
+        {
+
+        }
     }
 
     @Override

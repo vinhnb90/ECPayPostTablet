@@ -16,8 +16,8 @@ public class CustomerSearchModel extends CommonModel {
     }
 
 
-    public List<Customer> getListCustomer(String tenKH, String dcKH, String phoneKH, String gtKH)
+    public List<Customer> getListCustomer(String maKH, String tenKH, String dcKH, String phoneKH, String gtKH)
     {
-        return  sqLiteConnection.selectAllCustomerFitter(tenKH, dcKH, phoneKH, gtKH);
+        return  sqLiteConnection.selectAllCustomerFitter(maKH, tenKH, dcKH, phoneKH, gtKH);
     }
 }

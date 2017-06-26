@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,8 @@ import butterknife.Unbinder;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.CustomerInfoPresenter;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
+import views.ecpay.com.postabletecpay.view.Util.BarcodeScannerDialog;
 
 /**
  * Created by duydatpham on 6/23/17.
@@ -86,8 +89,14 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
     @BindView(R.id.fragment_customer_info_btnDangKy)
     Button fragment_customer_info_btnDangKy;
     @Nullable
+    @BindView(R.id.fragment_customer_info_fragment_customer_info_btnScanCode)
+    ImageButton fragment_customer_info_fragment_customer_info_btnScanCode;
+    @Nullable
     @BindView(R.id.layout_loading)
     RelativeLayout layout_loading;
+    @Nullable
+    @BindView(R.id.fragment_customer_info_fragment_customer_info_btnBack1)
+    ImageButton fragment_customer_info_fragment_customer_info_btnBack1;
 
 
     private Customer mCustomer;
@@ -106,6 +115,8 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
 
         fragment_customer_info_btnDangKy.setOnClickListener(this);
         fragment_customer_info_btnThoat.setOnClickListener(this);
+        fragment_customer_info_fragment_customer_info_btnScanCode.setOnClickListener(this);
+        fragment_customer_info_fragment_customer_info_btnBack1.setOnClickListener(this);
 
 
         layout_loading.setVisibility(View.GONE);
@@ -118,7 +129,7 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.fragment_customer_info_btnThoat)
+        if(v.getId() == R.id.fragment_customer_info_btnThoat || v.getId() == R.id.fragment_customer_info_fragment_customer_info_btnBack1)
         {
             FragmentTransaction fragmentTransaction = this.getActivity().getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.frameLayout, SearchCustomerFragment.newInstance(mEDong));
@@ -141,6 +152,19 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
             }
             return;
         }
+
+        if(v.getId() == R.id.fragment_customer_info_fragment_customer_info_btnScanCode)
+        {
+            BarcodeScannerDialog dialog = new BarcodeScannerDialog((MainActivity) getContextView(), new BarcodeScannerDialog.OnResultListener() {
+                @Override
+                public void onResult(String text) {
+                    fragment_customer_info_fragment_customer_info_eSearchCustomer.setText(text);
+                }
+            });
+            dialog.show();
+            return;
+        }
+
     }
 
     @Override
@@ -197,7 +221,12 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
 
     @Override
     public void showMessageText(String message) {
-        Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
+        try{
+            Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
+        }catch (Exception e)
+        {
+
+        }
     }
 
     @Override

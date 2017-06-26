@@ -49,204 +49,210 @@
         android:id="@+id/llTitleTable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_below="@+id/tvThuNgan"
-        android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/bg_cyan_border"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:padding="5dp">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:paddingLeft="10dp"
             android:text="Trạng thái"
-            android:textStyle="bold"
-            android:layout_weight="4"/>
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="3"
             android:text="Số hoá đơn"
-            android:textStyle="bold"
-            android:layout_weight="3"/>
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="3"
             android:text="Số tiền"
-            android:textStyle="bold"
-            android:layout_weight="3"/>
+            android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/llGiao"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_below="@+id/llTitleTable"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:background="@drawable/bg_white_border"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:padding="5dp">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Giao"
-            android:layout_weight="4"/>
+            android:layout_weight="4"
+            android:paddingLeft="10dp"
+            android:text="Giao" />
 
         <TextView
             android:id="@+id/tvSHDGiao"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="11"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:text="11" />
 
         <TextView
             android:id="@+id/tvSTGiao"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="100.000 đ"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:text="100.000 đ" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/llThu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_below="@+id/llGiao"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:background="@drawable/bg_white_border"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:padding="5dp">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Thu"
-            android:layout_weight="4"/>
+            android:layout_weight="4"
+            android:paddingLeft="10dp"
+            android:text="Thu" />
 
         <TextView
             android:id="@+id/tvSHDThu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="158"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:text="158" />
 
         <TextView
             android:id="@+id/tvSTThu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="100.000 đ"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:text="100.000 đ" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/llTon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_below="@+id/llThu"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:background="@drawable/bg_white_border"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:padding="5dp">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Tồn"
-            android:layout_weight="4"/>
+            android:layout_weight="4"
+            android:paddingLeft="10dp"
+            android:text="Tồn" />
 
         <TextView
             android:id="@+id/tvSHDTon"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="100"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:text="100" />
 
         <TextView
             android:id="@+id/tvSTTon"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="100.000 đ"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:text="100.000 đ" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/llThuVangLai"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_below="@+id/llTon"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:background="@drawable/bg_gray_border"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:padding="5dp">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:paddingLeft="10dp"
             android:text="Thu vãng lai"
-            android:textStyle="bold"
-            android:layout_weight="4"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvSHDThuVangLai"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="20"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:text="20" />
 
         <TextView
             android:id="@+id/tvSTThuVangLai"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="3"
             android:text="100.000 đ"
-            android:textColor="@color/colorRed"
-            android:layout_weight="3"/>
+            android:textColor="@color/colorRed" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/llHoanTra"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_below="@+id/llThuVangLai"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:background="@drawable/bg_gray_border"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:padding="5dp">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:paddingLeft="10dp"
             android:text="Hoàn trả KH"
-            android:textStyle="bold"
-            android:layout_weight="4"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvSHDHoanTra"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="20"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:text="20" />
 
         <TextView
             android:id="@+id/tvSTHoanTra"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="3"
             android:text="100.000 đ"
-            android:textColor="@color/colorRed"
-            android:layout_weight="3"/>
+            android:textColor="@color/colorRed" />
     </LinearLayout>
 
     <LinearLayout

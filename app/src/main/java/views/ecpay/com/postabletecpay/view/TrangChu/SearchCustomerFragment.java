@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.log4j.chainsaw.Main;
 
@@ -91,6 +92,9 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
     @Nullable
     @BindView(R.id.btnSearch2)
     Button btnSearch2;
+    @Nullable
+    @BindView(R.id.btnBack1)
+    ImageButton btnBack1;
 
     @Nullable
     @BindView(R.id.eSearchCustomer)
@@ -130,6 +134,7 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
         btnExpand.setOnClickListener(this);
         btnScanCode.setOnClickListener(this);
         btnSearch2.setOnClickListener(this);
+        btnBack1.setOnClickListener(this);
 
         isCurrentExpand = false;
         btnExpand.setRotation(180F);
@@ -177,17 +182,53 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
         if(v.getId() == R.id.btnSearch2)
         {
 
+            String codeEcard = eSearchCustomer.getText().toString();
+            String name = eSearchTen.getText().toString();
+            String address = eSearchAddress.getText().toString();
+            String bookCmis = eSearchBookCmis.getText().toString();
+            String phone = eSearchDT.getText().toString();
+
+
+            if(codeEcard.length() == 0 && (name.length() == 0 && address.length() == 0 && bookCmis.length() == 0 && phone.length() == 0))
+            {
+                this.showMessage("Bạn Chưa Nhập Tham Số Tìm Kiếm");
+                return;
+            }
+
+            if(codeEcard.length() > 0 && codeEcard.length() < 2)
+            {
+                this.showMessage("Mã Khách Hàng/Mã Thẻ Phải Nhập Tối Thiếu 2 Ký Tự");
+                return;
+            }
+
+
+            boolean isSearchOnline = false;
+
+            if(codeEcard.length() == 16 || (codeEcard.length() == 13 && codeEcard.charAt(0) == 'P'))
+            {
+                isSearchOnline = true;
+            }
+
+
             isCurrentExpand = false;
             btnExpand.setRotation(180F);
 
             layout_timkiem_nangcao.setVisibility(View.GONE);
 
-            searchCustomerPresenter.search(eSearchCustomer.getText().toString(), eSearchTen.getText().toString(), eSearchAddress.getText().toString(), eSearchDT.getText().toString(), eSearchBookCmis.getText().toString());
+            searchCustomerPresenter.search(isSearchOnline, eSearchCustomer.getText().toString(), eSearchTen.getText().toString(), eSearchAddress.getText().toString(), eSearchDT.getText().toString(), eSearchBookCmis.getText().toString());
             return;
         }
         if(v.getId() == R.id.btnScanCode)
         {
             this.showDialogBarcode();
+            return;
+        }
+
+        if(v.getId() == R.id.btnBack1)
+        {
+            FragmentTransaction fragmentTransaction = this.getActivity().getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frameLayout, MainPageFragment.newInstance(eDong));
+            fragmentTransaction.commit();
             return;
         }
     }
@@ -197,7 +238,7 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
         BarcodeScannerDialog dialog = new BarcodeScannerDialog((MainActivity) this.getActivity(), new BarcodeScannerDialog.OnResultListener() {
             @Override
             public void onResult(String text) {
-                Log.d("LOG", "Barcode result = " + text);
+                eSearchCustomer.setText(text);
             }
         });
         dialog.show();
@@ -221,5 +262,15 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
         FragmentTransaction fragmentTransaction = this.getActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout, CustomerInfoFragment.newInstance(customer, eDong));
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void showMessage(String message) {
+        try{
+            Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
+        }catch (Exception e)
+        {
+
+        }
     }
 }
