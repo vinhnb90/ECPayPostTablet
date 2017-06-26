@@ -42,7 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <ImageButton
-                    android:id="@+id/ibtn_dialog_layout_icon"
+                    android:id="@+id/ibtn_dialog_layout_ico1n"
                     android:layout_alignParentLeft="true"
                     android:background="@drawable/ic_success_48"
                     android:clickable="false"
@@ -51,7 +51,7 @@
 
                 <TextView
                     android:layout_marginLeft="10dp"
-                    android:layout_toRightOf="@+id/ibtn_dialog_layout_icon"
+                    android:layout_toRightOf="@+id/ibtn_dialog_layout_ico1n"
                     android:id="@+id/tv_dialog_layout_message"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

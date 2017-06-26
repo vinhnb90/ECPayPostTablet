@@ -1821,7 +1821,7 @@ public class Common {
         final TextView messageView = (TextView) view.findViewById(R.id.tv_dialog_layout_message);
         final Button buttonOK = (Button) view.findViewById(R.id.btn_dialog_layout_button_ok);
         final Button buttonCancle = (Button) view.findViewById(R.id.btn_dialog_layout_button_cancel);
-        final ImageButton imageButton = (ImageButton) view.findViewById(R.id.ibtn_dialog_layout_icon);
+        final ImageButton imageButton = (ImageButton) view.findViewById(R.id.ibtn_dialog_layout_ico1n);
 
         builder.setView(view);
 
