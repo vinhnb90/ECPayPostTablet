@@ -11,6 +11,8 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import org.apache.log4j.chainsaw.Main;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -122,8 +124,11 @@ public class PayPresenter implements IPayPresenter {
             indexEnd = pageIndex * ROWS_ON_PAGE;
             if (indexEnd > mAdapterList.size())
                 indexEnd = mAdapterList.size();
-            for (; indexBegin < indexEnd; indexBegin++)
-                fitter.add(mAdapterList.get(indexBegin));
+            int index = indexBegin;
+            int maxIndex = indexEnd;
+            for (; index < maxIndex; index++) {
+                fitter.add(mAdapterList.get(index));
+            }
         } else {
             if (pageIndex > totalPage)
                 return;
@@ -133,8 +138,10 @@ public class PayPresenter implements IPayPresenter {
             if (indexEnd > mAdapterList.size())
                 indexEnd = mAdapterList.size();
 
-            for (; indexBegin < indexEnd; indexBegin++) {
-                fitter.add(mAdapterList.get(indexBegin));
+            int index = indexBegin;
+            int maxIndex = indexEnd;
+            for (; index < maxIndex; index++) {
+                fitter.add(mAdapterList.get(index));
             }
         }
 
@@ -170,7 +177,7 @@ public class PayPresenter implements IPayPresenter {
             isErr = true;
         }
         if (isErr) {
-            mIPayView.showMessageNotifySearchOnline(textMessage);
+            mIPayView.showMessageNotifySearchOnline(textMessage, Common.TYPE_DIALOG.LOI);
             return;
         }
 
@@ -181,7 +188,7 @@ public class PayPresenter implements IPayPresenter {
         try {
             configInfo = Common.setupInfoRequest(context, mEdong, Common.COMMAND_ID.CUSTOMER_BILL.toString(), versionApp);
         } catch (Exception e) {
-            mIPayView.showMessageNotifySearchOnline(textMessage);
+            mIPayView.showMessageNotifySearchOnline(textMessage, Common.TYPE_DIALOG.LOI);
             return;
         }
 
@@ -236,19 +243,26 @@ public class PayPresenter implements IPayPresenter {
             handlerDelay.postDelayed(runnableCountTimeSearchOnline, TIME_OUT_CONNECT);
 
         } catch (Exception e) {
-            mIPayView.showMessageNotifySearchOnline(e.getMessage());
+            mIPayView.showMessageNotifySearchOnline(e.getMessage(), Common.TYPE_DIALOG.LOI);
             return;
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void callPayingBillOnline(String edong) {
+    public void callPayingBillOnline(final String edong) {
         if (totalBillsChooseDialog == 0) {
-            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10000.getMessage(), false);
+            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10000.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
             return;
         }
 
+        //disable click checkbox list dialog
+        ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mIPayView.showPayRecyclerListBillsAndDisableCheckBox(listBillDialog, true);
+            }
+        });
 
         //totalBillsChooseDialog will minus - 1 change value when every billDeleteOnline is payed online
         //totalBillsChooseDialogTemp to visible count billDeleteOnline paying succes and will be save value begin
@@ -288,7 +302,7 @@ public class PayPresenter implements IPayPresenter {
     @Override
     public void callPayingBillOffline(String edong) {
         if (totalBillsChooseDialog == 0) {
-            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10000.getMessage(), false);
+            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10000.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
             return;
         }
 
@@ -312,19 +326,20 @@ public class PayPresenter implements IPayPresenter {
         double amount = 0d;
         for (; index < maxIndex; index++) {
             PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
-            amount += entity.getAmount();
+            if (entity.isChecked())
+                amount += entity.getAmount();
         }
 
         //Kiểm tra kỳ hoá đơn thanh toán
 
         //Kiểm tra số dư khả dụng của tài khoản thanh toán
         if (mPayModel.selectBalance() < amount) {
-            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e03.getMessage(), false);
+            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e03.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
             return;
         }
         //Kiểm tra địa bàn thanh toán
         if (mPayModel.getPcCode().substring(0, 2).toUpperCase().equals("PD") || mPayModel.getPcCode().substring(0, 2).toUpperCase().equals("PE")) {
-            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e04.getMessage(), false);
+            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e04.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
             return;
         }
         //Thanh toán offline
@@ -349,7 +364,7 @@ public class PayPresenter implements IPayPresenter {
         }
 
         if (!sbMsg.toString().isEmpty()) {
-            mIPayView.showMessageNotifyBillOnlineDialog(sbMsg.toString(), false);
+            mIPayView.showMessageNotifyBillOnlineDialog(sbMsg.toString(), false, Common.TYPE_DIALOG.LOI, true);
         }
     }
 
@@ -367,9 +382,13 @@ public class PayPresenter implements IPayPresenter {
         countBillPayedSuccess++;
 
         //kiểm tra nếu countBillPayedSuccess = tổng số bill được chọn ban đầu ở dialog
-        if (countBillPayedSuccess == totalBillsChooseDialogTemp)
-            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false);
-
+        if (index == listBillDialog.size()) {
+            if (countBillPayedSuccess == totalBillsChooseDialogTemp)
+                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+            else {
+                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+            }
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy'T'HH:mm:ss");
         String currentDateandTime = sdf.format(new Date());
@@ -462,14 +481,14 @@ public class PayPresenter implements IPayPresenter {
             return;
 
         if (TextUtils.isEmpty(reasonDeleteBill)) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_API_CHECK_TRAINS.ex10001.getMessage());
+            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_API_CHECK_TRAINS.ex10001.getMessage(), Common.TYPE_DIALOG.LOI);
             return;
         }
 
         //TODO validate
         //check bill exist
         if (posCustomerListDeleteOnline > mAdapterList.size()) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_API_CHECK_TRAINS.ex10000.getMessage());
+            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_API_CHECK_TRAINS.ex10000.getMessage(), Common.TYPE_DIALOG.LOI);
             return;
         }
         // Kiểm tra trạng thái thanh toán hóa đơn (tương đương API CHECK-TRANS)
@@ -496,7 +515,7 @@ public class PayPresenter implements IPayPresenter {
 //            return;
 //        }
         if (!isHasNetwork) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString(), Common.TYPE_DIALOG.LOI);
             return;
         }
 
@@ -505,7 +524,7 @@ public class PayPresenter implements IPayPresenter {
         try {
             configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.CHECK_TRANS.toString(), versionApp);
         } catch (Exception e) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString(), Common.TYPE_DIALOG.LOI);
             return;
         }
 
@@ -535,7 +554,7 @@ public class PayPresenter implements IPayPresenter {
                 configInfo.getAccountId());
 
         if (jsonRequestCheckTrainOnline == null) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_API_CHECK_TRAINS.ex10002.getMessage());
+            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_API_CHECK_TRAINS.ex10002.getMessage(), Common.TYPE_DIALOG.LOI);
             return;
         }
 
@@ -570,7 +589,7 @@ public class PayPresenter implements IPayPresenter {
             handlerDelay.postDelayed(runnableCountTimeCheckTrainOnline, TIME_OUT_CONNECT);
 
         } catch (Exception e) {
-            mIPayView.showMessageNotifySearchOnline(e.getMessage());
+            mIPayView.showMessageNotifySearchOnline(e.getMessage(), Common.TYPE_DIALOG.LOI);
             return;
         }
     }
@@ -581,7 +600,7 @@ public class PayPresenter implements IPayPresenter {
         try {
             configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.BILLING.toString(), versionApp);
         } catch (Exception e) {
-            mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString(), false);
+            mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString(), false, Common.TYPE_DIALOG.LOI, true);
             return;
         }
 
@@ -651,7 +670,7 @@ public class PayPresenter implements IPayPresenter {
                         return;
                     SoapAPI.AsyncSoapBillOnline soapBillOnline = billOnlineAsyncList.get(positionIndex);
                     if (soapBillOnline == null) {
-                        mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.e9999.getMessage(), false);
+                        mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.e9999.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
                         Log.e(TAG, "run: at runnableCountTimeBillOnline has soapBillOnline is null!");
                         return;
                     }
@@ -678,7 +697,7 @@ public class PayPresenter implements IPayPresenter {
             //run
             billOnlineAsyncList.get(positionIndex).execute(jsonRequestBillOnline);
         } catch (Exception e) {
-            mIPayView.showMessageNotifyBillOnlineDialog(e.getMessage(), false);
+            mIPayView.showMessageNotifyBillOnlineDialog(e.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
             return;
         }
     }
@@ -698,26 +717,27 @@ public class PayPresenter implements IPayPresenter {
             mIPayView.showEditTextSearch(soapSearchOnline.getInfoSearch());
             callSearchOnline(edong, soapSearchOnline.getInfoSearch(), true);
         } else {
-            mIPayView.showMessageNotifySearchOnline(Common.CODE_REPONSE_SEARCH_ONLINE.e9999.getMessage());
+            mIPayView.showMessageNotifySearchOnline(Common.CODE_REPONSE_SEARCH_ONLINE.e9999.getMessage(), Common.TYPE_DIALOG.LOI);
             Log.e(TAG, "reseachOnline: soapSearchOnline không được khởi tạo");
         }
     }
 
     @Override
-    public void callProcessDataBillFragmentChecked(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomer, int indexBegin, int indexEnd) {
+    public void callProcessDataBillFragmentChecked(String edong, String code, int posCustomer, PayAdapter.BillEntityAdapter bill, int posBillInside, int indexBegin, int indexEnd) {
         if (TextUtils.isEmpty(edong))
             return;
         if (TextUtils.isEmpty(code))
             return;
         if (bill == null)
             return;
-        if (indexEnd >= mAdapterList.size())
+        if (indexEnd > mAdapterList.size())
             return;
 
         mPayModel.updateBillIsChecked(edong, code, (int) bill.getBillId(), bill.isChecked());
 
         //show billDeleteOnline or not show billDeleteOnline
         mPayModel.updateCustomerIsShowBill(edong, code, bill.isChecked());
+
         mAdapterList.get(indexBegin + posCustomer).setShowBill(bill.isChecked());
 
         //show total bills and total money of all bills is checked
@@ -739,15 +759,6 @@ public class PayPresenter implements IPayPresenter {
     public void callProcessDataBillDialogChecked(String edong, int pos, boolean isChecked) {
         if (listBillCheckedFragment.size() <= pos)
             return;
-
-        //TODO check hóa đơn kỳ xa nhất dialog
-        PayBillsDialogAdapter.Entity entity = listBillDialog.get(pos);
-
-        boolean isHasBillNotPayTermBefore = mPayModel.checkIsHasBillNotPayTermBefore(entity.getEdong(), entity.getCode(), entity.getBillId());
-        if (isHasBillNotPayTermBefore) {
-            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage(), false);
-            return;
-        }
 
         listBillDialog.get(pos).setChecked(isChecked);
         refreshTotalBillsAndTotalMoneyInDialogWhenChecked(edong, Common.STATUS_BILLING.CHUA_THANH_TOAN);
@@ -805,7 +816,7 @@ public class PayPresenter implements IPayPresenter {
 //                soapSearchOnline.cancel(true);
 //            }
             if (!isHasNetwork) {
-                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString(), Common.TYPE_DIALOG.LOI);
 
                 soapSearchOnline.setEndCallSoap(true);
                 soapSearchOnline.cancel(true);
@@ -820,7 +831,7 @@ public class PayPresenter implements IPayPresenter {
             ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mIPayView.showMessageNotifySearchOnline(message);
+                    mIPayView.showMessageNotifySearchOnline(message, Common.TYPE_DIALOG.LOI);
                 }
             });
         }
@@ -833,7 +844,7 @@ public class PayPresenter implements IPayPresenter {
 
             Common.CODE_REPONSE_SEARCH_ONLINE codeResponse = Common.CODE_REPONSE_SEARCH_ONLINE.findCodeMessage(response.getFooterSearchOnlineResponse().getResponseCode());
             if (codeResponse != Common.CODE_REPONSE_SEARCH_ONLINE.e000) {
-                mIPayView.showMessageNotifySearchOnline(codeResponse.getMessage());
+                mIPayView.showMessageNotifySearchOnline(codeResponse.getMessage(), Common.TYPE_DIALOG.LOI);
                 return;
             }
 
@@ -889,7 +900,7 @@ public class PayPresenter implements IPayPresenter {
                 @Override
                 public void run() {
                     if (!soapSearchOnlineCallBack.isEndCallSoap()) {
-                        mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                        mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
                     }
                 }
             });
@@ -935,7 +946,7 @@ public class PayPresenter implements IPayPresenter {
 //                soapSearchOnline.cancel(true);
 //            }
             if (!isHasNetwork) {
-                mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+                mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString(), Common.TYPE_DIALOG.LOI);
 
                 soapSearchOnline.setEndCallSoap(true);
                 soapSearchOnline.cancel(true);
@@ -950,7 +961,7 @@ public class PayPresenter implements IPayPresenter {
             ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mIPayView.showMessageNotifyDeleteOnlineDialog(message);
+                    mIPayView.showMessageNotifyDeleteOnlineDialog(message, Common.TYPE_DIALOG.LOI);
                 }
             });
         }
@@ -968,7 +979,7 @@ public class PayPresenter implements IPayPresenter {
 
             Common.CODE_REPONSE_API_CHECK_TRAINS codeResponse = Common.CODE_REPONSE_API_CHECK_TRAINS.findCodeMessage(response.getFooter().getResponseCode());
             if (codeResponse != Common.CODE_REPONSE_API_CHECK_TRAINS.eBILLING) {
-                mIPayView.showMessageNotifyDeleteOnlineDialog(codeResponse.getMessage());
+                mIPayView.showMessageNotifyDeleteOnlineDialog(codeResponse.getMessage(), Common.TYPE_DIALOG.LOI);
                 mIPayView.visibleButtonDeleteDialog(SHOW_ALL);
                 return;
             }
@@ -986,7 +997,7 @@ public class PayPresenter implements IPayPresenter {
                 @Override
                 public void run() {
                     if (!soapCheckTrainOnlineCallBack.isEndCallSoap()) {
-                        mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                        mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
                     }
                 }
             });
@@ -1019,7 +1030,7 @@ public class PayPresenter implements IPayPresenter {
 //                soapDeleteBillOnline.cancel(true);
 //            }
             if (!isHasNetwork) {
-                mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+                mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString(), Common.TYPE_DIALOG.LOI);
 
                 soapDeleteBillOnline.setEndCallSoap(true);
                 soapDeleteBillOnline.cancel(true);
@@ -1034,7 +1045,7 @@ public class PayPresenter implements IPayPresenter {
             ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mIPayView.showMessageNotifyDeleteOnlineDialog(message);
+                    mIPayView.showMessageNotifyDeleteOnlineDialog(message, Common.TYPE_DIALOG.LOI);
                 }
             });
         }
@@ -1052,7 +1063,7 @@ public class PayPresenter implements IPayPresenter {
 
             Common.CODE_REPONSE_TRANSACTION_CANCELLATION codeResponse = Common.CODE_REPONSE_TRANSACTION_CANCELLATION.findCodeMessage(response.getFooter().getResponseCode());
             if (codeResponse != Common.CODE_REPONSE_TRANSACTION_CANCELLATION.e000) {
-                mIPayView.showMessageNotifyDeleteOnlineDialog(codeResponse.getMessage());
+                mIPayView.showMessageNotifyDeleteOnlineDialog(codeResponse.getMessage(), Common.TYPE_DIALOG.LOI);
                 mIPayView.visibleButtonDeleteDialog(SHOW_ALL);
                 return;
             }
@@ -1061,7 +1072,7 @@ public class PayPresenter implements IPayPresenter {
             mPayModel.updateBillReasonDelete(edong, code, billId, reasonDeleteBill, Common.STATUS_BILLING.DANG_CHO_HUY);
 
 //            mPayModel.updateBillStatusCancelBillOnline()
-            mIPayView.showMessageNotifyDeleteOnlineDialog(codeResponse.getMessage());
+            mIPayView.showMessageNotifyDeleteOnlineDialog(codeResponse.getMessage(), Common.TYPE_DIALOG.THANH_CONG);
             mIPayView.visibleButtonDeleteDialog(HIDE_COUNTINUE);
         }
 
@@ -1074,7 +1085,7 @@ public class PayPresenter implements IPayPresenter {
                 @Override
                 public void run() {
                     if (!soapDeleteBillOnline.isEndCallSoap()) {
-                        mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                        mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
                     }
                 }
             });
@@ -1099,7 +1110,7 @@ public class PayPresenter implements IPayPresenter {
 //            soapDeleteBillOnline.cancel(true);
 //        }
         if (!isHasNetwork) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString(), Common.TYPE_DIALOG.LOI);
 
             soapDeleteBillOnline.setEndCallSoap(true);
             soapDeleteBillOnline.cancel(true);
@@ -1112,7 +1123,7 @@ public class PayPresenter implements IPayPresenter {
         try {
             configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.TRANSACTION_CANCELLATION.toString(), versionApp);
         } catch (Exception e) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString(), Common.TYPE_DIALOG.LOI);
             return;
         }
 
@@ -1143,7 +1154,7 @@ public class PayPresenter implements IPayPresenter {
                 configInfo.getAccountId());
 
         if (jsonRequestDeleteBillOnline == null) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_TRANSACTION_CANCELLATION.ex10002.getMessage());
+            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.CODE_REPONSE_TRANSACTION_CANCELLATION.ex10002.getMessage(), Common.TYPE_DIALOG.LOI);
             return;
         }
 
@@ -1178,7 +1189,7 @@ public class PayPresenter implements IPayPresenter {
             handlerDelay.postDelayed(runnableCountTimeDeleteBillOnline, TIME_OUT_CONNECT);
 
         } catch (Exception e) {
-            mIPayView.showMessageNotifyDeleteOnlineDialog(e.getMessage());
+            mIPayView.showMessageNotifyDeleteOnlineDialog(e.getMessage(), Common.TYPE_DIALOG.LOI);
             return;
         }
 
@@ -1236,7 +1247,7 @@ public class PayPresenter implements IPayPresenter {
 //                soapBillOnline.cancel(true);
 //            }
             if (!isHasNetwork) {
-                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString(), Common.TYPE_DIALOG.LOI);
 
                 soapBillOnline.setEndCallSoap(true);
                 soapBillOnline.cancel(true);
@@ -1251,7 +1262,7 @@ public class PayPresenter implements IPayPresenter {
             ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString(), false);
+                    mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString(), false, Common.TYPE_DIALOG.LOI, false);
 //                    Toast.makeText(mIPayView.getContextView(), "Erorr billDeleteOnline " + listBillDialog.get(positionIndex).getName() + " - " + listBillDialog.get(positionIndex).getTerm(), Toast.LENGTH_SHORT).show();
                 }
             });
@@ -1275,17 +1286,23 @@ public class PayPresenter implements IPayPresenter {
                     @Override
                     public void run() {
                         PayBillsDialogAdapter.Entity entity = listBillDialog.get(positionIndex);
-
-
                         String messageError = Common.CODE_REPONSE_SEARCH_ONLINE.getMessageServerNotify(entity.getName(), entity.getTerm(), codeResponse.getMessage());
-
                         listBillDialog.get(positionIndex).setMessageError(messageError);
+//                        //check if not has thread is running then hide process bar paying online
+//                        boolean isHasRunningYet = checkIsHasThreadRunning(positionIndex);
+//                        if (!isHasRunningYet)
+//                            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), true, Common.TYPE_DIALOG.THANH_CONG, false);
 
-                        //check if not has thread is running then hide process bar paying online
-                        boolean isHasRunningYet = checkIsHasThreadRunning(positionIndex);
-                        if (!isHasRunningYet)
-                            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false);
-                        refreshStatusPaySuccessDialog(edong);
+                        //check full billDeleteOnline is payed
+                        boolean isFinishAllThread = checkIsAllThreadFinish();
+                        if (isFinishAllThread) {
+                            refreshStatusPaySuccessDialog(edong);
+                            if (countBillPayedSuccess == totalBillsChooseDialogTemp)
+                                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                            else
+                                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10004.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+                        } else
+                            refreshStatusPaySuccessDialogAndDisableCheckbox(edong, true);
                     }
                 });
                 return;
@@ -1295,13 +1312,18 @@ public class PayPresenter implements IPayPresenter {
             countBillPayedSuccess++;
 
             //check full billDeleteOnline is payed
-            if (countBillPayedSuccess == totalBillsChooseDialogTemp)
-                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false);
+            boolean isFinishAllThread = checkIsAllThreadFinish();
+            if (isFinishAllThread) {
+                if (countBillPayedSuccess == totalBillsChooseDialogTemp)
+                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                else
+                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+            }
 
             //set database to
             int rowUpdate = mPayModel.updateBillStatus(edong, response.getBodyBillingOnlineRespone().getCustomerCode(), response.getBodyBillingOnlineRespone().getBillId(), Common.STATUS_BILLING.DA_THANH_TOAN);
             if (rowUpdate == ERROR_OCCUR) {
-                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10002.getMessage(), false);
+                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10002.getMessage(), false, Common.TYPE_DIALOG.LOI, false);
                 Log.e(TAG, "onPost: Lỗi thực hiện update dữ liệu trên máy tính bảng. ");
 //                callPayRecyclerDialog(edong);
             }
@@ -1335,12 +1357,32 @@ public class PayPresenter implements IPayPresenter {
                 @Override
                 public void run() {
                     if (!soapBillOnline.isEndCallSoap()) {
-                        mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), false);
+                        mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), false, Common.TYPE_DIALOG.LOI, false);
                     }
                 }
             });
         }
     };
+
+    private void refreshStatusPaySuccessDialogAndDisableCheckbox(String edong, boolean isDisableAllCheckbox) {
+        if (TextUtils.isEmpty(edong))
+            return;
+
+        refreshTextCountBillPayedSuccess();
+        mIPayView.showPayRecyclerListBillsAndDisableCheckBox(listBillDialog, isDisableAllCheckbox);
+    }
+
+    private boolean checkIsAllThreadFinish() {
+        boolean hasThreadRunning = false;
+        for (int index = 0; index < billOnlineAsyncList.size(); index++) {
+            SoapAPI.AsyncSoapBillOnline soapBillOnline = billOnlineAsyncList.get(index);
+            if (!soapBillOnline.isEndCallSoap()) {
+                hasThreadRunning = true;
+                break;
+            }
+        }
+        return hasThreadRunning ? false : true;
+    }
 
     private boolean checkIsHasThreadRunning(int positionIndex) {
 

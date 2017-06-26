@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -212,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements
 
     //region PayAdapter.BillInsidePayAdapter.BillInsidePayViewHolder.OnInterationBillInsidePayAdapter
     @Override
-    public void processCheckedBillFragment(String edong, String code, int posCustomer, List<PayAdapter.BillEntityAdapter>  billList, int posBillInside,int indexBegin, int indexEnd) {
+    public void processCheckedBillFragment(String edong, String code, int posCustomer, List<PayAdapter.BillEntityAdapter> billList, int posBillInside, int indexBegin, int indexEnd) {
         if (TextUtils.isEmpty(edong))
             return;
         if (TextUtils.isEmpty(code))
@@ -222,15 +223,19 @@ public class MainActivity extends AppCompatActivity implements
 
         PayAdapter.BillEntityAdapter bill = billList.get(posBillInside);
 
-        //TODO check hóa đơn kỳ xa nhất fragment
-        boolean isHasBillNotPayTermBefore = false;
-        int index = posCustomer + ONE;
+       /* //
+        boolean isNotBillPayedTermBefore = false;
+        int index = posBillInside;
+
+        String term = billList.get(posBillInside).getMonthBill();
+
 
         for (; index < billList.size(); index++) {
-            if (billList.get(index).getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) {
-                isHasBillNotPayTermBefore = true;
+            String termIndex = billList.get(index).getMonthBill();
+            if (billList.get(index).getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode() && billList.get(index).isChecked() == false && termIndex.equals(term)== false) {
+                isNotBillPayedTermBefore = true;
             }
-        }
+        }*/
 
         //check fragment
         PayFragment payFragment = null;
@@ -242,12 +247,12 @@ public class MainActivity extends AppCompatActivity implements
         if (payFragment == null)
             return;
 
-        if (isHasBillNotPayTermBefore) {
+       /* if (isNotBillPayedTermBefore) {
             payFragment.showMessageNotifyPayfrag(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage());
             return;
-        }
+        }*/
 
-        payFragment.showBillCheckedFragment(edong, code, bill, posCustomer, indexBegin, indexEnd);
+        payFragment.showBillCheckedFragment(edong, code, posCustomer, bill, posBillInside, indexBegin, indexEnd);
     }
 
     @Override
@@ -264,12 +269,27 @@ public class MainActivity extends AppCompatActivity implements
         if (fragmentVisibling instanceof PayFragment)
             ((PayFragment) fragmentVisibling).processDialogDeleteBillOnline(edong, code, bill, posCustomerInside);
     }
+
+    @Override
+    public void processUnCheckedBillFragment(String message) {
+        boolean fail = TextUtils.isEmpty(message);
+        if (fail)
+            return;
+
+        //check fragment
+        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+            return;
+        }
+        if (fragmentVisibling instanceof PayFragment)
+            ((PayFragment) fragmentVisibling).showMessageNotifyPayfrag(message);
+
+    }
     //endregion
 
     //region PayBillsDialogAdapter.OnInteractionBillDialogRecycler
     @Override
     public void processCheckedBillsDialog(int pos, boolean isChecked) {
-
         //check fragment
         Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
         if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
@@ -290,6 +310,22 @@ public class MainActivity extends AppCompatActivity implements
 //        }
 //        if (fragmentVisibling instanceof PayFragment)
 //            ((PayFragment) fragmentVisibling).showMessage(mEdong, pos, isChecked);
+    }
+
+    @Override
+    public void processUnCheckedBillDialog(String message) {
+        boolean fail = TextUtils.isEmpty(message);
+        if (fail)
+            return;
+
+        //check fragment
+        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+            return;
+        }
+        if (fragmentVisibling instanceof PayFragment)
+            ((PayFragment) fragmentVisibling).showMessageNotifyBillOnlineDialog(message, Common.TYPE_DIALOG.LOI);
+
     }
     //endregion
 

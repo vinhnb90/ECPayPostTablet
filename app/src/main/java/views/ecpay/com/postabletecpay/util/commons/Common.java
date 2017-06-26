@@ -32,6 +32,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.ecpay.client.Partner;
@@ -72,6 +73,7 @@ import java.util.TimeZone;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -91,24 +93,6 @@ import static java.lang.System.lineSeparator;
  */
 
 public class Common {
-
-
-
-
-    public static String convertLongToMoney(long balance) {
-
-        Locale locale = new Locale("vi", "VN");
-        Currency currency = Currency.getInstance("VND");
-
-        DecimalFormatSymbols df = DecimalFormatSymbols.getInstance(locale);
-        df.setCurrency(currency);
-        NumberFormat numberFormat = NumberFormat.getCurrencyInstance(locale);
-        numberFormat.setCurrency(currency);
-        System.out.println("Formatted currency: " + numberFormat.format(balance));
-
-        return numberFormat.format(balance);
-
-    }
 
     //region param account
     public enum TYPE_ACCOUNT {
@@ -537,6 +521,7 @@ public class Common {
         e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
 
         e10000("10000", "Lỗi xử lý logout");
+
         CODE_REPONSE_LOGOUT(String code, String message) {
             this.code = code;
             this.message = message;
@@ -582,7 +567,9 @@ public class Common {
         ex10000("10000", "Chưa có hóa đơn nào được chọn"),
         ex10001("10001", "Quá trình thanh toán kết thúc"),
         ex10002("10002", "Vui lòng kiểm tra sự tồn tại của database"),
-        ex10003("10003", "Tồn tại kỳ trước đó chưa được thanh toán. Vui lòng chọn hóa đơn kỳ trước");
+        ex10003("10003", "Phải thanh toán từ kỳ hóa đơn xa nhất, mã KH:"),
+        ex10004("10004", "Quá trình thanh toán kết thúc. Có xảy ra lỗi"),
+        ex10005("10005", "Phải thanh toán liên tục các kỳ hóa đơn, mã KH:");
 
         CODE_REPONSE_BILL_ONLINE(String code, String message) {
             this.code = code;
@@ -820,7 +807,7 @@ public class Common {
     public static final String TEXT_SLASH = "/";
     public static final String TEXT_ENTER = "/n";
     public static final String TEXT_BILL = "Hóa đơn";
-    public static final String TEXT_MULTI_SPACE = TEXT_SPACE.concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE);
+    public static final String TEXT_MULTI_SPACE = TEXT_SPACE.concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE);
     public static final String TEXT_SEARCHING = "Searching online....";
     public static final int NEGATIVE_ONE = -1;
     public static final int ZERO = 0;
@@ -1591,7 +1578,6 @@ public class Common {
         return configInfo;
     }
 
-
     public static ConfigInfo setupInfoRequest(Context context, String userName, String commandId, String versionApp, String pcCode) throws Exception {
         if (context == null)
             return null;
@@ -1678,6 +1664,22 @@ public class Common {
     //endregion
 
     //region method utils
+
+    public static String convertLongToMoney(long balance) {
+
+        Locale locale = new Locale("vi", "VN");
+        Currency currency = Currency.getInstance("VND");
+
+        DecimalFormatSymbols df = DecimalFormatSymbols.getInstance(locale);
+        df.setCurrency(currency);
+        NumberFormat numberFormat = NumberFormat.getCurrencyInstance(locale);
+        numberFormat.setCurrency(currency);
+        System.out.println("Formatted currency: " + numberFormat.format(balance));
+
+        return numberFormat.format(balance);
+
+    }
+
     //delay animations when view is clicked
     public static final int TIME_DELAY_ANIM = 250;
     public static final int LONG_TIME_DELAY_ANIM = 1000;
@@ -1707,6 +1709,12 @@ public class Common {
                 return "Bạn có chắc chắn muốn thoát không?";
             return "";
         }
+    }
+
+    public enum TYPE_DIALOG{
+        THANH_CONG,
+        LOI,
+        XAC_NHAN;
     }
 
     public enum DATE_TIME_TYPE {
@@ -1804,7 +1812,7 @@ public class Common {
         view.startAnimation(animation);
     }
 
-    public static void showDialog(Context context, final IActionClickYesNoDialog clickYesNoDialog, String title, String message) {
+    public static void showDialog(Context context, final IActionClickYesNoDialog clickYesNoDialog, String title, String message, boolean isHasCancel, TYPE_DIALOG typeDialog) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -1813,11 +1821,39 @@ public class Common {
         final TextView messageView = (TextView) view.findViewById(R.id.tv_dialog_layout_message);
         final Button buttonOK = (Button) view.findViewById(R.id.btn_dialog_layout_button_ok);
         final Button buttonCancle = (Button) view.findViewById(R.id.btn_dialog_layout_button_cancel);
+        final ImageButton imageButton = (ImageButton) view.findViewById(R.id.ibtn_dialog_layout_icon);
 
         builder.setView(view);
 
         titleView.setText(title);
         messageView.setText(message);
+
+        if (!isHasCancel)
+            buttonCancle.setVisibility(View.GONE);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                if(typeDialog == TYPE_DIALOG.THANH_CONG) {
+                    imageButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_success_48));
+                }
+                if(typeDialog == TYPE_DIALOG.LOI) {
+                    imageButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_error_48));
+                }
+                if(typeDialog == TYPE_DIALOG.XAC_NHAN) {
+                    imageButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_question_48));
+                }
+            }
+            else
+            {
+                if(typeDialog == TYPE_DIALOG.THANH_CONG) {
+                    imageButton.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_success_48));
+                }
+                if(typeDialog == TYPE_DIALOG.LOI) {
+                    imageButton.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_error_48));
+                }
+                if(typeDialog == TYPE_DIALOG.XAC_NHAN) {
+                    imageButton.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_question_48));
+                }
+            }
 
         final AlertDialog alertDialog = builder.show();
 
@@ -1972,18 +2008,17 @@ public class Common {
     public static String[] PHONE_VI_TONG = {"", "01683861612", "0964592623", "01213779477", "0966605945", "01266977026"};
 
 
-    private  static String[] CHARS = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
-                                    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "M",
-                                    "N", "L", "O", "P", "Q", "R", "S", "T", "U", "X", "V", "W", "Z", "Y",
-                                    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m",
-                                    "n", "l", "o", "p", "q", "r", "s", "t", "u", "x", "v", "w", "z", "y"};
-    public static String createCapcha(int length)
-    {
+    private static String[] CHARS = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "M",
+            "N", "L", "O", "P", "Q", "R", "S", "T", "U", "X", "V", "W", "Z", "Y",
+            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m",
+            "n", "l", "o", "p", "q", "r", "s", "t", "u", "x", "v", "w", "z", "y"};
+
+    public static String createCapcha(int length) {
         String result = "";
-        for (int i = 0; i < length; i ++)
-        {
-            result += CHARS[(int)(Math.random() * CHARS.length)];
+        for (int i = 0; i < length; i++) {
+            result += CHARS[(int) (Math.random() * CHARS.length)];
         }
-        return  result;
+        return result;
     }
 }

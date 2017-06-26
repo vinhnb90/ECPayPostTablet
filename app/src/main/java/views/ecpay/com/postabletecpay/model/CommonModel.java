@@ -50,4 +50,6 @@ public abstract class CommonModel implements ICommonSharedReference {
 
         sqLiteConnection.insertOrUpdateAccount(account);
     }
+
+
 }

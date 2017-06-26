@@ -238,7 +238,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         database = getReadableDatabase();
         String query = "SELECT balance FROM " + TABLE_NAME_ACCOUNT;
         Cursor c = database.rawQuery(query, null);
-        if(c.moveToFirst()){
+        if (c.moveToFirst()) {
             return c.getDouble(0);
         }
         return 0;
@@ -956,8 +956,11 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             String customerPayCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerPayCode")));
             String billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
 
+            String strTerm = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strTerm")));
             String term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
             term = Common.convertDateToDate(term, yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.MMyyyy);
+
+            String termVisible = strTerm.equals(Common.TEXT_EMPTY) ? term : strTerm;
 
             String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
 
@@ -966,7 +969,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             bill.setBillingBy(billingBy);
             bill.setCustomerPayCode(customerPayCode);
             bill.setMoneyBill(amount);
-            bill.setMonthBill(term);
+            bill.setMonthBill(termVisible);
             bill.setStatus(status);
             bill.setChecked(isChecked);
             if (bill.getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())
@@ -1043,7 +1046,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (term.length() == yyyyMMdd.toString().length()) {
             term = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
         }
+
+//        String strTerm = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
+//                String strTerm = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strTerm")));
+//        String termVisible = strTerm.equals(Common.TEXT_EMPTY) ? term : strTerm;
+
         initialValues.put("term", term);
+        initialValues.put("strTerm", billInsideCustomer.getStrTerm());
         initialValues.put("amount", billInsideCustomer.getAmount());
         initialValues.put("period", billInsideCustomer.getPeriod());
         initialValues.put("issueDate", billInsideCustomer.getIssueDate());
@@ -1191,10 +1200,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 String term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
                 term = Common.convertDateToDate(term, yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.MMyyyy);
 
+                String strTerm = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strTerm")));
+                String termVisible = strTerm.equals(Common.TEXT_EMPTY) ? term : strTerm;
+
                 entity = new PayBillsDialogAdapter.Entity(
                         stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode"))),
                         stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name"))),
-                        term,
+                        termVisible,
                         longConvertNull(mCursor.getLong(mCursor.getColumnIndex("amount"))),
                         booleanConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))),
                         edong,
@@ -1218,7 +1230,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (TextUtils.isEmpty(edong))
             return null;
 
-        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " ORDER BY date(term) DESC ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.strTerm, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, strTerm, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " ORDER BY date(term) DESC ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
         return selectAllBillsOfAllCustomerCheckedWithQuery(edong, query);
     }
 
@@ -1226,7 +1238,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (TextUtils.isEmpty(edong))
             return null;
 
-        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " and status = " + statusBilling.getCode() + " ORDER BY date(term) DESC ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.strTerm, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, strTerm, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " and status = " + statusBilling.getCode() + " ORDER BY date(term) DESC ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
         return selectAllBillsOfAllCustomerCheckedWithQuery(edong, query);
     }
 
@@ -1316,7 +1328,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE billId = " + billId;
         Cursor c = database.rawQuery(query, null);
         EntityDanhSachThu entityDanhSachThu = new EntityDanhSachThu();
-        if(c.moveToFirst()) {
+        if (c.moveToFirst()) {
             entityDanhSachThu.setEdong(c.getString(c.getColumnIndex("edong")));
             entityDanhSachThu.setCustomerCode(c.getString(c.getColumnIndex("customerCode")));
             entityDanhSachThu.setCustomerPayCode(c.getString(c.getColumnIndex("customerPayCode")));
@@ -1385,7 +1397,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE billId = " + billId;
         Cursor c = database.rawQuery(query, null);
         EntityLichSuThanhToan entityLichSuThanhToan = new EntityLichSuThanhToan();
-        if(c.moveToFirst()) {
+        if (c.moveToFirst()) {
             entityLichSuThanhToan.setEdong(c.getString(c.getColumnIndex("edong")));
             entityLichSuThanhToan.setCustomerCode(c.getString(c.getColumnIndex("customerCode")));
             entityLichSuThanhToan.setCustomerPayCode(c.getString(c.getColumnIndex("customerPayCode")));
@@ -1715,9 +1727,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return 0;
     }
 
-    public Cursor getCustomer(String code){
+    public Cursor getCustomer(String code) {
         database = this.getReadableDatabase();
-        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_CUSTOMER + " WHERE code = '" + code + "'";
+        String query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE code = '" + code + "'";
         return database.rawQuery(query, null);
     }
     //endregion
@@ -2005,7 +2017,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     public boolean checkIsHasBillNotPayTermBefore(String edong, String code, String term) {
         database = this.getReadableDatabase();
 
-        String query = "SELECT billId FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode = '" + code + "' and status = "+Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()+" and term < " + term;
+        String query = "SELECT billId FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode = '" + code + "' and status = " + Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode() + " and term < " + term;
         Cursor mCursor = database.rawQuery(query, null);
 
         if (mCursor.getCount() > 0)
@@ -2210,6 +2222,28 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         int rowAffect = (int) database.insert(TABLE_NAME_LICH_SU_TTOAN, null, initialValues);
 
         return rowAffect;
+    }
+
+    public String getCustomerNameByBillId(String edong, long billId) {
+        database = this.getReadableDatabase();
+        String query = "SELECT name FROM (SELECT customerCode FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and billId = " + billId + " ) AS A JOIN " + TABLE_NAME_CUSTOMER + " AS B ON A.customerCode = B.code";
+        Cursor c = database.rawQuery(query, null);
+
+        c.moveToFirst();
+        if (c.getCount() == 0) {
+            return null;
+        } else return stringConvertNull(c.getString(c.getColumnIndex("name")));
+    }
+
+    public String getCustomerCodeByBillId(String edong, long billId) {
+        database = this.getReadableDatabase();
+        String query = "SELECT customerCode FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and billId = " + billId;
+        Cursor c = database.rawQuery(query, null);
+
+        c.moveToFirst();
+        if (c.getCount() == 0) {
+            return null;
+        } else return stringConvertNull(c.getString(c.getColumnIndex("customerCode")));
     }
     //endregion
 }
