@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import views.ecpay.com.postabletecpay.model.adapter.ChangePassRequestAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.EvnRequestAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.LoginRequestAdapter;
+import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.request.Base.Request;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityBillingOnline.BillingOnlineRequest;
@@ -227,7 +228,7 @@ public class SoapAPI {
     //region create JSON Request service
     public static String getJsonCashTranfer(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver,
                                             String signatureEncrypted, String session, String sendPhone, String receivedPhone, Long amount,
-                                            String description, String accountId){
+                                            String description, String accountId) {
         if (agent == null || agent.isEmpty() || agent.trim().equals(""))
             return null;
         if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
@@ -259,7 +260,8 @@ public class SoapAPI {
         body.setMac(mac);
         body.setDiskDrive(diskDriver);
         body.setSignature(signatureEncrypted);
-        body.setSession(session);;
+        body.setSession(session);
+        ;
         body.setSendPhone(sendPhone);
         body.setOtp("");
         body.setReceivedPhone(receivedPhone);
@@ -283,8 +285,7 @@ public class SoapAPI {
         //Serialised
         final String jsonResult = gson.toJson(request, type);
 
-        if(TEST_REQUEST)
-        {
+        if (TEST_REQUEST) {
             //Test Deserialised
             final CashTranferRequest parsedRequest = gson.fromJson(jsonResult, CashTranferRequest.class);
         }
@@ -294,8 +295,8 @@ public class SoapAPI {
 
     //region create JSON Request service
     public static String getJsonGetPCInfo(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver,
-                                            String signatureEncrypted, String pcName, String pcCode, String pcTax, String pcAddress,
-                                            String pcPhoneNumber, String accountId){
+                                          String signatureEncrypted, String pcName, String pcCode, String pcTax, String pcAddress,
+                                          String pcPhoneNumber, String accountId) {
         if (agent == null || agent.isEmpty() || agent.trim().equals(""))
             return null;
         if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
@@ -345,8 +346,7 @@ public class SoapAPI {
         //Serialised
         final String jsonResult = gson.toJson(request, type);
 
-        if(TEST_REQUEST)
-        {
+        if (TEST_REQUEST) {
             //Test Deserialised
             final GetPCInfoRequest parsedRequest = gson.fromJson(jsonResult, GetPCInfoRequest.class);
             Log.d("LOG", "jsonResult = " + jsonResult);
@@ -1767,6 +1767,123 @@ public class SoapAPI {
 
         public String getReasonDeleteBill() {
             return reasonDeleteBill;
+        }
+
+        public CheckTrainOnlineResponse getCheckTrainOnlineResponse() {
+            return checkTrainOnlineResponse;
+        }
+    }
+
+    public static class AsyncSoapCheckTrainPayingBill extends AsyncTask<String, String, CheckTrainOnlineResponse> {
+
+        //request action to eStore
+        private String edong;
+        private PayBillsDialogAdapter.Entity entity;
+        private static final String METHOD_NAME = "execute";
+        private static final String NAMESPACE = "http://services.ecpay.org/";
+        private static final String URL = ENDPOINT_URL;
+        private static final String SOAP_ACTION = "request action to eStore";
+        private static final String METHOD_PARAM = "message";
+        private AsyncSoapCheckTrainPayingBillCallBack callBack;
+        private boolean isEndCallSoap = false;
+        private CheckTrainOnlineResponse checkTrainOnlineResponse;
+
+        public AsyncSoapCheckTrainPayingBill(String edong, AsyncSoapCheckTrainPayingBillCallBack callBack, PayBillsDialogAdapter.Entity entity) throws Exception {
+            this.callBack = callBack;
+            this.edong = edong;
+            this.entity = entity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            checkTrainOnlineResponse = null;
+            callBack.onPre(this);
+        }
+
+        @Override
+        protected CheckTrainOnlineResponse doInBackground(String... jsons) {
+            String json = jsons[0];
+            Log.d("here", "doInBackground: " + json);
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            request.addProperty(METHOD_PARAM, json);
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            envelope.setOutputSoapObject(request);
+
+            HttpTransportSE ht;
+            SoapPrimitive response = null;
+
+            try {
+                ht = new HttpTransportSE(URL);
+                ht.call(SOAP_ACTION, envelope);
+                response = (SoapPrimitive) envelope.getResponse();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (response == null) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                return null;
+            }
+
+            String data = response.toString();
+            if (data.isEmpty()) {
+                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                return null;
+            }
+
+            checkTrainOnlineResponse = new Gson().fromJson(data, CheckTrainOnlineResponse.class);
+            return checkTrainOnlineResponse;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            String message = values[0];
+            isEndCallSoap = true;
+            callBack.onUpdate(message);
+        }
+
+        @Override
+        protected void onPostExecute(CheckTrainOnlineResponse checkTrainOnlineResponse) {
+            super.onPostExecute(checkTrainOnlineResponse);
+            isEndCallSoap = true;
+            callBack.onPost(checkTrainOnlineResponse);
+        }
+
+        public static abstract class AsyncSoapCheckTrainPayingBillCallBack {
+            public abstract void onPre(final AsyncSoapCheckTrainPayingBill checkTrainPayingBill);
+
+            public abstract void onUpdate(String message);
+
+            public abstract void onPost(CheckTrainOnlineResponse response);
+
+            public abstract void onTimeOut(final AsyncSoapCheckTrainPayingBill checkTrainPayingBill);
+        }
+
+        public void callCountdown(final AsyncSoapCheckTrainPayingBill checkTrainPayingBill) {
+            if (checkTrainPayingBill == null)
+                return;
+
+            callBack.onTimeOut(checkTrainPayingBill);
+        }
+
+        public boolean isEndCallSoap() {
+            return isEndCallSoap;
+        }
+
+        public void setEndCallSoap(boolean endCallSoap) {
+            isEndCallSoap = endCallSoap;
+        }
+
+        public String getEdong() {
+            return edong;
+        }
+
+        public PayBillsDialogAdapter.Entity getEntity() {
+            return entity;
         }
 
         public CheckTrainOnlineResponse getCheckTrainOnlineResponse() {

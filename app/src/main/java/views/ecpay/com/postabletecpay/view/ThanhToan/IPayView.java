@@ -4,6 +4,7 @@ import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
+import views.ecpay.com.postabletecpay.presenter.MainPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.ICommonView;
 
@@ -11,10 +12,10 @@ import views.ecpay.com.postabletecpay.view.ICommonView;
  * Created by VinhNB on 5/26/2017.
  */
 
-public interface IPayView extends ICommonView {
+public interface IPayView extends ICommonView, MainPresenter.InteractorMainPresenter {
 //    void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline);
 
-    void showPayRecyclerPage(List<PayAdapter.PayEntityAdapter> adapterList,  int indexBegin, int indexEnd, int pageIndexNew, int totalPage, String infoSearch, boolean isSeachOnline);
+    void showPayRecyclerPage(List<PayAdapter.DataAdapter> adapterList, int indexBegin, int indexEnd, int pageIndexNew, int totalPage, String infoSearch, boolean isSeachOnline);
 
     void showSearchOnlineProcess();
 

@@ -45,6 +45,7 @@ import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
+import views.ecpay.com.postabletecpay.presenter.MainPresenter;
 import views.ecpay.com.postabletecpay.presenter.PayPresenter;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.commons.Common;
@@ -222,6 +223,16 @@ public class PayFragment extends Fragment implements
     public static final int REQUEST_BARCODE = 999;
     public static final int RESPONSE_BARCODE = 1000;
 
+    @Override
+    public List<PayAdapter.DataAdapter> getData() {
+        return listener.getData();
+    }
+
+    @Override
+    public void refreshData() {
+        listener.refreshData();
+    }
+
 
     public enum VISIBLE_BUTTON_DELETE_DIALOG {
         SHOW_ALL(0),
@@ -284,7 +295,6 @@ public class PayFragment extends Fragment implements
             listener = (OnPayFragmentInteractionListener) activity;
         else
             throw new ClassCastException("activity must be implement OnPayFragmentInteractionListener!");
-
     }
 
     @Override
@@ -327,6 +337,11 @@ public class PayFragment extends Fragment implements
         listener = null;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        listener.refreshData();
+    }
 
     //region onClick fragment
     @Optional
@@ -576,7 +591,7 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
-    public void showPayRecyclerPage(List<PayAdapter.PayEntityAdapter> adapterList, int indexBegin, int indexEnd, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) {
+    public void showPayRecyclerPage(List<PayAdapter.DataAdapter> adapterList, int indexBegin, int indexEnd, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) {
         btnPre.setEnabled(true);
         btnNext.setEnabled(true);
         tvPage.setText(String.valueOf(pageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
@@ -1216,7 +1231,7 @@ public class PayFragment extends Fragment implements
         etSearch.setText(textBarcode);
     }
 
-    public interface OnPayFragmentInteractionListener {
+    public interface OnPayFragmentInteractionListener extends MainPresenter.InteractorMainPresenter {
         void fillToSearchText(String textBarcode);
 
         void setRootViewAgain();

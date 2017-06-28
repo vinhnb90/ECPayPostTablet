@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.view.Main;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,7 +11,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +25,8 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
+import views.ecpay.com.postabletecpay.presenter.IMainPresenter;
+import views.ecpay.com.postabletecpay.presenter.MainPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
@@ -32,13 +34,12 @@ import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
-import static views.ecpay.com.postabletecpay.util.commons.Common.NEGATIVE_ONE;
-import static views.ecpay.com.postabletecpay.util.commons.Common.ONE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.REQUEST_BARCODE;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.RESPONSE_BARCODE;
 
 public class MainActivity extends AppCompatActivity implements
+        IMainView,
         MainPageFragment.OnFragmentInteractionListener,
         PayAdapter.OnInterationBillInsidePayAdapter,
         PayBillsDialogAdapter.OnInteractionBillDialogRecycler,
@@ -47,10 +48,30 @@ public class MainActivity extends AppCompatActivity implements
         PayFragment.CallbackDeleteBillOnlineDialog,
         BaoCaoFragment.OnFragmentInteractionListener,
         ZXingScannerView.ResultHandler,
-        UserInfoFragment.OnFragmentInteractionListener {
+        UserInfoFragment.OnFragmentInteractionListener{
 
     public static BottomNavigationView sNavigation;
     public static String mEdong;
+    private IMainPresenter iMainPresenter;
+    @Override
+    public Context getContextView() {
+        return this;
+    }
+
+    @Override
+    public void showTextMessage(String textMessage) {
+        Toast.makeText(this, textMessage, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public List<PayAdapter.DataAdapter> getData() {
+        return iMainPresenter.getDataPayAdapter();
+    }
+
+    @Override
+    public void refreshData() {
+        iMainPresenter.refreshDataPayAdapter();
+    }
 
     public enum ID_MENU_BOTTOM {
         HOME(1),
@@ -119,6 +140,14 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         getBundle();
+        iMainPresenter = new MainPresenter(this, mEdong);
+        iMainPresenter.refreshDataPayAdapter();
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                iMainPresenter.synchronizePC();
+            }
+        });
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout, MainPageFragment.newInstance(mEdong));
@@ -160,6 +189,11 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override

@@ -62,7 +62,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     private String TABLE_NAME_CUSTOMER = "TBL_CUSTOMER";
     private String TABLE_NAME_BILL = "TBL_BILL";
     private String TABLE_NAME_DEBT_COLLECTION = "TBL_DEBT_COLLECTION";
-    private String TABLE_NAME_LICH_SU_TTOAN = "TBL_LICH_SU_TTOAN";
+    private String TABLE_NAME_HISTORY_PAY = "TBL_LICH_SU_TTOAN";
 
     private String CREATE_TABLE_ACCOUNT = "CREATE TABLE `" + TABLE_NAME_ACCOUNT + "` (`edong` TEXT NOT NULL PRIMARY KEY, `name` TEXT, " +
             "`address` TEXT, `phone` TEXT, `email` TEXT, `birthday` TEXT, `session` TEXT, `balance` NUMERIC, `lockMoney` NUMERIC, " +
@@ -110,11 +110,11 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             "`nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, " +
             "`taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, " +
             "`billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `requestDate` TEXT,`edongKey` TEXT NOT NULL, " +
-            "`isChecked` INTEGER default 0, `traceNumber` INTERGER, `causeCancelBillOnline` TEXT, payments INTEGER, payStatus INTEGER, " +
             "stateOfDebt INTEGER, stateOfCancel TEXT, stateOfReturn TEXT, suspectedProcessingStatus TEXT, stateOfPush INTEGER, dateOfPush TEXT, " +
+            "`isChecked` INTEGER default 0, `traceNumber` INTERGER, `causeCancelBillOnline` TEXT, payments INTEGER, payStatus INTEGER, " +
             "countPrintReceipt INTEGER, printInfo TEXT)";
 
-    private String CREATE_TABLE_LICH_SU_TTOAN = "CREATE TABLE `" + TABLE_NAME_LICH_SU_TTOAN + "` ( `customerCode` TEXT, `customerPayCode` TEXT, " +
+    private String CREATE_TABLE_HISTORY_PAY = "CREATE TABLE `" + TABLE_NAME_HISTORY_PAY + "` ( `customerCode` TEXT, `customerPayCode` TEXT, " +
             "`billId` INTEGER NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, " +
             "`strIssueDate` TEXT, `status` INTEGER, `seri` TEXT, `pcCode` TEXT, `handoverCode` TEXT, `cashierCode` TEXT, `bookCmis` TEXT, " +
             "`fromDate` TEXT, `toDate` TEXT, `strFromDate` TEXT, `strToDate` TEXT, `home` TEXT, `tax` REAL, `billNum` TEXT, `currency` TEXT, " +
@@ -164,7 +164,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             db.execSQL(CREATE_TABLE_BILL);
             db.execSQL(CREATE_TABLE_DEBT_COLLECTION);
             db.execSQL(CREATE_TABLE_CUSTOMER);
-            db.execSQL(CREATE_TABLE_LICH_SU_TTOAN);
+            db.execSQL(CREATE_TABLE_HISTORY_PAY);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -178,7 +178,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_BILL);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_DEBT_COLLECTION);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_CUSTOMER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_LICH_SU_TTOAN);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_HISTORY_PAY);
         onCreate(db);
     }
 
@@ -1252,7 +1252,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
     //endregion
 
-    //region BILL
+    //region BILL Danh sách hóa dơn nợ
     public long insertBill(ListBillResponse listBillResponse) {
         ContentValues initialValues = new ContentValues();
 
@@ -1503,6 +1503,17 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return rowAffect;
     }
 
+    public int updateBillWith(String edongKey, int billId, int code, String edong) {
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("code", code);
+        initialValues.put("edong", edong);
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.update(TABLE_NAME_DEBT_COLLECTION, initialValues, " edongKey = ? and billId = ? ", new String[]{edongKey, String.valueOf(billId)});
+        return rowAffect;
+    }
+
     public long checkBillExist(String billId) {
         database = this.getReadableDatabase();
         String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE billId = '" + billId + "'";
@@ -1560,7 +1571,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
     //endregion
 
-    //region Xử lý bảng danh sách thu
+    //region DEBT Danh sách hóa đơn thu
     public int insertDebtCollection(EntityDanhSachThu entityDanhSachThu) {
 
         if (entityDanhSachThu.getEdong() == null || entityDanhSachThu.getEdong().trim().isEmpty())
@@ -1648,9 +1659,88 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         return rowAffect;
     }
+
+    public int updateBillDebtWith(
+            String edongKey, int billId, //where
+            String edong, Integer paymentMode, int payStatus, Integer stateOfDebt, Integer stateOfCancel,
+            Integer stateOfReturn, Integer suspectedProcessingStatus, Integer stateOfPush, String dateOfPush,
+            int countPrintReceipt, Integer statusOfPrintInfo) {
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("edong", edong);
+        initialValues.put("payments", paymentMode);
+
+        initialValues.put("payStatus", payStatus);
+        initialValues.put("stateOfDebt", stateOfDebt);
+        initialValues.put("stateOfCancel", stateOfCancel);
+        initialValues.put("stateOfReturn", stateOfReturn);
+        initialValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
+        initialValues.put("stateOfPush", stateOfPush);
+        initialValues.put("dateOfPush", dateOfPush);
+        initialValues.put("countPrintReceipt", countPrintReceipt);
+        initialValues.put("printInfo", statusOfPrintInfo);
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.update(TABLE_NAME_DEBT_COLLECTION, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
+        return rowAffect;
+    }
+
+    public int updateBillDebtWithThanhToanBoiNguonKhac(String edongKey, int billId, String edong, Integer paymentMode, int payStatus, Integer stateOfDebt, Integer stateOfCancel, Integer stateOfReturn, Integer suspectedProcessingStatus, String dateOfPush, int countPrintReceipt, Integer statusOfPrintInfo, Integer tradeCode) {
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("edong", edong);
+        initialValues.put("payments", paymentMode);
+
+        initialValues.put("payStatus", payStatus);
+        initialValues.put("stateOfDebt", stateOfDebt);
+        initialValues.put("stateOfCancel", stateOfCancel);
+        initialValues.put("stateOfReturn", stateOfReturn);
+        initialValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
+        initialValues.put("dateOfPush", dateOfPush);
+        initialValues.put("countPrintReceipt", countPrintReceipt);
+        initialValues.put("printInfo", statusOfPrintInfo);
+        initialValues.put("tradeCode", tradeCode);
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.update(TABLE_NAME_DEBT_COLLECTION, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
+        return rowAffect;
+    }
+
+
+    public int selectPayStatusDebt(String edong, String code, int billId) {
+        database = this.getReadableDatabase();
+        String query = "SELECT payStatus FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE edongKey = '" + edong + "' and customerCode = '" + code + "' and billId = '" + billId + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+        if (mCursor.moveToFirst())
+            return mCursor.getInt(0);
+        return ERROR_OCCUR;
+    }
+
+    public int updateBillDebtWithThanhToanErrorOrSuccess(
+            String edongKey, int billId, //where
+            String edong, Integer paymentMode, int payStatus, Integer stateOfDebt, Integer stateOfCancel,
+            Integer stateOfReturn, Integer suspectedProcessingStatus, int countPrintReceipt, Integer statusOfPrintInfo) {
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("edong", edong);
+        initialValues.put("payments", paymentMode);
+
+        initialValues.put("payStatus", payStatus);
+        initialValues.put("stateOfDebt", stateOfDebt);
+        initialValues.put("stateOfCancel", stateOfCancel);
+        initialValues.put("stateOfReturn", stateOfReturn);
+        initialValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
+        initialValues.put("countPrintReceipt", countPrintReceipt);
+        initialValues.put("printInfo", statusOfPrintInfo);
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.update(TABLE_NAME_DEBT_COLLECTION, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
+        return rowAffect;
+    }
+
     //endregion
 
-    //region Xử lý bảng lịch sử
+    //region HISTORY Lịch sử
     public int insertPayLib(EntityLichSuThanhToan entityLichSuThanhToan) {
 
         database = getWritableDatabase();
@@ -1737,7 +1827,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("printInfo", entityLichSuThanhToan.getPrintInfo());
         initialValues.put("dateIncurred", entityLichSuThanhToan.getDateIncurred());
         initialValues.put("tradingCode", entityLichSuThanhToan.getTradingCode());
-        int rowAffect = (int) database.insert(TABLE_NAME_LICH_SU_TTOAN, null, initialValues);
+        int rowAffect = (int) database.insert(TABLE_NAME_HISTORY_PAY, null, initialValues);
 
         return rowAffect;
     }
@@ -1763,5 +1853,48 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             return null;
         } else return stringConvertNull(c.getString(c.getColumnIndex("customerCode")));
     }
+
+    public int updateBillHistoryWith(String edongKey, int billId, String dateIncurred, Integer tradingCode) {
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("dateIncurred", dateIncurred);
+        initialValues.put("tradingCode", tradingCode);
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.update(TABLE_NAME_HISTORY_PAY, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
+        return rowAffect;
+    }
+
+    public int updateBillWithWithThanhToanError(String edongKey, int billId, String edong) {
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("edong", edong);
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.update(TABLE_NAME_HISTORY_PAY, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
+        return rowAffect;
+    }
+
+    public int updateBillHistoryWithThanhToanErrorOrSuccess(String edongKey, int billId, String edong, Integer paymentMode, int payStatus, Integer stateOfDebt, Integer stateOfCancel, Integer stateOfReturn, Integer suspectedProcessingStatus, int countPrintReceipt, Integer statusOfPrintInfo, String dateIncurred, Integer tradingCode) {
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("edong", edong);
+        initialValues.put("payments", paymentMode);
+        initialValues.put("payStatus", payStatus);
+        initialValues.put("stateOfDebt", stateOfDebt);
+        initialValues.put("stateOfCancel", stateOfCancel);
+        initialValues.put("stateOfReturn", stateOfReturn);
+        initialValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
+        initialValues.put("countPrintReceipt", countPrintReceipt);
+        initialValues.put("printInfo", statusOfPrintInfo);
+
+        initialValues.put("dateIncurred", dateIncurred);
+        initialValues.put("tradingCode", tradingCode);
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.update(TABLE_NAME_HISTORY_PAY, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
+        return rowAffect;
+    }
+
     //endregion
 }
