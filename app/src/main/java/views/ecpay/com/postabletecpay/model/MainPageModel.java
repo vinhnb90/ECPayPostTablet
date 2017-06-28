@@ -99,12 +99,36 @@ public class MainPageModel extends CommonModel {
         return sqLiteConnection.insertBill(listBillResponse);
     }
 
+    public long insertDebt(ListBillResponse listBillResponse) {
+        return sqLiteConnection.insertDebt(listBillResponse);
+    }
+
+    public long insertHistory(ListBillResponse listBillResponse) {
+        return sqLiteConnection.insertHistory(listBillResponse);
+    }
+
     public long insertBill(BillResponse listBillResponse) {
         return sqLiteConnection.insertBill(listBillResponse);
     }
 
+    public long insertDebt(BillResponse listBillResponse) {
+        return sqLiteConnection.insertDebt(listBillResponse);
+    }
+
+    public long insertHistory(BillResponse listBillResponse) {
+        return sqLiteConnection.insertHistory(listBillResponse);
+    }
+
     public long updateBill(BillResponse listBillResponse) {
         return sqLiteConnection.updateBill(listBillResponse);
+    }
+
+    public long updateDebt(BillResponse listBillResponse) {
+        return sqLiteConnection.updateDebt(listBillResponse);
+    }
+
+    public long updateHistory(BillResponse listBillResponse) {
+        return sqLiteConnection.updateHistory(listBillResponse);
     }
 
     public long getMaxIdChanged() {

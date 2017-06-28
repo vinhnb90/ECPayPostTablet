@@ -884,6 +884,12 @@ public class MainPagePresenter implements IMainPagePresenter {
                                             if (mainPageModel.insertBill(listBillResponse) != -1) {
                                                 Log.i("INFO", "TEST");
                                             }
+                                            if (mainPageModel.insertDebt(listBillResponse) != -1) {
+                                                Log.i("INFO", "TEST");
+                                            }
+                                            if (mainPageModel.insertHistory(listBillResponse) != -1) {
+                                                Log.i("INFO", "TEST");
+                                            }
                                         }
                                     }
                                 } catch (IOException e) {
@@ -967,8 +973,20 @@ public class MainPagePresenter implements IMainPagePresenter {
                             if (mainPageModel.insertBill(billResponse) != -1) {
                                 Log.i("INFO", "SUCCESS");
                             }
+                            if (mainPageModel.insertDebt(billResponse) != -1) {
+                                Log.i("INFO", "SUCCESS");
+                            }
+                            if (mainPageModel.insertHistory(billResponse) != -1) {
+                                Log.i("INFO", "SUCCESS");
+                            }
                         } else {
                             if (mainPageModel.updateBill(billResponse) != -1) {
+                                Log.i("INFO", "SUCCESS");
+                            }
+                            if (mainPageModel.updateDebt(billResponse) != -1) {
+                                Log.i("INFO", "SUCCESS");
+                            }
+                            if (mainPageModel.updateHistory(billResponse) != -1) {
                                 Log.i("INFO", "SUCCESS");
                             }
                         }
