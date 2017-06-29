@@ -370,8 +370,8 @@ public class PayModel extends CommonModel {
         return sqLiteConnection.getCustomerCodeByBillId(edong, billId);
     }
 
-    public int updateBillWith(String edongKey, int billId, int code, String edong) {
-        return sqLiteConnection.updateBillWith(edongKey, billId, code, edong);
+    public int updateBillWith(String edongKey, int billId, int status, String edong) {
+        return sqLiteConnection.updateBillWith(edongKey, billId, status, edong);
     }
 
     public int updateBillDebtWith(
@@ -429,5 +429,25 @@ public class PayModel extends CommonModel {
         return sqLiteConnection.updateBillHistoryWithThanhToanErrorOrSuccess(edongKey, billId,
                 edong, paymentMode, payStatus, stateOfDebt, stateOfCancel,
                 stateOfReturn, suspectedProcessingStatus, countPrintReceipt, statusOfPrintInfo, dateIncurred, tradingCode);
+    }
+
+    public int updateBillHistoryWithPrintInfo(String edongKey, int billId, Integer code) {
+        return sqLiteConnection.updateBillHistoryWithPrintInfo(edongKey, billId, code);
+    }
+
+    public int getNotYetPushMoney(String edongKey) {
+        return sqLiteConnection.selectNotYetPushMoney(edongKey);
+    }
+
+    public int updateAccountWith(String edong, int notYetPushMoney) {
+        return sqLiteConnection.updateAccountWith(edong, notYetPushMoney);
+    }
+
+    public int updateBillDebtWithSuspectedProcessingStatus(String edong, int billId, Integer suspectedProcessingStatus) {
+        return sqLiteConnection.updateBillDebtWithSuspectedProcessingStatus(edong, billId, suspectedProcessingStatus);
+    }
+
+    public int updateBillHistoryWithSuspectedProcessingStatus(String edong, int billId, Integer suspectedProcessingStatus) {
+        return sqLiteConnection.updateBillHistoryWithSuspectedProcessingStatus(edong, billId, suspectedProcessingStatus);
     }
 }

@@ -1535,6 +1535,7 @@ public class SoapAPI {
 
         //request action to eStore
         private String edong;
+        PayBillsDialogAdapter.Entity entity;
         private static final String METHOD_NAME = "execute";
         private static final String NAMESPACE = "http://services.ecpay.org/";
         private static final String URL = ENDPOINT_URL;
@@ -1546,11 +1547,12 @@ public class SoapAPI {
         private Handler handlerDelay;
         int positionIndexListAsyncBillOnline;
 
-        public AsyncSoapBillOnline(String edong, AsyncSoapBillOnlineCallBack callBack, Handler handler, int positionIndexListAsyncBillOnline) throws Exception {
+        public AsyncSoapBillOnline(String edong, AsyncSoapBillOnlineCallBack callBack, Handler handler, int positionIndexListAsyncBillOnline, PayBillsDialogAdapter.Entity  entity) throws Exception {
             this.callBack = callBack;
             this.edong = edong;
             this.handlerDelay = handler;
             this.positionIndexListAsyncBillOnline = positionIndexListAsyncBillOnline;
+            this.entity = entity;
         }
 
         @Override
@@ -1630,6 +1632,10 @@ public class SoapAPI {
                 return;
 
             callBack.onTimeOut(soapBillOnline);
+        }
+
+        public PayBillsDialogAdapter.Entity getEntity() {
+            return entity;
         }
 
         public boolean isEndCallSoap() {

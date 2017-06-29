@@ -67,7 +67,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     private String CREATE_TABLE_ACCOUNT = "CREATE TABLE `" + TABLE_NAME_ACCOUNT + "` (`edong` TEXT NOT NULL PRIMARY KEY, `name` TEXT, " +
             "`address` TEXT, `phone` TEXT, `email` TEXT, `birthday` TEXT, `session` TEXT, `balance` NUMERIC, `lockMoney` NUMERIC, " +
             "`changePIN` INTEGER, `verified` INTEGER, `mac` TEXT, `ip` TEXT, `strLoginTime` TEXT, `strLogoutTime` TEXT, `type` INTEGER, " +
-            "`status` TEXT, `idNumber` TEXT, `idNumberDate` TEXT, `idNumberPlace` TEXT, `parentEdong` TEXT )";
+            "`status` TEXT, `idNumber` TEXT, `idNumberDate` TEXT, `idNumberPlace` TEXT, `parentEdong` TEXT, `notYetPushMoney` INTEGER DEFAULT 0)";
 
 
     private String CREATE_TABLE_EVN_PC = "CREATE TABLE " + TABLE_NAME_EVN_PC + " ( pcId NOT NULL PRIMARY KEY, strPcId TEXT, parentId INTEGER, " +
@@ -1503,10 +1503,10 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return rowAffect;
     }
 
-    public int updateBillWith(String edongKey, int billId, int code, String edong) {
+    public int updateBillWith(String edongKey, int billId, int status, String edong) {
         ContentValues initialValues = new ContentValues();
 
-        initialValues.put("code", code);
+        initialValues.put("status", status);
         initialValues.put("edong", edong);
 
         database = getWritableDatabase();
@@ -1738,6 +1738,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return rowAffect;
     }
 
+    public int updateBillDebtWithSuspectedProcessingStatus(String edong, int billId, Integer suspectedProcessingStatus) {
+        database = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
+        return database.update(TABLE_NAME_DEBT_COLLECTION, contentValues, "edongKey = ? and billId = ? ", new String[]{edong, String.valueOf(billId)});
+    }
+
     //endregion
 
     //region HISTORY Lịch sử
@@ -1894,6 +1901,43 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         database = getWritableDatabase();
         int rowAffect = (int) database.update(TABLE_NAME_HISTORY_PAY, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
         return rowAffect;
+    }
+
+    public int updateBillHistoryWithPrintInfo(String edongKey, int billId, Integer statusOfPrintInfo) {
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("printInfo", statusOfPrintInfo);
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.update(TABLE_NAME_HISTORY_PAY, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
+        return rowAffect;
+    }
+
+    public int updateBillHistoryWithSuspectedProcessingStatus(String edong, int billId, Integer suspectedProcessingStatus) {
+        database = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
+        return database.update(TABLE_NAME_HISTORY_PAY, contentValues, "edongKey = ? and billId = ? ", new String[]{edong, String.valueOf(billId)});
+    }
+
+    //endregion
+
+    //region Account Tài khoản
+    public int selectNotYetPushMoney(String edongKey) {
+        database = getReadableDatabase();
+        String query = "SELECT notYetPushMoney FROM " + TABLE_NAME_ACCOUNT + " where edong = '" + edongKey + "'";
+        Cursor c = database.rawQuery(query, null);
+        if (c.moveToFirst()) {
+            return intConvertNull(c.getInt(0));
+        }
+        return 0;
+    }
+
+    public int updateAccountWith(String edong, int notYetPushMoney) {
+        database = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("notYetPushMoney", notYetPushMoney);
+        return database.update(TABLE_NAME_ACCOUNT, contentValues, "edong = ?", new String[]{String.valueOf(edong)});
     }
 
     //endregion

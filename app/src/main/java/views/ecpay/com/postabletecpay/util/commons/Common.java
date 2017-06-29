@@ -291,7 +291,6 @@ public class Common {
         }
     }
 
-
     public enum PAYMENT_MODE {
         NULL(0, ""),
         ONLINE(1, "Hình thức thanh toán online"),
@@ -427,7 +426,8 @@ public class Common {
 
     public enum SUSPECTED_PROCESSING_STATUS {
         NULL(0, ""),
-        CHUA_TRA(1, "Chưa trả");
+        CHUA_TRA(1, "Chưa trả"),
+        TRANG_THAI_NGHI_NGO(2, "Trạng thái nghi ngờ");
 
         SUSPECTED_PROCESSING_STATUS(Integer code, String message) {
             this.code = code;
@@ -555,6 +555,36 @@ public class Common {
         public static TRADING_CODE findCodeMessage(Integer code) {
             for (TRADING_CODE v : values()) {
                 if (v.getCode() == code) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum GATE_EVN_PAY {
+        ON("ON", "Giờ mở cổng EVN"),
+        OFF("OFF", "Giờ đóng cổng EVN");
+
+        GATE_EVN_PAY(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+        private String message;
+
+        public static GATE_EVN_PAY findCodeMessage(Integer code) {
+            for (GATE_EVN_PAY v : values()) {
+                if (v.getCode().equals(code)) {
                     return v;
                 }
             }
@@ -837,13 +867,20 @@ public class Common {
         e2040("2039", "Không thể login, đã login ở 1 thiết bị khác"),
         e2042("2042", "Tài khoản chưa được xác định loại tài khoản"),
         e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
+        e814("814", "Lỗi hóa đơn đã thanh toán bởi ECPAY"),
+        e824("824", "Giao dịch lỗi"),
+        e825("825", "Lỗi hóa đơn đã thanh toán bởi đối tác khác"),
+        e095("095", "Không được thanh toán ở thời điểm hiện tại"),
 
         ex10000("10000", "Chưa có hóa đơn nào được chọn"),
         ex10001("10001", "Quá trình thanh toán kết thúc"),
         ex10002("10002", "Vui lòng kiểm tra sự tồn tại của database"),
         ex10003("10003", "Phải thanh toán từ kỳ hóa đơn xa nhất, mã KH:"),
         ex10004("10004", "Quá trình thanh toán kết thúc. Có xảy ra lỗi"),
-        ex10005("10005", "Phải thanh toán liên tục các kỳ hóa đơn, mã KH:");
+        ex10005("10005", "Phải thanh toán liên tục các kỳ hóa đơn, mã KH:"),
+        ex10006("10006", "Không thành công, đã thanh toán bởi nguồn khác"),
+        ex10007("10007", "Không thành công, đã thanh toán bởi số ví khác"),
+        ex10008("10008", "Thanh toán thành công");
 
         CODE_REPONSE_BILL_ONLINE(String code, String message) {
             this.code = code;
@@ -856,6 +893,11 @@ public class Common {
 
         public String getMessage() {
             return message;
+        }
+
+        //thông báo hiển thị thông tin thanh toán thành công lên màn hình khi kết thúc quá trình thanh toán
+        public static String getMessageSuccess(int countBillPaySuccess, long totalAmountMoney) {
+            return ex10001.getMessage() + Common.TEXT_ENTER + "Số hóa đơn = " + countBillPaySuccess + Common.TEXT_ENTER + "Tổng tiền = " + totalAmountMoney;
         }
 
         private final String code;

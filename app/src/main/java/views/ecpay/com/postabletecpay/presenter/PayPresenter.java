@@ -36,6 +36,7 @@ import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.NEGATIVE_ONE;
+import static views.ecpay.com.postabletecpay.util.commons.Common.ONE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PARTNER_CODE_DEFAULT;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PROVIDER_DEFAULT;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_EMPTY;
@@ -67,6 +68,7 @@ public class PayPresenter implements IPayPresenter {
     List<SoapAPI.AsyncSoapBillOnline> billOnlineAsyncList = new ArrayList<>();
     private SoapAPI.AsyncSoapBillOnline soapBillOnline;
     private int countBillPayedSuccess;
+    private long totalAmountBillPayedSuccess;
 
     //check Train Online
     private SoapAPI.AsyncSoapCheckTrainOnline soapCheckTrainOnlineRequestCancelBill;
@@ -282,8 +284,9 @@ public class PayPresenter implements IPayPresenter {
         //stop all thread
         int maxIndex = billOnlineAsyncList.size();
 
-        //start count billDeleteOnline pay
+        //start again count billDeleteOnline pay
         countBillPayedSuccess = 0;
+        totalAmountBillPayedSuccess = 0;
 
         for (; index < maxIndex; index++) {
             SoapAPI.AsyncSoapBillOnline billOnline = billOnlineAsyncList.get(index);
@@ -348,8 +351,8 @@ public class PayPresenter implements IPayPresenter {
             PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
 
             if (entity.isChecked())
-                callAPICheckTransAndRequestPayingBill(versionApp, edong, entity);
-//                payOnlineTheBill(context, versionApp, edong, entity);
+//                callAPICheckTransAndRequestPayingBill(versionApp, edong, entity);
+                payOnlineTheBill(versionApp, edong, entity);
         }
     }
 
@@ -695,7 +698,6 @@ public class PayPresenter implements IPayPresenter {
             return;
         }
 
-        //TODO Đang làm
         try {
             if (soapCheckTrainOnlineRequestPayingBill == null) {
                 //if null then create new
@@ -787,8 +789,9 @@ public class PayPresenter implements IPayPresenter {
         if (jsonRequestBillOnline == null)
             return;
 
-        //TODO Trước khi gọi API thanh toán online - thực hiện Thanh toán hóa đơn trong Danh sách hóa đơn nợ đã lưu trong máy
+        //TODO Trước khi gọi API thanh toán online
         /**
+         * Thanh toán hóa đơn trong Danh sách hóa đơn nợ đã lưu trong máy
          * update các thông tin vào danh sách hóa đơn nợ bill
          * Cập nhật Danh sách hóa đơn nợ đã lưu trong máy
          * Trạng thái thanh toán status = 02_Đã thanh toán (trong database status = 1)
@@ -838,7 +841,7 @@ public class PayPresenter implements IPayPresenter {
             final int positionIndex = billOnlineAsyncList.size();
 
             Handler handlerDelayBillOnline = new Handler();
-            soapBillOnline = new SoapAPI.AsyncSoapBillOnline(edong, soapBillOnlineCallBack, handlerDelayBillOnline, positionIndex);
+            soapBillOnline = new SoapAPI.AsyncSoapBillOnline(edong, soapBillOnlineCallBack, handlerDelayBillOnline, positionIndex, entity);
 
             //add to last index and free soapBillOnline
             billOnlineAsyncList.add(soapBillOnline);
@@ -1276,6 +1279,7 @@ public class PayPresenter implements IPayPresenter {
     private SoapAPI.AsyncSoapCheckTrainPayingBill.AsyncSoapCheckTrainPayingBillCallBack soapCheckTrainPayingBillCallBack = new SoapAPI.AsyncSoapCheckTrainPayingBill.AsyncSoapCheckTrainPayingBillCallBack() {
         private String edong;
         private PayBillsDialogAdapter.Entity entity;
+
         @Override
 
         public void onPre(final SoapAPI.AsyncSoapCheckTrainPayingBill soapCheckTrainPayingBill) {
@@ -1627,10 +1631,12 @@ public class PayPresenter implements IPayPresenter {
     //region billDeleteOnline online
     private SoapAPI.AsyncSoapBillOnline.AsyncSoapBillOnlineCallBack soapBillOnlineCallBack = new SoapAPI.AsyncSoapBillOnline.AsyncSoapBillOnlineCallBack() {
         private String edong;
+        PayBillsDialogAdapter.Entity entity;
 
         @Override
         public void onPre(final SoapAPI.AsyncSoapBillOnline soapBillOnline) {
             edong = soapBillOnline.getEdong();
+            entity = soapBillOnline.getEntity();
 
             mIPayView.showPayingRViewDialogStart();
 
@@ -1657,12 +1663,40 @@ public class PayPresenter implements IPayPresenter {
             if (message == null || message.isEmpty() || message.trim().equals(""))
                 return;
 
-            ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString(), false, Common.TYPE_DIALOG.LOI, false);
-                }
-            });
+            /**
+             * Các trường hợp không nhận được kết quả trả về từ Server
+             * Connection Reset: Client gửi giao dịch lên Server vào đúng thời điểm Server khởi động lại
+             * Connection Refused: Client gửi giao dịch lên Server vào đúng thời điểm Service bị dừng hoạt dộng
+             * Connection Timeout: Client gửi giao dịch lên Server nhưng không nhận được kết quả trả lời của Server
+             */
+
+            processCasePayedBySupected(null, positionIndex, edong, entity);
+
+            //update text count billDeleteOnline payed success
+            countBillPayedSuccess++;
+            totalAmountBillPayedSuccess += entity.getAmount();
+            /**
+             * Hiển thị thông tin thanh toán thành công lên màn hình
+             * Số hóa đơn = số hóa đơn thanh toán thành công
+             * Tổng tiền = tổng tiền của các hóa đơn thanh toán thành công
+             */
+            boolean isFinishAllThread = checkIsAllThreadFinish();
+            if (isFinishAllThread) {
+                String messageNotify = Common.CODE_REPONSE_BILL_ONLINE.getMessageSuccess(countBillPayedSuccess, totalAmountBillPayedSuccess);
+                mIPayView.showMessageNotifyBillOnlineDialog(messageNotify, false, Common.TYPE_DIALOG.THANH_CONG, true);
+            }
+
+
+            ((MainActivity) mIPayView.getContextView()).runOnUiThread(
+                    new Runnable() {
+                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @Override
+                        public void run() {
+                            totalBillsChooseDialog--;
+                            refreshStatusPaySuccessDialog(edong);
+                        }
+                    }
+            );
         }
 
         @Override
@@ -1671,169 +1705,105 @@ public class PayPresenter implements IPayPresenter {
                 return;
             }
 
+            //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu không thành công
             final Common.CODE_REPONSE_BILL_ONLINE codeResponse = Common.CODE_REPONSE_BILL_ONLINE.findCodeMessage(response.getFooterBillingOnlineRespone().getResponseCode());
             long billId = response.getBodyBillingOnlineRespone().getBillId();
-            //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu thành công
-            if (codeResponse != Common.CODE_REPONSE_BILL_ONLINE.e000) {
-                /**
-                 * Trong giờ mở cổng kết nối thanh toán từ ECPAY sang EVN
-                 * (Service và SRS không quy định giờ mở cổng là giờ nào.
-                 * Mặc định ta lấy các trường hợp server trả về mã e000)
-                 * Cập nhật Danh sách hóa đơn nợ (Bill table) đã lưu trong máy
-                 * Ví thanh toán edong = Ví đăng nhập
-                 * Trạng thái thanh toán status = 02_Đã thanh toán
-                 */
-                int rowAffect = mPayModel.updateBillWith(
-                        edong, (int) billId, //where
-                        Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), edong);
-                Log.d(TAG, "rowAffect updateBillWith = " + rowAffect);
-
-                /**
-                 * Lưu thông tin hóa đơn vào Danh sách thu (Bảng Debt): các thông tin như Danh sách hóa đơn nợ, chỉ khác bổ sung thêm:
-                 * Ví thanh toán edong = Ví đăng nhập
-                 * Hình thức thanh toán payments = 01_Online
-                 * Trạng thái thanh toán payStatus = 02_Đã thanh toán(trong database payStatus = 1 tương đương STATUS_BILLING)
-                 * Trạng thái chấm nợ stateOfDebt = 02_Đã chấm
-                 * Trạng thái hủy stateOfCancel = null
-                 * Trạng thái xử lý nghi ngờ suspectedProcessingStatus = null
-                 * Trạng thái hoàn trả stateOfReturn = null
-                 * Số lần in biên nhận countPrintReceipt = 0
-                 * In thông báo điện printInfo = null
-                 */
-
-                rowAffect = mPayModel.updateBillDebtWithThanhToanErrorOrSuccess(
-                        edong, (int) billId,//where
-                        edong,
-                        Common.PAYMENT_MODE.ONLINE.getCode(), Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), Common.STATE_OF_DEBT.DA_CHAM.getCode(),
-                        Common.STATE_OF_CANCEL.NULL.getCode(), Common.STATE_OF_RETURN.NULL.getCode(), Common.SUSPECTED_PROCESSING_STATUS.NULL.getCode(),
-                        ZERO, Common.STATUS_OF_PRINT_INFO.NULL.getCode());
-
-                Log.d(TAG, "rowAffect updateBillDebtWithThanhToanErrorOrSuccess = " + rowAffect);
-
-                /**
-                 * Lưu thông tin hóa đơn vào Danh sách lịch sử: các thông tin như Danh sách thu, chỉ khác bổ sung thêm các thông tin
-                 * Ngày phát sinh dateIncurred = ngày thanh toán hóa đơn
-                 * Mã giao dịch tradeCode = 03_Thanh toán Online_Chấm nợ Online
-                 */
-
-                rowAffect = mPayModel.updateBillHistoryWithThanhToanErrorOrSuccess(
-                        edong, (int) billId,//where
-                        edong,
-                        Common.PAYMENT_MODE.ONLINE.getCode(), Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), Common.STATE_OF_DEBT.CHAM_LOI.getCode(),
-                        Common.STATE_OF_CANCEL.NULL.getCode(), Common.STATE_OF_RETURN.NULL.getCode(), Common.SUSPECTED_PROCESSING_STATUS.NULL.getCode(),
-                        ZERO, Common.STATUS_OF_PRINT_INFO.NULL.getCode(), date, Common.TRADING_CODE.THANH_TOAN_ONLINE_CHAM_NO_ONLINE.getCode());
-
-                Log.d(TAG, "rowAffect updateBillHistoryWithThanhToanErrorOrSuccess = " + rowAffect);
-
-                //TODO Gửi yêu cầu cập nhật thông tin tài khoản Ví TNV
-
-                return;
-            }
-
-            if (codeResponse != Common.CODE_REPONSE_BILL_ONLINE.e000) {
-                /**
-                 * Trong giờ đóng cổng kết nối hoặc lỗi thanh toán từ ECPAY sang EVN
-                 * (Service và SRS không quy định giờ mở cổng là giờ nào.
-                 * Mặc định ta lấy các trường hợp server trả về mã e000)
-                 * Cập nhật Danh sách hóa đơn nợ (Bill table) đã lưu trong máy
-                 * Ví thanh toán edong = Ví đăng nhập
-                 * Trạng thái thanh toán status = 02_Đã thanh toán
-                 */
-                int rowAffect = mPayModel.updateBillWith(
-                        edong, (int) billId, //where
-                        Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), edong);
-                Log.d(TAG, "rowAffect updateBillWith = " + rowAffect);
-
-                /**
-                 * Lưu thông tin hóa đơn vào Danh sách thu (Bảng Debt): các thông tin như Danh sách hóa đơn nợ, chỉ khác bổ sung thêm:
-                 * Ví thanh toán edong = Ví đăng nhập
-                 * Hình thức thanh toán payments = 01_Online
-                 * Trạng thái thanh toán payStatus = 02_Đã thanh toán(trong database payStatus = 1 tương đương STATUS_BILLING)
-                 * Trạng thái chấm nợ stateOfDebt = 03_Đang chờ xử lý chấm nợ
-                 * Trạng thái hủy stateOfCancel = null
-                 * Trạng thái xử lý nghi ngờ suspectedProcessingStatus = null
-                 * Trạng thái hoàn trả stateOfReturn = null
-                 * Số lần in biên nhận countPrintReceipt = 0
-                 * In thông báo điện printInfo = null
-                 */
-
-                rowAffect = mPayModel.updateBillDebtWithThanhToanErrorOrSuccess(
-                        edong, (int) billId,//where
-                        edong,
-                        Common.PAYMENT_MODE.ONLINE.getCode(), Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), Common.STATE_OF_DEBT.DANG_CHO_XU_LY_CHAM_NO.getCode(),
-                        Common.STATE_OF_CANCEL.NULL.getCode(), Common.STATE_OF_RETURN.NULL.getCode(), Common.SUSPECTED_PROCESSING_STATUS.NULL.getCode(),
-                        ZERO, Common.STATUS_OF_PRINT_INFO.NULL.getCode());
-
-                Log.d(TAG, "rowAffect updateBillDebtWithThanhToanErrorOrSuccess = " + rowAffect);
-
-                /**
-                 * Lưu thông tin hóa đơn vào Danh sách lịch sử: các thông tin như Danh sách thu, chỉ khác bổ sung thêm các thông tin
-                 * Ngày phát sinh dateIncurred = ngày thanh toán hóa đơn
-                 * Mã giao dịch tradeCode = 04_Thanh toán Online_Chấm nợ Offline
-                 */
-
-                rowAffect = mPayModel.updateBillHistoryWithThanhToanErrorOrSuccess(
-                        edong, (int) billId,//where
-                        edong,
-                        Common.PAYMENT_MODE.ONLINE.getCode(), Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), Common.STATE_OF_DEBT.CHAM_LOI.getCode(),
-                        Common.STATE_OF_CANCEL.NULL.getCode(), Common.STATE_OF_RETURN.NULL.getCode(), Common.SUSPECTED_PROCESSING_STATUS.NULL.getCode(),
-                        ZERO, Common.STATUS_OF_PRINT_INFO.NULL.getCode(), date, Common.TRADING_CODE.THANH_TOAN_ONLINE_CHAM_NO_OFFLINE.getCode());
-
-                Log.d(TAG, "rowAffect updateBillHistoryWithThanhToanErrorOrSuccess = " + rowAffect);
-
-                //TODO Gửi yêu cầu cập nhật thông tin tài khoản Ví TNV
-            }
-
-            if (codeResponse != Common.CODE_REPONSE_BILL_ONLINE.e000) {
-                ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        PayBillsDialogAdapter.Entity entity = listBillDialog.get(positionIndex);
-                        String messageError = Common.CODE_REPONSE_SEARCH_ONLINE.getMessageServerNotify(entity.getName(), entity.getTerm(), codeResponse.getMessage());
-                        listBillDialog.get(positionIndex).setMessageError(messageError);
-
-                        //check full billDeleteOnline is payed
-                        boolean isFinishAllThread = checkIsAllThreadFinish();
-                        if (isFinishAllThread) {
-                            refreshStatusPaySuccessDialog(edong);
-                            if (countBillPayedSuccess == totalBillsChooseDialogTemp)
-                                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
-                            else
-                                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10004.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
-                        } else
-                            refreshStatusPaySuccessDialogAndDisableCheckbox(edong, true);
-                    }
-                });
-                return;
-            }
-
-            //update text count billDeleteOnline payed success
-            countBillPayedSuccess++;
-
-            //check full billDeleteOnline is payed
-            boolean isFinishAllThread = checkIsAllThreadFinish();
-            if (isFinishAllThread) {
-                if (countBillPayedSuccess == totalBillsChooseDialogTemp)
-                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
-                else
-                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
-            }
-
-            //set database to
-            int rowUpdate = mPayModel.updateBillStatus(edong, response.getBodyBillingOnlineRespone().getCustomerCode(), response.getBodyBillingOnlineRespone().getBillId(), Common.STATUS_BILLING.DA_THANH_TOAN);
-            if (rowUpdate == ERROR_OCCUR) {
-                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10002.getMessage(), false, Common.TYPE_DIALOG.LOI, false);
-                Log.e(TAG, "onPost: Lỗi thực hiện update dữ liệu trên máy tính bảng. ");
-//                callPayRecyclerDialog(edong);
-            }
+            String date = Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy);
 
             //update date payed and tract number
             String dateNow = Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy);
             Long traceNumber = response.getBodyBillingOnlineRespone().getTraceNumber();
             mPayModel.updateBillRequestDateBill(edong, response.getBodyBillingOnlineRespone().getCustomerCode(), response.getBodyBillingOnlineRespone().getBillId(), dateNow, traceNumber);
 
-            //set new status for billDeleteOnline and refesh recycler bills
-            listBillDialog.get(positionIndex).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN.getCode());
+
+            if (codeResponse.getCode() == Common.CODE_REPONSE_BILL_ONLINE.e825.getCode()) {
+                /**
+                 * Trường hợp hóa đơn đã được thanh toán bởi nguồn khác: Không thực hiện thanh toán hóa đơn
+                 */
+                processCasePayedErrorByOtherSource(response, positionIndex, date, billId, edong);
+                return;
+            }
+
+            if (codeResponse.getCode() == Common.CODE_REPONSE_BILL_ONLINE.e814.getCode()) {
+                /**
+                 * Trường hợp hóa đơn đã được thanh toán bởi ví khác: Không thực hiện thanh toán hóa đơn
+                 */
+                processCasePayedErrorByOtherEdong(response, positionIndex, date, billId, edong);
+                return;
+            }
+
+            if (codeResponse.getCode() == Common.CODE_REPONSE_BILL_ONLINE.e824.getCode()) {
+                /**
+                 * Hóa đơn chấm nợ lỗi: Không thực hiện thanh toán hóa đơn
+                 */
+                processCasePayedErrorByErrorECPAY(response, positionIndex, date, billId, edong);
+            }
+
+            //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu thành công
+            String gateEVB = response.getBodyBillingOnlineRespone().getBillingType();
+
+            /**
+             * statusGateEVN = -1: giao dịch nghi ngờ
+             * statusGateEVN = 0: mở cổng EVN
+             * statusGateEVN = 1: đóng cổng EVN
+             */
+
+            /**
+             * Trong giờ mở cổng kết nối thanh toán từ ECPAY sang EVN
+             * Giờ mở công quy định khi mã lỗi là 000 và cờ mở tới EVN billingType = ON
+             */
+
+            /**
+             * Trong giờ đóng cổng kết nối hoặc lỗi thanh toán từ ECPAY sang EVN
+             * Giờ đóng công quy định khi
+             * mã lỗi là e095 và cờ mở tới EVN billingType = ON tức hóa đơn gửi lên server ECPAY rồi gửi lên EVN nhưng EVN không chấp nhận
+             * hoặc trường hợp mã lỗi là e000 và cờ mở tới EVN billingType = OFF tức hóa đơn bị giữ tại ECPAY khi bị lỗi thanh toán từ ECPAY sang EVN
+             */
+
+            int statusGateEVN = NEGATIVE_ONE;
+
+            if ((codeResponse != Common.CODE_REPONSE_BILL_ONLINE.e000) && gateEVB.equals(Common.GATE_EVN_PAY.ON.getCode()))
+                statusGateEVN = ZERO;
+            else if ((codeResponse == Common.CODE_REPONSE_BILL_ONLINE.e000) && !gateEVB.equals(Common.GATE_EVN_PAY.ON.getCode())
+                    ||
+                    (codeResponse == Common.CODE_REPONSE_BILL_ONLINE.e095) && gateEVB.equals(Common.GATE_EVN_PAY.ON.getCode()))
+                statusGateEVN = ONE;
+
+            else
+                statusGateEVN = NEGATIVE_ONE;
+
+            if (statusGateEVN == ZERO) {
+
+                processCasePayedSuccessOpenDoor(response, positionIndex, date, billId, edong);
+
+                //TODO Gửi yêu cầu cập nhật thông tin tài khoản Ví TNV
+
+            }
+
+            if (statusGateEVN == ONE) {
+                processCasePayedSuccessCloseDoorOrErrorECPAY(response, positionIndex, date, billId, edong);
+
+                //TODO Gửi yêu cầu cập nhật thông tin tài khoản Ví TNV
+            }
+
+            if (statusGateEVN == NEGATIVE_ONE) {
+                processCasePayedBySupected(response, positionIndex, edong, entity);
+            }
+
+            //update text count billDeleteOnline payed success
+            countBillPayedSuccess++;
+            totalAmountBillPayedSuccess += response.getBodyBillingOnlineRespone().getAmount();
+            /**
+             * Hiển thị thông tin thanh toán thành công lên màn hình
+             * Số hóa đơn = số hóa đơn thanh toán thành công
+             * Tổng tiền = tổng tiền của các hóa đơn thanh toán thành công
+             */
+            boolean isFinishAllThread = checkIsAllThreadFinish();
+            if (isFinishAllThread) {
+                String message = Common.CODE_REPONSE_BILL_ONLINE.getMessageSuccess(countBillPayedSuccess, totalAmountBillPayedSuccess);
+                mIPayView.showMessageNotifyBillOnlineDialog(message, false, Common.TYPE_DIALOG.THANH_CONG, true);
+            }
+
 
             ((MainActivity) mIPayView.getContextView()).runOnUiThread(
                     new Runnable() {
@@ -1862,6 +1832,419 @@ public class PayPresenter implements IPayPresenter {
             });
         }
     };
+
+    private void processCasePayedBySupected(BillingOnlineRespone respone, final int positionIndex, final String edong,  PayBillsDialogAdapter.Entity entity) {
+        //TODO Thực hiện thanh toán nghi ngờ
+        /**
+         * Danh sách hóa đơn: hiển thị kết quả “Thanh toán thành công”
+         * In biên nhận:
+         * --- In biên nhận thành công printInfo = 'Đã in thông báo' (trong bảng history)
+         * --- Cho phép lập phiếu và in lại biên nhận
+         * Thông tin tài khoản: Ghi tăng Số tiền chưa đẩy chấm nợ (trong bảng acccount cột notYetPushMoney)
+         * Lưu Danh sách hóa đơn vào hệ thống như trường hợp thanh toán Online thành công, chỉ khác bổ sung lưu
+         * --- TT thanh toán nghi ngờ = 01_Chưa kiểm tra (bảng debt)
+         * Lưu Lịch sử thanh toán vào hệ thống như trường hợp thanh toán Online thành công, chỉ khác bổ sung lưu
+         * --- TT thanh toán nghi ngờ = 01_Chưa kiểm tra (update bảng history)
+         * Lưu lại log giao dịch Thanh toán nghi ngờ
+         * Tổng hợp số Đã thanh toán trên Báo cáo tổng hợp, Báo cáo chi tiết
+         */
+
+        //In biên nhận thành công printInfo = 'Đã in thông báo' (trong bảng history)
+        int rowAffect = mPayModel.updateBillHistoryWithPrintInfo(
+                edong, entity.getBillId(), //where
+                Common.STATUS_OF_PRINT_INFO.DA_IN_THONG_BAO.getCode());
+        Log.d(TAG, "rowAffect updateBillHistoryWithPrintInfo = " + rowAffect);
+
+        //Thông tin tài khoản: Ghi tăng Số tiền chưa đẩy chấm nợ (trong bảng acccount cột notYetPushMoney)
+        int notYetPushMoney = mPayModel.getNotYetPushMoney(edong);
+        notYetPushMoney += entity.getAmount();
+        rowAffect = mPayModel.updateAccountWith(
+                edong, //where
+                notYetPushMoney);
+        Log.d(TAG, "rowAffect updateAccountWith = " + rowAffect);
+
+        //Lưu Danh sách hóa đơn vào hệ thống như trường hợp thanh toán Online thành công, chỉ khác bổ sung lưu
+        // --- TT thanh toán nghi ngờ = 01_Chưa kiểm tra (bảng debt)
+        // Đồng thời hiển thị message thành công
+        String date = Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy);
+        processCasePayedSuccessOpenDoor(null, positionIndex, date, entity.getBillId(), entity.getEdong());
+
+        rowAffect = mPayModel.updateBillDebtWithSuspectedProcessingStatus(
+                edong, entity.getBillId(),//where
+                Common.SUSPECTED_PROCESSING_STATUS.TRANG_THAI_NGHI_NGO.getCode()
+        );
+        Log.d(TAG, "rowAffect updateBillDebtWithSuspectedProcessingStatus = " + rowAffect);
+
+
+        rowAffect = mPayModel.updateBillHistoryWithSuspectedProcessingStatus(
+                edong, entity.getBillId(),//where
+                Common.SUSPECTED_PROCESSING_STATUS.TRANG_THAI_NGHI_NGO.getCode()
+        );
+        Log.d(TAG, "rowAffect updateBillHistoryWithSuspectedProcessingStatus = " + rowAffect);
+    }
+
+    private void processCasePayedSuccessCloseDoorOrErrorECPAY(BillingOnlineRespone respone, final int positionIndex, String date, long billId, final String edong) {
+        /**
+         * Trong giờ đóng cổng kết nối hoặc lỗi thanh toán từ ECPAY sang EVN
+         * (Trường hợp thanh toán thành công mã e000 && Trạng thái thanh toán ON/OFF billingType API trả về = OFF)
+         * hay tương đương với e000 và billingType khác ON
+         * Cập nhật Danh sách hóa đơn nợ (Bill table) đã lưu trong máy
+         * Ví thanh toán edong = Ví đăng nhập
+         * Trạng thái thanh toán status = 02_Đã thanh toán
+         */
+        int rowAffect = mPayModel.updateBillWith(
+                edong, (int) billId, //where
+                Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), edong);
+        Log.d(TAG, "rowAffect updateBillWith = " + rowAffect);
+
+        /**
+         * Lưu thông tin hóa đơn vào Danh sách thu (Bảng Debt): các thông tin như Danh sách hóa đơn nợ, chỉ khác bổ sung thêm:
+         * Ví thanh toán edong = Ví đăng nhập
+         * Hình thức thanh toán payments = 01_Online
+         * Trạng thái thanh toán payStatus = 02_Đã thanh toán(trong database payStatus = 1 tương đương STATUS_BILLING)
+         * Trạng thái chấm nợ stateOfDebt = 03_Đang chờ xử lý chấm nợ
+         * Trạng thái hủy stateOfCancel = null
+         * Trạng thái xử lý nghi ngờ suspectedProcessingStatus = null
+         * Trạng thái hoàn trả stateOfReturn = null
+         * Số lần in biên nhận countPrintReceipt = 0
+         * In thông báo điện printInfo = null
+         */
+
+        rowAffect = mPayModel.updateBillDebtWithThanhToanErrorOrSuccess(
+                edong, (int) billId,//where
+                edong,
+                Common.PAYMENT_MODE.ONLINE.getCode(), Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), Common.STATE_OF_DEBT.DANG_CHO_XU_LY_CHAM_NO.getCode(),
+                Common.STATE_OF_CANCEL.NULL.getCode(), Common.STATE_OF_RETURN.NULL.getCode(), Common.SUSPECTED_PROCESSING_STATUS.NULL.getCode(),
+                ZERO, Common.STATUS_OF_PRINT_INFO.NULL.getCode());
+
+        //set new status for billDeleteOnline and refesh recycler bills
+        listBillDialog.get(positionIndex).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN.getCode());
+
+        Log.d(TAG, "rowAffect updateBillDebtWithThanhToanErrorOrSuccess = " + rowAffect);
+
+        /**
+         * Lưu thông tin hóa đơn vào Danh sách lịch sử: các thông tin như Danh sách thu, chỉ khác bổ sung thêm các thông tin
+         * Ngày phát sinh dateIncurred = ngày thanh toán hóa đơn
+         * Mã giao dịch tradeCode = 04_Thanh toán Online_Chấm nợ Offline
+         */
+
+        rowAffect = mPayModel.updateBillHistoryWithThanhToanErrorOrSuccess(
+                edong, (int) billId,//where
+                edong,
+                Common.PAYMENT_MODE.ONLINE.getCode(), Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), Common.STATE_OF_DEBT.CHAM_LOI.getCode(),
+                Common.STATE_OF_CANCEL.NULL.getCode(), Common.STATE_OF_RETURN.NULL.getCode(), Common.SUSPECTED_PROCESSING_STATUS.NULL.getCode(),
+                ZERO, Common.STATUS_OF_PRINT_INFO.NULL.getCode(), date, Common.TRADING_CODE.THANH_TOAN_ONLINE_CHAM_NO_OFFLINE.getCode());
+
+        Log.d(TAG, "rowAffect updateBillHistoryWithThanhToanErrorOrSuccess = " + rowAffect);
+
+        /**
+         * Hiển thị và cập nhật thông tin thanh toán lên màn hình
+         * Thanh toán thành công Trong giờ đóng cổng
+         * Hiển thị message : Thanh toán thành công
+         */
+        ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String messageError = Common.CODE_REPONSE_BILL_ONLINE.ex10008.getMessage();
+                listBillDialog.get(positionIndex).setMessageError(messageError);
+
+                //check full billDeleteOnline is payed
+                boolean isFinishAllThread = checkIsAllThreadFinish();
+                if (isFinishAllThread) {
+                    refreshStatusPaySuccessDialog(edong);
+                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                } else
+                    refreshStatusPaySuccessDialogAndDisableCheckbox(edong, true);
+            }
+        });
+    }
+
+    private void processCasePayedSuccessOpenDoor(BillingOnlineRespone respone, final int positionIndex, String date, long billId, final String edongKey) {
+        //TODO mark
+        /**
+         * Trong giờ mở cổng kết nối thanh toán từ ECPAY sang EVN
+         * (Trường hợp thanh toán thành công mã e000 && Trạng thái thanh toán ON/OFF billingType API trả về = ON)
+         * Cập nhật Danh sách hóa đơn nợ (Bill table) đã lưu trong máy
+         * Ví thanh toán edong = Ví đăng nhập
+         * Trạng thái thanh toán status = 02_Đã thanh toán
+         */
+        int rowAffect = mPayModel.updateBillWith(
+                edongKey, (int) billId, //where
+                Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), edongKey);
+        Log.d(TAG, "rowAffect updateBillWith = " + rowAffect);
+
+        /**
+         * Lưu thông tin hóa đơn vào Danh sách thu (Bảng Debt): các thông tin như Danh sách hóa đơn nợ, chỉ khác bổ sung thêm:
+         * Ví thanh toán edong = Ví đăng nhập
+         * Hình thức thanh toán payments = 01_Online
+         * Trạng thái thanh toán payStatus = 02_Đã thanh toán(trong database payStatus = 1 tương đương STATUS_BILLING)
+         * Trạng thái chấm nợ stateOfDebt = 02_Đã chấm
+         * Trạng thái hủy stateOfCancel = null
+         * Trạng thái xử lý nghi ngờ suspectedProcessingStatus = null
+         * Trạng thái hoàn trả stateOfReturn = null
+         * Số lần in biên nhận countPrintReceipt = 0
+         * In thông báo điện printInfo = null
+         */
+
+        rowAffect = mPayModel.updateBillDebtWithThanhToanErrorOrSuccess(
+                edongKey, (int) billId,//where
+                edongKey,
+                Common.PAYMENT_MODE.ONLINE.getCode(), Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), Common.STATE_OF_DEBT.DA_CHAM.getCode(),
+                Common.STATE_OF_CANCEL.NULL.getCode(), Common.STATE_OF_RETURN.NULL.getCode(), Common.SUSPECTED_PROCESSING_STATUS.NULL.getCode(),
+                ZERO, Common.STATUS_OF_PRINT_INFO.NULL.getCode());
+
+        Log.d(TAG, "rowAffect updateBillDebtWithThanhToanErrorOrSuccess = " + rowAffect);
+
+        //set new status for billDeleteOnline and refesh recycler bills
+        listBillDialog.get(positionIndex).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN.getCode());
+
+        /**
+         * Lưu thông tin hóa đơn vào Danh sách lịch sử: các thông tin như Danh sách thu, chỉ khác bổ sung thêm các thông tin
+         * Ngày phát sinh dateIncurred = ngày thanh toán hóa đơn
+         * Mã giao dịch tradeCode = 03_Thanh toán Online_Chấm nợ Online
+         */
+
+        rowAffect = mPayModel.updateBillHistoryWithThanhToanErrorOrSuccess(
+                edongKey, (int) billId,//where
+                edongKey,
+                Common.PAYMENT_MODE.ONLINE.getCode(), Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), Common.STATE_OF_DEBT.CHAM_LOI.getCode(),
+                Common.STATE_OF_CANCEL.NULL.getCode(), Common.STATE_OF_RETURN.NULL.getCode(), Common.SUSPECTED_PROCESSING_STATUS.NULL.getCode(),
+                ZERO, Common.STATUS_OF_PRINT_INFO.NULL.getCode(), date, Common.TRADING_CODE.THANH_TOAN_ONLINE_CHAM_NO_ONLINE.getCode());
+
+        Log.d(TAG, "rowAffect updateBillHistoryWithThanhToanErrorOrSuccess = " + rowAffect);
+
+        /**
+         * Hiển thị và cập nhật thông tin thanh toán lên màn hình
+         * Thanh toán thành công Trong giờ mở cổng
+         * Hiển thị message : Thanh toán thành công
+         */
+        ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String messageError = Common.CODE_REPONSE_BILL_ONLINE.ex10008.getMessage();
+                listBillDialog.get(positionIndex).setMessageError(messageError);
+
+                //check full billDeleteOnline is payed
+                boolean isFinishAllThread = checkIsAllThreadFinish();
+                if (isFinishAllThread) {
+                    refreshStatusPaySuccessDialog(edongKey);
+                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                } else
+                    refreshStatusPaySuccessDialogAndDisableCheckbox(edongKey, true);
+            }
+        });
+
+    }
+
+    private void processCasePayedErrorByErrorECPAY(BillingOnlineRespone respone, final int positionIndex, String date, long billId, final String edong) {
+        /**
+         * Hóa đơn chấm nợ lỗi: Không thực hiện thanh toán hóa đơn
+         * Cập nhật Danh sách hóa đơn nợ (Bill table) đã lưu trong máy
+         * Ví thanh toán edong = Ví đăng nhập
+         * Trạng thái thanh toán status = (SRS không yêu cầu cập nhật trường này)
+         */
+        int rowAffect = mPayModel.updateBillWithWithThanhToanError(
+                edong, (int) billId, //where
+                edong);
+        Log.d(TAG, "rowAffect updateBillWithWithThanhToanError = " + rowAffect);
+
+
+        /**
+         * Lưu thông tin hóa đơn vào Danh sách thu (Bảng Debt): các thông tin như Danh sách hóa đơn nợ, chỉ khác bổ sung thêm:
+         * Ví thanh toán edong = Ví đăng nhập
+         * Hình thức thanh toán payments = 01_Online
+         * Trạng thái thanh toán payStatus = 02_Đã thanh toán(trong database payStatus = 1 tương đương STATUS_BILLING)
+         * Trạng thái chấm nợ stateOfDebt = 04_Chấm lỗi
+         * Trạng thái hủy stateOfCancel = null
+         * Trạng thái xử lý nghi ngờ suspectedProcessingStatus = null
+         * Trạng thái hoàn trả stateOfReturn = null
+         * Số lần in biên nhận countPrintReceipt = 0
+         * In thông báo điện printInfo = null
+         */
+
+        rowAffect = mPayModel.updateBillDebtWithThanhToanErrorOrSuccess(
+                edong, (int) billId,//where
+                edong,
+                Common.PAYMENT_MODE.ONLINE.getCode(), Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), Common.STATE_OF_DEBT.CHAM_LOI.getCode(),
+                Common.STATE_OF_CANCEL.NULL.getCode(), Common.STATE_OF_RETURN.NULL.getCode(), Common.SUSPECTED_PROCESSING_STATUS.NULL.getCode(),
+                ZERO, Common.STATUS_OF_PRINT_INFO.NULL.getCode());
+
+        Log.d(TAG, "rowAffect updateBillDebtWithThanhToanErrorOrSuccess = " + rowAffect);
+
+        //set new status for billDeleteOnline and refesh recycler bills
+        listBillDialog.get(positionIndex).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN.getCode());
+
+        /**
+         * Lưu thông tin hóa đơn vào Danh sách lịch sử: các thông tin như Danh sách thu, chỉ khác bổ sung thêm các thông tin
+         * Ngày phát sinh dateIncurred = ngày thanh toán hóa đơn
+         * Mã giao dịch tradeCode = 05_Thanh toán Online_Chấm nợ lỗi
+         */
+
+        rowAffect = mPayModel.updateBillHistoryWithThanhToanErrorOrSuccess(
+                edong, (int) billId,//where
+                edong,
+                Common.PAYMENT_MODE.ONLINE.getCode(), Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), Common.STATE_OF_DEBT.CHAM_LOI.getCode(),
+                Common.STATE_OF_CANCEL.NULL.getCode(), Common.STATE_OF_RETURN.NULL.getCode(), Common.SUSPECTED_PROCESSING_STATUS.NULL.getCode(),
+                ZERO, Common.STATUS_OF_PRINT_INFO.NULL.getCode(), date, Common.TRADING_CODE.THANH_TOAN_ONLINE_CHAM_NO_LOI.getCode());
+
+        Log.d(TAG, "rowAffect updateBillHistoryWithThanhToanErrorOrSuccess = " + rowAffect);
+
+        /**
+         * Hiển thị và cập nhật thông tin thanh toán lên màn hình
+         * Thanh toán hóa đơn không thành công Chấm nợ lỗi Timeout
+         * Hiển thị message : Thanh toán thành công
+         */
+        ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String messageError = Common.CODE_REPONSE_BILL_ONLINE.ex10008.getMessage();
+                listBillDialog.get(positionIndex).setMessageError(messageError);
+
+                //check full billDeleteOnline is payed
+                boolean isFinishAllThread = checkIsAllThreadFinish();
+                if (isFinishAllThread) {
+                    refreshStatusPaySuccessDialog(edong);
+                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                } else
+                    refreshStatusPaySuccessDialogAndDisableCheckbox(edong, true);
+            }
+        });
+    }
+
+    private void processCasePayedErrorByOtherEdong(BillingOnlineRespone response, final int positionIndex, String date, long billId, final String edong) {
+        /**
+         * Trường hợp hóa đơn đã được thanh toán bởi ví khác: Không thực hiện thanh toán hóa đơn
+         * Cập nhật Danh sách hóa đơn nợ (Bill table) đã lưu trong máy
+         * Ví thanh toán edong = Ví thanh toán do server trả về
+         * Trạng thái thanh toán status = 04_Đã thanh toán bởi ví khác (Trong database = 3)
+         */
+
+        int rowAffect = mPayModel.updateBillWith(
+                edong, (int) billId, //where
+                Common.STATUS_BILLING.DA_THANH_TOAN_BOI_VI_KHAC.getCode(), response.getBodyBillingOnlineRespone().getPaymentEdong());
+        Log.d(TAG, "rowAffect updateBillWith = " + rowAffect);
+
+
+        /** Lưu thông tin hóa đơn vào Danh sách lịch sử (Bảng History): các thông tin như Danh sách hóa đơn nợ, chỉ khác bổ sung thêm:
+         * Ví thanh toán edong = Ví thanh toán do server trả về
+         * Hình thức thanh toán payments = null
+         * Trạng thái thanh toán payStatus = 04_Đã thanh toán bởi ví khác(trong database payStatus = 3)
+         * Trạng thái chấm nợ stateOfDebt = null
+         * Trạng thái hủy stateOfCancel = null
+         * Trạng thái xử lý nghi ngờ suspectedProcessingStatus = null
+         * Trạng thái hoàn trả stateOfReturn = null
+         * Số lần in biên nhận countPrintReceipt = 0
+         * In thông báo điện printInfo = null
+         * Ngày đẩy dateOfPush = ngày thanh toán hóa đơn
+         * Mã giao dịch tradeCode = 02_Cập nhật trạng thái nợ (SRS update thêm trường này)
+         *
+         * Trạng thái đẩy chấm nợ stateOfPush = (SRS không yêu cầu cập nhật trường này nên sẽ ko update)
+         * */
+
+        rowAffect = mPayModel.updateBillDebtWithThanhToanBoiNguonKhacOrViKhac(
+                edong, (int) billId,//where
+                response.getBodyBillingOnlineRespone().getPaymentEdong(),
+                Common.PAYMENT_MODE.NULL.getCode(), Common.STATUS_BILLING.DA_THANH_TOAN_BOI_VI_KHAC.getCode(), Common.STATE_OF_DEBT.NULL.getCode(),
+                Common.STATE_OF_CANCEL.NULL.getCode(), Common.STATE_OF_RETURN.NULL.getCode(), Common.SUSPECTED_PROCESSING_STATUS.NULL.getCode(),
+                date, ZERO, Common.STATUS_OF_PRINT_INFO.NULL.getCode(), Common.TRADING_CODE.CAP_NHAT_TRANG_THAI_NO.getCode());
+
+        Log.d(TAG, "rowAffect updateBillDebtWithThanhToanBoiNguonKhacOrViKhac = " + rowAffect);
+
+        //set new status for billDeleteOnline and refesh recycler bills
+        listBillDialog.get(positionIndex).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN_BOI_VI_KHAC.getCode());
+
+        /**
+         * Hiển thị và cập nhật thông tin thanh toán lên màn hình
+         * Thanh toán hóa đơn không thành công Hóa đơn thanh toán bởi số ví khác
+         * Hiển thị message : Không thành công, đã thanh toán bởi số ví khác
+         */
+        ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String messageError = Common.CODE_REPONSE_BILL_ONLINE.ex10007.getMessage();
+                listBillDialog.get(positionIndex).setMessageError(messageError);
+
+                //check full billDeleteOnline is payed
+                boolean isFinishAllThread = checkIsAllThreadFinish();
+                if (isFinishAllThread) {
+                    refreshStatusPaySuccessDialog(edong);
+                    if (countBillPayedSuccess == totalBillsChooseDialogTemp)
+                        mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                    else
+                        mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10004.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+                } else
+                    refreshStatusPaySuccessDialogAndDisableCheckbox(edong, true);
+            }
+        });
+    }
+
+    private void processCasePayedErrorByOtherSource(BillingOnlineRespone respone, final int positionIndex, String date, long billId, final String edong) {
+        /** Trường hợp hóa đơn đã được thanh toán bởi nguồn khác: Không thực hiện thanh toán hóa đơn
+         * Cập nhật Danh sách hóa đơn nợ (Bill table) đã lưu trong máy
+         * Ví thanh toán edong = null
+         * Trạng thái thanh toán status = 03_Đã thanh toán bởi nguồn khác (Trong database = 2)
+         */
+
+
+        int rowAffect = mPayModel.updateBillWith(
+                edong, (int) billId, //where
+                Common.STATUS_BILLING.DA_THANH_TOAN_BOI_NGUON_KHAC.getCode(), null);
+        Log.d(TAG, "rowAffect updateBillWith = " + rowAffect);
+
+        /** Lưu thông tin hóa đơn vào Danh sách lịch sử (Bảng History): các thông tin như Danh sách hóa đơn nợ, chỉ khác bổ sung thêm:
+         * Ví thanh toán edong = null
+         * Hình thức thanh toán payments = null
+         * Trạng thái thanh toán payStatus = 03_Đã thanh toán bởi nguồn khác(trong database payStatus = 2)
+         * Trạng thái chấm nợ stateOfDebt = null
+         * Trạng thái hủy stateOfCancel = null
+         * Trạng thái xử lý nghi ngờ suspectedProcessingStatus = null
+         * Trạng thái hoàn trả stateOfReturn = null
+         * Số lần in biên nhận countPrintReceipt = 0
+         * In thông báo điện printInfo = null
+         * Ngày đẩy dateOfPush = ngày thanh toán hóa đơn
+         * Mã giao dịch tradeCode = 02_Cập nhật trạng thái nợ (SRS update thêm trường này)
+         *
+         * Trạng thái đẩy chấm nợ stateOfPush = (SRS không yêu cầu cập nhật trường này nên sẽ ko update)
+         */
+
+
+        rowAffect = mPayModel.updateBillDebtWithThanhToanBoiNguonKhacOrViKhac(
+                edong, (int) billId, //where
+                null,
+                Common.PAYMENT_MODE.NULL.getCode(), Common.STATUS_BILLING.DA_THANH_TOAN_BOI_NGUON_KHAC.getCode(), Common.STATE_OF_DEBT.NULL.getCode(),
+                Common.STATE_OF_CANCEL.NULL.getCode(), Common.STATE_OF_RETURN.NULL.getCode(), Common.SUSPECTED_PROCESSING_STATUS.NULL.getCode(),
+                date, ZERO, Common.STATUS_OF_PRINT_INFO.NULL.getCode(), Common.TRADING_CODE.CAP_NHAT_TRANG_THAI_NO.getCode());
+
+        Log.d(TAG, "rowAffect updateBillDebtWithThanhToanBoiNguonKhacOrViKhac = " + rowAffect);
+
+
+        //set new status for billDeleteOnline and refesh recycler bills
+        listBillDialog.get(positionIndex).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN_BOI_NGUON_KHAC.getCode());
+
+        /**
+         * Hiển thị và cập nhật thông tin thanh toán lên màn hình
+         * Thanh toán hóa đơn không thành công Hóa đơn thanh toán bởi nguồn khác
+         * Hiển thị message : Không thành công, đã thanh toán bởi nguồn khác
+         */
+        ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String messageError = Common.CODE_REPONSE_BILL_ONLINE.ex10006.getMessage();
+                listBillDialog.get(positionIndex).setMessageError(messageError);
+
+                //check full billDeleteOnline is payed
+                boolean isFinishAllThread = checkIsAllThreadFinish();
+                if (isFinishAllThread) {
+                    refreshStatusPaySuccessDialog(edong);
+                    if (countBillPayedSuccess == totalBillsChooseDialogTemp)
+                        mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                    else
+                        mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10004.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+                } else
+                    refreshStatusPaySuccessDialogAndDisableCheckbox(edong, true);
+            }
+        });
+    }
 
     private void refreshStatusPaySuccessDialogAndDisableCheckbox(String edong, boolean isDisableAllCheckbox) {
         if (TextUtils.isEmpty(edong))
