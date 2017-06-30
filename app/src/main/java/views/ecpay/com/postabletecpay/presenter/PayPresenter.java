@@ -356,7 +356,6 @@ public class PayPresenter implements IPayPresenter {
         }
     }
 
-
     @Override
     public void callPayingBillOffline(String edong) {
         if (totalBillsChooseDialog == 0) {
@@ -653,7 +652,7 @@ public class PayPresenter implements IPayPresenter {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void callAPICheckTransAndRequestPayingBill(String versionApp, String edong, PayBillsDialogAdapter.Entity entity) {
+    private void callAPIUpdateEdongAccount(String edong, PayBillsDialogAdapter.Entity entity) {
         Context context = mIPayView.getContextView();
         //check wifi
         boolean isHasWifi = Common.isConnectingWifi(mIPayView.getContextView());
@@ -669,7 +668,13 @@ public class PayPresenter implements IPayPresenter {
         }
 
         ConfigInfo configInfo = null;
-
+        String versionApp = Common.getVersionApp(context);
+        try {
+            configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.CHECK_TRANS.toString(), versionApp);
+        } catch (Exception e) {
+            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString(), Common.TYPE_DIALOG.LOI);
+            return;
+        }
         Long amount = entity.getAmount();
         String customerCode = entity.getCode();
         long billId = entity.getBillId();
@@ -1494,6 +1499,211 @@ public class PayPresenter implements IPayPresenter {
         }
     };
 
+    private SoapAPI.AsyncSoapBillOnline.AsyncSoapBillOnlineCallBack soapBillOnlineCallBack = new SoapAPI.AsyncSoapBillOnline.AsyncSoapBillOnlineCallBack() {
+        private String edong;
+        PayBillsDialogAdapter.Entity entity;
+
+        @Override
+        public void onPre(final SoapAPI.AsyncSoapBillOnline soapBillOnline) {
+            edong = soapBillOnline.getEdong();
+            entity = soapBillOnline.getEntity();
+
+            mIPayView.showPayingRViewDialogStart();
+
+            //check wifi
+            boolean isHasWifi = Common.isConnectingWifi(mIPayView.getContextView());
+            boolean isHasNetwork = Common.isNetworkConnected(mIPayView.getContextView());
+
+//            if (!isHasWifi) {
+//                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
+//
+//                soapBillOnline.setEndCallSoap(true);
+//                soapBillOnline.cancel(true);
+//            }
+            if (!isHasNetwork) {
+                mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString(), false, Common.TYPE_DIALOG.LOI, false);
+
+                soapBillOnline.setEndCallSoap(true);
+                soapBillOnline.cancel(true);
+            }
+        }
+
+        @Override
+        public void onUpdate(final String message, final int positionIndex) {
+            if (message == null || message.isEmpty() || message.trim().equals(""))
+                return;
+
+            /**
+             * Các trường hợp không nhận được kết quả trả về từ Server
+             * Connection Reset: Client gửi giao dịch lên Server vào đúng thời điểm Server khởi động lại
+             * Connection Refused: Client gửi giao dịch lên Server vào đúng thời điểm Service bị dừng hoạt dộng
+             * Connection Timeout: Client gửi giao dịch lên Server nhưng không nhận được kết quả trả lời của Server
+             */
+
+            processCasePayedBySupected(null, positionIndex, edong, entity);
+
+            //update text count billDeleteOnline payed success
+            countBillPayedSuccess++;
+            totalAmountBillPayedSuccess += entity.getAmount();
+            /**
+             * Hiển thị thông tin thanh toán thành công lên màn hình
+             * Số hóa đơn = số hóa đơn thanh toán thành công
+             * Tổng tiền = tổng tiền của các hóa đơn thanh toán thành công
+             */
+            boolean isFinishAllThread = checkIsAllThreadFinish();
+            if (isFinishAllThread) {
+                String messageNotify = Common.CODE_REPONSE_BILL_ONLINE.getMessageSuccess(countBillPayedSuccess, totalAmountBillPayedSuccess);
+                mIPayView.showMessageNotifyBillOnlineDialog(messageNotify, false, Common.TYPE_DIALOG.THANH_CONG, true);
+            }
+
+            /**
+             * Gửi yêu cầu cập nhật thông tin tài khoản ví TNV
+             */
+
+            callAPIUpdateEdongAccount(edong, entity);
+
+            ((MainActivity) mIPayView.getContextView()).runOnUiThread(
+                    new Runnable() {
+                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @Override
+                        public void run() {
+                            totalBillsChooseDialog--;
+                            refreshStatusPaySuccessDialog(edong);
+                        }
+                    }
+            );
+        }
+
+        @Override
+        public void onPost(BillingOnlineRespone response, final int positionIndex) {
+            if (response == null) {
+                return;
+            }
+
+            //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu không thành công
+            final Common.CODE_REPONSE_BILL_ONLINE codeResponse = Common.CODE_REPONSE_BILL_ONLINE.findCodeMessage(response.getFooterBillingOnlineRespone().getResponseCode());
+            long billId = response.getBodyBillingOnlineRespone().getBillId();
+            String date = Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy);
+
+            //update date payed and tract number
+            String dateNow = Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy);
+            Long traceNumber = response.getBodyBillingOnlineRespone().getTraceNumber();
+            mPayModel.updateBillRequestDateBill(edong, response.getBodyBillingOnlineRespone().getCustomerCode(), response.getBodyBillingOnlineRespone().getBillId(), dateNow, traceNumber);
+
+
+            if (codeResponse.getCode() == Common.CODE_REPONSE_BILL_ONLINE.e825.getCode()) {
+                /**
+                 * Trường hợp hóa đơn đã được thanh toán bởi nguồn khác: Không thực hiện thanh toán hóa đơn
+                 */
+                processCasePayedErrorByOtherSource(response, positionIndex, date, billId, edong);
+                return;
+            }
+
+            if (codeResponse.getCode() == Common.CODE_REPONSE_BILL_ONLINE.e814.getCode()) {
+                /**
+                 * Trường hợp hóa đơn đã được thanh toán bởi ví khác: Không thực hiện thanh toán hóa đơn
+                 */
+                processCasePayedErrorByOtherEdong(response, positionIndex, date, billId, edong);
+                return;
+            }
+
+            if (codeResponse.getCode() == Common.CODE_REPONSE_BILL_ONLINE.e824.getCode()) {
+                /**
+                 * Hóa đơn chấm nợ lỗi: Không thực hiện thanh toán hóa đơn
+                 */
+                processCasePayedErrorByErrorECPAY(response, positionIndex, date, billId, edong);
+            }
+
+            //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu thành công
+            String gateEVB = response.getBodyBillingOnlineRespone().getBillingType();
+
+            /**
+             * statusGateEVN = -1: giao dịch nghi ngờ
+             * statusGateEVN = 0: mở cổng EVN
+             * statusGateEVN = 1: đóng cổng EVN
+             */
+
+            /**
+             * Trong giờ mở cổng kết nối thanh toán từ ECPAY sang EVN
+             * Giờ mở công quy định khi mã lỗi là 000 và cờ mở tới EVN billingType = ON
+             */
+
+            /**
+             * Trong giờ đóng cổng kết nối hoặc lỗi thanh toán từ ECPAY sang EVN
+             * Giờ đóng công quy định khi
+             * mã lỗi là e095 và cờ mở tới EVN billingType = ON tức hóa đơn gửi lên server ECPAY rồi gửi lên EVN nhưng EVN không chấp nhận
+             * hoặc trường hợp mã lỗi là e000 và cờ mở tới EVN billingType = OFF tức hóa đơn bị giữ tại ECPAY khi bị lỗi thanh toán từ ECPAY sang EVN
+             */
+
+            int statusGateEVN = NEGATIVE_ONE;
+
+            if ((codeResponse != Common.CODE_REPONSE_BILL_ONLINE.e000) && gateEVB.equals(Common.GATE_EVN_PAY.ON.getCode()))
+                statusGateEVN = ZERO;
+            else if ((codeResponse == Common.CODE_REPONSE_BILL_ONLINE.e000) && !gateEVB.equals(Common.GATE_EVN_PAY.ON.getCode())
+                    ||
+                    (codeResponse == Common.CODE_REPONSE_BILL_ONLINE.e095) && gateEVB.equals(Common.GATE_EVN_PAY.ON.getCode()))
+                statusGateEVN = ONE;
+
+            else
+                statusGateEVN = NEGATIVE_ONE;
+
+            if (statusGateEVN == ZERO) {
+
+                processCasePayedSuccessOpenDoor(response, positionIndex, date, billId, edong);
+
+                //TODO Gửi yêu cầu cập nhật thông tin tài khoản Ví TNV
+
+            }
+
+            if (statusGateEVN == ONE) {
+                processCasePayedSuccessCloseDoorOrErrorECPAY(response, positionIndex, date, billId, edong);
+
+                //TODO Gửi yêu cầu cập nhật thông tin tài khoản Ví TNV
+            }
+
+            //update text count billDeleteOnline payed success
+            countBillPayedSuccess++;
+            totalAmountBillPayedSuccess += response.getBodyBillingOnlineRespone().getAmount();
+            /**
+             * Hiển thị thông tin thanh toán thành công lên màn hình
+             * Số hóa đơn = số hóa đơn thanh toán thành công
+             * Tổng tiền = tổng tiền của các hóa đơn thanh toán thành công
+             */
+            boolean isFinishAllThread = checkIsAllThreadFinish();
+            if (isFinishAllThread) {
+                String message = Common.CODE_REPONSE_BILL_ONLINE.getMessageSuccess(countBillPayedSuccess, totalAmountBillPayedSuccess);
+                mIPayView.showMessageNotifyBillOnlineDialog(message, false, Common.TYPE_DIALOG.THANH_CONG, true);
+            }
+
+
+            ((MainActivity) mIPayView.getContextView()).runOnUiThread(
+                    new Runnable() {
+                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @Override
+                        public void run() {
+                            totalBillsChooseDialog--;
+                            refreshStatusPaySuccessDialog(edong);
+                        }
+                    }
+            );
+        }
+
+        @Override
+        public void onTimeOut(final SoapAPI.AsyncSoapBillOnline soapBillOnline) {
+            soapBillOnline.cancel(true);
+
+            //thread call asyntask is running. must call in other thread to update UI
+            ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (!soapBillOnline.isEndCallSoap()) {
+                        mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), false, Common.TYPE_DIALOG.LOI, false);
+                    }
+                }
+            });
+        }
+    };
+
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void callAPITransationCancellation(String edong, CheckTrainOnlineResponse response, String reasonDeleteBill) {
@@ -1628,211 +1838,56 @@ public class PayPresenter implements IPayPresenter {
     };
     //endregion
 
-    //region billDeleteOnline online
-    private SoapAPI.AsyncSoapBillOnline.AsyncSoapBillOnlineCallBack soapBillOnlineCallBack = new SoapAPI.AsyncSoapBillOnline.AsyncSoapBillOnlineCallBack() {
-        private String edong;
-        PayBillsDialogAdapter.Entity entity;
+    private void refreshStatusPaySuccessDialogAndDisableCheckbox(String edong, boolean isDisableAllCheckbox) {
+        if (TextUtils.isEmpty(edong))
+            return;
 
-        @Override
-        public void onPre(final SoapAPI.AsyncSoapBillOnline soapBillOnline) {
-            edong = soapBillOnline.getEdong();
-            entity = soapBillOnline.getEntity();
+        refreshTextCountBillPayedSuccess();
+        mIPayView.showPayRecyclerListBillsAndDisableCheckBox(listBillDialog, isDisableAllCheckbox);
+    }
 
-            mIPayView.showPayingRViewDialogStart();
-
-            //check wifi
-            boolean isHasWifi = Common.isConnectingWifi(mIPayView.getContextView());
-            boolean isHasNetwork = Common.isNetworkConnected(mIPayView.getContextView());
-
-//            if (!isHasWifi) {
-//                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
-//
-//                soapBillOnline.setEndCallSoap(true);
-//                soapBillOnline.cancel(true);
-//            }
-            if (!isHasNetwork) {
-                mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString(), false, Common.TYPE_DIALOG.LOI, false);
-
-                soapBillOnline.setEndCallSoap(true);
-                soapBillOnline.cancel(true);
+    private boolean checkIsAllThreadFinish() {
+        boolean hasThreadRunning = false;
+        for (int index = 0; index < billOnlineAsyncList.size(); index++) {
+            SoapAPI.AsyncSoapBillOnline soapBillOnline = billOnlineAsyncList.get(index);
+            if (!soapBillOnline.isEndCallSoap()) {
+                hasThreadRunning = true;
+                break;
             }
         }
+        return hasThreadRunning ? false : true;
+    }
 
-        @Override
-        public void onUpdate(final String message, final int positionIndex) {
-            if (message == null || message.isEmpty() || message.trim().equals(""))
-                return;
+    private boolean checkIsHasThreadRunning(int positionIndex) {
 
-            /**
-             * Các trường hợp không nhận được kết quả trả về từ Server
-             * Connection Reset: Client gửi giao dịch lên Server vào đúng thời điểm Server khởi động lại
-             * Connection Refused: Client gửi giao dịch lên Server vào đúng thời điểm Service bị dừng hoạt dộng
-             * Connection Timeout: Client gửi giao dịch lên Server nhưng không nhận được kết quả trả lời của Server
-             */
-
-            processCasePayedBySupected(null, positionIndex, edong, entity);
-
-            //update text count billDeleteOnline payed success
-            countBillPayedSuccess++;
-            totalAmountBillPayedSuccess += entity.getAmount();
-            /**
-             * Hiển thị thông tin thanh toán thành công lên màn hình
-             * Số hóa đơn = số hóa đơn thanh toán thành công
-             * Tổng tiền = tổng tiền của các hóa đơn thanh toán thành công
-             */
-            boolean isFinishAllThread = checkIsAllThreadFinish();
-            if (isFinishAllThread) {
-                String messageNotify = Common.CODE_REPONSE_BILL_ONLINE.getMessageSuccess(countBillPayedSuccess, totalAmountBillPayedSuccess);
-                mIPayView.showMessageNotifyBillOnlineDialog(messageNotify, false, Common.TYPE_DIALOG.THANH_CONG, true);
-            }
-
-
-            ((MainActivity) mIPayView.getContextView()).runOnUiThread(
-                    new Runnable() {
-                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                        @Override
-                        public void run() {
-                            totalBillsChooseDialog--;
-                            refreshStatusPaySuccessDialog(edong);
-                        }
-                    }
-            );
-        }
-
-        @Override
-        public void onPost(BillingOnlineRespone response, final int positionIndex) {
-            if (response == null) {
-                return;
-            }
-
-            //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu không thành công
-            final Common.CODE_REPONSE_BILL_ONLINE codeResponse = Common.CODE_REPONSE_BILL_ONLINE.findCodeMessage(response.getFooterBillingOnlineRespone().getResponseCode());
-            long billId = response.getBodyBillingOnlineRespone().getBillId();
-            String date = Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy);
-
-            //update date payed and tract number
-            String dateNow = Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy);
-            Long traceNumber = response.getBodyBillingOnlineRespone().getTraceNumber();
-            mPayModel.updateBillRequestDateBill(edong, response.getBodyBillingOnlineRespone().getCustomerCode(), response.getBodyBillingOnlineRespone().getBillId(), dateNow, traceNumber);
-
-
-            if (codeResponse.getCode() == Common.CODE_REPONSE_BILL_ONLINE.e825.getCode()) {
-                /**
-                 * Trường hợp hóa đơn đã được thanh toán bởi nguồn khác: Không thực hiện thanh toán hóa đơn
-                 */
-                processCasePayedErrorByOtherSource(response, positionIndex, date, billId, edong);
-                return;
-            }
-
-            if (codeResponse.getCode() == Common.CODE_REPONSE_BILL_ONLINE.e814.getCode()) {
-                /**
-                 * Trường hợp hóa đơn đã được thanh toán bởi ví khác: Không thực hiện thanh toán hóa đơn
-                 */
-                processCasePayedErrorByOtherEdong(response, positionIndex, date, billId, edong);
-                return;
-            }
-
-            if (codeResponse.getCode() == Common.CODE_REPONSE_BILL_ONLINE.e824.getCode()) {
-                /**
-                 * Hóa đơn chấm nợ lỗi: Không thực hiện thanh toán hóa đơn
-                 */
-                processCasePayedErrorByErrorECPAY(response, positionIndex, date, billId, edong);
-            }
-
-            //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu thành công
-            String gateEVB = response.getBodyBillingOnlineRespone().getBillingType();
-
-            /**
-             * statusGateEVN = -1: giao dịch nghi ngờ
-             * statusGateEVN = 0: mở cổng EVN
-             * statusGateEVN = 1: đóng cổng EVN
-             */
-
-            /**
-             * Trong giờ mở cổng kết nối thanh toán từ ECPAY sang EVN
-             * Giờ mở công quy định khi mã lỗi là 000 và cờ mở tới EVN billingType = ON
-             */
-
-            /**
-             * Trong giờ đóng cổng kết nối hoặc lỗi thanh toán từ ECPAY sang EVN
-             * Giờ đóng công quy định khi
-             * mã lỗi là e095 và cờ mở tới EVN billingType = ON tức hóa đơn gửi lên server ECPAY rồi gửi lên EVN nhưng EVN không chấp nhận
-             * hoặc trường hợp mã lỗi là e000 và cờ mở tới EVN billingType = OFF tức hóa đơn bị giữ tại ECPAY khi bị lỗi thanh toán từ ECPAY sang EVN
-             */
-
-            int statusGateEVN = NEGATIVE_ONE;
-
-            if ((codeResponse != Common.CODE_REPONSE_BILL_ONLINE.e000) && gateEVB.equals(Common.GATE_EVN_PAY.ON.getCode()))
-                statusGateEVN = ZERO;
-            else if ((codeResponse == Common.CODE_REPONSE_BILL_ONLINE.e000) && !gateEVB.equals(Common.GATE_EVN_PAY.ON.getCode())
-                    ||
-                    (codeResponse == Common.CODE_REPONSE_BILL_ONLINE.e095) && gateEVB.equals(Common.GATE_EVN_PAY.ON.getCode()))
-                statusGateEVN = ONE;
-
-            else
-                statusGateEVN = NEGATIVE_ONE;
-
-            if (statusGateEVN == ZERO) {
-
-                processCasePayedSuccessOpenDoor(response, positionIndex, date, billId, edong);
-
-                //TODO Gửi yêu cầu cập nhật thông tin tài khoản Ví TNV
-
-            }
-
-            if (statusGateEVN == ONE) {
-                processCasePayedSuccessCloseDoorOrErrorECPAY(response, positionIndex, date, billId, edong);
-
-                //TODO Gửi yêu cầu cập nhật thông tin tài khoản Ví TNV
-            }
-
-            if (statusGateEVN == NEGATIVE_ONE) {
-                processCasePayedBySupected(response, positionIndex, edong, entity);
-            }
-
-            //update text count billDeleteOnline payed success
-            countBillPayedSuccess++;
-            totalAmountBillPayedSuccess += response.getBodyBillingOnlineRespone().getAmount();
-            /**
-             * Hiển thị thông tin thanh toán thành công lên màn hình
-             * Số hóa đơn = số hóa đơn thanh toán thành công
-             * Tổng tiền = tổng tiền của các hóa đơn thanh toán thành công
-             */
-            boolean isFinishAllThread = checkIsAllThreadFinish();
-            if (isFinishAllThread) {
-                String message = Common.CODE_REPONSE_BILL_ONLINE.getMessageSuccess(countBillPayedSuccess, totalAmountBillPayedSuccess);
-                mIPayView.showMessageNotifyBillOnlineDialog(message, false, Common.TYPE_DIALOG.THANH_CONG, true);
-            }
-
-
-            ((MainActivity) mIPayView.getContextView()).runOnUiThread(
-                    new Runnable() {
-                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                        @Override
-                        public void run() {
-                            totalBillsChooseDialog--;
-                            refreshStatusPaySuccessDialog(edong);
-                        }
-                    }
-            );
-        }
-
-        @Override
-        public void onTimeOut(final SoapAPI.AsyncSoapBillOnline soapBillOnline) {
-            soapBillOnline.cancel(true);
-
-            //thread call asyntask is running. must call in other thread to update UI
-            ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (!soapBillOnline.isEndCallSoap()) {
-                        mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), false, Common.TYPE_DIALOG.LOI, false);
-                    }
+        boolean hasThreadRunning = false;
+        for (int index = 0; index < billOnlineAsyncList.size(); index++) {
+            if (index != positionIndex) {
+                SoapAPI.AsyncSoapBillOnline soapBillOnline = billOnlineAsyncList.get(index);
+                if (!soapBillOnline.isEndCallSoap()) {
+                    hasThreadRunning = true;
+                    break;
                 }
-            });
+            }
         }
-    };
+        return hasThreadRunning;
+    }
 
+    private void refreshStatusPaySuccessDialog(String edong) {
+        if (TextUtils.isEmpty(edong))
+            return;
+
+        //not refreshData listBillDialog
+        //but refreshData
+        refreshTextCountBillPayedSuccess();
+        mIPayView.showPayRecyclerListBills(listBillDialog);
+    }
+
+    private void refreshTotalBillsAndTotalMoneyInDialogWhenCallPayingOnline() {
+        mIPayView.showCountBillsAndTotalMoneyInDialog(countBillPayedSuccess, totalBillsChooseDialogTemp);
+    }
+
+    //region xử lý các trường hợp thanh toán
     private void processCasePayedBySupected(BillingOnlineRespone respone, final int positionIndex, final String edong,  PayBillsDialogAdapter.Entity entity) {
         //TODO Thực hiện thanh toán nghi ngờ
         /**
@@ -2244,55 +2299,6 @@ public class PayPresenter implements IPayPresenter {
                     refreshStatusPaySuccessDialogAndDisableCheckbox(edong, true);
             }
         });
-    }
-
-    private void refreshStatusPaySuccessDialogAndDisableCheckbox(String edong, boolean isDisableAllCheckbox) {
-        if (TextUtils.isEmpty(edong))
-            return;
-
-        refreshTextCountBillPayedSuccess();
-        mIPayView.showPayRecyclerListBillsAndDisableCheckBox(listBillDialog, isDisableAllCheckbox);
-    }
-
-    private boolean checkIsAllThreadFinish() {
-        boolean hasThreadRunning = false;
-        for (int index = 0; index < billOnlineAsyncList.size(); index++) {
-            SoapAPI.AsyncSoapBillOnline soapBillOnline = billOnlineAsyncList.get(index);
-            if (!soapBillOnline.isEndCallSoap()) {
-                hasThreadRunning = true;
-                break;
-            }
-        }
-        return hasThreadRunning ? false : true;
-    }
-
-    private boolean checkIsHasThreadRunning(int positionIndex) {
-
-        boolean hasThreadRunning = false;
-        for (int index = 0; index < billOnlineAsyncList.size(); index++) {
-            if (index != positionIndex) {
-                SoapAPI.AsyncSoapBillOnline soapBillOnline = billOnlineAsyncList.get(index);
-                if (!soapBillOnline.isEndCallSoap()) {
-                    hasThreadRunning = true;
-                    break;
-                }
-            }
-        }
-        return hasThreadRunning;
-    }
-
-    private void refreshStatusPaySuccessDialog(String edong) {
-        if (TextUtils.isEmpty(edong))
-            return;
-
-        //not refreshData listBillDialog
-        //but refreshData
-        refreshTextCountBillPayedSuccess();
-        mIPayView.showPayRecyclerListBills(listBillDialog);
-    }
-
-    private void refreshTotalBillsAndTotalMoneyInDialogWhenCallPayingOnline() {
-        mIPayView.showCountBillsAndTotalMoneyInDialog(countBillPayedSuccess, totalBillsChooseDialogTemp);
     }
     //endregion
 }
