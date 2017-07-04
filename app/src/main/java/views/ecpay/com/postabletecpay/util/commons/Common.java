@@ -302,9 +302,10 @@ public class Common {
         }
 
         public Integer getCode() {
-            if (this.getCode() == 0)
+            if(this == NULL)
                 return null;
-            return code;
+            else
+            return Common.intConvertNull(code);
         }
 
         public String getMessage() {
@@ -314,9 +315,9 @@ public class Common {
         private final Integer code;
         private String message;
 
-        public static PAYMENT_MODE findCodeMessage(Integer code) {
+        public static PAYMENT_MODE findCodeMessage(Object code) {
             for (PAYMENT_MODE v : values()) {
-                if (v.getCode() == code) {
+                if (v.getCode().equals(code)) {
                     return v;
                 }
             }
@@ -338,9 +339,10 @@ public class Common {
         }
 
         public Integer getCode() {
-            if (this.getCode() == 0)
+            if (this == NULL)
                 return null;
-            return code;
+            else
+            return Common.intConvertNull(code);
         }
 
         public String getMessage() {
@@ -370,9 +372,10 @@ public class Common {
         }
 
         public Integer getCode() {
-            if (this.getCode() == 0)
+            if (this == NULL)
                 return null;
-            return code;
+            else
+                return Common.intConvertNull(code);
         }
 
         public String getMessage() {
@@ -402,9 +405,10 @@ public class Common {
         }
 
         public Integer getCode() {
-            if (this.getCode() == 0)
+            if (this == NULL)
                 return null;
-            return code;
+            else
+                return Common.intConvertNull(code);
         }
 
         public String getMessage() {
@@ -435,9 +439,10 @@ public class Common {
         }
 
         public Integer getCode() {
-            if (this.getCode() == 0)
+            if (this == NULL)
                 return null;
-            return code;
+            else
+                return Common.intConvertNull(code);
         }
 
         public String getMessage() {
@@ -468,9 +473,7 @@ public class Common {
         }
 
         public Integer getCode() {
-            if (this.getCode() == 0)
-                return null;
-            return code;
+           return code;
         }
 
         public String getMessage() {
@@ -500,9 +503,10 @@ public class Common {
         }
 
         public Integer getCode() {
-            if (this.getCode() == 0)
+            if (this == NULL)
                 return null;
-            return code;
+            else
+                return Common.intConvertNull(code);
         }
 
         public String getMessage() {
@@ -540,9 +544,7 @@ public class Common {
         }
 
         public Integer getCode() {
-            if (this.getCode() == 0)
-                return null;
-            return code;
+           return code;
         }
 
         public String getMessage() {
@@ -880,7 +882,8 @@ public class Common {
         ex10005("10005", "Phải thanh toán liên tục các kỳ hóa đơn, mã KH:"),
         ex10006("10006", "Không thành công, đã thanh toán bởi nguồn khác"),
         ex10007("10007", "Không thành công, đã thanh toán bởi số ví khác"),
-        ex10008("10008", "Thanh toán thành công");
+        ex10008("10008", "Thanh toán thành công"),
+        ex10009("10009", "Hóa đơn không thể thanh toán!");
 
         CODE_REPONSE_BILL_ONLINE(String code, String message) {
             this.code = code;
@@ -919,7 +922,7 @@ public class Common {
         e022("022", "Phải thanh toán liên tục các kỳ hoá đơn, mã KH: "),
         e03("03", "Số dư không đủ để thanh toán"),
         e04("043", "Kiểm tra kết nối mạng hoặc liên hệ với đội kỹ thuật!"),
-        e05("05", "Không thanh toán online với những hóa đơn chưa thanh toán!"),
+        e05("05", "Hóa đơn không thể thanh toán!"),
         e051("051", "Hoá đơn đã thanh toán bởi nguồn khác"),
         e052("052", "Hoá đơn đã thanh toán bởi số ví khác"),
         ex00("00", "Thanh toán hoá đơn thất bại");
@@ -2326,5 +2329,17 @@ public class Common {
             result += CHARS[(int) (Math.random() * CHARS.length)];
         }
         return result;
+    }
+
+    public static String stringConvertNull(String object) {
+        return object = (object == null) ? Common.TEXT_EMPTY : object;
+    }
+
+    public static long longConvertNull(Long object) {
+        return object = (object == null) ? 0 : object.longValue();
+    }
+
+    public static int intConvertNull(Integer object) {
+        return object = (object == null) ? 0 : object.intValue();
     }
 }

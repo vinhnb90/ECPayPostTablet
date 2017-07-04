@@ -43,6 +43,9 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_CON
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_DB;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_ROOT;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
+import static views.ecpay.com.postabletecpay.util.commons.Common.intConvertNull;
+import static views.ecpay.com.postabletecpay.util.commons.Common.longConvertNull;
+import static views.ecpay.com.postabletecpay.util.commons.Common.stringConvertNull;
 
 /**
  * Created by TungNV on 5/5/17.
@@ -306,18 +309,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return account;
     }
 
-    private String stringConvertNull(String object) {
-        return object = (object == null) ? Common.TEXT_EMPTY : object;
-    }
-
-    private long longConvertNull(Long object) {
-        return object = (object == null) ? 0 : object.longValue();
-    }
-
-    private int intConvertNull(Integer object) {
-        return object = (object == null) ? 0 : object.intValue();
-    }
-
     public int countBill(String edong) {
         if (edong == null)
             return 0;
@@ -500,6 +491,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId")));
             int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
             int status = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")));
+            //TODO mark
             boolean isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))) == 0 ? false : true;
             String customerPayCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerPayCode")));
             String billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
@@ -778,6 +770,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             return null;
 
         String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.strTerm, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, strTerm, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " ORDER BY date(term) DESC ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
+        Log.e(TAG, "selectAllBillsOfAllCustomerChecked: " + query);
         return selectAllBillsOfAllCustomerCheckedWithQuery(edong, query);
     }
 
@@ -1328,7 +1321,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("edongKey", bodyBillResponse.getEdong());
 
         //nếu status = 1(đã thanh toán) khi insert vào bill thì bật cờ isChecked = 1 tức được chọn và đã thanh toán
-        initialValues.put("isChecked", (status == 1) ? ONE : ZERO);
+        initialValues.put("isChecked", (status == ZERO) ? ZERO : ONE);
 
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
@@ -1411,8 +1404,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("cashierPay", bodyBillResponse.getCashierCode());
         initialValues.put("edongKey", bodyBillResponse.getEdong());
 
-        //nếu status = 1(đã thanh toán) khi insert vào bill thì bật cờ isChecked = 1 tức được chọn và đã thanh toán
-        initialValues.put("isChecked", (status == 1) ? ONE : ZERO);
+        //nếu status = 0(chưa thanh toán) khi insert vào bill thì cờ isChecked = 0
+        initialValues.put("isChecked", (status == ZERO) ? ZERO : ONE);
 
 
         database = getWritableDatabase();
@@ -1494,9 +1487,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("billingBy", "");
         initialValues.put("cashierPay", bodyBillResponse.getCashierCode());
         initialValues.put("edongKey", bodyBillResponse.getEdong());
-
-        //nếu status = 1(đã thanh toán) khi insert vào bill thì bật cờ isChecked = 1 tức được chọn và đã thanh toán
-        initialValues.put("isChecked", (status == 1) ? ONE : ZERO);
 
         database = getWritableDatabase();
         int rowAffect = (int) database.update(TABLE_NAME_BILL, initialValues, "billId=?", new String[]{String.valueOf(bodyBillResponse.getBillId())});

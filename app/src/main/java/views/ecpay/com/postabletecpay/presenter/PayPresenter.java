@@ -320,22 +320,40 @@ public class PayPresenter implements IPayPresenter {
          * 04_Đã thanh toán bởi số ví khác
          */
 
+        /**
+         * Lấy list hóa đơn lỗi và lọc ra không khởi động thread thanh toán hóa đơn đó
+         */
+        boolean[] errorBills = new boolean[listBillDialog.size()];
         index = 0;
         maxIndex = listBillDialog.size();
-        boolean canPayOnline = true;
         for (; index < maxIndex; index++) {
             PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
 
             int payStatusDebt = mPayModel.checkPayStatusDebt(edong, entity.getCode(), entity.getBillId());
-            if (payStatusDebt != Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) {
-                canPayOnline = false;
+            if (payStatusDebt != Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode() || payStatusDebt == ERROR_OCCUR) {
+                final int positionIndex = index;
+                errorBills[index] = true;
+                ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String messageError = Common.CODE_REPONSE_BILL_ONLINE.ex10009.getMessage();
+                        listBillDialog.get(positionIndex).setMessageError(messageError);
+
+                        //check full billDeleteOnline is payed
+                        boolean isFinishAllThread = checkIsAllThreadFinish();
+                        if (isFinishAllThread) {
+                            refreshStatusPaySuccessDialog(edong);
+                            if (countBillPayedSuccess == totalBillsChooseDialogTemp)
+                                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                            else
+                                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10004.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+                        } else
+                            refreshStatusPaySuccessDialogAndDisableCheckbox(edong, true);
+                    }
+                });
+                Log.e(TAG, "callPayingBillOnline: Hóa đơn không có trong danh sách thu");
                 break;
             }
-        }
-
-        if (!canPayOnline) {
-            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e05.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
-            return;
         }
 
 
@@ -350,7 +368,7 @@ public class PayPresenter implements IPayPresenter {
         for (; index < maxIndex; index++) {
             PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
 
-            if (entity.isChecked())
+            if (entity.isChecked() && !errorBills[index])
 //                callAPICheckTransAndRequestPayingBill(versionApp, edong, entity);
                 payOnlineTheBill(versionApp, edong, entity);
         }
@@ -822,6 +840,7 @@ public class PayPresenter implements IPayPresenter {
          * Số lần in biên nhận countPrintReceipt = 0
          * In thông báo điện printInfo = null
          */
+
         rowAffect = mPayModel.updateBillDebtWith(
                 edong, entity.getBillId(), edong, //where
                 Common.PAYMENT_MODE.OFFLINE.getCode(), Common.STATUS_BILLING.DA_THANH_TOAN.getCode(), Common.STATE_OF_DEBT.CHUA_CHAM.getCode(),
@@ -1528,6 +1547,7 @@ public class PayPresenter implements IPayPresenter {
             }
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onUpdate(final String message, final int positionIndex) {
             if (message == null || message.isEmpty() || message.trim().equals(""))
@@ -1615,7 +1635,7 @@ public class PayPresenter implements IPayPresenter {
             }
 
             //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu thành công
-            String gateEVB = response.getBodyBillingOnlineRespone().getBillingType();
+            String gateEVN = response.getBodyBillingOnlineRespone().getBillingType();
 
             /**
              * statusGateEVN = -1: giao dịch nghi ngờ
@@ -1637,20 +1657,19 @@ public class PayPresenter implements IPayPresenter {
 
             int statusGateEVN = NEGATIVE_ONE;
 
-            if ((codeResponse != Common.CODE_REPONSE_BILL_ONLINE.e000) && gateEVB.equals(Common.GATE_EVN_PAY.ON.getCode()))
-                statusGateEVN = ZERO;
-            else if ((codeResponse == Common.CODE_REPONSE_BILL_ONLINE.e000) && !gateEVB.equals(Common.GATE_EVN_PAY.ON.getCode())
-                    ||
-                    (codeResponse == Common.CODE_REPONSE_BILL_ONLINE.e095) && gateEVB.equals(Common.GATE_EVN_PAY.ON.getCode()))
-                statusGateEVN = ONE;
-
-            else
+            //nếu không xác định được gateEVN
+            if (gateEVN == null)
                 statusGateEVN = NEGATIVE_ONE;
+            else if ((codeResponse != Common.CODE_REPONSE_BILL_ONLINE.e000) && gateEVN.equals(Common.GATE_EVN_PAY.ON.getCode()))
+                statusGateEVN = ZERO;
+            else if ((codeResponse == Common.CODE_REPONSE_BILL_ONLINE.e000) && !gateEVN.equals(Common.GATE_EVN_PAY.ON.getCode())
+                    ||
+                    (codeResponse == Common.CODE_REPONSE_BILL_ONLINE.e095) && gateEVN.equals(Common.GATE_EVN_PAY.ON.getCode()))
+                statusGateEVN = ONE;
 
             if (statusGateEVN == ZERO) {
 
                 processCasePayedSuccessOpenDoor(response, positionIndex, date, billId, edong);
-
                 //TODO Gửi yêu cầu cập nhật thông tin tài khoản Ví TNV
 
             }
@@ -1888,7 +1907,7 @@ public class PayPresenter implements IPayPresenter {
     }
 
     //region xử lý các trường hợp thanh toán
-    private void processCasePayedBySupected(BillingOnlineRespone respone, final int positionIndex, final String edong,  PayBillsDialogAdapter.Entity entity) {
+    private void processCasePayedBySupected(BillingOnlineRespone respone, final int positionIndex, final String edong, PayBillsDialogAdapter.Entity entity) {
         //TODO Thực hiện thanh toán nghi ngờ
         /**
          * Danh sách hóa đơn: hiển thị kết quả “Thanh toán thành công”

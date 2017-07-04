@@ -784,7 +784,11 @@ public class PayFragment extends Fragment implements
         tvMessageDialog.setVisibility(View.VISIBLE);
         tvMessageDialog.setText(isMutilMessage ? tvMessageDialog.getText().toString() + Common.TEXT_ENTER + message : message);
 
-        if (!isMutilMessage && isShowDialog) {
+
+        Log.d(TAG, "showMessageNotifyBillOnlineDialog: " + message);
+        if (
+                !isMutilMessage &&
+                        isShowDialog) {
             IActionClickYesNoDialog yesNoDialog = new IActionClickYesNoDialog() {
                 @Override
                 public void doClickNo() {
