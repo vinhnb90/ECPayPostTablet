@@ -331,13 +331,16 @@ public class PayPresenter implements IPayPresenter {
 
             int payStatusDebt = mPayModel.checkPayStatusDebt(edong, entity.getCode(), entity.getBillId());
             if (payStatusDebt != Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode() || payStatusDebt == ERROR_OCCUR) {
-                final int positionIndex = index;
                 errorBills[index] = true;
+                String messageError = Common.CODE_REPONSE_BILL_ONLINE.ex10009.getMessage();
+                listBillDialog.get(index).setMessageError(messageError);
+
+               /*
+  final int positionIndex = index;
                 ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        String messageError = Common.CODE_REPONSE_BILL_ONLINE.ex10009.getMessage();
-                        listBillDialog.get(positionIndex).setMessageError(messageError);
+
 
                         //check full billDeleteOnline is payed
                         boolean isFinishAllThread = checkIsAllThreadFinish();
@@ -353,10 +356,12 @@ public class PayPresenter implements IPayPresenter {
                 });
                 Log.e(TAG, "callPayingBillOnline: Hóa đơn không có trong danh sách thu");
                 break;
+            }*/
+
+
             }
+
         }
-
-
         //TODO Khởi động quá trình thanh toán online
         /**
          * Quá trình này thực chất gồm 2 giai đoạn (trong SRS chỉ mô tả chung yêu cầu gồm cả 2
@@ -370,7 +375,7 @@ public class PayPresenter implements IPayPresenter {
 
             if (entity.isChecked() && !errorBills[index])
 //                callAPICheckTransAndRequestPayingBill(versionApp, edong, entity);
-                payOnlineTheBill(versionApp, edong, entity);
+                payOnlineTheBill(versionApp, edong, entity, index);
         }
     }
 
@@ -670,7 +675,7 @@ public class PayPresenter implements IPayPresenter {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void callAPIUpdateEdongAccount(String edong, PayBillsDialogAdapter.Entity entity) {
+    private void callAPIUpdateEdongAccount(String edong, PayBillsDialogAdapter.Entity entity, final int positionIndex) {
         Context context = mIPayView.getContextView();
         //check wifi
         boolean isHasWifi = Common.isConnectingWifi(mIPayView.getContextView());
@@ -755,12 +760,12 @@ public class PayPresenter implements IPayPresenter {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void payOnlineTheBill(String versionApp, String edong, PayBillsDialogAdapter.Entity entity) {
+    private void payOnlineTheBill(String versionApp, String edong, PayBillsDialogAdapter.Entity entity, final int position) {
         ConfigInfo configInfo = null;
         try {
             configInfo = Common.setupInfoRequest(mIPayView.getContextView(), edong, Common.COMMAND_ID.BILLING.toString(), versionApp);
         } catch (Exception e) {
-            mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString(), false, Common.TYPE_DIALOG.LOI, true);
+            listBillDialog.get(position).setMessageError(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
             return;
         }
 
@@ -809,8 +814,10 @@ public class PayPresenter implements IPayPresenter {
                 partnerCode,
                 configInfo.getAccountId());
 
-        if (jsonRequestBillOnline == null)
+        if (jsonRequestBillOnline == null) {
+            listBillDialog.get(position).setMessageError(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_REQUEST.toString());
             return;
+        }
 
         //TODO Trước khi gọi API thanh toán online
         /**
@@ -878,7 +885,7 @@ public class PayPresenter implements IPayPresenter {
                         return;
                     SoapAPI.AsyncSoapBillOnline soapBillOnline = billOnlineAsyncList.get(positionIndex);
                     if (soapBillOnline == null) {
-                        mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.e9999.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+                        listBillDialog.get(position).setMessageError(Common.CODE_REPONSE_BILL_ONLINE.e9999.toString());
                         Log.e(TAG, "run: at runnableCountTimeBillOnline has soapBillOnline is null!");
                         return;
                     }
@@ -905,9 +912,12 @@ public class PayPresenter implements IPayPresenter {
             //run
             billOnlineAsyncList.get(positionIndex).execute(jsonRequestBillOnline);
         } catch (Exception e) {
-            mIPayView.showMessageNotifyBillOnlineDialog(e.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+            listBillDialog.get(position).setMessageError(e.getMessage());
             return;
+        } finally {
+
         }
+
     }
 
     @Override
@@ -1499,7 +1509,7 @@ public class PayPresenter implements IPayPresenter {
                 return;
             }
 
-            payOnlineTheBill(getVersionApp(mIPayView.getContextView()), edong, entity);
+//            payOnlineTheBill(getVersionApp(mIPayView.getContextView()), edong, entity);
         }
 
         @Override
@@ -1580,7 +1590,7 @@ public class PayPresenter implements IPayPresenter {
              * Gửi yêu cầu cập nhật thông tin tài khoản ví TNV
              */
 
-            callAPIUpdateEdongAccount(edong, entity);
+            callAPIUpdateEdongAccount(edong, entity, positionIndex);
 
             ((MainActivity) mIPayView.getContextView()).runOnUiThread(
                     new Runnable() {
@@ -1627,11 +1637,14 @@ public class PayPresenter implements IPayPresenter {
                 return;
             }
 
-            if (codeResponse.getCode() == Common.CODE_REPONSE_BILL_ONLINE.e824.getCode()) {
+            if (codeResponse.getCode() != Common.CODE_REPONSE_BILL_ONLINE.e000.getCode()
+                    &&
+                    codeResponse.getCode() != Common.CODE_REPONSE_BILL_ONLINE.e095.getCode()) {
                 /**
                  * Hóa đơn chấm nợ lỗi: Không thực hiện thanh toán hóa đơn
                  */
                 processCasePayedErrorByErrorECPAY(response, positionIndex, date, billId, edong);
+                return;
             }
 
             //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu thành công

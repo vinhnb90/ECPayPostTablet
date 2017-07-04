@@ -616,6 +616,7 @@ public class Common {
         ERR_ENCRYPT_PASS,
 
         ERR_CALL_SOAP_EMPTY,
+        ERR_CALL_SOAP_REQUEST,
         ERR_CALL_SOAP_TIME_OUT,
         ERR_CALL_SOAP_LOGIN,
 
@@ -656,6 +657,9 @@ public class Common {
 
             if (ERR_CALL_SOAP_EMPTY == this)
                 return "Không nhận được dữ liệu khi kết nối tới máy chủ!";
+
+            if (ERR_CALL_SOAP_REQUEST == this)
+                return "Thiếu thông tin khi gửi yêu cầu lên máy chủ!";
 
             if (ERR_CALL_SOAP_TIME_OUT == this)
                 return "Quá thời gian kết nối cho phép tới máy chủ " + TIME_OUT_CONNECT / 1000 + " s";
@@ -1000,7 +1004,7 @@ public class Common {
         e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
         ex10000("10000", "Không tồn tại hóa đơn trong cơ sở dữ liệu"),
         ex10001("10001", "Vui lòng điền lý do hủy"),
-        ex10002("10002", "Thiếu thông tin khi gửi yêu cầu kiểm tra trạng thái hóa đơn");
+        ex10002("10002", "Thiếu thông tin khi gửi yêu cầu lên máy chủ");
 
         CODE_REPONSE_API_CHECK_TRAINS(String code, String message) {
             this.code = code;
@@ -1125,7 +1129,7 @@ public class Common {
     public static final String TEXT_SPACE = " ";
     public static final String TEXT_EMPTY = "";
     public static final String TEXT_SLASH = "/";
-    public static final String TEXT_ENTER = "/n";
+    public static final String TEXT_ENTER = "\n";
     public static final String TEXT_BILL = "Hóa đơn";
     public static final String TEXT_MULTI_SPACE = TEXT_SPACE.concat(TEXT_SPACE).concat(TEXT_SPACE).concat(TEXT_SPACE);
     public static final String TEXT_SEARCHING = "Searching online....";

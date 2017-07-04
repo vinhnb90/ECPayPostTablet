@@ -149,15 +149,6 @@ public class MainPageFragment extends Fragment implements
         super.onCreate(savedInstanceState);
         mIMainPagePresenter = new MainPagePresenter(this);
         mILogoutPresenter = new LogoutPresenter(this);
-<<<<<<< HEAD
-        mIMainPagePresenter.synchronizePC();
-        /*
-=======
->>>>>>> vinhnb
-        if(Common.isNetworkConnected(this.getActivity())) {
-//            mIMainPagePresenter.postBill();
-        }
-        */
     }
 
     @Override

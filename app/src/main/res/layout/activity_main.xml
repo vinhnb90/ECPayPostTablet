@@ -18,7 +18,7 @@
             android:id="@+id/navigation_ac_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:itemBackground="@color/colorMoreLightGray"
+            app:itemBackground="@android:color/transparent"
             app:menu="@menu/navigation"/>
     </LinearLayout>
 

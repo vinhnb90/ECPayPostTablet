@@ -2182,7 +2182,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public int selectPayStatusDebt(String edong, String code, int billId) {
         database = this.getReadableDatabase();
-        String query = "SELECT payStatus FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE edongKey = '" + edong + "' and customerCode = '" + code + "' and billId = '" + billId + "'";
+//        String query = "SELECT payStatus FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE edongKey = '" + edong + "' and customerCode = '" + code + "' and billId = '" + billId + "'";
+        String query = "SELECT status FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode = '" + code + "' and billId = '" + billId + "'";
         Cursor mCursor = database.rawQuery(query, null);
         if (mCursor.moveToFirst())
             return mCursor.getInt(0);
