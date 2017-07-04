@@ -3,6 +3,7 @@ package views.ecpay.com.postabletecpay.model.adapter;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindDrawable;
@@ -45,6 +47,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     private int indexBegin, indexEnd;
     private PayModel payModel;
 
+    private static List<DataAdapter> data = new ArrayList<>();
     private static List<PayEntityAdapter> billList = new ArrayList<>();
     @BindDrawable(R.drawable.bg_button_orange)
     Drawable green;
@@ -56,10 +59,15 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     private static int positionCustomer;
     private boolean onBind;
 
-    public PayAdapter(Context sContext, IPayView sIPayView, List<PayEntityAdapter> billList, int indexBegin, int indexEnd) {
+    public PayAdapter(Context sContext, IPayView sIPayView, List<DataAdapter> data, int indexBegin, int indexEnd) {
         this.sContext = sContext;
         this.sIPayView = sIPayView;
-        this.billList = billList;
+        this.data = data;
+        this.billList.clear();
+        for(int index = 0; index<data.size(); index++)
+        {
+            this.billList.add(data.get(index).getInfoKH());
+        }
         this.indexBegin = indexBegin;
         this.indexEnd = indexEnd;
         sPayModel = new PayModel(sIPayView.getContextView());
@@ -100,7 +108,15 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         Common.runAnimationClickViewScale(holder.cardView, R.anim.twinking_view, Common.TIME_DELAY_ANIM);
 
-        ((MainActivity) sContext).runOnUiThread(new Runnable() {
+        DataAdapter dataAdapter = getObjectDataAdapter(code);
+
+        holder.billsInsideAdapter.setBillList(edong, code, dataAdapter.getBillKH(), positionCustomer);
+        holder.rvBill.invalidate();
+
+        boolean isShowBill = billList.get(positionCustomer).isShowBill();
+        holder.rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
+
+        /*((MainActivity) sContext).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 List<PayAdapter.BillEntityAdapter> listBill = new ArrayList<>();
@@ -111,11 +127,24 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                 boolean isShowBill = billList.get(positionCustomer).isShowBill();
                 holder.rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
             }
-        });
-
+        });*/
 
         onBind = false;
 
+    }
+
+    private DataAdapter getObjectDataAdapter(String code) {
+        DataAdapter dataAdapter = null;
+        int index = 0;
+        for(; index<data.size(); index++)
+        {
+            if(data.get(index).getInfoKH().getMaKH().equals(code)) {
+                dataAdapter = data.get(index);
+                break;
+            }
+        }
+
+        return dataAdapter;
     }
 
     @Override
@@ -160,6 +189,8 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                         boolean isShowBill = billList.get(positionCustomer).isShowBill();
 
                         billList.get(positionCustomer).setShowBill(isShowBill = !isShowBill);
+
+                        int index = 0;
                         rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
                     }
                 }
@@ -267,7 +298,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
     }
 
-    public static class BillEntityAdapter {
+    public static class BillEntityAdapter implements Comparable<BillEntityAdapter>{
 
         private String monthBill;
         private long moneyBill;
@@ -367,6 +398,29 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         public void setBillingBy(String billingBy) {
             this.billingBy = billingBy;
         }
+
+        @Override
+        public int compareTo(@NonNull BillEntityAdapter billEntityAdapter) {
+            long termThis = Common.convertDateToLong(this.getMonthBill(), Common.DATE_TIME_TYPE.MMyyyy);
+            long termThat = Common.convertDateToLong(billEntityAdapter.getMonthBill(), Common.DATE_TIME_TYPE.MMyyyy);
+
+            //giảm dần
+            return (int) (termThat - termThis);
+        }
+
+        public static Comparator<BillEntityAdapter> TermComparatorBillEntityAdapter
+                = new Comparator<BillEntityAdapter>() {
+
+            public int compare(BillEntityAdapter entity, BillEntityAdapter entityNew) {
+
+                //giảm dần
+                return entityNew.compareTo(entity);
+
+                //descending order
+                //return fruitName2.compareTo(fruitName1);
+            }
+
+        };
     }
 
     public class BillInsidePayAdapter extends RecyclerView.Adapter<BillInsidePayAdapter.BillInsidePayViewHolder> {
@@ -605,5 +659,24 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         void processDeleteBillOnlineFragment(String edong, String code, BillEntityAdapter bill, int posCustomerInside);
 
         void processUnCheckedBillFragment(String message);
+    }
+
+    public static class DataAdapter {
+        private PayAdapter.PayEntityAdapter infoKH;
+        private List<BillEntityAdapter> billKH;
+
+        public DataAdapter(PayEntityAdapter infoKH, List<BillEntityAdapter> billKH) {
+            this.infoKH = infoKH;
+            this.billKH = billKH;
+        }
+
+        public PayEntityAdapter getInfoKH() {
+            return infoKH;
+        }
+
+        public List<BillEntityAdapter> getBillKH() {
+            return billKH;
+        }
+
     }
 }

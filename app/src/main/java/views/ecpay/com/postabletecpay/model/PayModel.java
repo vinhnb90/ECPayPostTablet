@@ -352,7 +352,7 @@ public class PayModel extends CommonModel {
 
         //lấy term của hóa đơn
         String term = sqLiteConnection.getTermBillOfCustomer(edong, code, billId);
-        if(term== null)
+        if (term == null)
             return false;
 
         return sqLiteConnection.checkIsHasBillNotPayTermBefore(edong, code, term);
@@ -368,5 +368,86 @@ public class PayModel extends CommonModel {
 
     public String getCustomerCodeByBillId(String edong, long billId) {
         return sqLiteConnection.getCustomerCodeByBillId(edong, billId);
+    }
+
+    public int updateBillWith(String edongKey, int billId, int status, String edong) {
+        return sqLiteConnection.updateBillWith(edongKey, billId, status, edong);
+    }
+
+    public int updateBillDebtWith(
+            String edongKey, int billId, String edong, Integer paymentMode, int payStatus, Integer stateOfDebt,
+            Integer stateIfCancel, Integer stateOfReturn, Integer suspectedProcessingStatus,
+            Integer stateOfPush, String dateOfPush, int countPrintReceipt, Integer statusOfPrintInfo) {
+
+        return sqLiteConnection.updateBillDebtWith(
+                edongKey, billId, //where
+                edong, paymentMode, payStatus,
+                stateOfDebt, stateIfCancel, stateOfReturn,
+                suspectedProcessingStatus, stateOfPush, dateOfPush,
+                countPrintReceipt, statusOfPrintInfo);
+    }
+
+    public int updateBillDebtWithThanhToanBoiNguonKhacOrViKhac(
+            String edongKey, int billId, String edong, Integer paymentMode, int payStatus, Integer stateOfDebt,
+            Integer stateOfCancel, Integer stateOfReturn, Integer suspectedProcessingStatus,
+            String dateOfPush, int countPrintReceipt, Integer statusOfPrintInfo, Integer tradeCode) {
+
+        return sqLiteConnection.updateBillDebtWithThanhToanBoiNguonKhac(
+                edongKey, billId, //where
+                edong, paymentMode, payStatus,
+                stateOfDebt, stateOfCancel, stateOfReturn,
+                suspectedProcessingStatus, dateOfPush,
+                countPrintReceipt, statusOfPrintInfo, tradeCode);
+    }
+
+    public int updateBillHistoryWith(String edongKey, int billId, String dateIncurred, Integer tradingCode) {
+        return sqLiteConnection.updateBillHistoryWith(edongKey, billId, dateIncurred, tradingCode);
+    }
+
+    public int checkPayStatusDebt(String edong, String code, int billId) {
+        return sqLiteConnection.selectPayStatusDebt(edong, code, billId);
+    }
+
+    public int updateBillWithWithThanhToanError(String edongKey, int billId, String edong) {
+        return sqLiteConnection.updateBillWithWithThanhToanError(edongKey, billId, edong);
+    }
+
+    public int updateBillDebtWithThanhToanErrorOrSuccess(
+            String edongKey, int billId, //where
+            String edong, Integer paymentMode, int payStatus, Integer stateOfDebt, Integer stateOfCancel,
+            Integer stateOfReturn, Integer suspectedProcessingStatus, int countPrintReceipt, Integer statusOfPrintInfo) {
+        return sqLiteConnection.updateBillDebtWithThanhToanErrorOrSuccess(edongKey, billId,
+                edong, paymentMode, payStatus, stateOfDebt, stateOfCancel,
+                stateOfReturn, suspectedProcessingStatus, countPrintReceipt, statusOfPrintInfo);
+    }
+
+    public int updateBillHistoryWithThanhToanErrorOrSuccess(
+            String edongKey, int billId, //where
+            String edong, Integer paymentMode, int payStatus, Integer stateOfDebt, Integer stateOfCancel,
+            Integer stateOfReturn, Integer suspectedProcessingStatus, int countPrintReceipt, Integer statusOfPrintInfo,
+            String dateIncurred, Integer tradingCode) {
+        return sqLiteConnection.updateBillHistoryWithThanhToanErrorOrSuccess(edongKey, billId,
+                edong, paymentMode, payStatus, stateOfDebt, stateOfCancel,
+                stateOfReturn, suspectedProcessingStatus, countPrintReceipt, statusOfPrintInfo, dateIncurred, tradingCode);
+    }
+
+    public int updateBillHistoryWithPrintInfo(String edongKey, int billId, Integer code) {
+        return sqLiteConnection.updateBillHistoryWithPrintInfo(edongKey, billId, code);
+    }
+
+    public int getNotYetPushMoney(String edongKey) {
+        return sqLiteConnection.selectNotYetPushMoney(edongKey);
+    }
+
+    public int updateAccountWith(String edong, int notYetPushMoney) {
+        return sqLiteConnection.updateAccountWith(edong, notYetPushMoney);
+    }
+
+    public int updateBillDebtWithSuspectedProcessingStatus(String edong, int billId, Integer suspectedProcessingStatus) {
+        return sqLiteConnection.updateBillDebtWithSuspectedProcessingStatus(edong, billId, suspectedProcessingStatus);
+    }
+
+    public int updateBillHistoryWithSuspectedProcessingStatus(String edong, int billId, Integer suspectedProcessingStatus) {
+        return sqLiteConnection.updateBillHistoryWithSuspectedProcessingStatus(edong, billId, suspectedProcessingStatus);
     }
 }

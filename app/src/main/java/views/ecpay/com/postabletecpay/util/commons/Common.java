@@ -260,8 +260,10 @@ public class Common {
     public enum STATUS_BILLING {
         CHUA_THANH_TOAN(0, "Chưa thanh toán"),
         DA_THANH_TOAN(1, "Đã thanh toán"),
-        HUY_HOA_DON(2, "Đã bị hủy hóa đơn"),
-        DANG_CHO_HUY(3, "Đang chờ hủy");
+        DA_THANH_TOAN_BOI_NGUON_KHAC(2, "Đã thanh toán bởi nguồn khác"),
+        DA_THANH_TOAN_BOI_VI_KHAC(3, "Đã thanh toán bởi ví khác"),
+        HUY_HOA_DON(4, "Đã bị hủy hóa đơn"),
+        DANG_CHO_HUY(5, "Đang chờ hủy");
 
         STATUS_BILLING(int code, String message) {
             this.code = code;
@@ -288,11 +290,315 @@ public class Common {
             return null;
         }
     }
+
+    public enum PAYMENT_MODE {
+        NULL(0, ""),
+        ONLINE(1, "Hình thức thanh toán online"),
+        OFFLINE(2, "Hình thức thanh toán offline");
+
+        PAYMENT_MODE(Integer code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public Integer getCode() {
+            if(this == NULL)
+                return null;
+            else
+            return Common.intConvertNull(code);
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final Integer code;
+        private String message;
+
+        public static PAYMENT_MODE findCodeMessage(Object code) {
+            for (PAYMENT_MODE v : values()) {
+                if (v.getCode().equals(code)) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum STATE_OF_DEBT {
+        NULL(0, ""),
+        CHUA_CHAM(1, "Chưa chấm nợ"),
+        DA_CHAM(2, "Đã chấm nợ"),
+        DANG_CHO_XU_LY_CHAM_NO(3, "Đang chờ xử lý chấm nợ"),
+        CHAM_LOI(4, "Chấm lỗi"),
+        KHONG_THANH_CONG(5, "Không thành công");
+
+        STATE_OF_DEBT(Integer code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public Integer getCode() {
+            if (this == NULL)
+                return null;
+            else
+            return Common.intConvertNull(code);
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final Integer code;
+        private String message;
+
+        public static STATE_OF_DEBT findCodeMessage(Integer code) {
+            for (STATE_OF_DEBT v : values()) {
+                if (v.getCode() == code) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum STATE_OF_CANCEL {
+        NULL(0, ""),
+        DA_HUY(1, "Đã hủy");
+
+        STATE_OF_CANCEL(Integer code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public Integer getCode() {
+            if (this == NULL)
+                return null;
+            else
+                return Common.intConvertNull(code);
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final Integer code;
+        private String message;
+
+        public static STATE_OF_CANCEL findCodeMessage(Integer code) {
+            for (STATE_OF_CANCEL v : values()) {
+                if (v.getCode() == code) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum STATE_OF_RETURN {
+        NULL(0, ""),
+        CHUA_TRA(1, "Chưa trả");
+
+        STATE_OF_RETURN(Integer code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public Integer getCode() {
+            if (this == NULL)
+                return null;
+            else
+                return Common.intConvertNull(code);
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final Integer code;
+        private String message;
+
+        public static STATE_OF_RETURN findCodeMessage(Integer code) {
+            for (STATE_OF_RETURN v : values()) {
+                if (v.getCode() == code) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum SUSPECTED_PROCESSING_STATUS {
+        NULL(0, ""),
+        CHUA_TRA(1, "Chưa trả"),
+        TRANG_THAI_NGHI_NGO(2, "Trạng thái nghi ngờ");
+
+        SUSPECTED_PROCESSING_STATUS(Integer code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public Integer getCode() {
+            if (this == NULL)
+                return null;
+            else
+                return Common.intConvertNull(code);
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final Integer code;
+        private String message;
+
+        public static SUSPECTED_PROCESSING_STATUS findCodeMessage(Integer code) {
+            for (SUSPECTED_PROCESSING_STATUS v : values()) {
+                if (v.getCode() == code) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum STATE_OF_PUSH {
+        CHUA_DAY(1, "Chưa đẩy"),
+        DA_DAY(2, "Đã đẩy"),
+        KHONG_THANH_CONG(3, "Không thành công");
+
+        STATE_OF_PUSH(Integer code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public Integer getCode() {
+           return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final Integer code;
+        private String message;
+
+        public static STATE_OF_PUSH findCodeMessage(Integer code) {
+            for (STATE_OF_PUSH v : values()) {
+                if (v.getCode() == code) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum STATUS_OF_PRINT_INFO {
+        NULL(0, ""),
+        DA_IN_THONG_BAO(1, "Đã in thông báo");
+
+        STATUS_OF_PRINT_INFO(Integer code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public Integer getCode() {
+            if (this == NULL)
+                return null;
+            else
+                return Common.intConvertNull(code);
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final Integer code;
+        private String message;
+
+        public static STATUS_OF_PRINT_INFO findCodeMessage(Integer code) {
+            for (STATUS_OF_PRINT_INFO v : values()) {
+                if (v.getCode() == code) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum TRADING_CODE {
+        TAI_HOA_DON_GIAO_THU(1, "Tải hóa đơn giao thu"),
+        CAP_NHAT_TRANG_THAI_NO(2, "Cập nhật trạng thái nợ"),
+        THANH_TOAN_ONLINE_CHAM_NO_ONLINE(3, "Thanh toán online, chấm nợ online"),
+        THANH_TOAN_ONLINE_CHAM_NO_OFFLINE(4, "Thanh toán online, chấm nợ offline"),
+        THANH_TOAN_ONLINE_CHAM_NO_LOI(5, "Thanh toán online, Chấm nợ lỗi"),
+        THANH_TOAN_OFFLINE(6, "Thanh toán offline"),
+        CHAM_NO(7, "Chấm nợ"),
+        HUY_HOA_DON(8, "Hủy hóa đơn"),
+        XU_LY_GIAO_DICH_NGHI_NGO(9, "Xử lý giao dịch nghi ngờ"),//Đang conflict tài liệu SRS với mã 09_Gửi yêu cầu hủy
+        DAY_CHAM_NO(10, "Đẩy chấm nợ"),;
+
+        TRADING_CODE(Integer code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public Integer getCode() {
+           return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final Integer code;
+        private String message;
+
+        public static TRADING_CODE findCodeMessage(Integer code) {
+            for (TRADING_CODE v : values()) {
+                if (v.getCode() == code) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum GATE_EVN_PAY {
+        ON("ON", "Giờ mở cổng EVN"),
+        OFF("OFF", "Giờ đóng cổng EVN");
+
+        GATE_EVN_PAY(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+        private String message;
+
+        public static GATE_EVN_PAY findCodeMessage(Integer code) {
+            for (GATE_EVN_PAY v : values()) {
+                if (v.getCode().equals(code)) {
+                    return v;
+                }
+            }
+            return null;
+        }
+    }
     //endregion
 
     //region Description key
     public static final String TAG = "TAG";
     public static final String KEY_EDONG = "EDONG";
+    public static final String INTERFACE_MAIN = "INTERFACE_MAIN";
 
     //endregion
 
@@ -563,13 +869,21 @@ public class Common {
         e2040("2039", "Không thể login, đã login ở 1 thiết bị khác"),
         e2042("2042", "Tài khoản chưa được xác định loại tài khoản"),
         e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ"),
+        e814("814", "Lỗi hóa đơn đã thanh toán bởi ECPAY"),
+        e824("824", "Giao dịch lỗi"),
+        e825("825", "Lỗi hóa đơn đã thanh toán bởi đối tác khác"),
+        e095("095", "Không được thanh toán ở thời điểm hiện tại"),
 
         ex10000("10000", "Chưa có hóa đơn nào được chọn"),
         ex10001("10001", "Quá trình thanh toán kết thúc"),
         ex10002("10002", "Vui lòng kiểm tra sự tồn tại của database"),
         ex10003("10003", "Phải thanh toán từ kỳ hóa đơn xa nhất, mã KH:"),
         ex10004("10004", "Quá trình thanh toán kết thúc. Có xảy ra lỗi"),
-        ex10005("10005", "Phải thanh toán liên tục các kỳ hóa đơn, mã KH:");
+        ex10005("10005", "Phải thanh toán liên tục các kỳ hóa đơn, mã KH:"),
+        ex10006("10006", "Không thành công, đã thanh toán bởi nguồn khác"),
+        ex10007("10007", "Không thành công, đã thanh toán bởi số ví khác"),
+        ex10008("10008", "Thanh toán thành công"),
+        ex10009("10009", "Hóa đơn không thể thanh toán!");
 
         CODE_REPONSE_BILL_ONLINE(String code, String message) {
             this.code = code;
@@ -582,6 +896,11 @@ public class Common {
 
         public String getMessage() {
             return message;
+        }
+
+        //thông báo hiển thị thông tin thanh toán thành công lên màn hình khi kết thúc quá trình thanh toán
+        public static String getMessageSuccess(int countBillPaySuccess, long totalAmountMoney) {
+            return ex10001.getMessage() + Common.TEXT_ENTER + "Số hóa đơn = " + countBillPaySuccess + Common.TEXT_ENTER + "Tổng tiền = " + totalAmountMoney;
         }
 
         private final String code;
@@ -603,6 +922,7 @@ public class Common {
         e022("022", "Phải thanh toán liên tục các kỳ hoá đơn, mã KH: "),
         e03("03", "Số dư không đủ để thanh toán"),
         e04("043", "Kiểm tra kết nối mạng hoặc liên hệ với đội kỹ thuật!"),
+        e05("05", "Hóa đơn không thể thanh toán!"),
         e051("051", "Hoá đơn đã thanh toán bởi nguồn khác"),
         e052("052", "Hoá đơn đã thanh toán bởi số ví khác"),
         ex00("00", "Thanh toán hoá đơn thất bại");
@@ -1711,7 +2031,7 @@ public class Common {
         }
     }
 
-    public enum TYPE_DIALOG{
+    public enum TYPE_DIALOG {
         THANH_CONG,
         LOI,
         XAC_NHAN;
@@ -1831,29 +2151,27 @@ public class Common {
         if (!isHasCancel)
             buttonCancle.setVisibility(View.GONE);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                if(typeDialog == TYPE_DIALOG.THANH_CONG) {
-                    imageButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_success_48));
-                }
-                if(typeDialog == TYPE_DIALOG.LOI) {
-                    imageButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_error_48));
-                }
-                if(typeDialog == TYPE_DIALOG.XAC_NHAN) {
-                    imageButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_question_48));
-                }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            if (typeDialog == TYPE_DIALOG.THANH_CONG) {
+                imageButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_success_48));
             }
-            else
-            {
-                if(typeDialog == TYPE_DIALOG.THANH_CONG) {
-                    imageButton.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_success_48));
-                }
-                if(typeDialog == TYPE_DIALOG.LOI) {
-                    imageButton.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_error_48));
-                }
-                if(typeDialog == TYPE_DIALOG.XAC_NHAN) {
-                    imageButton.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_question_48));
-                }
+            if (typeDialog == TYPE_DIALOG.LOI) {
+                imageButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_error_48));
             }
+            if (typeDialog == TYPE_DIALOG.XAC_NHAN) {
+                imageButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_question_48));
+            }
+        } else {
+            if (typeDialog == TYPE_DIALOG.THANH_CONG) {
+                imageButton.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_success_48));
+            }
+            if (typeDialog == TYPE_DIALOG.LOI) {
+                imageButton.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_error_48));
+            }
+            if (typeDialog == TYPE_DIALOG.XAC_NHAN) {
+                imageButton.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_question_48));
+            }
+        }
 
         final AlertDialog alertDialog = builder.show();
 
@@ -2020,5 +2338,17 @@ public class Common {
             result += CHARS[(int) (Math.random() * CHARS.length)];
         }
         return result;
+    }
+
+    public static String stringConvertNull(String object) {
+        return object = (object == null) ? Common.TEXT_EMPTY : object;
+    }
+
+    public static long longConvertNull(Long object) {
+        return object = (object == null) ? 0 : object.longValue();
+    }
+
+    public static int intConvertNull(Integer object) {
+        return object = (object == null) ? 0 : object.intValue();
     }
 }
