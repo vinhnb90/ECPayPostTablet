@@ -70,6 +70,18 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void refreshInfoMain() {
+        //check fragment
+        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+            return;
+        }
+
+        if (fragmentVisibling instanceof MainPageFragment)
+            ((MainPageFragment) fragmentVisibling).refreshInfoMain();
+    }
+
+    @Override
     public List<PayAdapter.DataAdapter> getData() {
         return iMainPresenter.getDataPayAdapter();
     }
@@ -194,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-
+        this.refreshInfoMain();
     }
 
     @Override
