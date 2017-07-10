@@ -42,7 +42,6 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.PROVIDER_DEFAUL
 import static views.ecpay.com.postabletecpay.util.commons.Common.TEXT_EMPTY;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
-import static views.ecpay.com.postabletecpay.util.commons.Common.getVersionApp;
 import static views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection.ERROR_OCCUR;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.PAGE_INCREMENT;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.ROWS_ON_PAGE;
@@ -103,6 +102,7 @@ public class PayPresenter implements IPayPresenter {
 
     @Override
     public void callPayRecycler(String edong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch, boolean isSeachOnline) {
+
         if (edong == null)
             return;
         if (infoSearch == null)
@@ -307,7 +307,7 @@ public class PayPresenter implements IPayPresenter {
 
         //TODO FR 001.1 (Thanh toán online): Kiểm tra thông tin và thanh toán theo trình tự sau
         //Kiểm tra số dư khả dụng của tài khoản thanh toán
-        if (mPayModel.selectBalance() < amount) {
+        if (mPayModel.selectBalance(edong) < amount) {
             mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e03.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
             return;
         }
@@ -413,7 +413,7 @@ public class PayPresenter implements IPayPresenter {
         //Kiểm tra kỳ hoá đơn thanh toán
 
         //Kiểm tra số dư khả dụng của tài khoản thanh toán
-        if (mPayModel.selectBalance() < amount) {
+        if (mPayModel.selectBalance(edong) < amount) {
             mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e03.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
             return;
         }
@@ -1582,6 +1582,7 @@ public class PayPresenter implements IPayPresenter {
              */
             boolean isFinishAllThread = checkIsAllThreadFinish();
             if (isFinishAllThread) {
+                mIPayView.hidePayingRViewDialog();
                 String messageNotify = Common.CODE_REPONSE_BILL_ONLINE.getMessageSuccess(countBillPayedSuccess, totalAmountBillPayedSuccess);
                 mIPayView.showMessageNotifyBillOnlineDialog(messageNotify, false, Common.TYPE_DIALOG.THANH_CONG, true);
             }
@@ -1612,7 +1613,7 @@ public class PayPresenter implements IPayPresenter {
 
             //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu không thành công
             final Common.CODE_REPONSE_BILL_ONLINE codeResponse = Common.CODE_REPONSE_BILL_ONLINE.findCodeMessage(response.getFooterBillingOnlineRespone().getResponseCode());
-            long billId = response.getBodyBillingOnlineRespone().getBillId();
+            final long billId = response.getBodyBillingOnlineRespone().getBillId();
             String date = Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy);
 
             //update date payed and tract number
@@ -1626,7 +1627,6 @@ public class PayPresenter implements IPayPresenter {
                  * Trường hợp hóa đơn đã được thanh toán bởi nguồn khác: Không thực hiện thanh toán hóa đơn
                  */
                 processCasePayedErrorByOtherSource(response, positionIndex, date, billId, edong);
-                return;
             }
 
             if (codeResponse.getCode() == Common.CODE_REPONSE_BILL_ONLINE.e814.getCode()) {
@@ -1634,17 +1634,15 @@ public class PayPresenter implements IPayPresenter {
                  * Trường hợp hóa đơn đã được thanh toán bởi ví khác: Không thực hiện thanh toán hóa đơn
                  */
                 processCasePayedErrorByOtherEdong(response, positionIndex, date, billId, edong);
-                return;
             }
 
             if (codeResponse.getCode() != Common.CODE_REPONSE_BILL_ONLINE.e000.getCode()
                     &&
                     codeResponse.getCode() != Common.CODE_REPONSE_BILL_ONLINE.e095.getCode()) {
                 /**
-                 * Hóa đơn chấm nợ lỗi: Không thực hiện thanh toán hóa đơn
+                 * Hóa đơn chấm nợ lỗi: thực hiện thanh toán hóa đơn
                  */
                 processCasePayedErrorByErrorECPAY(response, positionIndex, date, billId, edong);
-                return;
             }
 
             //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu thành công
@@ -1693,6 +1691,7 @@ public class PayPresenter implements IPayPresenter {
                 //TODO Gửi yêu cầu cập nhật thông tin tài khoản Ví TNV
             }
 
+
             //update text count billDeleteOnline payed success
             countBillPayedSuccess++;
             totalAmountBillPayedSuccess += response.getBodyBillingOnlineRespone().getAmount();
@@ -1713,7 +1712,17 @@ public class PayPresenter implements IPayPresenter {
                         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                         @Override
                         public void run() {
+                            mIPayView.hidePayingRViewDialog();
                             totalBillsChooseDialog--;
+
+                            for (int i = 0; i < listBillDialog.size(); i++) {
+                                if (listBillDialog.get(i).getBillId() == billId) {
+                                    listBillDialog.get(i).setChecked(false);
+                                    listBillDialog.get(i).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN.getCode());
+                                    break;
+                                }
+                            }
+
                             refreshStatusPaySuccessDialog(edong);
                         }
                     }
@@ -1909,6 +1918,8 @@ public class PayPresenter implements IPayPresenter {
         if (TextUtils.isEmpty(edong))
             return;
 
+        //hide process bar
+
         //not refreshData listBillDialog
         //but refreshData
         refreshTextCountBillPayedSuccess();
@@ -2005,9 +2016,18 @@ public class PayPresenter implements IPayPresenter {
                 ZERO, Common.STATUS_OF_PRINT_INFO.NULL.getCode());
 
         //set new status for billDeleteOnline and refesh recycler bills
-        listBillDialog.get(positionIndex).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN.getCode());
+//        listBillDialog.get(positionIndex).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN.getCode());
 
         Log.d(TAG, "rowAffect updateBillDebtWithThanhToanErrorOrSuccess = " + rowAffect);
+
+        /**
+         * Nhận kết quả cập nhật thông tin tài khoản Ví TNV
+         * Giao dịch thanh toán thành công ghi giảm Số dư ví = - Số tiền hóa đơn
+         */
+        double balance = mPayModel.getAccountBalance(edong);
+        balance -= listBillDialog.get(positionIndex).getAmount();
+
+        rowAffect = mPayModel.updateAccountBalance(edong, (int) balance);
 
         /**
          * Lưu thông tin hóa đơn vào Danh sách lịch sử: các thông tin như Danh sách thu, chỉ khác bổ sung thêm các thông tin
@@ -2039,7 +2059,8 @@ public class PayPresenter implements IPayPresenter {
                 boolean isFinishAllThread = checkIsAllThreadFinish();
                 if (isFinishAllThread) {
                     refreshStatusPaySuccessDialog(edong);
-                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+//                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                    Log.d(TAG, "run: " + Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage());
                 } else
                     refreshStatusPaySuccessDialogAndDisableCheckbox(edong, true);
             }
@@ -2083,7 +2104,16 @@ public class PayPresenter implements IPayPresenter {
         Log.d(TAG, "rowAffect updateBillDebtWithThanhToanErrorOrSuccess = " + rowAffect);
 
         //set new status for billDeleteOnline and refesh recycler bills
-        listBillDialog.get(positionIndex).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN.getCode());
+//        listBillDialog.get(positionIndex).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN.getCode());
+
+        /**
+         * Nhận kết quả cập nhật thông tin tài khoản Ví TNV
+         * Giao dịch thanh toán thành công ghi giảm Số dư ví = - Số tiền hóa đơn
+         */
+        double balance = mPayModel.getAccountBalance(edongKey);
+        balance -= listBillDialog.get(positionIndex).getAmount();
+
+        rowAffect = mPayModel.updateAccountBalance(edongKey, (int) balance);
 
         /**
          * Lưu thông tin hóa đơn vào Danh sách lịch sử: các thông tin như Danh sách thu, chỉ khác bổ sung thêm các thông tin
@@ -2115,7 +2145,8 @@ public class PayPresenter implements IPayPresenter {
                 boolean isFinishAllThread = checkIsAllThreadFinish();
                 if (isFinishAllThread) {
                     refreshStatusPaySuccessDialog(edongKey);
-                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                    Log.d(TAG, "run: " + Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage());
+//                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
                 } else
                     refreshStatusPaySuccessDialogAndDisableCheckbox(edongKey, true);
             }
@@ -2159,7 +2190,7 @@ public class PayPresenter implements IPayPresenter {
         Log.d(TAG, "rowAffect updateBillDebtWithThanhToanErrorOrSuccess = " + rowAffect);
 
         //set new status for billDeleteOnline and refesh recycler bills
-        listBillDialog.get(positionIndex).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN.getCode());
+//        listBillDialog.get(positionIndex).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN.getCode());
 
         /**
          * Lưu thông tin hóa đơn vào Danh sách lịch sử: các thông tin như Danh sách thu, chỉ khác bổ sung thêm các thông tin
@@ -2190,8 +2221,10 @@ public class PayPresenter implements IPayPresenter {
                 //check full billDeleteOnline is payed
                 boolean isFinishAllThread = checkIsAllThreadFinish();
                 if (isFinishAllThread) {
+                    mIPayView.hidePayingRViewDialog();
                     refreshStatusPaySuccessDialog(edong);
-                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                    Log.d(TAG, "run: " + Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage());
+//                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
                 } else
                     refreshStatusPaySuccessDialogAndDisableCheckbox(edong, true);
             }
@@ -2239,6 +2272,14 @@ public class PayPresenter implements IPayPresenter {
 
         //set new status for billDeleteOnline and refesh recycler bills
         listBillDialog.get(positionIndex).setStatus(Common.STATUS_BILLING.DA_THANH_TOAN_BOI_VI_KHAC.getCode());
+        /**
+         * Nhận kết quả cập nhật thông tin tài khoản Ví TNV
+         * Giao dịch thanh toán thành công ghi giảm Số dư ví = - Số tiền hóa đơn
+         */
+        double balance = mPayModel.getAccountBalance(edong);
+        balance -= listBillDialog.get(positionIndex).getAmount();
+
+        rowAffect = mPayModel.updateAccountBalance(edong, (int) balance);
 
         /**
          * Hiển thị và cập nhật thông tin thanh toán lên màn hình
@@ -2254,11 +2295,14 @@ public class PayPresenter implements IPayPresenter {
                 //check full billDeleteOnline is payed
                 boolean isFinishAllThread = checkIsAllThreadFinish();
                 if (isFinishAllThread) {
+                    mIPayView.hidePayingRViewDialog();
                     refreshStatusPaySuccessDialog(edong);
                     if (countBillPayedSuccess == totalBillsChooseDialogTemp)
-                        mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+//                        mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                        Log.d(TAG, "run: " + Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage());
                     else
-                        mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10004.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+//                        mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10004.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+                        Log.d(TAG, "run: " + Common.CODE_REPONSE_BILL_ONLINE.ex10004.getMessage());
                 } else
                     refreshStatusPaySuccessDialogAndDisableCheckbox(edong, true);
             }
@@ -2322,6 +2366,7 @@ public class PayPresenter implements IPayPresenter {
                 //check full billDeleteOnline is payed
                 boolean isFinishAllThread = checkIsAllThreadFinish();
                 if (isFinishAllThread) {
+                    mIPayView.hidePayingRViewDialog();
                     refreshStatusPaySuccessDialog(edong);
                     if (countBillPayedSuccess == totalBillsChooseDialogTemp)
                         mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);

@@ -95,6 +95,7 @@
             android:layout_height="match_parent">
 
             <ImageButton
+                android:visibility="invisible"
                 android:id="@+id/ibtn_dialog_thanhtoan_message"
                 android:background="@drawable/ic_message"
                 android:layout_alignParentRight="true"

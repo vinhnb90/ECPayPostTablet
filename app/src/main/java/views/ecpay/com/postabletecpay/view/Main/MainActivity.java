@@ -385,6 +385,7 @@ public class MainActivity extends AppCompatActivity implements
         }
         if (fragmentVisibling instanceof PayFragment) {
             ((PayFragment) fragmentVisibling).bindViewAgain();
+            ((PayFragment) fragmentVisibling).refreshData();
             ((PayFragment) fragmentVisibling).refreshRecyclerListFragment();
         }
     }

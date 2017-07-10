@@ -69,7 +69,8 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
 
         //TODO onBindViewHolder bill
         String message = billChecked.getMessageError();
-        holder.getIbtnMessage().setVisibility(TextUtils.isEmpty(message) ? View.INVISIBLE : View.VISIBLE);
+//        holder.getIbtnMessage().setVisibility(TextUtils.isEmpty(message) ? View.INVISIBLE : View.VISIBLE);
+        Log.d(TAG, "onBindViewHolder: " + message);
 
         String status = Common.STATUS_BILLING.findCodeMessage(billChecked.getStatus()).getMessage();
         if (billChecked.getStatus() == CHUA_THANH_TOAN.getCode())
@@ -241,8 +242,8 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
         TextView tvAmount;
         @BindView(R.id.tv_row_thanhtoan_list_bills_status_pay)
         TextView tvPayStatus;
-        @BindView(R.id.ibtn_dialog_thanhtoan_message)
-        ImageButton ibtnMessage;
+//        @BindView(R.id.ibtn_dialog_thanhtoan_message)
+//        ImageButton ibtnMessage;
 
         public BillDialogViewHorder(View itemView) {
             super(itemView);
@@ -280,9 +281,9 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
             return tvPayStatus;
         }
 
-        public ImageButton getIbtnMessage() {
-            return ibtnMessage;
-        }
+//        public ImageButton getIbtnMessage() {
+//            return ibtnMessage;
+//        }
 
         @OnCheckedChanged(R.id.cb_row_thanhtoan_list_bills_choose)
         public void onCheckedChanged(final CheckBox checkBox, boolean checked) {

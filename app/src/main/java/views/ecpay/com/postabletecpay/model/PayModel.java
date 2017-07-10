@@ -318,8 +318,8 @@ public class PayModel extends CommonModel {
         sqLiteConnection.updateBillReasonDelete(edong, code, billId, reasonDeleteBill, statusBilling);
     }
 
-    public double selectBalance() {
-        return sqLiteConnection.selectBalance();
+    public double selectBalance(String edong) {
+        return sqLiteConnection.selectBalance(edong);
     }
 
     public long updatePayOffine(int billID, int status, String edong) {
@@ -449,5 +449,13 @@ public class PayModel extends CommonModel {
 
     public int updateBillHistoryWithSuspectedProcessingStatus(String edong, int billId, Integer suspectedProcessingStatus) {
         return sqLiteConnection.updateBillHistoryWithSuspectedProcessingStatus(edong, billId, suspectedProcessingStatus);
+    }
+
+    public int updateAccountBalance(String edong, int balance) {
+        return sqLiteConnection.updateAccountBalance(edong, balance);
+    }
+
+    public  double getAccountBalance(String edong) {
+        return sqLiteConnection.selectBalance(edong);
     }
 }

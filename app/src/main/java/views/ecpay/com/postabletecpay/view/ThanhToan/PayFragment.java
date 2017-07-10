@@ -154,9 +154,9 @@ public class PayFragment extends Fragment implements
     @Nullable
     @BindView(R.id.tv_diaglog_thanhtoan_message)
     TextView tvMessageDialog;
-    @Nullable
+   /* @Nullable
     @BindView(R.id.tv_diaglog_thanhtoan_count_bill_payed)
-    TextView tvCountBillPayedSuccessDialog;
+    TextView tvCountBillPayedSuccessDialog;*/
     @Nullable
     @BindView(R.id.pbar_diaglog_thanhtoan)
     ProgressBar pbarDialogBilling;
@@ -223,6 +223,7 @@ public class PayFragment extends Fragment implements
     public static final int REQUEST_BARCODE = 999;
     public static final int RESPONSE_BARCODE = 1000;
 
+    //TODO mark here
     @Override
     public List<PayAdapter.DataAdapter> getData() {
         return listener.getData();
@@ -798,6 +799,7 @@ public class PayFragment extends Fragment implements
                 @Override
                 public void doClickYes() {
                     //dismiss
+                    showPayingRviewDialogFinish();
                 }
             };
             Common.showDialog(getContext(), yesNoDialog, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), tvMessageDialog.getText().toString(), false, typeDialog);
@@ -840,7 +842,8 @@ public class PayFragment extends Fragment implements
     public void showTextCountBillsPayed(int countBillPayedSuccess, int totalBillsDialog) {
         if (isHasNullViewPayingOnlineDialog())
             return;
-        tvCountBillPayedSuccessDialog.setText(countBillPayedSuccess + Common.TEXT_SLASH + totalBillsDialog + Common.TEXT_BILL);
+//        tvCountBillPayedSuccessDialog.setText(countBillPayedSuccess + Common.TEXT_SLASH + totalBillsDialog + Common.TEXT_BILL);
+        Log.d(TAG, "showTextCountBillsPayed: " + countBillPayedSuccess + Common.TEXT_SLASH + totalBillsDialog + Common.TEXT_BILL);
     }
 
     @Override
@@ -848,7 +851,10 @@ public class PayFragment extends Fragment implements
         if (isHasNullViewPayingOnlineDialog())
             return;
 
-        tvCountBillPayedSuccessDialog.setText(countBillPayedSuccess + Common.TEXT_SLASH + totalBillsChooseDialog + Common.TEXT_SPACE + Common.TEXT_BILL);
+//        rvBillOnline.setVisibility(View.INVISIBLE);
+//        visibleButtonDeleteDialog(VISIBLE_BUTTON_DELETE_DIALOG.HIDE_ALL);
+//        tvCountBillPayedSuccessDialog.setText(countBillPayedSuccess + Common.TEXT_SLASH + totalBillsChooseDialog + Common.TEXT_SPACE + Common.TEXT_BILL);
+        Log.d(TAG, "showTextCountBillsPayedSuccess: " + countBillPayedSuccess + Common.TEXT_SLASH + totalBillsChooseDialog + Common.TEXT_SPACE + Common.TEXT_BILL);
     }
 
     @Override
@@ -1164,7 +1170,7 @@ public class PayFragment extends Fragment implements
     private void setVisibleViewDialogBillOnlineProcess(TYPE_PAYING_PROCESS type) {
         if (isHasNullViewPayingOnlineDialog())
             return;
-        tvCountBillPayedSuccessDialog.setVisibility(View.VISIBLE);
+//        tvCountBillPayedSuccessDialog.setVisibility(View.VISIBLE);
         //hide all
         if (type == TYPE_PAYING_PROCESS.HIDE_ALL) {
             rvBillOnline.setVisibility(View.INVISIBLE);

@@ -37,4 +37,5 @@ public interface IPayPresenter {
     void callDeleteOnlineSoap(String edong, String reasonDeleteBill);
 
     void callShowDialogBarcode();
+
 }

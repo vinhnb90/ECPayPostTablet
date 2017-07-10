@@ -237,9 +237,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         }
     }
 
-    public double selectBalance() {
+    public double selectBalance(String edong) {
         database = getReadableDatabase();
-        String query = "SELECT balance FROM " + TABLE_NAME_ACCOUNT;
+        String query = "SELECT balance FROM " + TABLE_NAME_ACCOUNT + " where edong = '" + edong + "'";
         Cursor c = database.rawQuery(query, null);
         if (c.moveToFirst()) {
             return c.getDouble(0);
@@ -315,14 +315,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
 
-
     public ReportModel.BillInfo countBillDuocGiao(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
         String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "'";
         Cursor mCursor = database.rawQuery(query, null);
 
-        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-        {
+        if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
             bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
             bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
         }
@@ -334,7 +332,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return bill;
 
     }
-
 
 
     public ReportModel.BillInfo countBillDaThu(String edong) {
@@ -342,8 +339,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status != 0";
         Cursor mCursor = database.rawQuery(query, null);
 
-        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-        {
+        if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
             bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
             bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
         }
@@ -357,14 +353,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
 
-
     public ReportModel.BillInfo countBillHoanTra(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
         String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status != 0 and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
         Cursor mCursor = database.rawQuery(query, null);
 
-        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-        {
+        if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
             bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
             bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
         }
@@ -386,8 +380,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 //                "                  WHERE departments.department_id = employees.department_id)";
         Cursor mCursor = database.rawQuery(query, null);
 
-        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-        {
+        if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
             bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
             bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
         }
@@ -419,19 +412,16 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return code;
     }
 
-    public List<Bill> getBillThuByCodeAndDate(String edong, boolean isMaKH, String customerCode, Calendar dateFrom, Calendar dateTo)
-    {
+    public List<Bill> getBillThuByCodeAndDate(String edong, boolean isMaKH, String customerCode, Calendar dateFrom, Calendar dateTo) {
         List<Bill> lst = new ArrayList<>();
 
 
         String query;
 
-        if(isMaKH)
-        {
+        if (isMaKH) {
             query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
                     "' and status != 0 and customerCode like '%" + customerCode + "%'";
-        }else
-        {
+        } else {
             query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
                     "' and status != 0 and name like '%" + customerCode + "%'";
         }
@@ -442,24 +432,20 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             int count = mCursor.getCount();
             do {
                 String _requestDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
-                if(_requestDate.length() == 0)
-                {
+                if (_requestDate.length() == 0) {
                     continue;
                 }
 
                 String[] arr = _requestDate.split("/");
-                if (arr.length != 3)
-                {
+                if (arr.length != 3) {
                     continue;
                 }
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(intConvertNull(Integer.parseInt(arr[2])), intConvertNull(Integer.parseInt(arr[1])) - 1, intConvertNull(Integer.parseInt(arr[0])));
 
-                if((dateFrom != null && calendar.before(dateFrom)) || (dateTo != null && calendar.after(dateTo)))
-                {
+                if ((dateFrom != null && calendar.before(dateFrom)) || (dateTo != null && calendar.after(dateTo))) {
                     continue;
                 }
-
 
 
                 String _customerCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode")));
@@ -536,12 +522,11 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         }
 
 
-        if (lst.size() > 1)
-        {
+        if (lst.size() > 1) {
             Collections.sort(lst, new Comparator<Bill>() {
                 @Override
                 public int compare(Bill bill, Bill t1) {
-                    if(bill.getRequestDateCal().before(t1.getRequestDateCal()))
+                    if (bill.getRequestDateCal().before(t1.getRequestDateCal()))
                         return -1;
                     return 1;
                 }
@@ -552,19 +537,16 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
 
-    public List<Bill> getBillHoanTraByCodeAndDate(String edong, boolean isMaKH, String customerCode, Calendar dateFrom, Calendar dateTo)
-    {
+    public List<Bill> getBillHoanTraByCodeAndDate(String edong, boolean isMaKH, String customerCode, Calendar dateFrom, Calendar dateTo) {
         List<Bill> lst = new ArrayList<>();
 
 
         String query;
 
-        if(isMaKH)
-        {
+        if (isMaKH) {
             query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
                     "' and status != 0 and customerCode like '%" + customerCode + "%' and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
-        }else
-        {
+        } else {
             query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
                     "' and status != 0 and name like '%" + customerCode + "%' and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
         }
@@ -575,24 +557,20 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             int count = mCursor.getCount();
             do {
                 String _requestDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
-                if(_requestDate.length() == 0)
-                {
+                if (_requestDate.length() == 0) {
                     continue;
                 }
 
                 String[] arr = _requestDate.split("/");
-                if (arr.length != 3)
-                {
+                if (arr.length != 3) {
                     continue;
                 }
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(intConvertNull(Integer.parseInt(arr[2])), intConvertNull(Integer.parseInt(arr[1])) - 1, intConvertNull(Integer.parseInt(arr[0])));
 
-                if((dateFrom != null && calendar.before(dateFrom)) || (dateTo != null && calendar.after(dateTo)))
-                {
+                if ((dateFrom != null && calendar.before(dateFrom)) || (dateTo != null && calendar.after(dateTo))) {
                     continue;
                 }
-
 
 
                 String _customerCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode")));
@@ -669,12 +647,11 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         }
 
 
-        if (lst.size() > 1)
-        {
+        if (lst.size() > 1) {
             Collections.sort(lst, new Comparator<Bill>() {
                 @Override
                 public int compare(Bill bill, Bill t1) {
-                    if(bill.getRequestDateCal().before(t1.getRequestDateCal()))
+                    if (bill.getRequestDateCal().before(t1.getRequestDateCal()))
                         return -1;
                     return 1;
                 }
@@ -859,35 +836,29 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
 
         String query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE ";
-        if(_maKH.length() != 0)
-        {
+        if (_maKH.length() != 0) {
             query += "code like '%" + _maKH + "%' or ";
             query += "cardNo like '%" + _maKH + "%' ";
-        }else
-        {
+        } else {
             boolean hasWhere = false;
 
-            if(_name.length() > 0)
-            {
-                query += (hasWhere ? "and "  : "") + "name like '%" + _name + "%' ";
+            if (_name.length() > 0) {
+                query += (hasWhere ? "and " : "") + "name like '%" + _name + "%' ";
                 hasWhere = true;
             }
 
-            if(_address.length() > 0)
-            {
-                query += (hasWhere ? "and "  : "") + "address like '%" + _address + "%' ";
+            if (_address.length() > 0) {
+                query += (hasWhere ? "and " : "") + "address like '%" + _address + "%' ";
                 hasWhere = true;
             }
 
-            if(_phone.length() > 0)
-            {
-                query += (hasWhere ? "and "  : "") + "phoneByevn like '%" + _phone + "%' ";
+            if (_phone.length() > 0) {
+                query += (hasWhere ? "and " : "") + "phoneByevn like '%" + _phone + "%' ";
                 hasWhere = true;
             }
 
-            if(_bookCmis.length() > 0)
-            {
-                query += (hasWhere ? "and "  : "") + "bookCmis like '%" + _bookCmis + "%' ";
+            if (_bookCmis.length() > 0) {
+                query += (hasWhere ? "and " : "") + "bookCmis like '%" + _bookCmis + "%' ";
                 hasWhere = true;
             }
         }
@@ -1976,6 +1947,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return rowAffect;
     }
 
+    //TODO Sửa đổi để phục vụ test, phải chỉnh lại sau
     public int updateBillWith(String edongKey, int billId, int status, String edong) {
         ContentValues initialValues = new ContentValues();
 
@@ -1983,7 +1955,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("edong", edong);
 
         database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_DEBT_COLLECTION, initialValues, " edongKey = ? and billId = ? ", new String[]{edongKey, String.valueOf(billId)});
+        int rowAffect = (int) database.update(TABLE_NAME_BILL, initialValues, " edongKey = ? and billId = ? ", new String[]{edongKey, String.valueOf(billId)});
         return rowAffect;
     }
 
@@ -2180,6 +2152,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
 
+    //TODO Sửa đổi để phục vụ test, phải chỉnh lại sau
     public int selectPayStatusDebt(String edong, String code, int billId) {
         database = this.getReadableDatabase();
 //        String query = "SELECT payStatus FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE edongKey = '" + edong + "' and customerCode = '" + code + "' and billId = '" + billId + "'";
@@ -2346,13 +2319,15 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return rowAffect;
     }
 
+    //TODO Sửa đổi để phục vụ test, phải chỉnh lại sau
     public int updateBillWithWithThanhToanError(String edongKey, int billId, String edong) {
         ContentValues initialValues = new ContentValues();
 
         initialValues.put("edong", edong);
 
         database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_HISTORY_PAY, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
+//        int rowAffect = (int) database.update(TABLE_NAME_HISTORY_PAY, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
+        int rowAffect = (int) database.update(TABLE_NAME_BILL, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
         return rowAffect;
     }
 
@@ -2411,6 +2386,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         database = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("notYetPushMoney", notYetPushMoney);
+        return database.update(TABLE_NAME_ACCOUNT, contentValues, "edong = ?", new String[]{String.valueOf(edong)});
+    }
+
+    public int updateAccountBalance(String edong, int balance) {
+        database = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("balance", balance);
         return database.update(TABLE_NAME_ACCOUNT, contentValues, "edong = ?", new String[]{String.valueOf(edong)});
     }
 
