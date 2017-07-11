@@ -13,7 +13,7 @@
         android:background="@color/colorLightGray"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="80dp">
+        android:layout_height="@dimen/_60sdp">
         <android.support.design.widget.BottomNavigationView
             android:id="@+id/navigation_ac_main"
             android:layout_width="match_parent"
@@ -28,7 +28,7 @@
         android:id="@+id/rv_ac_main_request_pay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
+        android:padding="@dimen/_10sdp"
         android:background="@color/colorTextGreen"
         android:visibility="gone">
 
@@ -64,8 +64,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@+id/ll_frag_thanh_toan_action_search"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginLeft="@dimen/_10sdp"
+                android:layout_marginRight="@dimen/_10sdp"
                 android:layout_toLeftOf="@+id/ll_frag_thanh_toan_action_search"
 
                 android:indeterminate="true"
@@ -79,8 +79,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginLeft="@dimen/_10sdp"
+                android:layout_marginRight="@dimen/_10sdp"
                 android:layout_toRightOf="@+id/tv_ac_main_count_bill_payed"
                 android:gravity="right"
 

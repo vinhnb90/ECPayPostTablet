@@ -15,7 +15,7 @@
             android:id="@+id/btnBack1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:layout_margin="@dimen/_5sdp"
             android:background="@null"
             android:src="@mipmap/ic_back" />
 
@@ -24,10 +24,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_margin="15dp"
+            android:layout_margin="@dimen/_10sdp"
             android:text="CHUYỂN TIỀN VÍ TỔNG"
             android:textColor="@color/colorTextWhite"
-            android:textSize="20sp" />
+            android:textSize="@dimen/_16sdp" />
 
     </RelativeLayout>
 
@@ -49,50 +49,50 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="horizontal"
-                android:paddingBottom="5dp">
+                android:paddingBottom="@dimen/_5sdp">
 
                 <TextView
                     android:id="@+id/twtextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="30dp"
+                    android:layout_marginLeft="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:text="Tài Khoản Chuyển"
                     android:textColor="#000000"
-                    android:textSize="17sp" />
+                    android:textSize="@dimen/_13sdp" />
 
                 <TextView
                     android:id="@+id/txtSendPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="30dp"
+                    android:layout_marginRight="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:text="01666564963"
                     android:textColor="@color/colorBlue"
-                    android:textSize="17sp" />
+                    android:textSize="@dimen/_13sdp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:paddingBottom="5dp">
+                android:paddingBottom="@dimen/_5sdp">
 
                 <TextView
                     android:id="@+id/tetextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="30dp"
+                    android:layout_marginLeft="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:text="Ví Tổng"
                     android:textColor="#000000"
-                    android:textSize="17sp" />
+                    android:textSize="@dimen/_13sdp" />
 
                 <Spinner
                     android:id="@+id/sViTong"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginRight="30dp"
+                    android:layout_marginRight="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_button_white" />
 
@@ -103,29 +103,29 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="horizontal"
-                android:paddingBottom="5dp">
+                android:paddingBottom="@dimen/_5sdp">
 
                 <TextView
                     android:id="@+id/tttextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="30dp"
+                    android:layout_marginLeft="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:text="Số Tiền"
                     android:textColor="#000000"
-                    android:textSize="17sp" />
+                    android:textSize="@dimen/_13sdp" />
 
                 <EditText
                     android:id="@+id/eSoTien"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="30dp"
+                    android:layout_marginRight="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_button_white"
                     android:ems="30"
                     android:inputType="number|numberSigned|numberDecimal"
-                    android:padding="5dp"
-                    android:textSize="17sp" />
+                    android:padding="@dimen/_5sdp"
+                    android:textSize="@dimen/_13sdp" />
 
             </LinearLayout>
 
@@ -134,29 +134,29 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="horizontal"
-                android:paddingBottom="5dp">
+                android:paddingBottom="@dimen/_5sdp">
 
                 <TextView
                     android:id="@+id/ttextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="30dp"
+                    android:layout_marginLeft="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:text="Ghi Chú"
                     android:textColor="#000000"
-                    android:textSize="17sp" />
+                    android:textSize="@dimen/_13sdp" />
 
                 <EditText
                     android:id="@+id/eGhiChu"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:layout_marginRight="30dp"
+                    android:layout_height="@dimen/_100sdp"
+                    android:layout_marginRight="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_button_white"
                     android:ems="10"
                     android:gravity="top|left"
                     android:inputType="textMultiLine"
-                    android:padding="5dp" />
+                    android:padding="@dimen/_5sdp" />
 
             </LinearLayout>
 
@@ -166,22 +166,22 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="horizontal"
-                android:paddingBottom="5dp">
+                android:paddingBottom="@dimen/_5sdp">
 
                 <TextView
                     android:id="@+id/textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="30dp"
+                    android:layout_marginLeft="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:text="Mã Xác Nhận"
                     android:textColor="#000000"
-                    android:textSize="17sp" />
+                    android:textSize="@dimen/_13sdp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="30dp"
+                    android:layout_marginRight="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
@@ -198,12 +198,13 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="TextView"
+                            android:textSize="@dimen/_12sdp"
                             android:textColor="#FF0000" />
 
                         <Button
                             android:id="@+id/btnRefresh"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
                             android:background="@drawable/bg_button_white"
                             android:text="R" />
                     </LinearLayout>
@@ -216,7 +217,7 @@
                         android:background="@drawable/bg_button_white"
                         android:ems="10"
                         android:inputType="textPersonName"
-                        android:padding="5dp" />
+                        android:padding="@dimen/_5sdp" />
 
                 </LinearLayout>
 
@@ -225,7 +226,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="@dimen/_15sdp"
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
@@ -233,24 +234,26 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1.5"
-                    android:orientation="horizontal"></LinearLayout>
+                    android:orientation="horizontal"/>
 
                 <Button
                     android:id="@+id/btnBack"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="@dimen/_8sdp"
+                    android:layout_marginRight="@dimen/_8sdp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_button_white"
+                    android:textSize="@dimen/_12sdp"
                     android:text="Nhập Lại" />
 
                 <Button
                     android:id="@+id/btnNext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginLeft="@dimen/_10sdp"
                     android:layout_weight="1"
+                    android:textSize="@dimen/_12sdp"
                     android:background="@drawable/bg_button_white"
                     android:text="Tiếp Tục" />
 
@@ -258,7 +261,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1.5"
-                    android:orientation="horizontal"></LinearLayout>
+                    android:orientation="horizontal"/>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

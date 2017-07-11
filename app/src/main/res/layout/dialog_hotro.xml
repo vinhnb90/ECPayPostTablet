@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp">
+    android:layout_margin="@dimen/_5sdp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -10,16 +10,16 @@
         android:background="@android:drawable/dialog_holo_light_frame"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_margin="15dp">
+        android:layout_margin="@dimen/_15sdp">
 
         <ImageView
             android:id="@+id/ivLogo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/logoecpay"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="130dp"
-            android:layout_marginRight="130dp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:layout_marginLeft="@dimen/_130sdp"
+            android:layout_marginRight="@dimen/_130sdp"
             android:layout_centerHorizontal="true"
             android:adjustViewBounds="true" />
 
@@ -29,8 +29,9 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:text="Liên hệ để được hỗ trợ"
+            android:textSize="@dimen/_13sdp"
             android:layout_below="@+id/ivLogo"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="@dimen/_10sdp"/>
 
         <LinearLayout
             android:id="@+id/llText"
@@ -43,15 +44,17 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/_13sdp"
                 android:text="Điện thoại: "
-                android:layout_marginTop="5dp"/>
+                android:layout_marginTop="@dimen/_5sdp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/_13sdp"
                 android:text="1900 561 230 - 04 2222 3456"
                 android:textColor="@color/colorRed"
-                android:layout_marginTop="5dp"/>
+                android:layout_marginTop="@dimen/_5sdp"/>
 
         </LinearLayout>
 
@@ -60,9 +63,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:textSize="@dimen/_13sdp"
             android:text="Email: hotro@ecpay.vn"
             android:layout_below="@+id/llText"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginTop="@dimen/_5sdp"/>
 
         <Button
             android:id="@+id/btOK"
@@ -72,9 +76,10 @@
             android:background="@drawable/bg_button"
             android:textColor="@color/colorTextWhite"
             android:layout_centerHorizontal="true"
+            android:textSize="@dimen/_13sdp"
             android:layout_below="@+id/tv_dialog_help_content"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="30dp"/>
+            android:layout_marginTop="@dimen/_30sdp"
+            android:layout_marginBottom="@dimen/_30sdp"/>
 
     </RelativeLayout>
 

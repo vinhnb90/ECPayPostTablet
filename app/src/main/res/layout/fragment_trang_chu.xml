@@ -26,15 +26,15 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="20dp"
-                android:paddingBottom="10dp"
-                android:paddingTop="10dp"
+                android:layout_marginLeft="@dimen/_8sdp"
+                android:paddingBottom="@dimen/_10sdp"
+                android:paddingTop="@dimen/_10sdp"
                 android:src="@drawable/avatar" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/_7sdp"
                 android:gravity="center_vertical"
                 android:orientation="vertical">
 
@@ -44,17 +44,17 @@
                     android:layout_height="wrap_content"
                     android:text="User name"
                     android:textColor="@color/colorTextWhite"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/_14sdp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvSoDuKhaDung"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="@dimen/_15sdp"
                     tools:text="Số dư khả dụng: 1,000,000 đ"
                     android:textColor="@color/colorTextWhite"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/_12sdp" />
 
             </LinearLayout>
 
@@ -68,8 +68,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginRight="3dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="@dimen/_3sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:background="@null"
                     android:scaleX="0.8"
                     android:scaleY="0.8"
@@ -80,7 +80,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:layout_toLeftOf="@+id/ibtn_frag_main_exit"
                     android:background="@null"
                     android:scaleX="0.8"
@@ -106,7 +106,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="@dimen/_15sdp"
                     android:scaleX="1.5"
                     android:scaleY="1.5"
                     android:src="@mipmap/ic_sohoadon" />
@@ -115,21 +115,21 @@
                     android:id="@+id/tvSoHoaDon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginLeft="@dimen/_15sdp"
+                    android:layout_marginTop="@dimen/_20sdp"
                     android:text="30000"
                     android:textColor="@color/colorTextWhite"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/_14sdp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="@dimen/_15sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:text="Số hoá đơn"
                     android:textColor="@color/colorTextWhite"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/_13sdp" />
             </LinearLayout>
 
             <LinearLayout
@@ -142,7 +142,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginRight="@dimen/_15sdp"
                     android:scaleX="1.5"
                     android:scaleY="1.5"
                     android:src="@mipmap/ic_tongtien" />
@@ -151,21 +151,21 @@
                     android:id="@+id/tv_fragment_thanh_toan_total_bills_money"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginRight="@dimen/_15sdp"
+                    android:layout_marginTop="@dimen/_20sdp"
                     android:text="1,000,000 đ"
                     android:textColor="@color/colorTextWhite"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/_14sdp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="@dimen/_15sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:text="Tổng tiền"
                     android:textColor="@color/colorTextWhite"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/_13sdp" />
 
             </LinearLayout>
 
@@ -190,8 +190,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="@dimen/_8sdp"
                 android:layout_weight="1"
+                android:textSize="@dimen/_10sdp"
                 android:background="@drawable/bg_button_white"
                 android:text="Xoá dữ liệu"
                 android:textAllCaps="false"
@@ -202,11 +203,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="@dimen/_8sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button"
                 android:text="Thanh toán hoá đơn"
                 android:textAllCaps="false"
+                android:textSize="@dimen/_10sdp"
                 android:textColor="@color/colorTextWhite" />
 
             <Button
@@ -214,10 +216,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginLeft="@dimen/_8sdp"
+                android:layout_marginRight="@dimen/_8sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_white"
+                android:textSize="@dimen/_10sdp"
                 android:text="Báo cáo"
                 android:textAllCaps="false"
                 android:textColor="@color/colorMain" />
@@ -232,7 +235,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_weight="1.5"
                 android:orientation="horizontal">
 
@@ -243,9 +246,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginLeft="@dimen/_10sdp"
+                android:layout_marginRight="@dimen/_10sdp"
                 android:layout_weight="1"
+                android:textSize="@dimen/_10sdp"
                 android:background="@drawable/bg_button_white"
                 android:text="Chuyển Ví Tổng"
                 android:textAllCaps="false"
@@ -256,11 +260,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginLeft="@dimen/_10sdp"
+                android:layout_marginRight="@dimen/_10sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_white"
                 android:text="Định Danh Thẻ"
+                android:textSize="@dimen/_10sdp"
                 android:textAllCaps="false"
                 android:textColor="@color/colorMain" />
 
@@ -270,7 +275,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_weight="1.5"
-                android:orientation="horizontal"></LinearLayout>
+                android:orientation="horizontal"/>
         </LinearLayout>
 
     </LinearLayout>

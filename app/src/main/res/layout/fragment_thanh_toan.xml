@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_margin="5dp"
+            android:layout_margin="@dimen/_5sdp"
             android:background="@null"
             android:src="@mipmap/ic_back" />
 
@@ -34,10 +34,10 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/ibtn_frag_thanhtoan_back"
             android:layout_centerHorizontal="true"
-            android:layout_margin="15dp"
+            android:layout_margin="@dimen/_15sdp"
             android:text="DANH SÁCH HOÁ ĐƠN"
             android:textColor="@color/colorTextWhite"
-            android:textSize="20sp" />
+            android:textSize="@dimen/_16sdp" />
 
         <RelativeLayout
             android:id="@+id/rvSearch"
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="10dp"
+                android:layout_marginRight="@dimen/_10sdp"
                 android:background="@drawable/bg_edittext"
                 android:src="@mipmap/ic_barcode" />
 
@@ -62,19 +62,20 @@
                 android:layout_alignBaseline="@+id/ibtn_frag_thanhtoan_qrcode"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_marginBottom="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:layout_marginLeft="@dimen/_8sdp"
+                android:layout_marginRight="@dimen/_8sdp"
                 android:layout_toLeftOf="@+id/ibtn_frag_thanhtoan_qrcode"
                 android:background="@drawable/bg_edittext"
                 android:drawableLeft="@drawable/ic_search_black_24dp"
                 android:imeOptions="actionSearch"
                 android:inputType="textNoSuggestions|textVisiblePassword"
                 android:lines="1"
-                android:paddingBottom="10dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="50dp"
-                android:paddingTop="10dp"
+                android:paddingBottom="@dimen/_10sdp"
+                android:paddingLeft="@dimen/_10sdp"
+                android:paddingRight="@dimen/_40sdp"
+                android:paddingTop="@dimen/_10sdp"
+                android:textSize="@dimen/_13sdp"
                 android:scrollHorizontally="true"
                 android:text="" />
 
@@ -88,7 +89,7 @@
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/ibtn_frag_thanhtoan_qrcode"
                 android:background="@null"
-                android:padding="10dp"
+                android:padding="@dimen/_10sdp"
                 app:srcCompat="@drawable/ic_cancel" />
         </RelativeLayout>
 
@@ -107,6 +108,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_button_orange"
                 android:clickable="false"
+                android:textSize="@dimen/_12sdp"
                 android:text="@string/pre"
                 android:textColor="@android:color/white" />
 
@@ -116,6 +118,7 @@
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
                 android:text="Trang"
+                android:textSize="@dimen/_12sdp"
                 android:textColor="@color/colorTextWhite"
                 android:textStyle="bold" />
 
@@ -124,6 +127,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:textSize="@dimen/_12sdp"
                 android:gravity="center_horizontal"
                 android:text="1/24"
                 android:textColor="@color/colorTextWhite"
@@ -135,6 +139,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_button_orange"
                 android:clickable="false"
+                android:textSize="@dimen/_12sdp"
                 android:text="@string/next"
                 android:textColor="@android:color/white" />
 
@@ -145,7 +150,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/ll_frag_thanh_toan_page"
-            android:padding="5dp">
+            android:padding="@dimen/_5sdp">
 
             <RelativeLayout
                 android:id="@+id/rv_frag_thanhtoan_search_online_progress"
@@ -173,8 +178,8 @@
                         android:id="@+id/ibtn_frag_thanhtoan_action_cancel_search_online"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
+                        android:layout_marginLeft="@dimen/_10sdp"
+                        android:layout_marginRight="@dimen/_10sdp"
                         android:background="@drawable/bg_circle_gray"
                         android:visibility="gone"
                         app:srcCompat="@drawable/ic_cancel_white" />
@@ -183,8 +188,8 @@
                         android:id="@+id/ibtn_frag_thanhtoan_action_research_online"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
+                        android:layout_marginLeft="@dimen/_10sdp"
+                        android:layout_marginRight="@dimen/_10sdp"
                         android:background="@drawable/bg_circle_green"
                         android:visibility="visible"
                         app:srcCompat="@drawable/ic_refresh" />
@@ -197,8 +202,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/ll_frag_thanh_toan_action_search"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="@dimen/_10sdp"
+                    android:layout_marginRight="@dimen/_10sdp"
                     android:layout_toLeftOf="@+id/ll_frag_thanh_toan_action_search"
                     android:layout_toRightOf="@+id/tv_search"
                     android:indeterminate="true"
@@ -213,8 +218,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/ll_frag_thanh_toan_action_search"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="@dimen/_10sdp"
+                    android:layout_marginRight="@dimen/_10sdp"
                     android:layout_toLeftOf="@+id/ll_frag_thanh_toan_action_search"
                     android:layout_toRightOf="@+id/tv_search"
                     android:gravity="right"
@@ -240,7 +245,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/rlTop"
         android:background="@color/colorTab"
-        android:padding="6dp"
+        android:padding="@dimen/_6sdp"
         android:visibility="gone" />
 
     <android.support.v4.view.ViewPager
@@ -260,7 +265,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:paddingTop="10dp">
+            android:paddingTop="@dimen/_10sdp">
 
 
             <LinearLayout
@@ -281,19 +286,19 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/_5sdp"
                         android:text="Hoá đơn"
-                        android:textSize="14sp" />
+                        android:textSize="@dimen/_12sdp" />
 
                     <TextView
                         android:id="@+id/tv_fragment_thanh_toan_total_bills_checked"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/_5sdp"
                         android:lines="1"
                         android:scrollHorizontally="true"
                         android:text="0"
-                        android:textSize="18sp"
+                        android:textSize="@dimen/_14sdp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -311,9 +316,9 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
                         android:layout_centerHorizontal="true"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/_5sdp"
                         android:text="Tổng tiền"
-                        android:textSize="14sp" />
+                        android:textSize="@dimen/_12sdp" />
 
                     <TextView
                         android:id="@+id/tv_fragment_thanh_toan_total_bills_money"
@@ -324,7 +329,7 @@
                         android:lines="1"
                         android:text="0 đ"
                         android:textColor="@color/colorRed"
-                        android:textSize="18sp"
+                        android:textSize="@dimen/_14sdp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -357,7 +362,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/ll_frag_thanh_toan_count"
-                android:layout_margin="10dp"
+                android:layout_margin="@dimen/_10sdp"
+                android:textSize="@dimen/_12sdp"
                 android:background="@drawable/bg_button"
                 android:text="THANH TOÁN"
                 android:textColor="@color/colorTextWhite" />

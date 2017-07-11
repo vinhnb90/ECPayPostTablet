@@ -1,7 +1,9 @@
 package views.ecpay.com.postabletecpay.view.Main;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -137,6 +139,10 @@ public class MainActivity extends AppCompatActivity implements
         }
 
     };
+
+    public MainActivity() {
+        super();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

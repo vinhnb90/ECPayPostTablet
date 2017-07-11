@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.view.DangNhap;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -7,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
@@ -16,6 +18,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -51,12 +54,24 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM
  */
 
 public class LoginActivity extends BaseActivity implements ILoginView {
+    private static final int MY_REQUEST_CODE = 100;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.hideActionBar();
 
         setContentView(R.layout.activity_login);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                }, MY_REQUEST_CODE);
+            }
+        }
         ButterKnife.bind(this);
         initSource();
         initView();
@@ -95,7 +110,21 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         tvMessage.setVisibility(View.VISIBLE);
         tvMessage.setText(message);
     }
-
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_REQUEST_CODE: {
+                if (grantResults.length == 0
+                        || grantResults[0] != PackageManager.PERMISSION_GRANTED
+                        || grantResults[1] != PackageManager.PERMISSION_GRANTED
+                        || grantResults[2] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(LoginActivity.this, "Unable to show permission required", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+        }
+    }
     @Override
     public void hideTextMessage() {
         tvMessage.setVisibility(View.INVISIBLE);

@@ -10,11 +10,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.5">
+        android:layout_weight="1.6">
 
         <RelativeLayout
             android:id="@+id/rlBanner"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/bg_changepass">
@@ -23,7 +23,7 @@
                 android:id="@+id/ibtn_frag_user_info_back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="1dp"
+                android:layout_margin="@dimen/_1sdp"
                 android:background="@null"
                 android:src="@mipmap/ic_back" />
 
@@ -32,17 +32,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_margin="15dp"
+                android:layout_margin="@dimen/_10sdp"
                 android:text="ĐỔI MẬT KHẨU"
                 android:textColor="@color/colorTextWhite"
-                android:textSize="20sp" />
+                android:textSize="@dimen/_18sdp" />
 
             <ImageView
                 android:id="@+id/iv_frag_main_avatar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
+                android:layout_below="@+id/tvTitle"
                 android:src="@drawable/avatar" />
 
             <TextView
@@ -51,10 +51,10 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/iv_frag_main_avatar"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="@dimen/_5sdp"
                 tools:text="Username"
                 android:textColor="@color/colorTextWhite"
-                android:textSize="22sp" />
+                android:textSize="@dimen/_20sdp" />
 
             <TextView
                 android:id="@+id/tvSDT"
@@ -62,10 +62,11 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvUsername"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_marginBottom="@dimen/_5sdp"
                 tools:text="0987 212 472"
                 android:textColor="@color/colorTextWhite"
-                android:textSize="22sp" />
+                android:textSize="@dimen/_20sdp" />
 
         </RelativeLayout>
     </LinearLayout>
@@ -73,10 +74,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
-        android:layout_weight="1.5"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_weight="1.4"
         android:orientation="vertical"
-        android:padding="20dp"
+        android:padding="@dimen/_10sdp"
         android:weightSum="3">
 
         <EditText
@@ -87,6 +88,7 @@
             android:background="@drawable/bg_edittext_border"
             android:drawableLeft="@mipmap/ic_tick"
             android:hint="Mật khẩu cũ"
+            android:textSize="@dimen/_13sdp"
             android:maxLength="18"
             android:inputType="textPassword" />
 
@@ -94,11 +96,12 @@
             android:id="@+id/etMatKhauMoi"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/_20sdp"
             android:layout_weight="1"
             android:background="@drawable/bg_edittext_border"
             android:drawableLeft="@mipmap/ic_matkhau"
             android:hint="Mật khẩu mới"
+            android:textSize="@dimen/_13sdp"
             android:maxLength="18"
             android:inputType="textPassword" />
 
@@ -106,12 +109,13 @@
             android:id="@+id/etNhapLaiMatKhauMoi"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/_20sdp"
             android:layout_weight="1"
             android:background="@drawable/bg_edittext_border"
             android:drawableLeft="@mipmap/ic_matkhau"
             android:hint="Nhập lại mật khẩu mới"
             android:imeOptions="actionDone"
+            android:textSize="@dimen/_13sdp"
             android:maxLength="18"
             android:inputType="textPassword" />
     </LinearLayout>
@@ -119,8 +123,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginLeft="@dimen/_20sdp"
+        android:layout_marginRight="@dimen/_20sdp"
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:orientation="vertical"
@@ -135,28 +139,29 @@
             android:gravity="center"
             android:text="dadasdasdasdadasdsadasdasdadsadsadasdasdsadasdasdsadsad"
             android:textColor="@color/colorRed"
+            android:textSize="@dimen/_13sdp"
             android:textStyle="italic" />
 
         <LinearLayout
             android:id="@+id/ll_ac_dangnhap_login"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginBottom="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_weight="1"
             android:orientation="vertical"
             android:weightSum="1">
 
             <Button
-                android:padding="20dp"
-                android:background="@drawable/bg_button"
-                android:textSize="22sp"
                 android:id="@+id/btn_ac_change_pass"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:text="Đổi mật khẩu"
                 android:textColor="@color/colorTextWhite"
                 android:textStyle="bold"
+                android:background="@drawable/bg_button"
+                android:textSize="@dimen/_20sdp"
                 android:visibility="visible" />
 
             <ProgressBar
@@ -168,8 +173,5 @@
                 android:background="@drawable/pbar_cricle"
                 android:visibility="gone" />
         </LinearLayout>
-
-
     </LinearLayout>
-
 </LinearLayout>
