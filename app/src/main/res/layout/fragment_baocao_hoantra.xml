@@ -11,14 +11,14 @@
         android:orientation="horizontal"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="10dp">
+        android:layout_marginRight="@dimen/_5sdp"
+        android:layout_marginTop="@dimen/_10sdp">
 
         <RadioButton
             android:id="@+id/rbMaKH"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
+            android:textSize="@dimen/_12sdp"
             android:checked="true"
             android:text="Mã KH"/>
 
@@ -26,9 +26,9 @@
             android:id="@+id/rbTenKH"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="15dp"
+            android:layout_marginRight="@dimen/_15sdp"
             android:text="Tên KH"
-            android:textSize="14sp" />
+            android:textSize="@dimen/_12sdp" />
 
     </RadioGroup>
 
@@ -38,15 +38,15 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginLeft="@dimen/_15sdp"
+        android:layout_marginRight="@dimen/_5sdp"
+        android:layout_marginTop="@dimen/_10sdp"
         android:layout_toLeftOf="@+id/rgSearch"
         android:background="@drawable/bg_edittext_border"
         android:drawableLeft="@drawable/ic_search_black_24dp"
         android:hint="Tìm kiếm báo cáo"
-        android:padding="5dp"
-        android:textSize="14sp" />
+        android:padding="@dimen/_5sdp"
+        android:textSize="@dimen/_12sdp" />
 
     <!--<LinearLayout-->
     <!--android:id="@+id/llDate"-->
@@ -102,9 +102,9 @@
         android:layout_centerHorizontal="true"
         android:text="-"
         android:layout_below="@+id/rgSearch"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"/>
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_marginRight="@dimen/_10sdp"/>
 
     <EditText
         android:id="@+id/etTuNgay"
@@ -112,8 +112,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/rgSearch"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginLeft="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_5sdp"
         android:layout_toLeftOf="@+id/tvGachNgang"
         android:background="@drawable/bg_edittext_border"
         android:drawableLeft="@mipmap/ic_calendar"
@@ -125,8 +125,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/rgSearch"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginRight="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_5sdp"
         android:layout_toRightOf="@+id/tvGachNgang"
         android:background="@drawable/bg_edittext_border"
         android:drawableLeft="@mipmap/ic_calendar"
@@ -139,11 +139,11 @@
         android:text="TÌM KIẾM"
         android:background="@drawable/bg_button"
         android:textColor="@color/colorTextWhite"
-        android:paddingLeft="50dp"
-        android:paddingRight="50dp"
+        android:paddingLeft="@dimen/_50sdp"
+        android:paddingRight="@dimen/_50sdp"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/etDenNgay"
-        android:layout_margin="10dp"/>
+        android:layout_margin="@dimen/_10sdp"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvDanhSach"
@@ -160,7 +160,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
-        android:padding="15dp">
+        android:padding="@dimen/_15sdp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -170,12 +170,12 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/textView10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Hoá Đơn"
-                android:textSize="15sp" />
+                android:textSize="@dimen/_13sdp" />
 
             <TextView
                 android:id="@+id/txtSoHD"
@@ -183,7 +183,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="5"
-                android:textSize="36sp"
+                android:textSize="@dimen/_26sdp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -200,7 +200,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Tổng Tiền"
-                android:textSize="15sp" />
+                android:textSize="@dimen/_13sdp" />
 
             <TextView
                 android:id="@+id/txtTongTien"
@@ -209,7 +209,7 @@
                 android:layout_weight="1"
                 android:text="5"
                 android:textColor="@color/colorRed"
-                android:textSize="36sp"
+                android:textSize="@dimen/_26sdp"
                 android:textStyle="bold" />
         </LinearLayout>
 

@@ -9,4 +9,6 @@ import views.ecpay.com.postabletecpay.view.ICommonView;
 public interface IMainView extends ICommonView{
 
     void showTextMessage(String textMessage);
+
+    void refreshInfoMain();
 }

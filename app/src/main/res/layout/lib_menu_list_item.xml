@@ -8,9 +8,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="left|center_vertical"
-        android:layout_margin="10dip"
-        android:layout_marginLeft="5dip"
-        android:layout_marginRight="5dip"
+        android:layout_margin="@dimen/_8sdp"
+        android:layout_marginLeft="@dimen/_5sdp"
+        android:layout_marginRight="@dimen/_5sdp"
         android:ellipsize="marquee"
         android:singleLine="true"
         android:text="item"
@@ -27,6 +27,6 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:src="@drawable/ic_chevron_right_black_24dp"
-        android:layout_marginRight="5dp" />
+        android:layout_marginRight="@dimen/_5sdp" />
 
 </RelativeLayout>

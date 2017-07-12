@@ -25,10 +25,10 @@
                 android:layout_alignParentTop="true"
                 android:background="@color/colorTextBlack"
                 android:gravity="center_horizontal"
-                android:padding="5dp"
+                android:padding="@dimen/_2sdp"
                 android:text="Vui lòng căn chỉnh mã vạch vào hình chữ nhật."
                 android:textColor="@color/colorTextWhite"
-                android:textSize="22dp"
+                android:textSize="@dimen/_10sdp"
                 android:textStyle="bold" />
             
             <LinearLayout
@@ -52,7 +52,7 @@
             <LinearLayout
                 android:id="@+id/rv_db_1"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_24sdp"
                 android:layout_alignParentBottom="true"
                 android:orientation="horizontal"
                 android:weightSum="6">
@@ -62,9 +62,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_button_corner_left_bottom"
-                    android:text="Refresh" />
+                    android:layout_weight="1.2"
+                    android:textSize="@dimen/_10sdp"
+                    android:textAllCaps="false"
+
+                    android:background="@drawable/bg_white"
+                    android:text="Quét mới" />
 
                 <TextView
                     android:id="@+id/tv_dialog_barcode_text"
@@ -73,7 +76,7 @@
                     android:layout_centerInParent="true"
                     android:layout_toLeftOf="@+id/btn_dialog_barcode_ok"
                     android:layout_toRightOf="@+id/btn_dialog_barcode_cancel"
-                    android:layout_weight="4"
+                    android:layout_weight="3.6"
                     android:background="@color/colorTextBlack"
                     android:gravity="center_horizontal|center_vertical"
                     android:hint="Kết quả....."
@@ -81,15 +84,17 @@
                     android:scrollHorizontally="true"
                     android:textColor="@color/colorTextWhite"
                     android:textColorHint="@color/colorTextWhite"
-                    android:textSize="22sp" />
+                    android:textSize="@dimen/_10sdp" />
 
                 <Button
                     android:id="@+id/btn_dialog_barcode_ok"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_button_conrner_right_bottom"
+                    android:layout_weight="1.2"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/_10sdp"
+                    android:background="@drawable/bg_white"
                     android:text="OK" />
 
             </LinearLayout>

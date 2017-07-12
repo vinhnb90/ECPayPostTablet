@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="5dp">
+    android:padding="@dimen/_5sdp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,11 +14,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_drop_up_black_24dp"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="@dimen/_15sdp"
             android:scaleX="2"
             android:scaleY="2.5"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="-8dp"/>
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginBottom="@dimen/_5sdp"/>
 
     </LinearLayout>
 
@@ -37,10 +37,10 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:gravity="left|center_vertical"
-            android:paddingBottom="5dip"
-            android:paddingLeft="10dip"
-            android:paddingRight="10dip"
-            android:paddingTop="5dip"
+            android:paddingBottom="@dimen/_5sdp"
+            android:paddingLeft="@dimen/_8sdp"
+            android:paddingRight="@dimen/_8sdp"
+            android:paddingTop="@dimen/_5sdp"
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#FFFFFF"
@@ -53,7 +53,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:divider="#B0B0B0"
-            android:dividerHeight="1dp" />
+            android:dividerHeight="@dimen/_1sdp" />
 
     </LinearLayout>
 </LinearLayout>

@@ -10,9 +10,9 @@ import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
  */
 
 public interface IPayPresenter {
-    void callPayRecycler(String mEdong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch, boolean isSeachOnline);
+    void callPayRecycler(String mEdong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch, boolean isSeachOnline) throws Exception;
 
-    void callSearchOnline(String mEdong, String infoSearch, boolean isReseach);
+    void callSearchOnline(String mEdong, String infoSearch, boolean isReseach) throws Exception;
 
     void cancelSeachOnline();
 

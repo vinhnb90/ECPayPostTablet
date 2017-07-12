@@ -93,7 +93,13 @@ public class ChangePassActivity extends ActionBarActivity implements IChangePass
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                ChangePassActivity.this.finish();
+                try {
+                    ChangePassActivity.this.finish();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         }, TIME_DELAY_ANIM);
     }

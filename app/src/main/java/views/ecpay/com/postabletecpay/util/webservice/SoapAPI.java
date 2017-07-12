@@ -105,6 +105,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchCustome
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.GetPCInfo.GetPCInfoRespone;
 
+import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
 
 /**
@@ -371,7 +372,7 @@ public class SoapAPI {
     //region create JSON Request service
     public static String getJsonSearchCustomer(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver,
                                                String signatureEncrypted, String code, String name, String phone, String address,
-                                               String gcs, String pcCode, int directEvn, String accountId){
+                                               String gcs, String pcCode, int directEvn, String accountId) {
         if (agent == null || agent.isEmpty() || agent.trim().equals(""))
             return null;
         if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
@@ -423,8 +424,7 @@ public class SoapAPI {
         //Serialised
         final String jsonResult = gson.toJson(request, type);
 
-        if(TEST_REQUEST)
-        {
+        if (TEST_REQUEST) {
             //Test Deserialised
             final SearchCustomerRequest parsedRequest = gson.fromJson(jsonResult, SearchCustomerRequest.class);
             Log.d("LOG", "jsonResult = " + jsonResult);
@@ -432,9 +432,10 @@ public class SoapAPI {
 
         return jsonResult;
     }
+
     //region create JSON Request service
     public static String getJsonSearchCustomerBill(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver,
-                                               String signatureEncrypted, String code, String accountId){
+                                                   String signatureEncrypted, String code, String accountId) {
         if (agent == null || agent.isEmpty() || agent.trim().equals(""))
             return null;
         if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
@@ -480,8 +481,7 @@ public class SoapAPI {
         //Serialised
         final String jsonResult = gson.toJson(request, type);
 
-        if(TEST_REQUEST)
-        {
+        if (TEST_REQUEST) {
             //Test Deserialised
             final SearchCustomerBillRequest parsedRequest = gson.fromJson(jsonResult, SearchCustomerBillRequest.class);
             Log.d("LOG", "jsonResult = " + jsonResult);
@@ -489,10 +489,11 @@ public class SoapAPI {
 
         return jsonResult;
     }
+
     //region create JSON Request service
     public static String getJsonMapCustomerCard(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver,
-                                                   String signatureEncrypted, String eCard, String cusCode, Long status, String phoneEcpay, String bankAcc,
-                                            String idNumer, String bankName, String accountId){
+                                                String signatureEncrypted, String eCard, String cusCode, Long status, String phoneEcpay, String bankAcc,
+                                                String idNumer, String bankName, String accountId) {
         if (agent == null || agent.isEmpty() || agent.trim().equals(""))
             return null;
         if (agentEncypted == null || agentEncypted.isEmpty() || agentEncypted.trim().equals(""))
@@ -544,8 +545,7 @@ public class SoapAPI {
         //Serialised
         final String jsonResult = gson.toJson(request, type);
 
-        if(TEST_REQUEST)
-        {
+        if (TEST_REQUEST) {
             //Test Deserialised
             final MapCustomerCardRequest parsedRequest = gson.fromJson(jsonResult, MapCustomerCardRequest.class);
             Log.d("LOG", "jsonResult = " + jsonResult);
@@ -553,7 +553,6 @@ public class SoapAPI {
 
         return jsonResult;
     }
-
 
     //region create JSON Request service
     public static String getJsonSyncPC(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver, String signatureEncrypted, String edong, String accountId) {
@@ -1169,6 +1168,13 @@ public class SoapAPI {
         protected LoginResponseReponse doInBackground(String... jsons) {
             String json = jsons[0];
             Log.d("here", "doInBackground: " + json);
+
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.LOGIN.toString(), true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
 
@@ -1193,6 +1199,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.LOGIN.toString(), false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -1271,6 +1284,11 @@ public class SoapAPI {
         @Override
         protected ChangePassResponse doInBackground(String... jsons) {
             String json = jsons[0];
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.CHANGE_PIN.toString(),true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
 
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
@@ -1298,6 +1316,12 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.CHANGE_PIN.toString(),false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -1354,7 +1378,6 @@ public class SoapAPI {
         }
     }
 
-
     public static class AsyncSoapCashTranfer extends AsyncTask<String, String, CashTranferRespone> {
 
         //request action to eStore
@@ -1379,6 +1402,11 @@ public class SoapAPI {
         @Override
         protected CashTranferRespone doInBackground(String... jsons) {
             String json = jsons[0];
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.CASH_TRANSFER.toString(),true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
 
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
@@ -1406,6 +1434,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.CASH_TRANSFER.toString(),false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -1489,6 +1524,12 @@ public class SoapAPI {
         protected GetPCInfoRespone doInBackground(String... jsons) {
             String json = jsons[0];
 
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.GET_PC_INFO.toString(),true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
 
@@ -1515,6 +1556,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.GET_PC_INFO.toString(),false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -1572,7 +1620,6 @@ public class SoapAPI {
         }
     }
 
-
     public static class AsyncSoapSearchCustomer extends AsyncTask<String, String, SearchCustomerRespone> {
 
         //request action to eStore
@@ -1584,7 +1631,7 @@ public class SoapAPI {
         private AsyncSoapCallBack callBack;
         private boolean isEndCallSoap = false;
 
-        public AsyncSoapSearchCustomer( AsyncSoapCallBack callBack) throws Exception {
+        public AsyncSoapSearchCustomer(AsyncSoapCallBack callBack) throws Exception {
             this.callBack = callBack;
         }
 
@@ -1692,7 +1739,7 @@ public class SoapAPI {
         private AsyncSoapCallBack callBack;
         private boolean isEndCallSoap = false;
 
-        public AsyncSoapSearchCustomerBill( AsyncSoapCallBack callBack) throws Exception {
+        public AsyncSoapSearchCustomerBill(AsyncSoapCallBack callBack) throws Exception {
             this.callBack = callBack;
         }
 
@@ -1789,7 +1836,7 @@ public class SoapAPI {
         }
     }
 
-    public static class AsyncSoap<T extends Respone> extends AsyncTask<String, String,  T> {
+    public static class AsyncSoap<T extends Respone> extends AsyncTask<String, String, T> {
 
         Class<T> classType;
 
@@ -1802,7 +1849,7 @@ public class SoapAPI {
         private AsyncSoapCallBack callBack;
         private boolean isEndCallSoap = false;
 
-        public AsyncSoap( Class<T> type, AsyncSoapCallBack callBack) throws Exception {
+        public AsyncSoap(Class<T> type, AsyncSoapCallBack callBack) throws Exception {
             this.callBack = callBack;
             this.classType = type;
         }
@@ -1816,6 +1863,11 @@ public class SoapAPI {
         @Override
         protected T doInBackground(String... jsons) {
             String json = jsons[0];
+            try {
+                Common.writeLog(json, "Chưa rõ---Xem thông số header",true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
 
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
@@ -1843,6 +1895,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, "Chưa rõ---Xem thông số header",false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -1874,7 +1933,7 @@ public class SoapAPI {
             callBack.onPost(respone);
         }
 
-        public static abstract class AsyncSoapCallBack<T extends  Respone> {
+        public static abstract class AsyncSoapCallBack<T extends Respone> {
             public abstract void onPre(final AsyncSoap soap);
 
             public abstract void onUpdate(String message);
@@ -1899,7 +1958,6 @@ public class SoapAPI {
             isEndCallSoap = endCallSoap;
         }
     }
-
 
     public static class AsyncSoapIncludeTimout<T extends Respone> extends AsyncTask<String, String,  T> {
 
@@ -2086,6 +2144,13 @@ public class SoapAPI {
         @Override
         protected SearchOnlineResponse doInBackground(String... jsons) {
             String json = jsons[0];
+
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.CUSTOMER_BILL.toString(),true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             Log.d("here", "doInBackground: " + json);
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
@@ -2111,6 +2176,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.CUSTOMER_BILL.toString(),false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -2214,7 +2286,13 @@ public class SoapAPI {
         @Override
         protected LogoutResponse doInBackground(String... jsons) {
             String json = jsons[0];
-            Log.d("here", "doInBackground: " + json);
+
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.LOGOUT.toString(),true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
 
@@ -2239,6 +2317,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.LOGOUT.toString(),false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -2343,7 +2428,13 @@ public class SoapAPI {
         @Override
         protected BillingOnlineRespone doInBackground(String... jsons) {
             String json = jsons[0];
-            Log.d("here", "doInBackground: " + json);
+
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.BILLING.toString(),true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
 
@@ -2370,6 +2461,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.BILLING.toString(),false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -2471,7 +2569,13 @@ public class SoapAPI {
         @Override
         protected CheckTrainOnlineResponse doInBackground(String... jsons) {
             String json = jsons[0];
-            Log.d("here", "doInBackground: " + json);
+
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.CHECK_TRANS.toString(),true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
 
@@ -2496,6 +2600,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.CHECK_TRANS.toString(),false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -2589,6 +2700,14 @@ public class SoapAPI {
         protected CheckTrainOnlineResponse doInBackground(String... jsons) {
             String json = jsons[0];
             Log.d("here", "doInBackground: " + json);
+
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.CHECK_TRANS.toString(),true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
+
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
 
@@ -2613,6 +2732,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.CHECK_TRANS.toString(),false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -2710,7 +2836,13 @@ public class SoapAPI {
         @Override
         protected DeleteBillOnlineRespone doInBackground(String... jsons) {
             String json = jsons[0];
-            Log.d("here", "doInBackground: " + json);
+
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.TRANSACTION_CANCELLATION.toString(),true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
 
@@ -2735,6 +2867,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.TRANSACTION_CANCELLATION.toString(),false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -2831,7 +2970,13 @@ public class SoapAPI {
         @Override
         protected ListEVNReponse doInBackground(String... jsons) {
             String json = jsons[0];
-            Log.d("here", "doInBackground: " + json);
+
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER.toString(),true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
 
@@ -2856,6 +3001,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER.toString(),false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -2944,7 +3096,13 @@ public class SoapAPI {
         @Override
         protected ListDataResponse doInBackground(String... jsons) {
             String json = jsons[0];
-            Log.d("here", "doInBackground: " + json);
+
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.SYNC_DATA.toString(),true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
 
@@ -2969,6 +3127,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.SYNC_DATA.toString(),false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -3058,7 +3223,13 @@ public class SoapAPI {
         @Override
         protected ListDataZipResponse doInBackground(String... jsons) {
             String json = jsons[0];
-            Log.d("here", "doInBackground: " + json);
+
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.GET_FILE_GEN.toString(),true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
 
@@ -3083,6 +3254,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.GET_FILE_GEN.toString(),false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;
@@ -3174,7 +3352,13 @@ public class SoapAPI {
         @Override
         protected PostBillResponse doInBackground(String... jsons) {
             String json = jsons[0];
-            Log.d("here", "doInBackground: " + json);
+
+            try {
+                Common.writeLog(json, Common.COMMAND_ID.PUT_TRANSACTION_OFF.toString(),true);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
             request.addProperty(METHOD_PARAM, json);
 
@@ -3199,6 +3383,13 @@ public class SoapAPI {
             }
 
             String data = response.toString();
+
+            try {
+                Common.writeLog(data, Common.COMMAND_ID.PUT_TRANSACTION_OFF.toString(),false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
             if (data.isEmpty()) {
                 publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return null;

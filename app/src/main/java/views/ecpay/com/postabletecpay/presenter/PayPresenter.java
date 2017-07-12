@@ -403,7 +403,12 @@ public class PayPresenter implements IPayPresenter {
                 List<PayAdapter.DataAdapter> adapters = new ArrayList<PayAdapter.DataAdapter>();
                 adapters.add(dataAdapter);
 
-                mIPayView.showPayRecyclerPage(adapters, 0, 0, 1, 1, "", false);
+                try {
+                    mIPayView.showPayRecyclerPage(adapters, 0, 0, 1, 1, "", false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    mIPayView.hideSearchOnlineProcess();
+                }
 
             }
         }

@@ -10,6 +10,7 @@
         android:id="@+id/tvNgay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="@dimen/_12sdp"
         android:text="02/12/2016"
         android:layout_centerVertical="true"/>
 
@@ -17,10 +18,11 @@
         android:id="@+id/tv_fragment_thanh_toan_total_bills_money"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="@dimen/_12sdp"
         android:text="1.000.000 đ"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/tvNgay"
-        android:layout_marginLeft="20dp"/>
+        android:layout_marginLeft="@dimen/_15sdp"/>
 
     <TextView
         android:id="@+id/tvTinhTrang"
@@ -29,8 +31,9 @@
         android:text="Chưa thanh toán"
         android:textColor="@color/colorRed"
         android:layout_centerVertical="true"
+        android:textSize="@dimen/_12sdp"
         android:layout_toRightOf="@+id/tv_fragment_thanh_toan_total_bills_money"
-        android:layout_marginLeft="20dp"/>
+        android:layout_marginLeft="@dimen/_15sdp"/>
 
     <ImageButton
         android:id="@+id/ibChiTiet"

@@ -1,7 +1,9 @@
 package views.ecpay.com.postabletecpay.view.Main;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -47,13 +49,13 @@ public class MainActivity extends AppCompatActivity implements
         BaoCaoFragment.OnFragmentInteractionListener,
         UserInfoFragment.OnFragmentInteractionListener{
 
-
-
-    private  IOnPauseScannerBarcodeListner pauseScannerBarcodeListner;
+    private IOnPauseScannerBarcodeListner pauseScannerBarcodeListner;
 
     public static BottomNavigationView sNavigation;
     public static String mEdong;
     private IMainPresenter iMainPresenter;
+    private static boolean isLoginCall;
+
     @Override
     public Context getContextView() {
         return this;
@@ -64,6 +66,17 @@ public class MainActivity extends AppCompatActivity implements
         Toast.makeText(this, textMessage, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void refreshInfoMain() {
+        //check fragment
+        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+            return;
+        }
+
+        if (fragmentVisibling instanceof MainPageFragment)
+            ((MainPageFragment) fragmentVisibling).refreshInfoMain();
+    }
 
     public enum ID_MENU_BOTTOM {
         HOME(1),
@@ -112,6 +125,10 @@ public class MainActivity extends AppCompatActivity implements
 
     };
 
+    public MainActivity() {
+        super();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -137,7 +154,16 @@ public class MainActivity extends AppCompatActivity implements
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                iMainPresenter.synchronizePC();
+                if (isLoginCall) {
+                    try {
+                        iMainPresenter.synchronizePC();
+                    } catch (Exception e) {
+                        showTextMessage(e.getMessage());
+                        e.printStackTrace();
+                    } finally {
+                        isLoginCall = false;
+                    }
+                }
             }
         });
 
@@ -146,19 +172,6 @@ public class MainActivity extends AppCompatActivity implements
         fragmentTransaction.commit();
 
         sNavigation = (BottomNavigationView) findViewById(R.id.navigation_ac_main);
-
-
-       /* BottomNavigationMenuView menuView = (BottomNavigationMenuView) sNavigation.getChildAt(0);
-        for (int i = 0; i < menuView.getChildCount(); i++) {
-            final View iconView = menuView.getChildAt(i).findViewById(android.support.design.R.id.icon);
-            menuView.getChildAt(i).get
-            final ViewGroup.LayoutParams layoutParams = iconView.getLayoutParams();
-            final DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-            layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, displayMetrics);
-            layoutParams.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, displayMetrics);
-            iconView.setLayoutParams(layoutParams);
-        }*/
-
         sNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
     }
@@ -178,8 +191,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-
+        this.refreshInfoMain();
     }
+
 
     @Override
     protected void onDestroy() {
@@ -191,8 +205,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_BARCODE && resultCode == RESPONSE_BARCODE & data != null) {
 
-            if(pauseScannerBarcodeListner != null)
-            {
+            if (pauseScannerBarcodeListner != null) {
                 pauseScannerBarcodeListner.pause();
             }
 
@@ -216,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void getBundle() {
         mEdong = getIntent().getExtras().getString(KEY_EDONG, "");
-//        mEdong = "01656226909";
+        isLoginCall = true;
     }
 
     public static void updateNavigationBarState(int actionId) {
@@ -305,18 +318,6 @@ public class MainActivity extends AppCompatActivity implements
 
 
     //region PayFragment.CallbackPayingOnlineDialog
-//    @Override
-//    public void processOnDismissPayingOnlineDialog() {
-//        //check fragment
-//        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-//        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
-//            return;
-//        }
-//        if (fragmentVisibling instanceof PayFragment) {
-//            ((PayFragment) fragmentVisibling).bindViewAgain();
-//            ((PayFragment) fragmentVisibling).refreshRecyclerListFragment();
-//        }
-//    }
 
     //endregion
 
@@ -339,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements
     }
     //endregion
 
-    public  interface  IOnPauseScannerBarcodeListner {
+    public interface IOnPauseScannerBarcodeListner {
         public void pause();
     }
 

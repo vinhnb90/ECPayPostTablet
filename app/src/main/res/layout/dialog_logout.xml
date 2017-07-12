@@ -6,9 +6,9 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     app:cardBackgroundColor="@android:color/white"
-    app:cardCornerRadius="5dp"
-    android:layout_margin="50dp"
-    app:cardElevation="5dp">
+    app:cardCornerRadius="@dimen/_5sdp"
+    android:layout_margin="@dimen/_50sdp"
+    app:cardElevation="@dimen/_5sdp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,12 +29,13 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimary"
                 android:gravity="center_horizontal"
-                android:padding="15dp"
+                android:padding="@dimen/_5sdp"
+
                 android:text="ĐĂNG XUẤT"
                 android:textAllCaps="true"
                 android:textColor="@android:color/white"
-                android:textSize="24sp"
-                android:textStyle="normal" />
+                android:textSize="@dimen/_12sdp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_dialog_layout_message"
@@ -42,33 +43,34 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:gravity="center_horizontal"
-                android:padding="15dp"
+                android:padding="@dimen/_5sdp"
                 android:text="Đăng xuất phiên làm việc trên thiết bị này."
-                android:textSize="20sp" />
+                android:textSize="@dimen/_10sdp" />
         </LinearLayout>
 
         <RelativeLayout
             android:id="@+id/rv_diaglog_logout_process"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginLeft="@dimen/_20sdp"
+            android:layout_marginRight="@dimen/_20sdp"
             android:layout_toRightOf="@+id/tv_search"
             android:background="@color/colorDarkOrange"
             android:orientation="horizontal">
 
             <TextView
-                android:padding="5dp"
+                android:padding="@dimen/_2sdp"
                 android:id="@+id/tv_diaglog_logout_response"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:textColor="@color/colorTextWhite"
+                android:textSize="@dimen/_10sdp"
                 android:visibility="visible"
                 tools:text="Message Lỗi" />
 
             <ProgressBar
-                android:padding="5dp"
+                android:padding="@dimen/_2sdp"
                 android:id="@+id/pbar_diaglog_logout"
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
@@ -86,7 +88,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:gravity="center_horizontal"
             android:orientation="horizontal"
             android:weightSum="3">
@@ -94,21 +96,21 @@
             <Button
                 android:id="@+id/btn_dialog_logout_cancel"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="50dp"
+                android:layout_height="@dimen/_24sdp"
+                android:layout_marginRight="@dimen/_20sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_gray"
-                android:padding="15dp"
+                android:textSize="@dimen/_10sdp"
                 android:text="Bỏ qua"
                 android:textAllCaps="false" />
 
             <Button
                 android:id="@+id/btn_dialog_logout_ok"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_24sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_orange"
-                android:padding="15dp"
+                android:textSize="@dimen/_10sdp"
                 android:text="Chấp nhận"
                 android:textAllCaps="false" />
 

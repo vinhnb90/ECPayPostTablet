@@ -293,7 +293,11 @@ public class PayFragment extends Fragment implements
         //first page
         typeSearch = Common.TYPE_SEARCH.ALL;
         mPageIndex = FIRST_PAGE_INDEX;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        try {
+            mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        } catch (Exception e) {
+
+        }
 
 
         List<String> list = new ArrayList<>();
@@ -350,7 +354,11 @@ public class PayFragment extends Fragment implements
             return;
 
         mPageIndex += PAGE_INCREMENT;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        try {
+            mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Optional
@@ -360,7 +368,11 @@ public class PayFragment extends Fragment implements
             return;
 
         mPageIndex -= PAGE_INCREMENT;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        try {
+            mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Optional
@@ -470,7 +482,11 @@ public class PayFragment extends Fragment implements
         boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
         if (isSeachOnline)
             return;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString().trim(), false);
+        try {
+            mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString().trim(), false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean checkUserNeedSearchOnline(String infoSearch) {
@@ -508,7 +524,11 @@ public class PayFragment extends Fragment implements
 
         if (isSeachOnline) {
             typeSearch = Common.TYPE_SEARCH.MA_KH_SO_THE;
-            mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), isSeachOnline);
+            try {
+                mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), isSeachOnline);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             this.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -520,7 +540,11 @@ public class PayFragment extends Fragment implements
         } else {
             if (typeSearch != Common.TYPE_SEARCH.ALL)
             {
-                mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), isSeachOnline);
+                try {
+                    mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), isSeachOnline);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             hideSearchOnlineProcess();
         }
@@ -1138,10 +1162,6 @@ public class PayFragment extends Fragment implements
             btnPayDialog.setEnabled(true);
             btnCancelDialog.setEnabled(true);
         }
-    }
-
-    public void refreshRecyclerListFragment() {
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
     }
 
     private void setUpRecyclerFragment(final View view) {

@@ -58,6 +58,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.security.PrivateKey;
 import java.text.DecimalFormatSymbols;
@@ -300,10 +301,10 @@ public class Common {
         }
 
         public Integer getCode() {
-            if(this == NULL)
+            if (this == NULL)
                 return null;
             else
-            return Common.intConvertNull(code);
+                return Common.intConvertNull(code);
         }
 
         public String getMessage() {
@@ -340,7 +341,7 @@ public class Common {
             if (this == NULL)
                 return null;
             else
-            return Common.intConvertNull(code);
+                return Common.intConvertNull(code);
         }
 
         public String getMessage() {
@@ -471,7 +472,7 @@ public class Common {
         }
 
         public Integer getCode() {
-           return code;
+            return code;
         }
 
         public String getMessage() {
@@ -542,7 +543,7 @@ public class Common {
         }
 
         public Integer getCode() {
-           return code;
+            return code;
         }
 
         public String getMessage() {
@@ -633,10 +634,10 @@ public class Common {
                 return "Kiểm tra kết nối internet của wifi!";
 
             if (LOGIN_ERR_USER == this)
-                return "Tên đăng nhập là chữ thường, chữ hoa, các kí tự đặc biệt, từ 6 tới 18 kí tự và không để trống!";
+                return "Tên đăng nhập là chữ thường, chữ hoa, các kí tự đặc biệt, dưới 8 kí tự và không để trống!";
 
             if (LOGIN_ERR_PASS == this)
-                return "Mật khẩu là chữ thường, chữ hoa, các kí tự đặc biệt, từ 6 tới 18 kí tự và không để trống!";
+                return "Mật khẩu là chữ thường, chữ hoa, các kí tự đặc biệt, dưới 8 kí tự và không để trống!";
 
             if (ERR_CREATE_FOLDER == this)
                 return "Xảy ra vấn đề khi tạo thư mục chứa tài nguyên trên SDCard!";
@@ -663,13 +664,13 @@ public class Common {
                 return "Quá thời gian kết nối cho phép tới máy chủ " + TIME_OUT_CONNECT / 1000 + " s";
 
             if (CHANGE_PASS_ERR_PASS_OLD == this)
-                return "Mật khẩu cũ không hợp lệ, số kí tự giới hạn từ 6 tới 18 kí tự!";
+                return "Mật khẩu cũ không hợp lệ, giới hạn 8 kí tự!";
 
             if (CHANGE_PASS_ERR_PASS_NEW == this)
-                return "Mật khẩu mới không hợp lệ, số kí tự giới hạn từ 6 tới 18 kí tự!";
+                return "Mật khẩu mới không hợp lệ, giới hạn 8 kí tự!";
 
             if (CHANGE_PASS_ERR_PASS_RETYPE == this)
-                return "Mật khẩu mới nhập lại không hợp lệ, số kí tự giới hạn từ 6 tới 18 kí tự!";
+                return "Mật khẩu mới nhập lại không hợp lệ, giới hạn 8 kí tự!";
 
             if (CHANGE_PASS_ERR_PASS_NEW_NOT_EQUAL_PASS_OLD == this)
                 return "Mật khẩu mới không trùng với mật khẩu cũ!";
@@ -1285,13 +1286,13 @@ public class Common {
                 return "PUT-TRANSACTION-OFF";
             if (this == CASH_TRANSFER)
                 return "CASH-TRANSFER";
-            if(this == GET_PC_INFO)
-                return  "GET-PC-INFO";
-            if(this == SEARCH_CUSTOMER)
-                return  "CUSTOMER";
-            if(this == SEARCH_CUSTOMER_BILL)
-                return  "CUSTOMER-BILL";
-            if(this == MAP_CUSTOMER_CARD)
+            if (this == GET_PC_INFO)
+                return "GET-PC-INFO";
+            if (this == SEARCH_CUSTOMER)
+                return "CUSTOMER";
+            if (this == SEARCH_CUSTOMER_BILL)
+                return "CUSTOMER-BILL";
+            if (this == MAP_CUSTOMER_CARD)
                 return "MAP-CUSTOMER-CARD";
             if(this == BALANCE)
                 return "BALANCE";
@@ -1322,6 +1323,7 @@ public class Common {
     public static final String PATH_FOLDER_DOWNLOAD = PATH_FOLDER_ROOT + "Download" + File.separator;
     //    public static final String PATH_FOLDER_DATA = PATH_FOLDER_ROOT + "Data" + File.separator;
     public static final String PATH_FOLDER_HELP = PATH_FOLDER_ROOT + "Help" + File.separator;
+    public static final String PATH_FOLDER_LOG = PATH_FOLDER_ROOT + "Log" + File.separator;
     //endregion
 
     //region info connect API SOAP
@@ -1333,6 +1335,7 @@ public class Common {
     public static final String CONFIG_FILENAME = "config.cfg";
     public static final String[] CFG_COLUMN = {"PUBLIC_KEY", "PRIVATE_KEY", "AGENT", "PASS_WORD", "PC_CODE"};
     public static final String HELP_FILENAME = "help.txt";
+    public static final String LOG_FILENAME = "log.txt";
     public static final String[] HELP_COLUMN = {"INFO_HELP"};
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -1438,11 +1441,49 @@ public class Common {
         }
     }
 
+    public static File makeRootFolderLog() throws Exception {
+        if (!isExternalStorageWritable())
+            return null;
+
+        File folderRoot = new File(PATH_FOLDER_ROOT);
+        if (!folderRoot.isDirectory()) {
+            folderRoot.mkdir();
+        }
+
+
+        File folderLog = new File(PATH_FOLDER_LOG);
+        if (!folderLog.isDirectory()) {
+            folderLog.mkdir();
+        }
+
+        File fileLog = new File(PATH_FOLDER_LOG + Common.LOG_FILENAME);
+
+        if (!fileLog.exists()) {
+            try {
+                fileLog.createNewFile();
+            } catch (IOException e) {
+                throw e;
+            }
+        }
+
+        fileLog = new File(PATH_FOLDER_LOG + Common.LOG_FILENAME);
+        return fileLog;
+    }
+
     public static void loadFolder(ContextWrapper ctx) {
         if (ctx == null)
             return;
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            // Load root folder
+            File rootFolder = new File(Common.PATH_FOLDER_ROOT);
+            String[] allFilesRoot = rootFolder.list();
+            for (int i = 0; i < allFilesRoot.length; i++) {
+                allFilesRoot[i] = Common.PATH_FOLDER_ROOT + allFilesRoot[i];
+            }
+            if (allFilesRoot != null)
+                scanFile(ctx, allFilesRoot);
+
             // Load config folder
             File file_config = new File(Common.PATH_FOLDER_CONFIG);
             String[] allFilesConfig = file_config.list();
@@ -1471,9 +1512,19 @@ public class Common {
             if (allFilesDb != null)
                 scanFile(ctx, allFilesDb);
 
+
+            // Load log folder
+            File fileLog = new File(Common.PATH_FOLDER_LOG);
+            String[] allFilesLog = fileLog.list();
+            for (int i = 0; i < allFilesLog.length; i++) {
+                allFilesLog[i] = Common.PATH_FOLDER_LOG + allFilesLog[i];
+            }
+            if (allFilesLog != null)
+                scanFile(ctx, allFilesLog);
+
             // Load download folder
             File file_download = new File(Common.PATH_FOLDER_DOWNLOAD);
-            String[] allFilesDownload = file_db.list();
+            String[] allFilesDownload = file_download.list();
 
             for (int i = 0; i < allFilesDownload.length; i++) {
                 allFilesDownload[i] = Common.PATH_FOLDER_DOWNLOAD + allFilesDownload[i];
@@ -1786,8 +1837,8 @@ public class Common {
     //endregion
 
     //region method process ecrypt and decrypt data
-    public static int MAX_LENGTH = 18;
-    public static int MIN_LENGTH = 6;
+    public static int MAX_LENGTH = 8;
+    public static int MIN_LENGTH = 1;
 
     public static int LENGTH_PASS = 8;
 
@@ -2567,12 +2618,93 @@ public class Common {
         return object = (object == null) ? 0 : object.intValue();
     }
     public static int parseInt(String object) {
-        try
-        {
+        try {
             return Integer.parseInt(object);
-        }catch (Exception e)
-        {
-            return  0;
+        } catch (Exception e) {
+            return 0;
         }
+    }
+
+    public static void writeLog(String text, String nameAPI, boolean isRequest) throws Exception {
+        try {
+            File fileLog = new File(PATH_FOLDER_LOG + Common.LOG_FILENAME);
+            if (!fileLog.exists())
+                try {
+                    fileLog = Common.makeRootFolderLog();
+                } catch (Exception e) {
+                    throw e;
+                }
+            String textOld = Common.getDataFileLog(fileLog);
+
+            PrintWriter writer = new PrintWriter(fileLog, "UTF-8");
+            writer.print(textOld);
+            writer.print("\n");
+            writer.print("\n");
+            writer.print("\n");
+            writer.println("====================================================");
+            if (isRequest)
+                writer.println(Common.getDateTimeNow(DATE_TIME_TYPE.FULL) + "----REQUEST-- " + nameAPI);
+            else
+                writer.println(Common.getDateTimeNow(DATE_TIME_TYPE.FULL) + "----RESPONSE-- " + nameAPI);
+            writer.println("====================================================");
+            writer.print("\n");
+            writer.println(text);
+            writer.print("\n");
+            writer.close();
+        } catch (IOException e) {
+            // do something
+        }
+
+    }
+
+    public static String getDataFileLog(File file) throws Exception {
+        if (!isExternalStorageWritable())
+            return TEXT_EMPTY;
+
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw e;
+            }
+//            if (!Common.createFileHelp(fileHelp)) return TEXT_EMPTY;
+        }
+
+        StringBuilder result = new StringBuilder();
+        String sCurrentLine = Common.TEXT_EMPTY;
+        BufferedReader br = null;
+        FileReader fr = null;
+
+        try {
+
+            InputStream inputStream = new FileInputStream(file);
+
+            fr = new FileReader(file);
+            br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                result.append(sCurrentLine);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    result.append(lineSeparator());
+                } else
+                    result.append(System.getProperty("line.separator"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (br != null)
+                    br.close();
+                if (fr != null)
+                    fr.close();
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+        }
+
+
+        return result.toString();
     }
 }

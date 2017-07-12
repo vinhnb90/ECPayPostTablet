@@ -23,19 +23,19 @@
             android:layout_centerHorizontal="true"
             android:background="@color/colorBlue"
             android:gravity="center_horizontal"
-            android:padding="10dp"
+            android:padding="@dimen/_10sdp"
             android:text="LÝ DO HỦY"
             android:textAllCaps="true"
             android:textColor="@color/colorTextWhite"
-            android:textSize="22dp"
-            android:textStyle="normal" />
+            android:textSize="@dimen/_10sdp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_dialog_delete_bill_title"
-            android:layout_margin="20dp"
-            android:layout_marginTop="30dp"
+            android:layout_margin="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_40sdp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -49,19 +49,18 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="right"
-                    android:text="Mã khách hàng:"
-                    android:textSize="18sp" />
-
+                    android:text="Mã khách hàng"
+                    android:textSize="@dimen/_12sdp" />
 
                 <TextView
                     android:id="@+id/tv_dialog_delete_bill_online_code_customer"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:lines="1"
                     android:scrollHorizontally="true"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/_12sdp"
                     tools:text="PDABC" />
             </LinearLayout>
 
@@ -69,7 +68,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -79,19 +78,19 @@
                     android:layout_weight="1"
                     android:gravity="right"
                     android:text="Mã khách hàng:"
-                    android:textSize="18sp" />
+                    android:textSize="@dimen/_12sdp" />
 
 
                 <TextView
                     android:id="@+id/tv_dialog_delete_bill_online_name_customer"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginLeft="@dimen/_10sdp"
                     android:layout_toRightOf="@+id/tv_dialog_delete_bill_online_2"
                     android:layout_weight="1"
                     android:lines="1"
                     android:scrollHorizontally="true"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/_12sdp"
                     tools:text="Tên khách hàng:" />
 
             </LinearLayout>
@@ -100,28 +99,27 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tv_dialog_delete_bill_online_3"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-
                     android:layout_weight="1"
                     android:gravity="right"
                     android:text="Kỳ:"
-                    android:textSize="18sp" />
+                    android:textSize="@dimen/_12sdp" />
 
                 <TextView
                     android:id="@+id/tv_dialog_delete_bill_online_term"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:lines="1"
                     android:scrollHorizontally="true"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/_12sdp"
                     tools:text="Kỳ:" />
 
             </LinearLayout>
@@ -130,29 +128,28 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tv_dialog_delete_bill_online_4"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-
                     android:layout_weight="1"
                     android:gravity="right"
                     android:text="Số tiền:"
-                    android:textSize="18sp" />
+                    android:textSize="@dimen/_12sdp" />
 
 
                 <TextView
                     android:id="@+id/tv_dialog_delete_bill_online_amount"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:lines="1"
                     android:scrollHorizontally="true"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/_12sdp"
                     tools:text="Số tiền:" />
 
             </LinearLayout>
@@ -172,17 +169,18 @@
                     android:layout_weight="1"
                     android:gravity="right"
                     android:text="Lý do hủy:"
-                    android:textSize="18sp" />
+                    android:textSize="@dimen/_12sdp" />
 
                 <EditText
                     android:id="@+id/et_dialog_delete_bill_online_reason"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:inputType="text"
+                    android:paddingRight="@dimen/_10sdp"
                     android:lines="1"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/_12sdp"
                     tools:text="Lý do hủydo hủdo hủdo hủdo hủdo hủdo hủdo hủdo hủdo hủdo hủ:" />
             </LinearLayout>
 
@@ -192,19 +190,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginBottom="20dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginBottom="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_20sdp"
                 android:orientation="vertical"
                 app:cardBackgroundColor="@color/colorDarkOrange"
-                app:cardCornerRadius="5dp">
+                app:cardCornerRadius="@dimen/_4sdp">
 
                 <ProgressBar
                     android:id="@+id/pbar_dialog_delete_bill_online"
                     style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="@dimen/_10sdp"
+                    android:layout_marginRight="@dimen/_10sdp"
 
                     android:indeterminate="true"
                     android:indeterminateTint="@color/colorTextWhite"
@@ -218,10 +216,10 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:lines="1"
-                    android:padding="2dp"
+                    android:padding="@dimen/_2sdp"
                     android:scrollHorizontally="true"
                     android:textColor="@color/colorTextWhite"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/_12sdp"
                     android:visibility="visible"
                     tools:text="Message" />
             </android.support.v7.widget.CardView>
@@ -229,7 +227,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_24sdp"
                 android:gravity="center_horizontal"
                 android:weightSum="4">
 
@@ -237,8 +235,9 @@
                     android:id="@+id/btn_dialog_delete_bill_ignore"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="1.2"
                     android:background="@drawable/bg_button_gray"
+                    android:textSize="@dimen/_10sdp"
                     android:text="Bỏ qua"
                     android:textAllCaps="false" />
 
@@ -246,8 +245,9 @@
                     android:id="@+id/btn_dialog_delete_bill_continued"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_weight="1"
+                    android:layout_marginLeft="@dimen/_30sdp"
+                    android:textSize="@dimen/_10sdp"
+                    android:layout_weight="1.2"
                     android:background="@drawable/bg_button_orange"
                     android:text="Tiếp tục"
                     android:textAllCaps="false"

@@ -27,18 +27,18 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimary"
                 android:gravity="center_horizontal"
-                android:padding="15dp"
+                android:padding="@dimen/_15sdp"
                 android:text="Thông báo"
                 android:textAllCaps="true"
                 android:textColor="@android:color/white"
-                android:textSize="24sp"
+                android:textSize="@dimen/_22sdp"
                 android:textStyle="normal" />
 
             <LinearLayout
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:padding="10dp"
-                android:layout_margin="10dp"
+                android:padding="@dimen/_2sdp"
+                android:layout_margin="@dimen/_2sdp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <ImageButton
@@ -46,18 +46,18 @@
                     android:layout_alignParentLeft="true"
                     android:background="@drawable/ic_success_48"
                     android:clickable="false"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp" />
 
                 <TextView
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginLeft="@dimen/_2sdp"
                     android:layout_toRightOf="@+id/ibtn_dialog_layout_ico1n"
                     android:id="@+id/tv_dialog_layout_message"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:text="MessageMessMes"
-                    android:textSize="20sp" />
+                    android:textSize="@dimen/_10sdp" />
 
 
 
@@ -66,9 +66,9 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_height="@dimen/_24sdp"
+            android:layout_marginBottom="@dimen/_2sdp"
+            android:layout_marginTop="@dimen/_2sdp"
             android:gravity="center_horizontal"
             android:orientation="horizontal"
             android:weightSum="3">
@@ -77,10 +77,10 @@
                 android:id="@+id/btn_dialog_layout_button_cancel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="50dp"
+                android:layout_marginRight="@dimen/_50sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_gray"
-                android:padding="15dp"
+                android:textSize="@dimen/_10sdp"
                 android:text="Bỏ qua"
                 android:textAllCaps="false" />
 
@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_orange"
-                android:padding="15dp"
+                android:textSize="@dimen/_10sdp"
                 android:text="Chấp nhận"
                 android:textAllCaps="false" />
 

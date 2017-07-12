@@ -164,9 +164,7 @@ public class MainPageFragment extends Fragment implements
         btBaoCao.setOnClickListener(this);
         btnChuyenViTong.setOnClickListener(this);
         btnDinhDanhThe.setOnClickListener(this);
-
-        mIMainPagePresenter.callInfoMain(mEdong);
-
+        this.refreshInfoMain();
         return view;
     }
 
@@ -392,6 +390,11 @@ public class MainPageFragment extends Fragment implements
 
     public boolean isHasNullViewLogoutDialog() {
         return rvLogoutProcess == null || tvLogoutResponse == null || pbarLogout == null || btnLogoutOK == null || btnLogoutCancel == null;
+    }
+
+    public void refreshInfoMain() {
+//        Toast.makeText(getContext(), "call", Toast.LENGTH_SHORT).show();
+        mIMainPagePresenter.callInfoMain(mEdong);
     }
 
     //endregion

@@ -263,10 +263,6 @@ public class PayModel extends CommonModel {
         sqLiteConnection.updateBillReasonDelete(edong, code, billId, reasonDeleteBill, statusBilling);
     }
 
-    public double selectBalance() {
-        return sqLiteConnection.selectBalance();
-    }
-
     public long updateHoaDonNo(long billID, String status, String edong) {
         return sqLiteConnection.updateHoaDonNo(billID, status, edong);
     }
@@ -415,7 +411,6 @@ public class PayModel extends CommonModel {
     public int updateBillHistoryWithSuspectedProcessingStatus(String edong, int billId, Integer suspectedProcessingStatus) {
         return sqLiteConnection.updateBillHistoryWithSuspectedProcessingStatus(edong, billId, suspectedProcessingStatus);
     }
-
 
 
     public static class AsyncSearchOffline extends AsyncTask<Pair<Common.TYPE_SEARCH, String>, String, Void> {

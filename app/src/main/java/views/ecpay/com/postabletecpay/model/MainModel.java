@@ -73,7 +73,7 @@ public class MainModel extends CommonModel {
     }
 
     public Cursor selectOfflineBill() {
-        return sqLiteConnection.selectOfflineBill();
+        return null;//sqLiteConnection.selectOfflineBill();
     }
 
     public long checkCustomerExist(String code) {
