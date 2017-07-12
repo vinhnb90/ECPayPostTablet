@@ -5,43 +5,47 @@ import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import views.ecpay.com.postabletecpay.util.entities.request.Base.BodyRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.Base.FooterRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.Base.HeaderRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.Base.Request;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.FooterLoginRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityLogin.HeaderLoginRequest;
 
-public class SearchOnlineRequest implements Serializable {
+public class SearchOnlineRequest extends Request {
 
     @SerializedName("header")
     @Expose
-    private HeaderLoginRequest header;
+    private HeaderRequest header;
     @SerializedName("body")
     @Expose
     private BodySearchOnlineRequest body;
     @SerializedName("footer")
     @Expose
-    private FooterLoginRequest footer;
+    private FooterRequest footer;
     private final static long serialVersionUID = 6743274675011955698L;
 
-    public HeaderLoginRequest getHeader() {
+    public HeaderRequest getHeader() {
         return header;
     }
 
-    public void setHeader(HeaderLoginRequest header) {
+    public void setHeader(HeaderRequest header) {
         this.header = header;
     }
 
-    public BodySearchOnlineRequest getBody() {
+    public BodyRequest getBody() {
         return body;
     }
 
-    public void setBody(BodySearchOnlineRequest body) {
-        this.body = body;
+    public void setBody(BodyRequest body) {
+        this.body = (BodySearchOnlineRequest) body;
     }
 
-    public FooterLoginRequest getFooter() {
+    public FooterRequest getFooter() {
         return footer;
     }
 
-    public void setFooter(FooterLoginRequest footer) {
+    public void setFooter(FooterRequest footer) {
         this.footer = footer;
     }
 }

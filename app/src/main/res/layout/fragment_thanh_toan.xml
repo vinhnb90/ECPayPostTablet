@@ -49,11 +49,11 @@
                 android:id="@+id/ibtn_frag_thanhtoan_qrcode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="10dp"
                 android:background="@drawable/bg_edittext"
-                android:src="@mipmap/ic_barcode" />
+                android:src="@mipmap/ic_barcode"
+                android:layout_toLeftOf="@+id/spine_provider"
+                android:layout_toStartOf="@+id/spine_provider" />
 
             <EditText
                 android:id="@+id/et_frag_thanh_toan_search"
@@ -90,6 +90,15 @@
                 android:background="@null"
                 android:padding="10dp"
                 app:srcCompat="@drawable/ic_cancel" />
+
+            <Spinner
+                android:id="@+id/spine_provider"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/ibtn_frag_thanhtoan_qrcode"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@+id/et_frag_thanh_toan_search" />
         </RelativeLayout>
 
         <LinearLayout
@@ -125,7 +134,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
-                android:text="1/24"
+                android:text="0/0"
                 android:textColor="@color/colorTextWhite"
                 android:textStyle="bold" />
 

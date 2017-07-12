@@ -27,7 +27,7 @@ public class BodyBillingOnlineRequest implements Serializable
     private String session;
     @SerializedName("bill-id")
     @Expose
-    private Integer billId;
+    private Long billId;
     @SerializedName("amount")
     @Expose
     private Long amount;
@@ -90,11 +90,11 @@ public class BodyBillingOnlineRequest implements Serializable
         this.session = session;
     }
 
-    public Integer getBillId() {
+    public Long getBillId() {
         return billId;
     }
 
-    public void setBillId(Integer billId) {
+    public void setBillId(Long billId) {
         this.billId = billId;
     }
 

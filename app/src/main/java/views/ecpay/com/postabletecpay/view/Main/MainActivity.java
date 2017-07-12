@@ -43,13 +43,8 @@ import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.RESPONSE
 public class MainActivity extends AppCompatActivity implements
         IMainView,
         MainPageFragment.OnFragmentInteractionListener,
-        PayAdapter.OnInterationBillInsidePayAdapter,
-        PayBillsDialogAdapter.OnInteractionBillDialogRecycler,
-        PayFragment.OnPayFragmentInteractionListener,
-        PayFragment.CallbackPayingOnlineDialog,
         PayFragment.CallbackDeleteBillOnlineDialog,
         BaoCaoFragment.OnFragmentInteractionListener,
-        ZXingScannerView.ResultHandler,
         UserInfoFragment.OnFragmentInteractionListener{
 
 
@@ -69,15 +64,6 @@ public class MainActivity extends AppCompatActivity implements
         Toast.makeText(this, textMessage, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public List<PayAdapter.DataAdapter> getData() {
-        return iMainPresenter.getDataPayAdapter();
-    }
-
-    @Override
-    public void refreshData() {
-        iMainPresenter.refreshDataPayAdapter();
-    }
 
     public enum ID_MENU_BOTTOM {
         HOME(1),
@@ -147,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements
 
         getBundle();
         iMainPresenter = new MainPresenter(this, mEdong);
-        iMainPresenter.refreshDataPayAdapter();
+//        iMainPresenter.refreshDataPayAdapter();
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -187,8 +173,6 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
-        if (fragmentVisibling instanceof PayFragment)
-            ((PayFragment) fragmentVisibling).onPauseScannerBarcode();
     }
 
     @Override
@@ -218,8 +202,6 @@ public class MainActivity extends AppCompatActivity implements
                 return;
             }
 
-            if (fragmentVisibling instanceof PayFragment)
-                ((PayFragment) fragmentVisibling).onPauseScannerBarcode();
 
         }
     }
@@ -246,136 +228,95 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     //region PayAdapter.BillInsidePayAdapter.BillInsidePayViewHolder.OnInterationBillInsidePayAdapter
-    @Override
-    public void processCheckedBillFragment(String edong, String code, int posCustomer, List<PayAdapter.BillEntityAdapter> billList, int posBillInside, int indexBegin, int indexEnd) {
-        if (TextUtils.isEmpty(edong))
-            return;
-        if (TextUtils.isEmpty(code))
-            return;
-        if (billList == null || billList.size() == ZERO)
-            return;
-
-        PayAdapter.BillEntityAdapter bill = billList.get(posBillInside);
-
-       /* //
-        boolean isNotBillPayedTermBefore = false;
-        int index = posBillInside;
-
-        String term = billList.get(posBillInside).getMonthBill();
-
-
-        for (; index < billList.size(); index++) {
-            String termIndex = billList.get(index).getMonthBill();
-            if (billList.get(index).getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode() && billList.get(index).isChecked() == false && termIndex.equals(term)== false) {
-                isNotBillPayedTermBefore = true;
-            }
-        }*/
-
-        //check fragment
-        PayFragment payFragment = null;
-        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling instanceof PayFragment && fragmentVisibling.isVisible() == true) {
-            payFragment = (PayFragment) fragmentVisibling;
-        }
-
-        if (payFragment == null)
-            return;
-
-       /* if (isNotBillPayedTermBefore) {
-            payFragment.showMessageNotifyPayfrag(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage());
-            return;
-        }*/
-
-        payFragment.showBillCheckedFragment(edong, code, posCustomer, bill, posBillInside, indexBegin, indexEnd);
-    }
-
-    @Override
-    public void processDeleteBillOnlineFragment(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside) {
-        boolean fail = TextUtils.isEmpty(edong) || TextUtils.isEmpty(code) || bill == null;
-        if (fail)
-            return;
-
-        //check fragment
-        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
-            return;
-        }
-        if (fragmentVisibling instanceof PayFragment)
-            ((PayFragment) fragmentVisibling).processDialogDeleteBillOnline(edong, code, bill, posCustomerInside);
-    }
-
-    @Override
-    public void processUnCheckedBillFragment(String message) {
-        boolean fail = TextUtils.isEmpty(message);
-        if (fail)
-            return;
-
-        //check fragment
-        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
-            return;
-        }
-        if (fragmentVisibling instanceof PayFragment)
-            ((PayFragment) fragmentVisibling).showMessageNotifyPayfrag(message);
-
-    }
-    //endregion
-
-    //region PayBillsDialogAdapter.OnInteractionBillDialogRecycler
-    @Override
-    public void processCheckedBillsDialog(int pos, boolean isChecked) {
-        //check fragment
-        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
-            return;
-        }
-        if (fragmentVisibling instanceof PayFragment)
-            ((PayFragment) fragmentVisibling).showBillCheckedDialog(mEdong, pos, isChecked);
-
-    }
-
-    @Override
-    public void processClickMessageErrorBillDialog(String messageError) {
-        Toast.makeText(this, messageError, Toast.LENGTH_SHORT).show();
+//    @Override
+//    public void processCheckedBillFragment(String edong, String code, int posCustomer, List<PayAdapter.BillEntityAdapter> billList, int posBillInside, int indexBegin, int indexEnd) {
+//        if (TextUtils.isEmpty(edong))
+//            return;
+//        if (TextUtils.isEmpty(code))
+//            return;
+//        if (billList == null || billList.size() == ZERO)
+//            return;
+//
+//        PayAdapter.BillEntityAdapter bill = billList.get(posBillInside);
+//
+//       /* //
+//        boolean isNotBillPayedTermBefore = false;
+//        int index = posBillInside;
+//
+//        String term = billList.get(posBillInside).getTHANG_THANH_TOAN();
+//
+//
+//        for (; index < billList.size(); index++) {
+//            String termIndex = billList.get(index).getTHANG_THANH_TOAN();
+//            if (billList.get(index).getTRANG_THAI_TT() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode() && billList.get(index).isChecked() == false && termIndex.equals(term)== false) {
+//                isNotBillPayedTermBefore = true;
+//            }
+//        }*/
+//
+//        //check fragment
+//        PayFragment payFragment = null;
+//        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+//        if (fragmentVisibling instanceof PayFragment && fragmentVisibling.isVisible() == true) {
+//            payFragment = (PayFragment) fragmentVisibling;
+//        }
+//
+//        if (payFragment == null)
+//            return;
+//
+//       /* if (isNotBillPayedTermBefore) {
+//            payFragment.showMessageNotifyPayfrag(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage());
+//            return;
+//        }*/
+//
+//        payFragment.showBillCheckedFragment(edong, code, posCustomer, bill, posBillInside, indexBegin, indexEnd);
+//    }
+//
+//    @Override
+//    public void processDeleteBillOnlineFragment(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside) {
+//        boolean fail = TextUtils.isEmpty(edong) || TextUtils.isEmpty(code) || bill == null;
+//        if (fail)
+//            return;
+//
 //        //check fragment
 //        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
 //        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
 //            return;
 //        }
 //        if (fragmentVisibling instanceof PayFragment)
-//            ((PayFragment) fragmentVisibling).showMessage(mEdong, pos, isChecked);
-    }
-
-    @Override
-    public void processUnCheckedBillDialog(String message) {
-        boolean fail = TextUtils.isEmpty(message);
-        if (fail)
-            return;
-
-        //check fragment
-        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
-            return;
-        }
-        if (fragmentVisibling instanceof PayFragment)
-            ((PayFragment) fragmentVisibling).showMessageNotifyBillOnlineDialog(message, Common.TYPE_DIALOG.LOI);
-
-    }
+//            ((PayFragment) fragmentVisibling).processDialogDeleteBillOnline(edong, code, bill, posCustomerInside);
+//    }
+//
+//    @Override
+//    public void processUnCheckedBillFragment(String message) {
+//        boolean fail = TextUtils.isEmpty(message);
+//        if (fail)
+//            return;
+//
+//        //check fragment
+//        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+//        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+//            return;
+//        }
+//        if (fragmentVisibling instanceof PayFragment)
+//            ((PayFragment) fragmentVisibling).showMessageNotifyPayfrag(message);
+//
+//    }
     //endregion
 
+
     //region PayFragment.CallbackPayingOnlineDialog
-    @Override
-    public void processOnDismissPayingOnlineDialog() {
-        //check fragment
-        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
-            return;
-        }
-        if (fragmentVisibling instanceof PayFragment) {
-            ((PayFragment) fragmentVisibling).bindViewAgain();
-            ((PayFragment) fragmentVisibling).refreshRecyclerListFragment();
-        }
-    }
+//    @Override
+//    public void processOnDismissPayingOnlineDialog() {
+//        //check fragment
+//        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+//        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
+//            return;
+//        }
+//        if (fragmentVisibling instanceof PayFragment) {
+//            ((PayFragment) fragmentVisibling).bindViewAgain();
+//            ((PayFragment) fragmentVisibling).refreshRecyclerListFragment();
+//        }
+//    }
 
     //endregion
 
@@ -390,47 +331,6 @@ public class MainActivity extends AppCompatActivity implements
 
     }
     //endregion
-
-    //region ZXingScannerView.ResultHandler
-    @Override
-    public void handleResult(Result result) {
-        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling instanceof PayFragment)
-            ((PayFragment) fragmentVisibling).fillResultToTextBarcodeDialog(result.getText());
-    }
-
-    @Override
-    public void fillToSearchText(String textBarcode) {
-        if (TextUtils.isEmpty(textBarcode))
-            return;
-        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling instanceof PayFragment)
-            ((PayFragment) fragmentVisibling).fillResultToSearchText(textBarcode);
-    }
-
-    @Override
-    public void setRootViewAgain() {
-        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling instanceof PayFragment) {
-            ((PayFragment) fragmentVisibling).bindViewAgain();
-        }
-    }
-
-    @Override
-    public void refreshCamera(ZXingScannerView mScannerView) {
-        mScannerView.resumeCameraPreview(this);
-    }
-
-    @Override
-    public void showMainPageFragment() {
-        Fragment fragment = MainPageFragment.newInstance(mEdong);
-        if (fragment != null) {
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.frameLayout, fragment);
-            fragmentTransaction.commit();
-        }
-    }
-
 
     //region OnFragmentInteractionListener
     @Override

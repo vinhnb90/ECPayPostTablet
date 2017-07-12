@@ -5,7 +5,12 @@ import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class CheckTrainOnlineResponse implements Serializable {
+import views.ecpay.com.postabletecpay.util.entities.response.Base.BodyRespone;
+import views.ecpay.com.postabletecpay.util.entities.response.Base.FooterRespone;
+import views.ecpay.com.postabletecpay.util.entities.response.Base.HeaderRespone;
+import views.ecpay.com.postabletecpay.util.entities.response.Base.Respone;
+
+public class CheckTrainOnlineResponse extends Respone {
 
     @SerializedName("header")
     @Expose
@@ -18,27 +23,33 @@ public class CheckTrainOnlineResponse implements Serializable {
     private FooterCheckTrainOnlineResponse footer;
     private final static long serialVersionUID = 6743274675011955698L;
 
-    public HeaderCheckTrainOnlineResponse getHeader() {
-        return header;
+    @Override
+    public HeaderRespone getHeader() {
+        return this.header;
     }
 
-    public void setHeader(HeaderCheckTrainOnlineResponse header) {
-        this.header = header;
+    @Override
+    public void setHeader(HeaderRespone header) {
+        this.header = (HeaderCheckTrainOnlineResponse)header;
     }
 
-    public BodyCheckTrainOnlineResponse getBody() {
-        return body;
+    @Override
+    public BodyRespone getBody() {
+        return this.body;
     }
 
-    public void setBody(BodyCheckTrainOnlineResponse body) {
-        this.body = body;
+    @Override
+    public void setBody(BodyRespone body) {
+        this.body = (BodyCheckTrainOnlineResponse)body;
     }
 
-    public FooterCheckTrainOnlineResponse getFooter() {
-        return footer;
+    @Override
+    public FooterRespone getFooter() {
+        return this.footer;
     }
 
-    public void setFooter(FooterCheckTrainOnlineResponse footer) {
-        this.footer = footer;
+    @Override
+    public void setFooter(FooterRespone footer) {
+        this.footer = (FooterCheckTrainOnlineResponse)footer;
     }
 }

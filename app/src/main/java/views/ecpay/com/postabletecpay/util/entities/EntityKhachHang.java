@@ -8,26 +8,27 @@ import java.util.Date;
 
 public class EntityKhachHang {
 
-    private int ID;
+    private String E_DONG;
     private String MA_KHANG;
     private String MA_THE;
     private String TEN_KHANG;
     private String DIA_CHI;
-    private int PHIEN_TTOAN;
+    private String PHIEN_TTOAN;
     private String LO_TRINH;
     private String SO_GCS;
     private String DIEN_LUC;
     private String SO_HO;
     private String SDT_ECPAY;
     private String SDT_EVN;
+    private String GIAO_THU;
     private Date NGAY_GIAO_THU;
 
-    public int getID() {
-        return ID;
+    public String getE_DONG() {
+        return E_DONG;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setE_DONG(String e_DONG) {
+        E_DONG = e_DONG;
     }
 
     public String getMA_KHANG() {
@@ -62,11 +63,11 @@ public class EntityKhachHang {
         this.DIA_CHI = DIA_CHI;
     }
 
-    public int getPHIEN_TTOAN() {
+    public String getPHIEN_TTOAN() {
         return PHIEN_TTOAN;
     }
 
-    public void setPHIEN_TTOAN(int PHIEN_TTOAN) {
+    public void setPHIEN_TTOAN(String PHIEN_TTOAN) {
         this.PHIEN_TTOAN = PHIEN_TTOAN;
     }
 
@@ -124,5 +125,13 @@ public class EntityKhachHang {
 
     public void setNGAY_GIAO_THU(Date NGAY_GIAO_THU) {
         this.NGAY_GIAO_THU = NGAY_GIAO_THU;
+    }
+
+    public String getGIAO_THU() {
+        return GIAO_THU;
+    }
+
+    public void setGIAO_THU(String GIAO_THU) {
+        this.GIAO_THU = GIAO_THU;
     }
 }

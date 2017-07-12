@@ -42,6 +42,7 @@ import views.ecpay.com.postabletecpay.model.adapter.CustomerAdapter;
 import views.ecpay.com.postabletecpay.presenter.ISearchCustomerPresenter;
 import views.ecpay.com.postabletecpay.presenter.SearchCustomerPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
@@ -251,14 +252,14 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
     }
 
     @Override
-    public void refreshView(List<Customer> lst) {
+    public void refreshView(List<EntityKhachHang> lst) {
         CustomerAdapter customerAdapter = (CustomerAdapter)rvKH.getAdapter();
         customerAdapter.setCustomers(lst);
         customerAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void showCustomerInfo(Customer customer) {
+    public void showCustomerInfo(EntityKhachHang customer) {
         FragmentTransaction fragmentTransaction = this.getActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout, CustomerInfoFragment.newInstance(customer, eDong));
         fragmentTransaction.commit();

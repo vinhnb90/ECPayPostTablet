@@ -110,6 +110,75 @@ public class BodyBillResponse {
     @SerializedName("billingType")
     @Expose
     private String billingType;
+    @SerializedName("electricityMeter")
+    @Expose
+    private String electricityMeter;
+    @SerializedName("phoneByevn")
+    @Expose
+    private String phoneByevn;
+    @SerializedName("phoneByecp")
+    @Expose
+    private String phoneByecp;
+    @SerializedName("code")
+    @Expose
+    private String code;
+    @SerializedName("name")
+    @Expose
+    private String name;
+    @SerializedName("cardNo")
+    @Expose
+    private String cardNo;
+    @SerializedName("address")
+    @Expose
+    private String address;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhoneByevn() {
+        return phoneByevn;
+    }
+
+    public void setPhoneByevn(String phoneByevn) {
+        this.phoneByevn = phoneByevn;
+    }
+
+    public String getPhoneByecp() {
+        return phoneByecp;
+    }
+
+    public void setPhoneByecp(String phoneByecp) {
+        this.phoneByecp = phoneByecp;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getElectricityMeter() {
+        return electricityMeter;
+    }
+
+    public void setElectricityMeter(String electricityMeter) {
+        this.electricityMeter = electricityMeter;
+    }
 
     public String getId() {
         return id;
@@ -381,5 +450,13 @@ public class BodyBillResponse {
 
     public void setBillingType(String billingType) {
         this.billingType = billingType;
+    }
+
+    public String getCardNo() {
+        return cardNo;
+    }
+
+    public void setCardNo(String cardNo) {
+        this.cardNo = cardNo;
     }
 }

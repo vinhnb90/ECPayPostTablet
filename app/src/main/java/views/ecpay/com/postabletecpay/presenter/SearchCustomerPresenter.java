@@ -20,6 +20,7 @@ import java.util.List;
 import views.ecpay.com.postabletecpay.model.CustomerSearchModel;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ListEvnPCLoginResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchCustomer.SearchCustomerRespone;
@@ -74,38 +75,38 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
             }.getType();
             BodySearchCustomerBillRespone.CustomerObject customerObject = null;
 
-            Customer customer = null;
-            try {
-                customerObject = new Gson().fromJson(responseData, type);
-
-
-                customer = new Customer(
-                        customerObject.getCode() == null ? null : customerObject.getCode().toString(),
-                        customerObject.getName() == null ? null : customerObject.getName().toString(),
-                        customerObject.getAddress() == null ? null : customerObject.getAddress().toString(),
-                        customerObject.getPcCode() == null ? null : customerObject.getPcCode().toString(),
-                        customerObject.getPcCodeExt() == null ? null : customerObject.getPcCodeExt().toString(),
-                        customerObject.getPhoneByevn() == null ? null : customerObject.getPhoneByevn().toString(),
-                        customerObject.getPhoneByecp() == null ? null : customerObject.getPhoneByecp().toString(),
-                        customerObject.getBookCmis() == null ? null : customerObject.getBookCmis().toString(),
-                        customerObject.getElectricityMeter() == null ? null : customerObject.getElectricityMeter().toString(),
-                        customerObject.getInning() == null ? null : customerObject.getInning().toString(),
-                        customerObject.getStatus() == null ? null : customerObject.getStatus().toString(),
-                        customerObject.getBankAccount() == null ? null : customerObject.getBankAccount().toString(),
-                        "",
-                        customerObject.getBankName() == null ? null : customerObject.getBankName().toString(),
-                        "",
-                        customerObject.getIdChanged() == null ? null : customerObject.getIdChanged().toString(),
-                        customerObject.getDateChanged() == null ? null : customerObject.getDateChanged().toString(),
-                        false);
-                customer.setCardNo(customerObject.getCardNo() == null ? null : customerObject.getCardNo().toString());
-            } catch (JsonSyntaxException e) {
-                e.printStackTrace();
-            }
+            EntityKhachHang customer = null;
+//            try {
+//                customerObject = new Gson().fromJson(responseData, type);
+//
+//
+//                customer = new Customer(
+//                        customerObject.getCode() == null ? null : customerObject.getCode().toString(),
+//                        customerObject.getName() == null ? null : customerObject.getName().toString(),
+//                        customerObject.getAddress() == null ? null : customerObject.getAddress().toString(),
+//                        customerObject.getPcCode() == null ? null : customerObject.getPcCode().toString(),
+//                        customerObject.getPcCodeExt() == null ? null : customerObject.getPcCodeExt().toString(),
+//                        customerObject.getPhoneByevn() == null ? null : customerObject.getPhoneByevn().toString(),
+//                        customerObject.getPhoneByecp() == null ? null : customerObject.getPhoneByecp().toString(),
+//                        customerObject.getBookCmis() == null ? null : customerObject.getBookCmis().toString(),
+//                        customerObject.getElectricityMeter() == null ? null : customerObject.getElectricityMeter().toString(),
+//                        customerObject.getInning() == null ? null : customerObject.getInning().toString(),
+//                        customerObject.getTRANG_THAI_TT() == null ? null : customerObject.getTRANG_THAI_TT().toString(),
+//                        customerObject.getBankAccount() == null ? null : customerObject.getBankAccount().toString(),
+//                        "",
+//                        customerObject.getBankName() == null ? null : customerObject.getBankName().toString(),
+//                        "",
+//                        customerObject.getIdChanged() == null ? null : customerObject.getIdChanged().toString(),
+//                        customerObject.getDateChanged() == null ? null : customerObject.getDateChanged().toString(),
+//                        false);
+//                customer.setCardNo(customerObject.getCardNo() == null ? null : customerObject.getCardNo().toString());
+//            } catch (JsonSyntaxException e) {
+//                e.printStackTrace();
+//            }
 
             if(customer != null)
             {
-                List<Customer> lst = new ArrayList<Customer>();
+                List<EntityKhachHang> lst = new ArrayList<>();
                 lst.add(customer);
                 searchCustomerView.refreshView(lst);
             }
@@ -140,7 +141,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
 
     protected void searchOffline(String maxKH, String tenKH, String dcKH, String phoneKH, String gtKH)
     {
-        List<Customer> lst = customerSearchModel.getListCustomer(maxKH, tenKH, dcKH, phoneKH, gtKH);
+        List<EntityKhachHang> lst = customerSearchModel.getListCustomer(maxKH, tenKH, dcKH, phoneKH, gtKH);
         searchCustomerView.refreshView(lst);
 
         if(lst.size() == 0)

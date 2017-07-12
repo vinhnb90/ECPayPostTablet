@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,9 +19,11 @@ import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.ReportModel;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
-import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.EntityDanhSachThu;
+import views.ecpay.com.postabletecpay.util.entities.EntityHoaDonNo;
+import views.ecpay.com.postabletecpay.util.entities.EntityHoaDonThu;
+import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.util.entities.EntityLichSuThanhToan;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
@@ -28,12 +31,10 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookC
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPCResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.BodyBillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.BodyCustomerResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.FooterBillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.FooterCustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListBillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListCustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
-import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
@@ -42,7 +43,6 @@ import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS;
-import static views.ecpay.com.postabletecpay.util.commons.Common.DATE_TIME_TYPE.yyyyMMdd;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ONE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_CONFIG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_DB;
@@ -87,54 +87,31 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     private String CREATE_TABLE_BOOK_CMIS = "CREATE TABLE " + TABLE_NAME_BOOK_CMIS + "(bookCmis TEXT, pcCode TEXT, pcCodeExt TEXT, inningDate TEXT, email TEXT, status INTEGER, strStatus TEXT, strCreateDate TEXT, strChangeDate TEXT, idChanged INTEGER, id INTEGER, parentPcCode TEXT, countBill INTEGER, countBillPaid INTEGER, countCustomer INTEGER, listCustomer TEXT, listBillUnpaid TEXT, listBillPaid TEXT)";
 
-    private String CREATE_TABLE_CUSTOMER = "CREATE TABLE `" + TABLE_NAME_CUSTOMER + "` ( `code` TEXT NOT NULL PRIMARY KEY, `name` TEXT, `cardNo` TEXT, " +
-            "`address` TEXT, `pcCode` TEXT, `pcCodeExt` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `bookCmis` TEXT, " +
-            "`electricityMeter` TEXT, `inning` TEXT, `status` TEXT, `bankAccount` TEXT, `idNumber` TEXT, `bankName` TEXT , " +
-            "`edongKey` TEXT NOT NULL, `isShowBill` INTEGER DEFAULT 0, " +
-            "idChanged TEXT, dateChanged TEXT)";
+    private String CREATE_TABLE_CUSTOMER = "CREATE TABLE `" + TABLE_NAME_CUSTOMER + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT, `MA_KHANG` TEXT," +
+            " `MA_THE` TEXT, `E_DONG` TEXT, `TEN_KHANG` TEXT, " +
+            "`DIA_CHI` TEXT, `PHIEN_TTOAN` TEXT, `LO_TRINH` TEXT,`SO_GCS` TEXT, `DIEN_LUC` TEXT, `SO_HO` TEXT, `SDT_ECPAY` TEXT, " +
+            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE)";
 
     //add new field requestDate: date bill paying online success from tablet
-    private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `customerCode` TEXT, `customerPayCode` TEXT, " +
-            "`billId` INTEGER NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, " +
-            "`strIssueDate` TEXT, `status` INTEGER, `seri` TEXT, `pcCode` TEXT, `handoverCode` TEXT, `cashierCode` TEXT, `bookCmis` TEXT, " +
-            "`fromDate` TEXT, `toDate` TEXT, `strFromDate` TEXT, `strToDate` TEXT, `home` TEXT, `tax` REAL, `billNum` TEXT, `currency` TEXT, " +
-            "`priceDetails` TEXT, `numeDetails` TEXT, `amountDetails` TEXT, `oldIndex` TEXT, `newIndex` TEXT, `nume` TEXT, " +
-            "`amountNotTax` INTEGER, `amountTax` INTEGER, `multiple` TEXT, `billType` TEXT, `typeIndex` TEXT, `groupTypeIndex` TEXT, " +
-            "`createdDate` TEXT, `idChanged` INTEGER, `dateChanged` TEXT, `edong` TEXT, `pcCodeExt` TEXT, `code` TEXT, `name` TEXT, " +
-            "`nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, " +
-            "`taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, " +
-            "`billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `requestDate` TEXT,`edongKey` TEXT NOT NULL, " +
-            "`isChecked` INTEGER default 0," +
-            "`traceNumber` INTERGER, " +
-            "`causeCancelBillOnline` TEXT)";
+    private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, `SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
+            "`MA_THE` TEXT, `TEN_KHANG` TEXT, `DIA_CHI` TEXT, `THANG_TTOAN` DATE, `PHIEN_TTOAN` TEXT, `SO_TIEN_TTOAN` INTEGER, " +
+            "`SO_GCS` TEXT, `DIEN_LUC` TEXT, `SO_HO` TEXT, `SO_DAU_KY` TEXT, `SO_CUOI_KY` TEXT, `SO_CTO` TEXT, `SDT_ECPAY` TEXT, " +
+            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT)";
 
-    private String CREATE_TABLE_DEBT_COLLECTION = "CREATE TABLE `" + TABLE_NAME_DEBT_COLLECTION + "` ( `customerCode` TEXT, `customerPayCode` TEXT, " +
-            "`billId` INTEGER NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, " +
-            "`strIssueDate` TEXT, `status` INTEGER, `seri` TEXT, `pcCode` TEXT, `handoverCode` TEXT, `cashierCode` TEXT, `bookCmis` TEXT, " +
-            "`fromDate` TEXT, `toDate` TEXT, `strFromDate` TEXT, `strToDate` TEXT, `home` TEXT, `tax` REAL, `billNum` TEXT, `currency` TEXT, " +
-            "`priceDetails` TEXT, `numeDetails` TEXT, `amountDetails` TEXT, `oldIndex` TEXT, `newIndex` TEXT, `nume` TEXT, " +
-            "`amountNotTax` INTEGER, `amountTax` INTEGER, `multiple` TEXT, `billType` TEXT, `typeIndex` TEXT, `groupTypeIndex` TEXT, " +
-            "`createdDate` TEXT, `idChanged` INTEGER, `dateChanged` TEXT, `edong` TEXT, `pcCodeExt` TEXT, `code` TEXT, `name` TEXT, " +
-            "`nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, " +
-            "`taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, " +
-            "`billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `requestDate` TEXT,`edongKey` TEXT NOT NULL, " +
-            "stateOfDebt INTEGER, stateOfCancel TEXT, stateOfReturn TEXT, suspectedProcessingStatus TEXT, stateOfPush INTEGER, dateOfPush TEXT, " +
-            "`isChecked` INTEGER default 0, `traceNumber` INTERGER, `causeCancelBillOnline` TEXT, payments INTEGER, payStatus INTEGER, " +
-            "countPrintReceipt INTEGER, printInfo TEXT)";
+    private String CREATE_TABLE_DEBT_COLLECTION = "CREATE TABLE `" + TABLE_NAME_DEBT_COLLECTION + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, `SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
+            "`MA_THE` TEXT, `TEN_KHANG` TEXT, `DIA_CHI` TEXT, `THANG_TTOAN` DATE, `PHIEN_TTOAN` TEXT, `SO_TIEN_TTOAN` INTEGER, " +
+            "`SO_GCS` TEXT, `DIEN_LUC` TEXT, `SO_HO` TEXT, `SO_DAU_KY` TEXT, `SO_CUOI_KY` TEXT, `SO_CTO` TEXT, `SDT_ECPAY` TEXT, " +
+            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT, `HINH_THUC_TT` TEXT, " +
+            "`TRANG_THAI_CHAM_NO` TEXT, `TRANG_THAI_HUY` TEXT, `TRANG_THAI_HOAN_TRA` TEXT, `TRANG_THAI_XU_LY_NGHI_NGO` TEXT, " +
+            "`TRANG_THAI_DAY_CHAM_NO` TEXT, `NGAY_DAY` DATE, `SO_LAN_IN_BIEN_NHAN` INTEGER, `IN_THONG_BAO_DIEN` TEXT)";
 
-    private String CREATE_TABLE_HISTORY_PAY = "CREATE TABLE `" + TABLE_NAME_HISTORY_PAY + "` ( `customerCode` TEXT, `customerPayCode` TEXT, " +
-            "`billId` INTEGER NOT NULL PRIMARY KEY, `term` TEXT, `strTerm` TEXT, `amount` INTEGER, `period` TEXT, `issueDate` TEXT, " +
-            "`strIssueDate` TEXT, `status` INTEGER, `seri` TEXT, `pcCode` TEXT, `handoverCode` TEXT, `cashierCode` TEXT, `bookCmis` TEXT, " +
-            "`fromDate` TEXT, `toDate` TEXT, `strFromDate` TEXT, `strToDate` TEXT, `home` TEXT, `tax` REAL, `billNum` TEXT, `currency` TEXT, " +
-            "`priceDetails` TEXT, `numeDetails` TEXT, `amountDetails` TEXT, `oldIndex` TEXT, `newIndex` TEXT, `nume` TEXT, " +
-            "`amountNotTax` INTEGER, `amountTax` INTEGER, `multiple` TEXT, `billType` TEXT, `typeIndex` TEXT, `groupTypeIndex` TEXT, " +
-            "`createdDate` TEXT, `idChanged` INTEGER, `dateChanged` TEXT, `edong` TEXT, `pcCodeExt` TEXT, `code` TEXT, `name` TEXT, " +
-            "`nameNosign` TEXT, `phoneByevn` TEXT, `phoneByecp` TEXT, `electricityMeter` TEXT, `inning` TEXT, `road` TEXT, `station` TEXT, " +
-            "`taxCode` TEXT, `trade` TEXT, `countPeriod` TEXT, `team` TEXT, `type` INTEGER, `lastQuery` TEXT, `groupType` INTEGER, " +
-            "`billingChannel` TEXT, `billingType` TEXT, `billingBy` TEXT, `cashierPay` TEXT, `requestDate` TEXT,`edongKey` TEXT NOT NULL, " +
-            "`isChecked` INTEGER default 0, `traceNumber` INTERGER, `causeCancelBillOnline` TEXT, payments INTEGER, payStatus INTEGER, " +
-            "stateOfDebt INTEGER, stateOfCancel TEXT, stateOfReturn TEXT, suspectedProcessingStatus TEXT, stateOfPush INTEGER, dateOfPush TEXT, " +
-            "countPrintReceipt INTEGER, printInfo TEXT, dateIncurred TEXT, tradingCode INTEGER)";
+    private String CREATE_TABLE_HISTORY_PAY = "CREATE TABLE `" + TABLE_NAME_HISTORY_PAY + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, " +
+            "`SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
+            "`MA_THE` TEXT, `TEN_KHANG` TEXT, `DIA_CHI` TEXT, `THANG_TTOAN` DATE, `PHIEN_TTOAN` TEXT, `SO_TIEN_TTOAN` INTEGER, " +
+            "`SO_GCS` TEXT, `DIEN_LUC` TEXT, `SO_HO` TEXT, `SO_DAU_KY` TEXT, `SO_CUOI_KY` TEXT, `SO_CTO` TEXT, `SDT_ECPAY` TEXT, " +
+            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT, `HINH_THUC_TT` TEXT, " +
+            "`TRANG_THAI_CHAM_NO` TEXT, `TRANG_THAI_HUY` TEXT, `TRANG_THAI_NGHI_NGO` TEXT, `SO_IN_BIEN_NHAN` INTERGER, `IN_THONG_BAO_DIEN` TEXT, " +
+            "`NGAY_PHAT_SINH` DATE, `MA_GIAO_DICH` TEXT)";
 
     private SQLiteConnection(Context context) {
         super(context, Common.PATH_FOLDER_DB + databaseName, null, DATABASE_VERSION);
@@ -690,7 +667,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         database = this.getReadableDatabase();
 
-        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status = " + ZERO;
+        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "'";// + "' and status = " + ZERO;
         Cursor mCursor = database.rawQuery(query, null);
         int count = mCursor.getCount();
         if (count != ZERO) {
@@ -709,7 +686,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         database = this.getReadableDatabase();
         long totalMoney = 0;
-        String query = "SELECT SUM(amount) AS totalMoney FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode ='" + customerCode + "'";
+        String query = "SELECT SUM(SO_TIEN_TTOAN) AS totalMoney FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and MA_KHANG ='" + customerCode + "'";
         Cursor mCursor = database.rawQuery(query, null);
         int count = mCursor.getCount();
 
@@ -723,31 +700,99 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return totalMoney;
     }
 
-    public String selectRoadFirstInBill(String edong, String code) {
-        String query = "SELECT road FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode ='" + code + "' and road is not null and road <> ''";
-        String road = "";
-        database = this.getReadableDatabase();
-        Cursor mCursor = database.rawQuery(query, null);
-        mCursor.moveToFirst();
 
-        int count = mCursor.getCount();
-        //get first value
-        if (count != Common.ZERO)
-            road = mCursor.getString(mCursor.getColumnIndex("road"));
+    public void selectOfflineBill() {
+        database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + MainActivity.mEdong + "' and HINH_THUC_TT = '" + Common.HINH_THUC_TTOAN.OFFLINE.getCode() + "' and TRANG_THAI_DAY_CHAM_NO = '" + Common.TRANG_THAI_DAY_CHAM_NO.CHUA_DAY.getCode() + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+        if(mCursor != null && mCursor.moveToFirst())
+        {
+            do {
+
+                String MA_HOA_DON = mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON"));
+                String currentDate = Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS);
+
+                Common.TRANG_THAI_TTOAN trangThaiTtoan = getTrangThaiThanhToanHoaDonNo(MA_HOA_DON);
+                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.NULL))
+                    continue;;
+
+                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC))
+                {
+
+                    this.updateHoaDonThu(MA_HOA_DON, Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC, "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(),
+                            currentDate, Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
+
+
+                    this.insertLichSuThanhToan(MA_HOA_DON, currentDate, Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
+                    continue;
+                }
+                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC))
+                {
+
+                    this.updateHoaDonThu(MA_HOA_DON, Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC, "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(),
+                            currentDate, Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
+
+
+                    this.insertLichSuThanhToan(MA_HOA_DON, currentDate, Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
+                    continue;
+                }
+
+                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.CHUA_TTOAN))
+                {
+
+                    
+                    continue;
+                }
+
+
+            }while (mCursor.moveToNext());
+        }
+
 
         if (mCursor != null && !mCursor.isClosed()) {
             mCursor.close();
         }
-        return road;
     }
 
-    public Cursor selectOfflineBill() {
+
+    public  void updateHoaDonThu(String MA_HOA_DON, Common.TRANG_THAI_TTOAN TRANG_THAI_TTOAN, String TRANG_THAI_CHAM_NO,
+                                 String TRANG_THAI_DAY_CHAM_NO, String NGAY_DAY, String TRANG_THAI_HOAN_TRA)
+    {
+        database = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("TRANG_THAI_TTOAN", TRANG_THAI_TTOAN.getCode());
+        contentValues.put("TRANG_THAI_CHAM_NO", TRANG_THAI_CHAM_NO);
+        contentValues.put("TRANG_THAI_DAY_CHAM_NO", TRANG_THAI_DAY_CHAM_NO);
+        contentValues.put("NGAY_DAY", NGAY_DAY);
+        contentValues.put("TRANG_THAI_HOAN_TRA", TRANG_THAI_HOAN_TRA);
+        database.update(TABLE_NAME_BILL, contentValues, "MA_HOA_DON = ?", new String[]{MA_HOA_DON});
+    }
+
+
+    public Common.TRANG_THAI_TTOAN getTrangThaiThanhToanHoaDonNo(String MA_HOA_DON)
+    {
         database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE status = 2";
-        return database.rawQuery(query, null);
+        String query = "SELECT TRANG_THAI_TTOAN FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + MainActivity.mEdong + "' and MA_HOA_DON = '" + MA_HOA_DON + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+        if(mCursor != null && mCursor.moveToFirst())
+        {
+
+            if (mCursor != null && !mCursor.isClosed()) {
+                mCursor.close();
+            }
+            return Common.TRANG_THAI_TTOAN.valueOf(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN")));
+        }
+
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+
+        return Common.TRANG_THAI_TTOAN.NULL;
     }
 
-    public List<Customer> selectAllCustomer(String edong) {
+
+    public List<EntityKhachHang> selectAllCustomer(String edong) {
         return this.selectAllCustomerFitterBy(edong, Common.TYPE_SEARCH.ALL, Common.TEXT_EMPTY);
     }
 
@@ -764,17 +809,64 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return isPayed;
     }
 
-    public long updatePayOffine(int billID, int status, String edong) {
+    public long updateHoaDonNo(long billID, String status, String edong) {
         database = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("status", status);
-        contentValues.put("edong", edong);
-        contentValues.put("edongKey", edong);
-        return database.update(TABLE_NAME_BILL, contentValues, "billId = ?", new String[]{String.valueOf(billID)});
+        contentValues.put("TRANG_THAI_TTOAN", status);
+        contentValues.put("VI_TTOAN", edong);
+        return database.update(TABLE_NAME_BILL, contentValues, "MA_HOA_DON = ?", new String[]{String.valueOf(billID)});
     }
 
-    public List<Customer> selectAllCustomerFitterBy(String edong, Common.TYPE_SEARCH typeSearch, String infoSearch) {
-        List<Customer> customerList = new ArrayList<>();
+    public long updateHoaDonNo(long billID, String edong) {
+        database = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("VI_TTOAN", edong);
+        return database.update(TABLE_NAME_BILL, contentValues, "MA_HOA_DON = ?", new String[]{String.valueOf(billID)});
+    }
+
+    public EntityHoaDonNo getHoaDonNo(long billID)
+    {
+        EntityHoaDonNo entityHoaDonNo = new EntityHoaDonNo();
+        database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE MA_HOA_DON ='" + billID + "'";
+        Cursor c = database.rawQuery(query, null);
+
+        if(c.moveToFirst())
+        {
+            entityHoaDonNo.setE_DONG(c.getString(c.getColumnIndex("E_DONG")));
+            entityHoaDonNo.setMA_HOA_DON(c.getString(c.getColumnIndex("MA_HOA_DON")));
+            entityHoaDonNo.setSERI_HDON(c.getString(c.getColumnIndex("SERI_HDON")));
+            entityHoaDonNo.setMA_KHANG(c.getString(c.getColumnIndex("MA_KHANG")));
+            entityHoaDonNo.setMA_THE(c.getString(c.getColumnIndex("MA_THE")));
+            entityHoaDonNo.setTEN_KHANG(c.getString(c.getColumnIndex("TEN_KHANG")));
+            entityHoaDonNo.setDIA_CHI(c.getString(c.getColumnIndex("DIA_CHI")));
+            entityHoaDonNo.setTHANG_TTOAN(Common.parseDate(c.getString(c.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            entityHoaDonNo.setPHIEN_TTOAN(c.getInt(c.getColumnIndex("PHIEN_TTOAN")));
+            entityHoaDonNo.setSO_TIEN_TTOAN(c.getInt(c.getColumnIndex("SO_TIEN_TTOAN")));
+            entityHoaDonNo.setSO_GCS(c.getString(c.getColumnIndex("SO_GCS")));
+            entityHoaDonNo.setDIEN_LUC(c.getString(c.getColumnIndex("DIEN_LUC")));
+            entityHoaDonNo.setSO_HO(c.getString(c.getColumnIndex("SO_HO")));
+            entityHoaDonNo.setSO_DAU_KY(c.getString(c.getColumnIndex("SO_DAU_KY")));
+            entityHoaDonNo.setSO_CUOI_KY(c.getString(c.getColumnIndex("SO_CUOI_KY")));
+            entityHoaDonNo.setSO_CTO(c.getString(c.getColumnIndex("SO_CTO")));
+            entityHoaDonNo.setSDT_ECPAY(c.getString(c.getColumnIndex("SDT_ECPAY")));
+            entityHoaDonNo.setSDT_EVN(c.getString(c.getColumnIndex("SDT_EVN")));
+            entityHoaDonNo.setGIAO_THU(c.getString(c.getColumnIndex("GIAO_THU")));
+            entityHoaDonNo.setNGAY_GIAO_THU(Common.parseDate(c.getString(c.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            entityHoaDonNo.setTRANG_THAI_TTOAN(c.getString(c.getColumnIndex("TRANG_THAI_TTOAN")));
+            entityHoaDonNo.setVI_TTOAN(c.getString(c.getColumnIndex("VI_TTOAN")));
+
+        }
+
+
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+        return entityHoaDonNo;
+    }
+
+    public List<EntityKhachHang> selectAllCustomerFitterBy(String edong, Common.TYPE_SEARCH typeSearch, String infoSearch) {
+        List<EntityKhachHang> customerList = new ArrayList<>();
 
         boolean fail = TextUtils.isEmpty(edong) || TextUtils.isEmpty(infoSearch) && typeSearch.getPosition() != Common.TYPE_SEARCH.ALL.getPosition();
         if (fail)
@@ -783,29 +875,29 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         String query = null;
         switch (typeSearch.getPosition()) {
             case 0:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "'";
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "'";
                 break;
             case 1:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and code like '%" + infoSearch + "%'";
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "' and MA_KHANG like '%" + infoSearch + "%'";
                 break;
             case 2:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and name like '%" + infoSearch + "%'";
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "' and TEN_KHANG like '%" + infoSearch + "%'";
                 break;
             case 3:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and phoneByevn like '%" + infoSearch + "%'";
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "' and SDT_EVN like '%" + infoSearch + "%'";
                 break;
             case 4:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and address like '%" + infoSearch + "%'";
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "' and DIA_CHI like '%" + infoSearch + "%'";
                 break;
             case 5:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and bookCmis like '%" + infoSearch + "%'";
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "' and SO_GCS like '%" + infoSearch + "%'";
                 break;
             case 6:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong + "' and road like '%" + infoSearch + "%'";
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "' and LO_TRINH like '%" + infoSearch + "%'";
                 break;
 
           /*  case 7:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE edongKey = '" + edong
+                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong
                         + "' and code like '%" + infoSearch
                         + "%' or name like '%" + infoSearch
                         + "%' or phoneByevn like '%" + infoSearch
@@ -817,77 +909,73 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         }
 
         database = this.getWritableDatabase();
-        Cursor mCursor = database.rawQuery(query, null);
+        Cursor c = database.rawQuery(query, null);
 
-        if (mCursor != null && mCursor.moveToFirst()) {
-            int count = mCursor.getCount();
+        if (c != null && c.moveToFirst()) {
+            int count = c.getCount();
             do {
-                String code = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("code")));
-                String name = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name")));
-                String address = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("address")));
-                String cardNo = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cardNo")));
-                String pcCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCode")));
-                String pcCodeExt = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCodeExt")));
-                String phoneByevn = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByevn")));
-                String phoneByecp = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByecp")));
-                String bookCmis = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bookCmis")));
-                String electricityMeter = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("electricityMeter")));
-                String inning = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("inning")));
-                String status = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("status")));
-                String bankAccount = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bankAccount")));
-                String idNumber = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idNumber")));
-                String bankName = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bankName")));
-                String edongKey = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edongKey")));
-                boolean isShowBill = booleanConvertNull(mCursor.getInt(mCursor.getColumnIndex("isShowBill")));
 
-                String idChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idChanged")));
-                String dateChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("dateChanged")));
-                Customer customer = new Customer(code, name, address, pcCode, pcCodeExt, phoneByevn, phoneByecp, bookCmis, electricityMeter, inning, status, bankAccount, idNumber, bankName, edongKey, idChanged, dateChanged, isShowBill);
-                customer.setCardNo(cardNo);
-                customerList.add(customer);
+
+                EntityKhachHang khachHang = new EntityKhachHang();
+                khachHang.setE_DONG(c.getString(c.getColumnIndex("E_DONG")));
+                khachHang.setMA_KHANG(c.getString(c.getColumnIndex("MA_KHANG")));
+                khachHang.setMA_THE(c.getString(c.getColumnIndex("MA_THE")));
+                khachHang.setTEN_KHANG(c.getString(c.getColumnIndex("TEN_KHANG")));
+                khachHang.setDIA_CHI(c.getString(c.getColumnIndex("DIA_CHI")));
+                khachHang.setPHIEN_TTOAN(c.getString(c.getColumnIndex("PHIEN_TTOAN")));
+                khachHang.setLO_TRINH(c.getString(c.getColumnIndex("LO_TRINH")));
+                khachHang.setSO_GCS(c.getString(c.getColumnIndex("SO_GCS")));
+                khachHang.setDIEN_LUC(c.getString(c.getColumnIndex("DIEN_LUC")));
+                khachHang.setSO_HO(c.getString(c.getColumnIndex("SO_HO")));
+                khachHang.setSDT_ECPAY(c.getString(c.getColumnIndex("SDT_ECPAY")));
+                khachHang.setSDT_EVN(c.getString(c.getColumnIndex("SDT_EVN")));
+                khachHang.setGIAO_THU(c.getString(c.getColumnIndex("GIAO_THU")));
+                khachHang.setNGAY_GIAO_THU(Common.parseDate(c.getString(c.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+
+                customerList.add(khachHang);
             }
-            while (mCursor.moveToNext());
+            while (c.moveToNext());
 
-            mCursor.close();
+            c.close();
         }
         return customerList;
     }
 
 
-    public List<Customer> selectAllCustomerFitter(String _maKH, String _name, String _address, String _phone, String _bookCmis) {
-        List<Customer> customerList = new ArrayList<>();
+    public List<EntityKhachHang> selectAllCustomerFitter(String _maKH, String _name, String _address, String _phone, String _bookCmis) {
+        List<EntityKhachHang> customerList = new ArrayList<>();
 
 
         String query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE ";
         if(_maKH.length() != 0)
         {
-            query += "code like '%" + _maKH + "%' or ";
-            query += "cardNo like '%" + _maKH + "%' ";
+            query += "MA_KHANG like '%" + _maKH + "%' or ";
+            query += "MA_THE like '%" + _maKH + "%' ";
         }else
         {
             boolean hasWhere = false;
 
             if(_name.length() > 0)
             {
-                query += (hasWhere ? "and "  : "") + "name like '%" + _name + "%' ";
+                query += (hasWhere ? "and "  : "") + "TEN_KHANG like '%" + _name + "%' ";
                 hasWhere = true;
             }
 
             if(_address.length() > 0)
             {
-                query += (hasWhere ? "and "  : "") + "address like '%" + _address + "%' ";
+                query += (hasWhere ? "and "  : "") + "DIA_CHI like '%" + _address + "%' ";
                 hasWhere = true;
             }
 
             if(_phone.length() > 0)
             {
-                query += (hasWhere ? "and "  : "") + "phoneByevn like '%" + _phone + "%' ";
+                query += (hasWhere ? "and "  : "") + "SDT_ECPAY like '%" + _phone + "%' ";
                 hasWhere = true;
             }
 
             if(_bookCmis.length() > 0)
             {
-                query += (hasWhere ? "and "  : "") + "bookCmis like '%" + _bookCmis + "%' ";
+                query += (hasWhere ? "and "  : "") + "SO_GCS like '%" + _bookCmis + "%' ";
                 hasWhere = true;
             }
         }
@@ -898,28 +986,23 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (mCursor != null && mCursor.moveToFirst()) {
             int count = mCursor.getCount();
             do {
-                String code = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("code")));
-                String name = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name")));
-                String address = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("address")));
-                String cardNo = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cardNo")));
-                String pcCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCode")));
-                String pcCodeExt = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCodeExt")));
-                String phoneByevn = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByevn")));
-                String phoneByecp = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByecp")));
-                String bookCmis = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bookCmis")));
-                String electricityMeter = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("electricityMeter")));
-                String inning = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("inning")));
-                String status = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("status")));
-                String bankAccount = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bankAccount")));
-                String idNumber = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idNumber")));
-                String bankName = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bankName")));
-                String edongKey = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edongKey")));
-                boolean isShowBill = booleanConvertNull(mCursor.getInt(mCursor.getColumnIndex("isShowBill")));
+                EntityKhachHang customer = new EntityKhachHang();
+                customer.setMA_KHANG(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("MA_KHANG"))));
+                customer.setE_DONG(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("E_DONG"))));
+                customer.setMA_THE(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("MA_THE"))));
+                customer.setTEN_KHANG(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"))));
+                customer.setDIA_CHI(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("DIA_CHI"))));
+                customer.setPHIEN_TTOAN(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("PHIEN_TTOAN"))));
+                customer.setLO_TRINH(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("LO_TRINH"))));
+                customer.setSO_GCS(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("SO_GCS"))));
+                customer.setDIEN_LUC(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC"))));
+                customer.setSO_HO(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("SO_HO"))));
+                customer.setSDT_ECPAY(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("SDT_ECPAY"))));
+                customer.setSDT_EVN(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("SDT_EVN"))));
+                customer.setGIAO_THU(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("GIAO_THU"))));
+                customer.setNGAY_GIAO_THU(Common.parseDate(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU"))), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
 
-                String idChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idChanged")));
-                String dateChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("dateChanged")));
-                Customer customer = new Customer(code, name, address, pcCode, pcCodeExt, phoneByevn, phoneByecp, bookCmis, electricityMeter, inning, status, bankAccount, idNumber, bankName, edongKey, idChanged, dateChanged, isShowBill);
-                customer.setCardNo(cardNo);
+
                 customerList.add(customer);
             }
             while (mCursor.moveToNext());
@@ -929,61 +1012,66 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return customerList;
     }
 
-    public List<PayAdapter.BillEntityAdapter> selectInfoBillOfCustomerToRecycler(String edong, String code) {
+    public Pair<List<PayAdapter.BillEntityAdapter>, Long> selectInfoBillOfCustomerToRecycler(String edong, String code) {
+
         List<PayAdapter.BillEntityAdapter> billList = new ArrayList<>();
 
         database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode ='" + code + "' ORDER BY term DESC";
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and MA_KHANG ='" + code + "' ORDER BY THANG_TTOAN DESC";
         Cursor mCursor = database.rawQuery(query, null);
 
+        long total = 0;
         if (mCursor.getCount() == 0)
-            return billList;
+            return new Pair<>(billList, total);
+        if(mCursor.moveToFirst())
+        {
+            do {
+                String viThanhToan = mCursor.getString(mCursor.getColumnIndex("VI_TTOAN"));
+                int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("MA_HOA_DON")));
+                int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
+                String status = mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN"));
 
-        mCursor.moveToFirst();
-        do {
-            int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId")));
-            int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
-            int status = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")));
-            //TODO mark
-            boolean isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))) == 0 ? false : true;
-            String customerPayCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerPayCode")));
-            String billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
+                total += amount;
 
-            String strTerm = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strTerm")));
-            String term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
-            term = Common.convertDateToDate(term, yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.MMyyyy);
+                String term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("THANG_TTOAN")));
+                term = Common.convertDateToDate(term, yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.MMyyyy);
 
-            String termVisible = strTerm.equals(Common.TEXT_EMPTY) ? term : strTerm;
+                String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")));
 
-            String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
+                PayAdapter.BillEntityAdapter bill = new PayAdapter.BillEntityAdapter();
+                bill.setBillId(billId);
+                bill.setVI_TTOAN(viThanhToan);
+                bill.setTIEN_THANH_TOAN(amount);
+                bill.setTHANG_THANH_TOAN(term);
+                bill.setTRANG_THAI_TT(status);
+                bill.setMA_DIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
+                bill.setChecked(false);
+                bill.setMA_KHACH_HANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
 
-            PayAdapter.BillEntityAdapter bill = new PayAdapter.BillEntityAdapter();
-            bill.setBillId(billId);
-            bill.setBillingBy(billingBy);
-            bill.setCustomerPayCode(customerPayCode);
-            bill.setMoneyBill(amount);
-            bill.setMonthBill(termVisible);
-            bill.setStatus(status);
-            bill.setChecked(isChecked);
-            if (bill.getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())
-                bill.setPrint(false);
-            else bill.setPrint(true);
+                bill.setCheckEnable(!bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()));
 
-            bill.setRequestDate(dateRequest);
+                if (bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()) && MainActivity.mEdong.equalsIgnoreCase(viThanhToan))
+                    bill.setPrintEnable(true);
+                else
+                    bill.setPrintEnable(false);
 
-            billList.add(bill);
+                bill.setRequestDate(dateRequest);
+
+                billList.add(bill);
+            }
+            while (mCursor.moveToNext());
         }
-        while (mCursor.moveToNext());
+
 
         if (mCursor != null && !mCursor.isClosed()) {
             mCursor.close();
         }
-        return billList;
+        return new Pair<>(billList, total);
     }
 
     public int countMoneyAllBill(String edong) {
         database = this.getReadableDatabase();
-        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status = " + ZERO;
+        String query = "SELECT SUM(SO_TIEN_TTOAN) FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "'";// and status = " + ZERO;
         Cursor mCursor = database.rawQuery(query, null);
         int totalMoney = ERROR_OCCUR;
         if (mCursor.moveToFirst())
@@ -997,115 +1085,90 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return totalMoney;
     }
 
-    public int insertNotUpdateCustomerFromSearchOnline(String edong, CustomerInsideBody customer) {
-        if (edong == null || edong.trim().isEmpty() || customer == null)
-            return ERROR_OCCUR;
+    public void insertOrUpdateCustomerFromSearchOnline(EntityKhachHang customer) {
 
         ContentValues initialValues = new ContentValues();
 
-        initialValues.put("code", customer.getCode());
-        initialValues.put("name", customer.getName());
-        initialValues.put("cardNo", customer.getCardNo());
-        initialValues.put("address", customer.getAddress());
-        initialValues.put("pcCode", customer.getPcCode());
-        initialValues.put("pcCodeExt", customer.getPcCodeExt());
-        initialValues.put("phoneByevn", customer.getPhoneByevn());
-        initialValues.put("phoneByecp", customer.getPhoneByecp());
-        initialValues.put("bookCmis", customer.getBookCmis());
-        initialValues.put("electricityMeter", customer.getElectricityMeter());
-        initialValues.put("inning", customer.getInning());
-        initialValues.put("status", customer.getStatus());
-        initialValues.put("bankAccount", customer.getBankAccount());
-        initialValues.put("idNumber", customer.getIdNumber());
-        initialValues.put("bankName", customer.getBankName());
-        initialValues.put("edongKey", edong);
-
+        initialValues.put("MA_KHANG", customer.getMA_KHANG());
+        initialValues.put("TEN_KHANG", customer.getTEN_KHANG());
+        initialValues.put("MA_THE", customer.getMA_THE());
+        initialValues.put("DIA_CHI", customer.getDIA_CHI());
+        initialValues.put("PHIEN_TTOAN", customer.getPHIEN_TTOAN());
+        initialValues.put("LO_TRINH", customer.getLO_TRINH());
+        initialValues.put("SO_GCS", customer.getSO_GCS());
+        initialValues.put("DIEN_LUC", customer.getDIEN_LUC());
+        initialValues.put("SO_HO", "");
+        initialValues.put("E_DONG", customer.getE_DONG());
+        initialValues.put("SDT_ECPAY", customer.getSDT_ECPAY());
+        initialValues.put("SDT_EVN", customer.getSDT_EVN());
+        initialValues.put("NGAY_GIAO_THU", Common.parse(customer.getNGAY_GIAO_THU(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
         database = getWritableDatabase();
-        int rowAffect = (int) database.insert(TABLE_NAME_CUSTOMER, null, initialValues);
-        return rowAffect;
-    }
 
-    public int insertNotUpdateBillOfCustomer(String edong, BillInsideCustomer billInsideCustomer) {
-        if (edong == null || edong.trim().isEmpty() || billInsideCustomer == null)
-            return SQLiteConnection.ERROR_OCCUR;
+        String query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE MA_KHANG = '" + customer.getMA_KHANG() + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+        if (mCursor.moveToFirst()) {
+            database.update(TABLE_NAME_CUSTOMER, initialValues, "MA_KHANG=?", new String[]{String.valueOf(customer.getMA_KHANG())});
+        }else
+        {
 
-        ContentValues initialValues = new ContentValues();
-        initialValues.put("customerCode", billInsideCustomer.getCustomerCode());
-        initialValues.put("customerPayCode", billInsideCustomer.getCustomerPayCode());
-        initialValues.put("billId", billInsideCustomer.getBillId());
-
-        String term = billInsideCustomer.getTerm();
-        //20170414011107000 != 2015-01-01
-        if (term.length() == yyyyMMdd.toString().length()) {
-            term = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
+            initialValues.put("GIAO_THU", customer.getGIAO_THU());
+            database.insert(TABLE_NAME_CUSTOMER, null, initialValues);
         }
 
-//        String strTerm = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
-//                String strTerm = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strTerm")));
-//        String termVisible = strTerm.equals(Common.TEXT_EMPTY) ? term : strTerm;
 
-        initialValues.put("term", term);
-        initialValues.put("strTerm", billInsideCustomer.getStrTerm());
-        initialValues.put("amount", billInsideCustomer.getAmount());
-        initialValues.put("period", billInsideCustomer.getPeriod());
-        initialValues.put("issueDate", billInsideCustomer.getIssueDate());
-        initialValues.put("strIssueDate", billInsideCustomer.getStrIssueDate());
-        initialValues.put("status", billInsideCustomer.getStatus());
-        initialValues.put("seri", billInsideCustomer.getSeri());
-        initialValues.put("pcCode", billInsideCustomer.getPcCode());
-        initialValues.put("handoverCode", billInsideCustomer.getHandoverCode());
-        initialValues.put("cashierCode", billInsideCustomer.getCashierCode());
-        initialValues.put("bookCmis", billInsideCustomer.getBookCmis());
-        initialValues.put("fromDate", billInsideCustomer.getFromDate());
-        initialValues.put("toDate", billInsideCustomer.getToDate());
-        initialValues.put("strFromDate", billInsideCustomer.getStrFromDate());
-        initialValues.put("strToDate", billInsideCustomer.getStrToDate());
-        initialValues.put("home", billInsideCustomer.getHome());
-        initialValues.put("tax", billInsideCustomer.getTax());
-        initialValues.put("billNum", billInsideCustomer.getBillNum());
-        initialValues.put("currency", billInsideCustomer.getCurrency());
-        initialValues.put("priceDetails", billInsideCustomer.getPriceDetails());
-        initialValues.put("numeDetails", billInsideCustomer.getNumeDetails());
-        initialValues.put("amountDetails", billInsideCustomer.getAmountDetails());
-        initialValues.put("oldIndex", billInsideCustomer.getOldIndex());
-        initialValues.put("newIndex", billInsideCustomer.getNewIndex());
-        initialValues.put("nume", billInsideCustomer.getNume());
-        initialValues.put("amountNotTax", billInsideCustomer.getAmountNotTax());
-        initialValues.put("amountTax", billInsideCustomer.getAmountTax());
-        initialValues.put("multiple", billInsideCustomer.getMultiple());
-        initialValues.put("billType", billInsideCustomer.getBillType());
-        initialValues.put("typeIndex", billInsideCustomer.getTypeIndex());
-        initialValues.put("groupTypeIndex", billInsideCustomer.getGroupTypeIndex());
-        initialValues.put("createdDate", billInsideCustomer.getCreatedDate());
-        initialValues.put("idChanged", billInsideCustomer.getIdChanged());
-        initialValues.put("dateChanged", billInsideCustomer.getDateChanged());
-        initialValues.put("edong", billInsideCustomer.getEdong());
-        initialValues.put("pcCodeExt", billInsideCustomer.getPcCodeExt());
-        initialValues.put("code", billInsideCustomer.getCode());
-        initialValues.put("name", billInsideCustomer.getName());
-        initialValues.put("nameNosign", billInsideCustomer.getNameNosign());
-        initialValues.put("phoneByevn", billInsideCustomer.getPhoneByevn());
-        initialValues.put("phoneByecp", billInsideCustomer.getPhoneByecp());
-        initialValues.put("electricityMeter", billInsideCustomer.getElectricityMeter());
-        initialValues.put("inning", billInsideCustomer.getInning());
-        initialValues.put("road", billInsideCustomer.getRoad());
-        initialValues.put("station", billInsideCustomer.getStation());
-        initialValues.put("taxCode", billInsideCustomer.getTaxCode());
-        initialValues.put("trade", billInsideCustomer.getTrade());
-        initialValues.put("countPeriod", billInsideCustomer.getCountPeriod());
-        initialValues.put("team", billInsideCustomer.getTeam());
-        initialValues.put("type", billInsideCustomer.getType());
-        initialValues.put("lastQuery", billInsideCustomer.getLastQuery());
-        initialValues.put("groupType", billInsideCustomer.getGroupType());
-        initialValues.put("billingChannel", billInsideCustomer.getBillingChannel());
-        initialValues.put("billingType", billInsideCustomer.getBillType());
-        initialValues.put("billingBy", billInsideCustomer.getBillingBy());
-        initialValues.put("cashierPay", billInsideCustomer.getCashierPay());
-        initialValues.put("edongKey", edong);
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+    }
+
+    public void insertOrUpdateBillSearchOnline(String edong, BillInsideCustomer bodyBillResponse) {
+
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("MA_KHANG", bodyBillResponse.getCustomerCode());
+        initialValues.put("E_DONG", edong);
+        initialValues.put("MA_HOA_DON", bodyBillResponse.getBillId());
+        initialValues.put("SERI_HDON", bodyBillResponse.getSeri());
+
+
+        initialValues.put("MA_THE", bodyBillResponse.getCardNo());
+        initialValues.put("TEN_KHANG", bodyBillResponse.getName());
+        initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
+
+        initialValues.put("THANG_TTOAN", bodyBillResponse.getTerm());
+        initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
+        initialValues.put("SO_TIEN_TTOAN", bodyBillResponse.getAmount());
+        initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
+        initialValues.put("DIEN_LUC", bodyBillResponse.getPcCode());
+        initialValues.put("SO_HO", bodyBillResponse.getHome());
+
+        initialValues.put("SO_DAU_KY", bodyBillResponse.getOldIndex());
+        initialValues.put("SO_CUOI_KY", bodyBillResponse.getNewIndex());
+        initialValues.put("SO_CTO", bodyBillResponse.getElectricityMeter());
+        initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
+        initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
+        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+        initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
+        initialValues.put("VI_TTOAN", "");
+
         database = getWritableDatabase();
-        int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
 
-        return rowAffect;
+
+        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE MA_HOA_DON = '" + bodyBillResponse.getBillId() + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+        if (mCursor.moveToFirst()) {
+            database.update(TABLE_NAME_BILL, initialValues, "MA_HOA_DON=?", new String[]{String.valueOf(bodyBillResponse.getBillId())});
+        }else
+        {
+            initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.VANG_LAI.getCode());
+            database.insert(TABLE_NAME_BILL, null, initialValues);
+        }
+
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+
     }
 
     public void updateBillOfCustomerIsChecked(String edong, String code, int billId, boolean checked) {
@@ -1136,18 +1199,19 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (edong == null || edong.trim().isEmpty())
             return ERROR_OCCUR;
 
-        database = this.getReadableDatabase();
-        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and isChecked = " + Common.ONE + " and status = " + statusBilling.getCode();
-        Cursor mCursor = database.rawQuery(query, null);
-
-        int totalMoney = ERROR_OCCUR;
-        if (mCursor.moveToFirst())
-            totalMoney = mCursor.getInt(0);
-
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
-        return totalMoney;
+//        database = this.getReadableDatabase();
+//        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and isChecked = " + Common.ONE + " and status = " + statusBilling.getCode();
+//        Cursor mCursor = database.rawQuery(query, null);
+//
+//        int totalMoney = ERROR_OCCUR;
+//        if (mCursor.moveToFirst())
+//            totalMoney = mCursor.getInt(0);
+//
+//        if (mCursor != null && !mCursor.isClosed()) {
+//            mCursor.close();
+//        }
+//        return totalMoney;
+        return  -1;
     }
 
 
@@ -1181,60 +1245,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return totalBills;
     }
 
-
-    private List<PayBillsDialogAdapter.Entity> selectAllBillsOfAllCustomerCheckedWithQuery(String edong, String query) {
-        database = getReadableDatabase();
-        Cursor mCursor = database.rawQuery(query, null);
-        List<PayBillsDialogAdapter.Entity> listBillChecked = new ArrayList<>();
-        PayBillsDialogAdapter.Entity entity = null;
-
-        if (mCursor.moveToFirst()) {
-            do {
-                String term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
-                term = Common.convertDateToDate(term, yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.MMyyyy);
-
-                String strTerm = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strTerm")));
-                String termVisible = strTerm.equals(Common.TEXT_EMPTY) ? term : strTerm;
-
-                entity = new PayBillsDialogAdapter.Entity(
-                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode"))),
-                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name"))),
-                        termVisible,
-                        longConvertNull(mCursor.getLong(mCursor.getColumnIndex("amount"))),
-                        booleanConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked"))),
-                        edong,
-                        intConvertNull(mCursor.getInt(mCursor.getColumnIndex("billId"))),
-                        intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")))
-                );
-
-                listBillChecked.add(entity);
-            }
-            while (mCursor.moveToNext());
-        }
-
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
-
-        return listBillChecked;
-    }
-
-    public List<PayBillsDialogAdapter.Entity> selectAllBillsOfAllCustomerChecked(String edong) {
-        if (TextUtils.isEmpty(edong))
-            return null;
-
-        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.strTerm, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, strTerm, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " ORDER BY date(term) DESC ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
-        Log.e(TAG, "selectAllBillsOfAllCustomerChecked: " + query);
-        return selectAllBillsOfAllCustomerCheckedWithQuery(edong, query);
-    }
-
-    public List<PayBillsDialogAdapter.Entity> selectAllBillsOfAllCustomerCheckedWithStatus(String edong, Common.STATUS_BILLING statusBilling) {
-        if (TextUtils.isEmpty(edong))
-            return null;
-
-        String query = "SELECT A.billId, A.status,  A.customerCode, A.term, A.strTerm, A.amount, A.isChecked, B.name  FROM (SELECT DISTINCT billId, status, customerCode, term, strTerm, amount, isChecked FROM " + TABLE_NAME_BILL + " WHERE edongKey='" + edong + "' and isChecked = " + ONE + " and status = " + statusBilling.getCode() + " ORDER BY date(term) DESC ) AS A JOIN TBL_CUSTOMER B on A.customerCode = B.code";
-        return selectAllBillsOfAllCustomerCheckedWithQuery(edong, query);
-    }
 
     private boolean booleanConvertNull(int isChecked) {
         return isChecked == Common.ONE ? true : false;
@@ -1323,65 +1333,65 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         Cursor c = database.rawQuery(query, null);
         EntityDanhSachThu entityDanhSachThu = new EntityDanhSachThu();
         if (c.moveToFirst()) {
-            entityDanhSachThu.setEdong(c.getString(c.getColumnIndex("edong")));
-            entityDanhSachThu.setCustomerCode(c.getString(c.getColumnIndex("customerCode")));
-            entityDanhSachThu.setCustomerPayCode(c.getString(c.getColumnIndex("customerPayCode")));
-            entityDanhSachThu.setBillId(c.getInt(c.getColumnIndex("billId")));
-            entityDanhSachThu.setTerm(c.getString(c.getColumnIndex("term")));
-            entityDanhSachThu.setAmount(c.getInt(c.getColumnIndex("amount")));
-            entityDanhSachThu.setPeriod(c.getString(c.getColumnIndex("period")));
-            entityDanhSachThu.setIssueDate(c.getString(c.getColumnIndex("issueDate")));
-            entityDanhSachThu.setStrIssueDate(c.getString(c.getColumnIndex("strIssueDate")));
-            entityDanhSachThu.setStatus(c.getInt(c.getColumnIndex("status")));
-            entityDanhSachThu.setSeri(c.getString(c.getColumnIndex("seri")));
-            entityDanhSachThu.setPcCode(c.getString(c.getColumnIndex("pcCode")));
-            entityDanhSachThu.setHandoverCode(c.getString(c.getColumnIndex("handoverCode")));
-            entityDanhSachThu.setCashierCode(c.getString(c.getColumnIndex("cashierCode")));
-            entityDanhSachThu.setBookCmis(c.getString(c.getColumnIndex("bookCmis")));
-            entityDanhSachThu.setFromDate(c.getString(c.getColumnIndex("fromDate")));
-            entityDanhSachThu.setToDate(c.getString(c.getColumnIndex("toDate")));
-            entityDanhSachThu.setStrFromDate(c.getString(c.getColumnIndex("strFromDate")));
-            entityDanhSachThu.setStrToDate(c.getString(c.getColumnIndex("strToDate")));
-            entityDanhSachThu.setHome(c.getString(c.getColumnIndex("home")));
-            entityDanhSachThu.setTax(c.getFloat(c.getColumnIndex("tax")));
-            entityDanhSachThu.setBillNum(c.getString(c.getColumnIndex("billNum")));
-            entityDanhSachThu.setCurrency(c.getString(c.getColumnIndex("currency")));
-            entityDanhSachThu.setPriceDetails(c.getString(c.getColumnIndex("priceDetails")));
-            entityDanhSachThu.setNumeDetails(c.getString(c.getColumnIndex("numeDetails")));
-            entityDanhSachThu.setAmountDetails(c.getString(c.getColumnIndex("amountDetails")));
-            entityDanhSachThu.setOldIndex(c.getString(c.getColumnIndex("oldIndex")));
-            entityDanhSachThu.setNewIndex(c.getString(c.getColumnIndex("newIndex")));
-            entityDanhSachThu.setNume(c.getString(c.getColumnIndex("nume")));
-            entityDanhSachThu.setAmountNotTax(c.getInt(c.getColumnIndex("amountNotTax")));
-            entityDanhSachThu.setAmountTax(c.getString(c.getColumnIndex("amountTax")));
-            entityDanhSachThu.setMultiple(c.getString(c.getColumnIndex("multiple")));
-            entityDanhSachThu.setBillType(c.getString(c.getColumnIndex("billType")));
-            entityDanhSachThu.setTypeIndex(c.getString(c.getColumnIndex("typeIndex")));
-            entityDanhSachThu.setGroupTypeIndex(c.getString(c.getColumnIndex("groupTypeIndex")));
-            entityDanhSachThu.setCreatedDate(c.getString(c.getColumnIndex("createdDate")));
-            entityDanhSachThu.setIdChanged(c.getInt(c.getColumnIndex("idChanged")));
-            entityDanhSachThu.setDateChanged(c.getString(c.getColumnIndex("dateChanged")));
-            entityDanhSachThu.setPcCodeExt(c.getString(c.getColumnIndex("pcCodeExt")));
-            entityDanhSachThu.setCode(c.getString(c.getColumnIndex("code")));
-            entityDanhSachThu.setName(c.getString(c.getColumnIndex("name")));
-            entityDanhSachThu.setNameNosign(c.getString(c.getColumnIndex("nameNosign")));
-            entityDanhSachThu.setPhoneByevn(c.getString(c.getColumnIndex("phoneByevn")));
-            entityDanhSachThu.setPhoneByecp(c.getString(c.getColumnIndex("phoneByecp")));
-            entityDanhSachThu.setElectricityMeter(c.getString(c.getColumnIndex("electricityMeter")));
-            entityDanhSachThu.setInning(c.getString(c.getColumnIndex("inning")));
-            entityDanhSachThu.setRoad(c.getString(c.getColumnIndex("road")));
-            entityDanhSachThu.setStation(c.getString(c.getColumnIndex("station")));
-            entityDanhSachThu.setTaxCode(c.getString(c.getColumnIndex("taxCode")));
-            entityDanhSachThu.setTrade(c.getString(c.getColumnIndex("trade")));
-            entityDanhSachThu.setCountPeriod(c.getString(c.getColumnIndex("countPeriod")));
-            entityDanhSachThu.setTeam(c.getString(c.getColumnIndex("team")));
-            entityDanhSachThu.setType(c.getInt(c.getColumnIndex("type")));
-            entityDanhSachThu.setLastQuery(c.getString(c.getColumnIndex("lastQuery")));
-            entityDanhSachThu.setGroupType(c.getInt(c.getColumnIndex("groupType")));
-            entityDanhSachThu.setBillingChannel(c.getString(c.getColumnIndex("billingChannel")));
-            entityDanhSachThu.setBillType(c.getString(c.getColumnIndex("billingType")));
-            entityDanhSachThu.setBillingBy(c.getString(c.getColumnIndex("billingBy")));
-            entityDanhSachThu.setCashierPay(c.getString(c.getColumnIndex("cashierPay")));
+//            entityDanhSachThu.setEdong(c.getString(c.getColumnIndex("edong")));
+//            entityDanhSachThu.setCustomerCode(c.getString(c.getColumnIndex("customerCode")));
+//            entityDanhSachThu.setCustomerPayCode(c.getString(c.getColumnIndex("customerPayCode")));
+//            entityDanhSachThu.setBillId(c.getInt(c.getColumnIndex("billId")));
+//            entityDanhSachThu.setTerm(c.getString(c.getColumnIndex("term")));
+//            entityDanhSachThu.setAmount(c.getInt(c.getColumnIndex("amount")));
+//            entityDanhSachThu.setPeriod(c.getString(c.getColumnIndex("period")));
+//            entityDanhSachThu.setIssueDate(c.getString(c.getColumnIndex("issueDate")));
+//            entityDanhSachThu.setStrIssueDate(c.getString(c.getColumnIndex("strIssueDate")));
+//            entityDanhSachThu.setTRANG_THAI_TT(c.getInt(c.getColumnIndex("status")));
+//            entityDanhSachThu.setSeri(c.getString(c.getColumnIndex("seri")));
+//            entityDanhSachThu.setPcCode(c.getString(c.getColumnIndex("pcCode")));
+//            entityDanhSachThu.setHandoverCode(c.getString(c.getColumnIndex("handoverCode")));
+//            entityDanhSachThu.setCashierCode(c.getString(c.getColumnIndex("cashierCode")));
+//            entityDanhSachThu.setBookCmis(c.getString(c.getColumnIndex("bookCmis")));
+//            entityDanhSachThu.setFromDate(c.getString(c.getColumnIndex("fromDate")));
+//            entityDanhSachThu.setToDate(c.getString(c.getColumnIndex("toDate")));
+//            entityDanhSachThu.setStrFromDate(c.getString(c.getColumnIndex("strFromDate")));
+//            entityDanhSachThu.setStrToDate(c.getString(c.getColumnIndex("strToDate")));
+//            entityDanhSachThu.setHome(c.getString(c.getColumnIndex("home")));
+//            entityDanhSachThu.setTax(c.getFloat(c.getColumnIndex("tax")));
+//            entityDanhSachThu.setBillNum(c.getString(c.getColumnIndex("billNum")));
+//            entityDanhSachThu.setCurrency(c.getString(c.getColumnIndex("currency")));
+//            entityDanhSachThu.setPriceDetails(c.getString(c.getColumnIndex("priceDetails")));
+//            entityDanhSachThu.setNumeDetails(c.getString(c.getColumnIndex("numeDetails")));
+//            entityDanhSachThu.setAmountDetails(c.getString(c.getColumnIndex("amountDetails")));
+//            entityDanhSachThu.setOldIndex(c.getString(c.getColumnIndex("oldIndex")));
+//            entityDanhSachThu.setNewIndex(c.getString(c.getColumnIndex("newIndex")));
+//            entityDanhSachThu.setNume(c.getString(c.getColumnIndex("nume")));
+//            entityDanhSachThu.setAmountNotTax(c.getInt(c.getColumnIndex("amountNotTax")));
+//            entityDanhSachThu.setAmountTax(c.getString(c.getColumnIndex("amountTax")));
+//            entityDanhSachThu.setMultiple(c.getString(c.getColumnIndex("multiple")));
+//            entityDanhSachThu.setBillType(c.getString(c.getColumnIndex("billType")));
+//            entityDanhSachThu.setTypeIndex(c.getString(c.getColumnIndex("typeIndex")));
+//            entityDanhSachThu.setGroupTypeIndex(c.getString(c.getColumnIndex("groupTypeIndex")));
+//            entityDanhSachThu.setCreatedDate(c.getString(c.getColumnIndex("createdDate")));
+//            entityDanhSachThu.setIdChanged(c.getInt(c.getColumnIndex("idChanged")));
+//            entityDanhSachThu.setDateChanged(c.getString(c.getColumnIndex("dateChanged")));
+//            entityDanhSachThu.setPcCodeExt(c.getString(c.getColumnIndex("pcCodeExt")));
+//            entityDanhSachThu.setCode(c.getString(c.getColumnIndex("code")));
+//            entityDanhSachThu.setName(c.getString(c.getColumnIndex("name")));
+//            entityDanhSachThu.setNameNosign(c.getString(c.getColumnIndex("nameNosign")));
+//            entityDanhSachThu.setPhoneByevn(c.getString(c.getColumnIndex("phoneByevn")));
+//            entityDanhSachThu.setPhoneByecp(c.getString(c.getColumnIndex("phoneByecp")));
+//            entityDanhSachThu.setElectricityMeter(c.getString(c.getColumnIndex("electricityMeter")));
+//            entityDanhSachThu.setInning(c.getString(c.getColumnIndex("inning")));
+//            entityDanhSachThu.setRoad(c.getString(c.getColumnIndex("road")));
+//            entityDanhSachThu.setStation(c.getString(c.getColumnIndex("station")));
+//            entityDanhSachThu.setTaxCode(c.getString(c.getColumnIndex("taxCode")));
+//            entityDanhSachThu.setTrade(c.getString(c.getColumnIndex("trade")));
+//            entityDanhSachThu.setCountPeriod(c.getString(c.getColumnIndex("countPeriod")));
+//            entityDanhSachThu.setTeam(c.getString(c.getColumnIndex("team")));
+//            entityDanhSachThu.setType(c.getInt(c.getColumnIndex("type")));
+//            entityDanhSachThu.setLastQuery(c.getString(c.getColumnIndex("lastQuery")));
+//            entityDanhSachThu.setGroupType(c.getInt(c.getColumnIndex("groupType")));
+//            entityDanhSachThu.setBillingChannel(c.getString(c.getColumnIndex("billingChannel")));
+//            entityDanhSachThu.setBillType(c.getString(c.getColumnIndex("billingType")));
+//            entityDanhSachThu.setVI_TTOAN(c.getString(c.getColumnIndex("billingBy")));
+//            entityDanhSachThu.setCashierPay(c.getString(c.getColumnIndex("cashierPay")));
         }
         return entityDanhSachThu;
     }
@@ -1392,65 +1402,65 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         Cursor c = database.rawQuery(query, null);
         EntityLichSuThanhToan entityLichSuThanhToan = new EntityLichSuThanhToan();
         if (c.moveToFirst()) {
-            entityLichSuThanhToan.setEdong(c.getString(c.getColumnIndex("edong")));
-            entityLichSuThanhToan.setCustomerCode(c.getString(c.getColumnIndex("customerCode")));
-            entityLichSuThanhToan.setCustomerPayCode(c.getString(c.getColumnIndex("customerPayCode")));
-            entityLichSuThanhToan.setBillId(c.getInt(c.getColumnIndex("billId")));
-            entityLichSuThanhToan.setTerm(c.getString(c.getColumnIndex("term")));
-            entityLichSuThanhToan.setAmount(c.getInt(c.getColumnIndex("amount")));
-            entityLichSuThanhToan.setPeriod(c.getString(c.getColumnIndex("period")));
-            entityLichSuThanhToan.setIssueDate(c.getString(c.getColumnIndex("issueDate")));
-            entityLichSuThanhToan.setStrIssueDate(c.getString(c.getColumnIndex("strIssueDate")));
-            entityLichSuThanhToan.setStatus(c.getInt(c.getColumnIndex("status")));
-            entityLichSuThanhToan.setSeri(c.getString(c.getColumnIndex("seri")));
-            entityLichSuThanhToan.setPcCode(c.getString(c.getColumnIndex("pcCode")));
-            entityLichSuThanhToan.setHandoverCode(c.getString(c.getColumnIndex("handoverCode")));
-            entityLichSuThanhToan.setCashierCode(c.getString(c.getColumnIndex("cashierCode")));
-            entityLichSuThanhToan.setBookCmis(c.getString(c.getColumnIndex("bookCmis")));
-            entityLichSuThanhToan.setFromDate(c.getString(c.getColumnIndex("fromDate")));
-            entityLichSuThanhToan.setToDate(c.getString(c.getColumnIndex("toDate")));
-            entityLichSuThanhToan.setStrFromDate(c.getString(c.getColumnIndex("strFromDate")));
-            entityLichSuThanhToan.setStrToDate(c.getString(c.getColumnIndex("strToDate")));
-            entityLichSuThanhToan.setHome(c.getString(c.getColumnIndex("home")));
-            entityLichSuThanhToan.setTax(c.getFloat(c.getColumnIndex("tax")));
-            entityLichSuThanhToan.setBillNum(c.getString(c.getColumnIndex("billNum")));
-            entityLichSuThanhToan.setCurrency(c.getString(c.getColumnIndex("currency")));
-            entityLichSuThanhToan.setPriceDetails(c.getString(c.getColumnIndex("priceDetails")));
-            entityLichSuThanhToan.setNumeDetails(c.getString(c.getColumnIndex("numeDetails")));
-            entityLichSuThanhToan.setAmountDetails(c.getString(c.getColumnIndex("amountDetails")));
-            entityLichSuThanhToan.setOldIndex(c.getString(c.getColumnIndex("oldIndex")));
-            entityLichSuThanhToan.setNewIndex(c.getString(c.getColumnIndex("newIndex")));
-            entityLichSuThanhToan.setNume(c.getString(c.getColumnIndex("nume")));
-            entityLichSuThanhToan.setAmountNotTax(c.getInt(c.getColumnIndex("amountNotTax")));
-            entityLichSuThanhToan.setAmountTax(c.getString(c.getColumnIndex("amountTax")));
-            entityLichSuThanhToan.setMultiple(c.getString(c.getColumnIndex("multiple")));
-            entityLichSuThanhToan.setBillType(c.getString(c.getColumnIndex("billType")));
-            entityLichSuThanhToan.setTypeIndex(c.getString(c.getColumnIndex("typeIndex")));
-            entityLichSuThanhToan.setGroupTypeIndex(c.getString(c.getColumnIndex("groupTypeIndex")));
-            entityLichSuThanhToan.setCreatedDate(c.getString(c.getColumnIndex("createdDate")));
-            entityLichSuThanhToan.setIdChanged(c.getInt(c.getColumnIndex("idChanged")));
-            entityLichSuThanhToan.setDateChanged(c.getString(c.getColumnIndex("dateChanged")));
-            entityLichSuThanhToan.setPcCodeExt(c.getString(c.getColumnIndex("pcCodeExt")));
-            entityLichSuThanhToan.setCode(c.getString(c.getColumnIndex("code")));
-            entityLichSuThanhToan.setName(c.getString(c.getColumnIndex("name")));
-            entityLichSuThanhToan.setNameNosign(c.getString(c.getColumnIndex("nameNosign")));
-            entityLichSuThanhToan.setPhoneByevn(c.getString(c.getColumnIndex("phoneByevn")));
-            entityLichSuThanhToan.setPhoneByecp(c.getString(c.getColumnIndex("phoneByecp")));
-            entityLichSuThanhToan.setElectricityMeter(c.getString(c.getColumnIndex("electricityMeter")));
-            entityLichSuThanhToan.setInning(c.getString(c.getColumnIndex("inning")));
-            entityLichSuThanhToan.setRoad(c.getString(c.getColumnIndex("road")));
-            entityLichSuThanhToan.setStation(c.getString(c.getColumnIndex("station")));
-            entityLichSuThanhToan.setTaxCode(c.getString(c.getColumnIndex("taxCode")));
-            entityLichSuThanhToan.setTrade(c.getString(c.getColumnIndex("trade")));
-            entityLichSuThanhToan.setCountPeriod(c.getString(c.getColumnIndex("countPeriod")));
-            entityLichSuThanhToan.setTeam(c.getString(c.getColumnIndex("team")));
-            entityLichSuThanhToan.setType(c.getInt(c.getColumnIndex("type")));
-            entityLichSuThanhToan.setLastQuery(c.getString(c.getColumnIndex("lastQuery")));
-            entityLichSuThanhToan.setGroupType(c.getInt(c.getColumnIndex("groupType")));
-            entityLichSuThanhToan.setBillingChannel(c.getString(c.getColumnIndex("billingChannel")));
-            entityLichSuThanhToan.setBillType(c.getString(c.getColumnIndex("billingType")));
-            entityLichSuThanhToan.setBillingBy(c.getString(c.getColumnIndex("billingBy")));
-            entityLichSuThanhToan.setCashierPay(c.getString(c.getColumnIndex("cashierPay")));
+//            entityLichSuThanhToan.setEdong(c.getString(c.getColumnIndex("edong")));
+//            entityLichSuThanhToan.setCustomerCode(c.getString(c.getColumnIndex("customerCode")));
+//            entityLichSuThanhToan.setCustomerPayCode(c.getString(c.getColumnIndex("customerPayCode")));
+//            entityLichSuThanhToan.setBillId(c.getInt(c.getColumnIndex("billId")));
+//            entityLichSuThanhToan.setTerm(c.getString(c.getColumnIndex("term")));
+//            entityLichSuThanhToan.setAmount(c.getInt(c.getColumnIndex("amount")));
+//            entityLichSuThanhToan.setPeriod(c.getString(c.getColumnIndex("period")));
+//            entityLichSuThanhToan.setIssueDate(c.getString(c.getColumnIndex("issueDate")));
+//            entityLichSuThanhToan.setStrIssueDate(c.getString(c.getColumnIndex("strIssueDate")));
+//            entityLichSuThanhToan.setTRANG_THAI_TT(c.getInt(c.getColumnIndex("status")));
+//            entityLichSuThanhToan.setSeri(c.getString(c.getColumnIndex("seri")));
+//            entityLichSuThanhToan.setPcCode(c.getString(c.getColumnIndex("pcCode")));
+//            entityLichSuThanhToan.setHandoverCode(c.getString(c.getColumnIndex("handoverCode")));
+//            entityLichSuThanhToan.setCashierCode(c.getString(c.getColumnIndex("cashierCode")));
+//            entityLichSuThanhToan.setBookCmis(c.getString(c.getColumnIndex("bookCmis")));
+//            entityLichSuThanhToan.setFromDate(c.getString(c.getColumnIndex("fromDate")));
+//            entityLichSuThanhToan.setToDate(c.getString(c.getColumnIndex("toDate")));
+//            entityLichSuThanhToan.setStrFromDate(c.getString(c.getColumnIndex("strFromDate")));
+//            entityLichSuThanhToan.setStrToDate(c.getString(c.getColumnIndex("strToDate")));
+//            entityLichSuThanhToan.setHome(c.getString(c.getColumnIndex("home")));
+//            entityLichSuThanhToan.setTax(c.getFloat(c.getColumnIndex("tax")));
+//            entityLichSuThanhToan.setBillNum(c.getString(c.getColumnIndex("billNum")));
+//            entityLichSuThanhToan.setCurrency(c.getString(c.getColumnIndex("currency")));
+//            entityLichSuThanhToan.setPriceDetails(c.getString(c.getColumnIndex("priceDetails")));
+//            entityLichSuThanhToan.setNumeDetails(c.getString(c.getColumnIndex("numeDetails")));
+//            entityLichSuThanhToan.setAmountDetails(c.getString(c.getColumnIndex("amountDetails")));
+//            entityLichSuThanhToan.setOldIndex(c.getString(c.getColumnIndex("oldIndex")));
+//            entityLichSuThanhToan.setNewIndex(c.getString(c.getColumnIndex("newIndex")));
+//            entityLichSuThanhToan.setNume(c.getString(c.getColumnIndex("nume")));
+//            entityLichSuThanhToan.setAmountNotTax(c.getInt(c.getColumnIndex("amountNotTax")));
+//            entityLichSuThanhToan.setAmountTax(c.getString(c.getColumnIndex("amountTax")));
+//            entityLichSuThanhToan.setMultiple(c.getString(c.getColumnIndex("multiple")));
+//            entityLichSuThanhToan.setBillType(c.getString(c.getColumnIndex("billType")));
+//            entityLichSuThanhToan.setTypeIndex(c.getString(c.getColumnIndex("typeIndex")));
+//            entityLichSuThanhToan.setGroupTypeIndex(c.getString(c.getColumnIndex("groupTypeIndex")));
+//            entityLichSuThanhToan.setCreatedDate(c.getString(c.getColumnIndex("createdDate")));
+//            entityLichSuThanhToan.setIdChanged(c.getInt(c.getColumnIndex("idChanged")));
+//            entityLichSuThanhToan.setDateChanged(c.getString(c.getColumnIndex("dateChanged")));
+//            entityLichSuThanhToan.setPcCodeExt(c.getString(c.getColumnIndex("pcCodeExt")));
+//            entityLichSuThanhToan.setCode(c.getString(c.getColumnIndex("code")));
+//            entityLichSuThanhToan.setName(c.getString(c.getColumnIndex("name")));
+//            entityLichSuThanhToan.setNameNosign(c.getString(c.getColumnIndex("nameNosign")));
+//            entityLichSuThanhToan.setPhoneByevn(c.getString(c.getColumnIndex("phoneByevn")));
+//            entityLichSuThanhToan.setPhoneByecp(c.getString(c.getColumnIndex("phoneByecp")));
+//            entityLichSuThanhToan.setElectricityMeter(c.getString(c.getColumnIndex("electricityMeter")));
+//            entityLichSuThanhToan.setInning(c.getString(c.getColumnIndex("inning")));
+//            entityLichSuThanhToan.setRoad(c.getString(c.getColumnIndex("road")));
+//            entityLichSuThanhToan.setStation(c.getString(c.getColumnIndex("station")));
+//            entityLichSuThanhToan.setTaxCode(c.getString(c.getColumnIndex("taxCode")));
+//            entityLichSuThanhToan.setTrade(c.getString(c.getColumnIndex("trade")));
+//            entityLichSuThanhToan.setCountPeriod(c.getString(c.getColumnIndex("countPeriod")));
+//            entityLichSuThanhToan.setTeam(c.getString(c.getColumnIndex("team")));
+//            entityLichSuThanhToan.setType(c.getInt(c.getColumnIndex("type")));
+//            entityLichSuThanhToan.setLastQuery(c.getString(c.getColumnIndex("lastQuery")));
+//            entityLichSuThanhToan.setGroupType(c.getInt(c.getColumnIndex("groupType")));
+//            entityLichSuThanhToan.setBillingChannel(c.getString(c.getColumnIndex("billingChannel")));
+//            entityLichSuThanhToan.setBillType(c.getString(c.getColumnIndex("billingType")));
+//            entityLichSuThanhToan.setVI_TTOAN(c.getString(c.getColumnIndex("billingBy")));
+//            entityLichSuThanhToan.setCashierPay(c.getString(c.getColumnIndex("cashierPay")));
         }
         return entityLichSuThanhToan;
     }
@@ -1542,6 +1552,21 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         }
         return "";
     }
+
+    public List<String> getPcCodes() {
+
+        List<String> result = new ArrayList<>();
+
+        database = this.getReadableDatabase();
+        String query = "SELECT ext FROM " + TABLE_NAME_EVN_PC;
+        Cursor c = database.rawQuery(query, null);
+        if (c.moveToFirst()) {
+            do {
+                result.add(c.getString(0));
+            }while (c.moveToNext());
+        }
+        return result;
+    }
     //endregion
 
     //region BOOK CMIS
@@ -1600,26 +1625,20 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         BodyCustomerResponse bodyCustomerResponse = listCustomerResponse.getBodyCustomerResponse();
         FooterCustomerResponse footerCustomerResponse = listCustomerResponse.getFooterCustomerResponse();
 
-        initialValues.put("code", bodyCustomerResponse.getCustomerCode());
-        initialValues.put("name", bodyCustomerResponse.getName());
-        initialValues.put("cardNo", bodyCustomerResponse.getCardNo());
-        initialValues.put("address", bodyCustomerResponse.getAddress());
-        initialValues.put("pcCode", bodyCustomerResponse.getPcCode());
-        initialValues.put("pcCodeExt", bodyCustomerResponse.getPcCodeExt());
-        initialValues.put("phoneByevn", bodyCustomerResponse.getPhoneByEVN());
-        initialValues.put("phoneByecp", bodyCustomerResponse.getPhoneByECP());
-        initialValues.put("bookCmis", bodyCustomerResponse.getBookCmis());
-        initialValues.put("electricityMeter", bodyCustomerResponse.getElectricityMeter());
-        initialValues.put("inning", bodyCustomerResponse.getInning());
-        initialValues.put("status", bodyCustomerResponse.getStatus());
-        initialValues.put("bankAccount", "");
-        initialValues.put("idNumber", bodyCustomerResponse.getId());
-        initialValues.put("bankName", "");
-        initialValues.put("edongKey", MainActivity.mEdong);
-        initialValues.put("isShowBill", 0);
-        initialValues.put("idChanged", footerCustomerResponse.getIdChanged());
-        initialValues.put("dateChanged", footerCustomerResponse.getDateChanged());
-
+        initialValues.put("MA_KHANG", bodyCustomerResponse.getCustomerCode());
+        initialValues.put("TEN_KHANG", bodyCustomerResponse.getName());
+        initialValues.put("MA_THE", bodyCustomerResponse.getCardNo());
+        initialValues.put("DIA_CHI", bodyCustomerResponse.getAddress());
+        initialValues.put("PHIEN_TTOAN", bodyCustomerResponse.getInning());
+        initialValues.put("LO_TRINH", bodyCustomerResponse.getRoad());
+        initialValues.put("SO_GCS", bodyCustomerResponse.getBookCmis());
+        initialValues.put("DIEN_LUC", bodyCustomerResponse.getPcCode());
+        initialValues.put("SO_HO", "");
+        initialValues.put("E_DONG", MainActivity.mEdong);
+        initialValues.put("SDT_ECPAY", bodyCustomerResponse.getPhoneByECP());
+        initialValues.put("SDT_EVN", bodyCustomerResponse.getPhoneByEVN());
+        initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
+        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_CUSTOMER, null, initialValues);
         return rowAffect;
@@ -1629,32 +1648,28 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         ContentValues initialValues = new ContentValues();
 
         views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.BodyCustomerResponse bodyCustomerResponse = customerResponse.getBodyCustomerResponse();
-        views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.FooterCustomerResponse footerCustomerResponse = customerResponse.getFooterCustomerResponse();
 
-        initialValues.put("code", bodyCustomerResponse.getCustomerCode());
-        initialValues.put("name", bodyCustomerResponse.getName());
-        initialValues.put("cardNo", bodyCustomerResponse.getCardNo());
-        initialValues.put("address", bodyCustomerResponse.getAddress());
-        initialValues.put("pcCode", bodyCustomerResponse.getPcCode());
-        initialValues.put("pcCodeExt", bodyCustomerResponse.getPcCodeExt());
-        initialValues.put("phoneByevn", bodyCustomerResponse.getPhoneByEVN());
-        initialValues.put("phoneByecp", bodyCustomerResponse.getPhoneByECP());
-        initialValues.put("bookCmis", bodyCustomerResponse.getBookCmis());
-        initialValues.put("electricityMeter", bodyCustomerResponse.getElectricityMeter());
-        initialValues.put("inning", bodyCustomerResponse.getInning());
-        initialValues.put("status", bodyCustomerResponse.getStatus());
-        initialValues.put("bankAccount", "");
-        initialValues.put("idNumber", bodyCustomerResponse.getId());
-        initialValues.put("bankName", "");
-        initialValues.put("edongKey", MainActivity.mEdong);
-        initialValues.put("isShowBill", 0);
-        initialValues.put("idChanged", footerCustomerResponse.getIdChanged());
-        initialValues.put("dateChanged", footerCustomerResponse.getDateChanged());
+        initialValues.put("MA_KHANG", bodyCustomerResponse.getCustomerCode());
+        initialValues.put("TEN_KHANG", bodyCustomerResponse.getName());
+        initialValues.put("MA_THE", bodyCustomerResponse.getCardNo());
+        initialValues.put("DIA_CHI", bodyCustomerResponse.getAddress());
+        initialValues.put("PHIEN_TTOAN", bodyCustomerResponse.getInning());
+        initialValues.put("LO_TRINH", bodyCustomerResponse.getRoad());
+        initialValues.put("SO_GCS", bodyCustomerResponse.getBookCmis());
+        initialValues.put("DIEN_LUC", bodyCustomerResponse.getPcCode());
+        initialValues.put("SO_HO", "");
+        initialValues.put("E_DONG", MainActivity.mEdong);
+        initialValues.put("SDT_ECPAY", bodyCustomerResponse.getPhoneByECP());
+        initialValues.put("SDT_EVN", bodyCustomerResponse.getPhoneByEVN());
+        initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
+        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
 
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_CUSTOMER, null, initialValues);
         return rowAffect;
     }
+
+
 
     public long updateCustomer(CustomerResponse customerResponse) {
         ContentValues initialValues = new ContentValues();
@@ -1662,27 +1677,20 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.BodyCustomerResponse bodyCustomerResponse = customerResponse.getBodyCustomerResponse();
         views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.FooterCustomerResponse footerCustomerResponse = customerResponse.getFooterCustomerResponse();
 
-        initialValues.put("name", bodyCustomerResponse.getName());
-        initialValues.put("address", bodyCustomerResponse.getAddress());
-        initialValues.put("pcCode", bodyCustomerResponse.getPcCode());
-        initialValues.put("cardNo", bodyCustomerResponse.getCardNo());
-        initialValues.put("pcCodeExt", bodyCustomerResponse.getPcCodeExt());
-        initialValues.put("phoneByevn", bodyCustomerResponse.getPhoneByEVN());
-        initialValues.put("phoneByecp", bodyCustomerResponse.getPhoneByECP());
-        initialValues.put("bookCmis", bodyCustomerResponse.getBookCmis());
-        initialValues.put("electricityMeter", bodyCustomerResponse.getElectricityMeter());
-        initialValues.put("inning", bodyCustomerResponse.getInning());
-        initialValues.put("status", bodyCustomerResponse.getStatus());
-        initialValues.put("bankAccount", "");
-        initialValues.put("idNumber", bodyCustomerResponse.getId());
-        initialValues.put("bankName", "");
-        initialValues.put("edongKey", MainActivity.mEdong);
-        initialValues.put("isShowBill", 0);
-        initialValues.put("idChanged", footerCustomerResponse.getIdChanged());
-        initialValues.put("dateChanged", footerCustomerResponse.getDateChanged());
+        initialValues.put("TEN_KHANG", bodyCustomerResponse.getName());
+        initialValues.put("MA_THE", bodyCustomerResponse.getCardNo());
+        initialValues.put("DIA_CHI", bodyCustomerResponse.getAddress());
+        initialValues.put("PHIEN_TTOAN", bodyCustomerResponse.getInning());
+        initialValues.put("LO_TRINH", bodyCustomerResponse.getRoad());
+        initialValues.put("SO_GCS", bodyCustomerResponse.getBookCmis());
+        initialValues.put("DIEN_LUC", bodyCustomerResponse.getPcCode());
+        initialValues.put("SO_HO", "");
+        initialValues.put("E_DONG", MainActivity.mEdong);
+        initialValues.put("SDT_ECPAY", bodyCustomerResponse.getPhoneByECP());
+        initialValues.put("SDT_EVN", bodyCustomerResponse.getPhoneByEVN());
 
         database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_CUSTOMER, initialValues, "code = ?", new String[]{bodyCustomerResponse.getCustomerCode()});
+        int rowAffect = (int) database.update(TABLE_NAME_CUSTOMER, initialValues, "MA_KHANG = ?", new String[]{bodyCustomerResponse.getCustomerCode()});
         return rowAffect;
     }
 
@@ -1714,98 +1722,76 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public long checkCustomerExist(String code) {
         database = this.getReadableDatabase();
-        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_CUSTOMER + " WHERE code = '" + code + "'";
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_CUSTOMER + " WHERE MA_KHANG = '" + code + "'";
         Cursor mCursor = database.rawQuery(query, null);
         if (mCursor.moveToFirst())
             return mCursor.getInt(0);
         return 0;
     }
 
-    public Cursor getCustomer(String code) {
+    public EntityKhachHang getCustomer(String code) {
         database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE code = '" + code + "'";
-        return database.rawQuery(query, null);
+        String query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE MA_KHANG = '" + code + "'";
+
+        Cursor c = database.rawQuery(query, null);
+        if (c.moveToFirst()) {
+            EntityKhachHang khachHang = new EntityKhachHang();
+            khachHang.setE_DONG(c.getString(c.getColumnIndex("E_DONG")));
+            khachHang.setMA_KHANG(c.getString(c.getColumnIndex("MA_KHANG")));
+            khachHang.setMA_THE(c.getString(c.getColumnIndex("MA_THE")));
+            khachHang.setTEN_KHANG(c.getString(c.getColumnIndex("TEN_KHANG")));
+            khachHang.setDIA_CHI(c.getString(c.getColumnIndex("DIA_CHI")));
+            khachHang.setPHIEN_TTOAN(c.getString(c.getColumnIndex("PHIEN_TTOAN")));
+            khachHang.setLO_TRINH(c.getString(c.getColumnIndex("LO_TRINH")));
+            khachHang.setSO_GCS(c.getString(c.getColumnIndex("SO_GCS")));
+            khachHang.setDIEN_LUC(c.getString(c.getColumnIndex("DIEN_LUC")));
+            khachHang.setSO_HO(c.getString(c.getColumnIndex("SO_HO")));
+            khachHang.setSDT_ECPAY(c.getString(c.getColumnIndex("SDT_ECPAY")));
+            khachHang.setSDT_EVN(c.getString(c.getColumnIndex("SDT_EVN")));
+            khachHang.setGIAO_THU(c.getString(c.getColumnIndex("GIAO_THU")));
+            khachHang.setNGAY_GIAO_THU(Common.parseDate(c.getString(c.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+
+            return khachHang;
+        }
+        return null;
     }
     //endregion
 
     //region BILL Danh sách hóa dơn nợ
     public long insertBill(ListBillResponse listBillResponse) {
+
+
+
         ContentValues initialValues = new ContentValues();
 
         BodyBillResponse bodyBillResponse = listBillResponse.getBodyBillResponse();
-        FooterBillResponse footerBillResponse = listBillResponse.getFooterBillResponse();
 
-        initialValues.put("customerCode", bodyBillResponse.getCustomerCode());
-        initialValues.put("customerPayCode", "");
-        initialValues.put("billId", !bodyBillResponse.getBillId().isEmpty() ? Integer.parseInt(bodyBillResponse.getBillId()) : 0);
-        String term = bodyBillResponse.getTerm();
-        //20170414011107000 != 2015-01-01
-        if (term.length() == yyyyMMdd.toString().length()) {
-            term = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
-        }
-        initialValues.put("term", term);
-        initialValues.put("strTerm", "");
-        initialValues.put("amount", !bodyBillResponse.getAmount().equals("") ? Integer.parseInt(bodyBillResponse.getAmount()) : 0);
-        initialValues.put("period", bodyBillResponse.getPeriod());
-        initialValues.put("issueDate", bodyBillResponse.getIssueDate());
-        initialValues.put("strIssueDate", "");
-        int status = !bodyBillResponse.getStatus().isEmpty() ? Integer.parseInt(bodyBillResponse.getStatus()) : 0;
-        initialValues.put("status", status);
-        initialValues.put("seri", bodyBillResponse.getSeri());
-        initialValues.put("pcCode", bodyBillResponse.getPcCode());
-        initialValues.put("handoverCode", bodyBillResponse.getHandOverCode());
-        initialValues.put("cashierCode", bodyBillResponse.getCashierCode());
-        initialValues.put("bookCmis", bodyBillResponse.getBookCmis());
-        initialValues.put("fromDate", bodyBillResponse.getFromDate());
-        initialValues.put("toDate", bodyBillResponse.getToDate());
-        initialValues.put("strFromDate", "");
-        initialValues.put("strToDate", "");
-        initialValues.put("home", bodyBillResponse.getHome());
-        initialValues.put("tax", !bodyBillResponse.getTax().isEmpty() ? Float.parseFloat(bodyBillResponse.getTax()) : 0f);
-        initialValues.put("billNum", bodyBillResponse.getBillNum());
-        initialValues.put("currency", bodyBillResponse.getCurrency());
-        initialValues.put("priceDetails", bodyBillResponse.getPriceDetail());
-        initialValues.put("numeDetails", bodyBillResponse.getNumeDetail());
-        initialValues.put("amountDetails", bodyBillResponse.getAmountDetail());
-        initialValues.put("oldIndex", bodyBillResponse.getOldIndex());
-        initialValues.put("newIndex", bodyBillResponse.getNewIndex());
-        initialValues.put("nume", bodyBillResponse.getNume());
-        initialValues.put("amountNotTax", !bodyBillResponse.getAmountNotTax().isEmpty() ? Integer.parseInt(bodyBillResponse.getAmountNotTax()) : 0);
-        initialValues.put("amountTax", !bodyBillResponse.getAmountTax().isEmpty() ? Integer.parseInt(bodyBillResponse.getAmountTax()) : 0);
-        initialValues.put("multiple", bodyBillResponse.getMultiple());
-        initialValues.put("billType", bodyBillResponse.getBillType());
-        initialValues.put("typeIndex", bodyBillResponse.getTypeIndex());
-        initialValues.put("groupTypeIndex", bodyBillResponse.getGroupTypeIndex());
-        initialValues.put("createdDate", bodyBillResponse.getCreatedDate());
-        initialValues.put("idChanged", footerBillResponse.getIdChanged());
-        initialValues.put("dateChanged", footerBillResponse.getDateChanged());
-        initialValues.put("edong", bodyBillResponse.getEdong());
-        initialValues.put("pcCodeExt", "");
-        initialValues.put("code", "");
-        initialValues.put("name", "");
-        initialValues.put("nameNosign", "");
-        initialValues.put("phoneByevn", "");
-        initialValues.put("phoneByecp", "");
-        initialValues.put("electricityMeter", "");
-        initialValues.put("inning", "");
-        initialValues.put("road", "");
-        initialValues.put("station", "");
-        initialValues.put("taxCode", bodyBillResponse.getTax());
-        initialValues.put("trade", "");
-        initialValues.put("countPeriod", "");
-        initialValues.put("team", "");
-        initialValues.put("type", bodyBillResponse.getBillType());
-        initialValues.put("lastQuery", "");
-        initialValues.put("groupType", !bodyBillResponse.getGroupTypeIndex().isEmpty() ? Integer.parseInt(bodyBillResponse.getGroupTypeIndex()) : 0);
-        initialValues.put("billingChannel", "");
-        initialValues.put("billingType", bodyBillResponse.getBillingType());
-        initialValues.put("billingBy", "");
-        initialValues.put("cashierPay", bodyBillResponse.getCashierCode());
-        initialValues.put("edongKey", bodyBillResponse.getEdong());
+        initialValues.put("MA_KHANG", bodyBillResponse.getCustomerCode());
+        initialValues.put("E_DONG", bodyBillResponse.getEdong());
+        initialValues.put("MA_HOA_DON", bodyBillResponse.getBillId());
+        initialValues.put("SERI_HDON", bodyBillResponse.getSeri());
 
-        //nếu status = 1(đã thanh toán) khi insert vào bill thì bật cờ isChecked = 1 tức được chọn và đã thanh toán
-        initialValues.put("isChecked", (status == ZERO) ? ZERO : ONE);
 
+        initialValues.put("MA_THE", bodyBillResponse.getCardNo());
+        initialValues.put("TEN_KHANG", bodyBillResponse.getName());
+        initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
+
+        initialValues.put("THANG_TTOAN", bodyBillResponse.getTerm());
+        initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
+        initialValues.put("SO_TIEN_TTOAN", Common.parseInt(bodyBillResponse.getAmount()));
+        initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
+        initialValues.put("DIEN_LUC", bodyBillResponse.getPcCode());
+        initialValues.put("SO_HO", bodyBillResponse.getHome());
+
+        initialValues.put("SO_DAU_KY", bodyBillResponse.getOldIndex());
+        initialValues.put("SO_CUOI_KY", bodyBillResponse.getNewIndex());
+        initialValues.put("SO_CTO", bodyBillResponse.getElectricityMeter());
+        initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
+        initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
+        initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
+        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+        initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
+        initialValues.put("VI_TTOAN", "");
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
         return rowAffect;
@@ -1815,164 +1801,496 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         ContentValues initialValues = new ContentValues();
 
         views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BodyBillResponse bodyBillResponse = listBillResponse.getBodyBillResponse();
-        views.ecpay.com.postabletecpay.util.entities.response.EntityBill.FooterBillResponse footerBillResponse = listBillResponse.getFooterBillResponse();
 
-        initialValues.put("customerCode", bodyBillResponse.getCustomerCode());
-        initialValues.put("customerPayCode", "");
-        initialValues.put("billId", bodyBillResponse.getBillId());
-        String term = bodyBillResponse.getTerm();
-        //20170414011107000 != 2015-01-01
-        if (term.length() == yyyyMMdd.toString().length()) {
-            term = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
-        }
-        initialValues.put("term", term);
-        initialValues.put("strTerm", "");
-        initialValues.put("amount", bodyBillResponse.getAmount());
-        initialValues.put("period", bodyBillResponse.getPeriod());
-        initialValues.put("issueDate", bodyBillResponse.getIssueDate());
-        initialValues.put("strIssueDate", "");
+        initialValues.put("MA_KHANG", bodyBillResponse.getCustomerCode());
+        initialValues.put("E_DONG", bodyBillResponse.getEdong());
+        initialValues.put("MA_HOA_DON", bodyBillResponse.getBillId());
+        initialValues.put("SERI_HDON", bodyBillResponse.getSeri());
 
-        int status = Integer.parseInt(bodyBillResponse.getStatus());
-        initialValues.put("status", status);
 
-        initialValues.put("seri", bodyBillResponse.getSeri());
-        initialValues.put("pcCode", bodyBillResponse.getPcCode());
-        initialValues.put("handoverCode", bodyBillResponse.getHandOverCode());
-        initialValues.put("cashierCode", bodyBillResponse.getCashierCode());
-        initialValues.put("bookCmis", bodyBillResponse.getBookCmis());
-        initialValues.put("fromDate", bodyBillResponse.getFromDate());
-        initialValues.put("toDate", bodyBillResponse.getToDate());
-        initialValues.put("strFromDate", "");
-        initialValues.put("strToDate", "");
-        initialValues.put("home", bodyBillResponse.getHome());
-        initialValues.put("tax", bodyBillResponse.getTax());
-        initialValues.put("billNum", bodyBillResponse.getBillNum());
-        initialValues.put("currency", bodyBillResponse.getCurrency());
-        initialValues.put("priceDetails", bodyBillResponse.getPriceDetail());
-        initialValues.put("numeDetails", bodyBillResponse.getNumeDetail());
-        initialValues.put("amountDetails", bodyBillResponse.getAmountDetail());
-        initialValues.put("oldIndex", bodyBillResponse.getOldIndex());
-        initialValues.put("newIndex", bodyBillResponse.getNewIndex());
-        initialValues.put("nume", bodyBillResponse.getNume());
-        initialValues.put("amountNotTax", bodyBillResponse.getAmountNotTax());
-        initialValues.put("amountTax", bodyBillResponse.getAmountTax());
-        initialValues.put("multiple", bodyBillResponse.getMultiple());
-        initialValues.put("billType", bodyBillResponse.getBillType());
-        initialValues.put("typeIndex", bodyBillResponse.getTypeIndex());
-        initialValues.put("groupTypeIndex", bodyBillResponse.getGroupTypeIndex());
-        initialValues.put("createdDate", bodyBillResponse.getCreatedDate());
-        initialValues.put("idChanged", footerBillResponse.getIdChanged());
-        initialValues.put("dateChanged", footerBillResponse.getDateChanged());
-        initialValues.put("edong", bodyBillResponse.getEdong());
-        initialValues.put("pcCodeExt", "");
-        initialValues.put("code", "");
-        initialValues.put("name", "");
-        initialValues.put("nameNosign", "");
-        initialValues.put("phoneByevn", "");
-        initialValues.put("phoneByecp", "");
-        initialValues.put("electricityMeter", "");
-        initialValues.put("inning", "");
-        initialValues.put("road", "");
-        initialValues.put("station", "");
-        initialValues.put("taxCode", bodyBillResponse.getTax());
-        initialValues.put("trade", "");
-        initialValues.put("countPeriod", "");
-        initialValues.put("team", "");
-        initialValues.put("type", bodyBillResponse.getBillType());
-        initialValues.put("lastQuery", "");
-        initialValues.put("groupType", !bodyBillResponse.getGroupTypeIndex().isEmpty() ? Integer.parseInt(bodyBillResponse.getGroupTypeIndex()) : 0);
-        initialValues.put("billingChannel", "");
-        initialValues.put("billingType", bodyBillResponse.getBillingType());
-        initialValues.put("billingBy", "");
-        initialValues.put("cashierPay", bodyBillResponse.getCashierCode());
-        initialValues.put("edongKey", bodyBillResponse.getEdong());
+        initialValues.put("MA_THE", bodyBillResponse.getCardNo());
+        initialValues.put("TEN_KHANG", bodyBillResponse.getName());
+        initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
 
-        //nếu status = 0(chưa thanh toán) khi insert vào bill thì cờ isChecked = 0
-        initialValues.put("isChecked", (status == ZERO) ? ZERO : ONE);
+        initialValues.put("THANG_TTOAN", bodyBillResponse.getTerm());
+        initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
+        initialValues.put("SO_TIEN_TTOAN", Common.parseInt(bodyBillResponse.getAmount()));
+        initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
+        initialValues.put("DIEN_LUC", bodyBillResponse.getPcCode());
+        initialValues.put("SO_HO", bodyBillResponse.getHome());
 
+        initialValues.put("SO_DAU_KY", bodyBillResponse.getOldIndex());
+        initialValues.put("SO_CUOI_KY", bodyBillResponse.getNewIndex());
+        initialValues.put("SO_CTO", bodyBillResponse.getElectricityMeter());
+        initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
+        initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
+        initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
+        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+        initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
+        initialValues.put("VI_TTOAN", "");
 
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
         return rowAffect;
     }
 
+    public long insertLichSuThanhToan( views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BodyBillResponse bodyBillResponse, String HINH_THUC_TT, String TRANG_THAI_TT, String TRANG_THAI_CHAM_NO, String TRANG_THAI_HUY,
+                                       String TRANG_THAI_NGHI_NGO, int SO_IN_BIEN_NHAN, String IN_THONG_BAO_DIEN, String NGAY_PHAT_SINH,
+                                       String MA_GIAO_DICH)
+    {
+        ContentValues initialValues = new ContentValues();
+
+
+        initialValues.put("MA_KHANG", bodyBillResponse.getCustomerCode());
+        initialValues.put("E_DONG", bodyBillResponse.getEdong());
+        initialValues.put("MA_HOA_DON", bodyBillResponse.getBillId());
+        initialValues.put("SERI_HDON", bodyBillResponse.getSeri());
+
+
+        initialValues.put("MA_THE", bodyBillResponse.getCardNo());
+        initialValues.put("TEN_KHANG", bodyBillResponse.getName());
+        initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
+
+        initialValues.put("THANG_TTOAN", bodyBillResponse.getTerm());
+        initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
+        initialValues.put("SO_TIEN_TTOAN", Common.parseInt(bodyBillResponse.getAmount()));
+        initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
+        initialValues.put("DIEN_LUC", bodyBillResponse.getPcCode());
+        initialValues.put("SO_HO", bodyBillResponse.getHome());
+
+        initialValues.put("SO_DAU_KY", bodyBillResponse.getOldIndex());
+        initialValues.put("SO_CUOI_KY", bodyBillResponse.getNewIndex());
+        initialValues.put("SO_CTO", bodyBillResponse.getElectricityMeter());
+        initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
+        initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
+        initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
+        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+        initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
+
+
+
+        initialValues.put("HINH_THUC_TT", HINH_THUC_TT);
+        initialValues.put("TRANG_THAI_TTOAN", TRANG_THAI_TT);
+        initialValues.put("TRANG_THAI_CHAM_NO", TRANG_THAI_CHAM_NO);
+        initialValues.put("TRANG_THAI_HUY", TRANG_THAI_HUY);
+        initialValues.put("TRANG_THAI_NGHI_NGO", TRANG_THAI_NGHI_NGO);
+        initialValues.put("SO_IN_BIEN_NHAN", SO_IN_BIEN_NHAN);
+        initialValues.put("IN_THONG_BAO_DIEN", IN_THONG_BAO_DIEN);
+        initialValues.put("NGAY_PHAT_SINH", NGAY_PHAT_SINH);
+        initialValues.put("MA_GIAO_DICH", MA_GIAO_DICH);
+
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.insert(TABLE_NAME_HISTORY_PAY, null, initialValues);
+        return rowAffect;
+    }
+
+    public void insertLichSuThanhToan(String  MA_HOA_DON, String NGAY_PHAT_SINH, String MA_GIAO_DICH)
+    {
+        database = getWritableDatabase();
+
+        String query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE MA_HOA_DON = " + MA_HOA_DON;
+        Cursor hoaDonThu = database.rawQuery(query, null);
+        if(hoaDonThu == null || !hoaDonThu.moveToFirst())
+            return;
+
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("MA_KHANG", hoaDonThu.getString(hoaDonThu.getColumnIndex("MA_KHANG")));
+        initialValues.put("E_DONG", hoaDonThu.getString(hoaDonThu.getColumnIndex("E_DONG")));
+        initialValues.put("MA_HOA_DON",hoaDonThu.getString(hoaDonThu.getColumnIndex("MA_HOA_DON")));
+        initialValues.put("SERI_HDON", hoaDonThu.getString(hoaDonThu.getColumnIndex("SERI_HDON")));
+
+
+        initialValues.put("MA_THE", hoaDonThu.getString(hoaDonThu.getColumnIndex("MA_THE")));
+        initialValues.put("TEN_KHANG", hoaDonThu.getString(hoaDonThu.getColumnIndex("TEN_KHANG")));
+        initialValues.put("DIA_CHI", hoaDonThu.getString(hoaDonThu.getColumnIndex("DIA_CHI")));
+
+        initialValues.put("THANG_TTOAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("THANG_TTOAN")));
+        initialValues.put("PHIEN_TTOAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("PHIEN_TTOAN")));
+        initialValues.put("SO_TIEN_TTOAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_TIEN_TTOAN")));
+        initialValues.put("SO_GCS", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_GCS")));
+        initialValues.put("DIEN_LUC", hoaDonThu.getString(hoaDonThu.getColumnIndex("DIEN_LUC")));
+        initialValues.put("SO_HO", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_HO")));
+
+        initialValues.put("SO_DAU_KY", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_DAU_KY")));
+        initialValues.put("SO_CUOI_KY", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_CUOI_KY")));
+        initialValues.put("SO_CTO", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_CTO")));
+        initialValues.put("SDT_ECPAY", hoaDonThu.getString(hoaDonThu.getColumnIndex("SDT_ECPAY")));
+        initialValues.put("SDT_EVN", hoaDonThu.getString(hoaDonThu.getColumnIndex("SDT_EVN")));
+        initialValues.put("GIAO_THU", hoaDonThu.getString(hoaDonThu.getColumnIndex("GIAO_THU")));
+        initialValues.put("NGAY_GIAO_THU", hoaDonThu.getString(hoaDonThu.getColumnIndex("NGAY_GIAO_THU")));
+        initialValues.put("VI_TTOAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("VI_TTOAN")));
+
+
+
+        initialValues.put("HINH_THUC_TT", hoaDonThu.getString(hoaDonThu.getColumnIndex("HINH_THUC_TT")));
+        initialValues.put("TRANG_THAI_TTOAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("TRANG_THAI_TTOAN")));
+        initialValues.put("TRANG_THAI_CHAM_NO", hoaDonThu.getString(hoaDonThu.getColumnIndex("TRANG_THAI_CHAM_NO")));
+        initialValues.put("TRANG_THAI_HUY", hoaDonThu.getString(hoaDonThu.getColumnIndex("TRANG_THAI_HUY")));
+        initialValues.put("TRANG_THAI_NGHI_NGO", hoaDonThu.getString(hoaDonThu.getColumnIndex("TRANG_THAI_NGHI_NGO")));
+        initialValues.put("SO_IN_BIEN_NHAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_IN_BIEN_NHAN")));
+        initialValues.put("IN_THONG_BAO_DIEN", hoaDonThu.getString(hoaDonThu.getColumnIndex("IN_THONG_BAO_DIEN")));
+        initialValues.put("NGAY_PHAT_SINH", NGAY_PHAT_SINH);
+        initialValues.put("MA_GIAO_DICH", MA_GIAO_DICH);
+
+        database.insert(TABLE_NAME_HISTORY_PAY, null, initialValues);
+
+
+        if (hoaDonThu != null && !hoaDonThu.isClosed()) {
+            hoaDonThu.close();
+        }
+    }
+
+    public long insertLichSuThanhToan( EntityLichSuThanhToan lichSuThanhToan)
+    {
+        ContentValues initialValues = new ContentValues();
+
+
+        initialValues.put("MA_KHANG", lichSuThanhToan.getMA_KHANG());
+        initialValues.put("E_DONG", lichSuThanhToan.getE_DONG());
+        initialValues.put("MA_HOA_DON", lichSuThanhToan.getMA_HOA_DON());
+        initialValues.put("SERI_HDON", lichSuThanhToan.getSERI_HDON());
+
+
+        initialValues.put("MA_THE", lichSuThanhToan.getMA_THE());
+        initialValues.put("TEN_KHANG", lichSuThanhToan.getTEN_KHANG());
+        initialValues.put("DIA_CHI", lichSuThanhToan.getDIA_CHI());
+
+        initialValues.put("THANG_TTOAN", Common.parse(lichSuThanhToan.getTHANG_TTOAN(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+        initialValues.put("PHIEN_TTOAN", lichSuThanhToan.getPHIEN_TTOAN());
+        initialValues.put("SO_TIEN_TTOAN", lichSuThanhToan.getSO_TIEN_TTOAN());
+        initialValues.put("SO_GCS", lichSuThanhToan.getSO_GCS());
+        initialValues.put("DIEN_LUC", lichSuThanhToan.getDIEN_LUC());
+        initialValues.put("SO_HO", lichSuThanhToan.getSO_HO());
+
+        initialValues.put("SO_DAU_KY", lichSuThanhToan.getSO_DAU_KY());
+        initialValues.put("SO_CUOI_KY", lichSuThanhToan.getSO_CUOI_KY());
+        initialValues.put("SO_CTO", lichSuThanhToan.getSO_CTO());
+        initialValues.put("SDT_ECPAY", lichSuThanhToan.getSDT_ECPAY());
+        initialValues.put("SDT_EVN", lichSuThanhToan.getSDT_EVN());
+        initialValues.put("GIAO_THU", lichSuThanhToan.getGIAO_THU());
+        initialValues.put("NGAY_GIAO_THU", Common.parse(lichSuThanhToan.getNGAY_GIAO_THU(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+        initialValues.put("VI_TTOAN", lichSuThanhToan.getVI_TTOAN());
+
+
+
+        initialValues.put("HINH_THUC_TT", lichSuThanhToan.getHINH_THUC_TT());
+        initialValues.put("TRANG_THAI_TTOAN", lichSuThanhToan.getTRANG_THAI_TTOAN());
+        initialValues.put("TRANG_THAI_CHAM_NO", lichSuThanhToan.getTRANG_THAI_CHAM_NO());
+        initialValues.put("TRANG_THAI_HUY", lichSuThanhToan.getTRANG_THAI_HUY());
+        initialValues.put("TRANG_THAI_NGHI_NGO", lichSuThanhToan.getTRANG_THAI_NGHI_NGO());
+        initialValues.put("SO_IN_BIEN_NHAN", lichSuThanhToan.getSO_IN_BIEN_NHAN());
+        initialValues.put("IN_THONG_BAO_DIEN", lichSuThanhToan.getIN_THONG_BAO_DIEN());
+        initialValues.put("NGAY_PHAT_SINH", Common.parse(lichSuThanhToan.getNGAY_PHAT_SINH(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+        initialValues.put("MA_GIAO_DICH", lichSuThanhToan.getMA_GIAO_DICH());
+
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.insert(TABLE_NAME_HISTORY_PAY, null, initialValues);
+        return rowAffect;
+    }
+
+    public void insertHoaDonThu( views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BodyBillResponse bodyBillResponse, String HINH_THUC_TT,
+                                 String TRANG_THAI_TT, String TRANG_THAI_CHAM_NO, String TRANG_THAI_HUY,
+                                       String TRANG_THAI_HOAN_TRA,String TRANG_THAI_XU_LY_NGHI_NGO, String TRANG_THAI_DAY_CHAM_NO, int SO_LAN_IN_BIEN_NHAN,
+                                        String NGAY_DAY, String IN_THONG_BAO_DIEN)
+    {
+
+        database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE MA_HOA_DON = '" + bodyBillResponse.getBillId() + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+        if (mCursor.moveToFirst())
+        {
+            ContentValues initialValues = new ContentValues();
+
+
+            initialValues.put("MA_KHANG", bodyBillResponse.getCustomerCode());
+            initialValues.put("E_DONG", bodyBillResponse.getEdong());
+            initialValues.put("MA_HOA_DON", bodyBillResponse.getBillId());
+            initialValues.put("SERI_HDON", bodyBillResponse.getSeri());
+
+
+            initialValues.put("MA_THE", bodyBillResponse.getCardNo());
+            initialValues.put("TEN_KHANG", bodyBillResponse.getName());
+            initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
+
+            initialValues.put("THANG_TTOAN", bodyBillResponse.getTerm());
+            initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
+            initialValues.put("SO_TIEN_TTOAN", Common.parseInt(bodyBillResponse.getAmount()));
+            initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
+            initialValues.put("DIEN_LUC", bodyBillResponse.getPcCode());
+            initialValues.put("SO_HO", bodyBillResponse.getHome());
+
+            initialValues.put("SO_DAU_KY", bodyBillResponse.getOldIndex());
+            initialValues.put("SO_CUOI_KY", bodyBillResponse.getNewIndex());
+            initialValues.put("SO_CTO", bodyBillResponse.getElectricityMeter());
+            initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
+            initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
+            initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
+            initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+            initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
+
+
+
+            initialValues.put("HINH_THUC_TT", HINH_THUC_TT);
+            initialValues.put("TRANG_THAI_TTOAN", TRANG_THAI_TT);
+            initialValues.put("TRANG_THAI_CHAM_NO", TRANG_THAI_CHAM_NO);
+            initialValues.put("TRANG_THAI_HUY", TRANG_THAI_HUY);
+            initialValues.put("TRANG_THAI_HOAN_TRA", TRANG_THAI_HOAN_TRA);
+            initialValues.put("TRANG_THAI_XU_LY_NGHI_NGO", TRANG_THAI_XU_LY_NGHI_NGO);
+            initialValues.put("IN_THONG_BAO_DIEN", IN_THONG_BAO_DIEN);
+            initialValues.put("TRANG_THAI_DAY_CHAM_NO", TRANG_THAI_DAY_CHAM_NO);
+            initialValues.put("SO_LAN_IN_BIEN_NHAN", SO_LAN_IN_BIEN_NHAN);
+            initialValues.put("NGAY_DAY", NGAY_DAY);
+
+            database.update(TABLE_NAME_DEBT_COLLECTION, initialValues, "MA_HOA_DON=?", new String[]{String.valueOf(bodyBillResponse.getBillId())});
+        }else
+        {
+
+            ContentValues initialValues = new ContentValues();
+
+
+            initialValues.put("MA_KHANG", bodyBillResponse.getCustomerCode());
+            initialValues.put("E_DONG", bodyBillResponse.getEdong());
+            initialValues.put("MA_HOA_DON", bodyBillResponse.getBillId());
+            initialValues.put("SERI_HDON", bodyBillResponse.getSeri());
+
+
+            initialValues.put("MA_THE", bodyBillResponse.getCardNo());
+            initialValues.put("TEN_KHANG", bodyBillResponse.getName());
+            initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
+
+            initialValues.put("THANG_TTOAN", bodyBillResponse.getTerm());
+            initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
+            initialValues.put("SO_TIEN_TTOAN", Common.parseInt(bodyBillResponse.getAmount()));
+            initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
+            initialValues.put("DIEN_LUC", bodyBillResponse.getPcCode());
+            initialValues.put("SO_HO", bodyBillResponse.getHome());
+
+            initialValues.put("SO_DAU_KY", bodyBillResponse.getOldIndex());
+            initialValues.put("SO_CUOI_KY", bodyBillResponse.getNewIndex());
+            initialValues.put("SO_CTO", bodyBillResponse.getElectricityMeter());
+            initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
+            initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
+            initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
+            initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+            initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
+
+
+
+            initialValues.put("HINH_THUC_TT", HINH_THUC_TT);
+            initialValues.put("TRANG_THAI_TTOAN", TRANG_THAI_TT);
+            initialValues.put("TRANG_THAI_CHAM_NO", TRANG_THAI_CHAM_NO);
+            initialValues.put("TRANG_THAI_HUY", TRANG_THAI_HUY);
+            initialValues.put("TRANG_THAI_HOAN_TRA", TRANG_THAI_HOAN_TRA);
+            initialValues.put("TRANG_THAI_XU_LY_NGHI_NGO", TRANG_THAI_XU_LY_NGHI_NGO);
+            initialValues.put("IN_THONG_BAO_DIEN", IN_THONG_BAO_DIEN);
+            initialValues.put("TRANG_THAI_DAY_CHAM_NO", TRANG_THAI_DAY_CHAM_NO);
+            initialValues.put("SO_LAN_IN_BIEN_NHAN", SO_LAN_IN_BIEN_NHAN);
+            initialValues.put("NGAY_DAY", NGAY_DAY);
+
+            int rowAffect = (int) database.insert(TABLE_NAME_DEBT_COLLECTION, null, initialValues);
+        }
+    }
+
+
+    public void insertHoaDonThu(EntityHoaDonThu entityHoaDonThu)
+    {
+
+        database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE MA_HOA_DON = '" + entityHoaDonThu.getMA_HOA_DON() + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+        if (mCursor.moveToFirst())
+        {
+            ContentValues initialValues = new ContentValues();
+
+
+            initialValues.put("MA_KHANG", entityHoaDonThu.getMA_KHANG());
+            initialValues.put("E_DONG", entityHoaDonThu.getE_DONG());
+            initialValues.put("MA_HOA_DON", entityHoaDonThu.getMA_HOA_DON());
+            initialValues.put("SERI_HDON", entityHoaDonThu.getSERI_HDON());
+
+
+            initialValues.put("MA_THE", entityHoaDonThu.getMA_THE());
+            initialValues.put("TEN_KHANG", entityHoaDonThu.getTEN_KHANG());
+            initialValues.put("DIA_CHI", entityHoaDonThu.getDIA_CHI());
+
+            initialValues.put("THANG_TTOAN", Common.parse(entityHoaDonThu.getTHANG_TTOAN(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            initialValues.put("PHIEN_TTOAN", entityHoaDonThu.getPHIEN_TTOAN());
+            initialValues.put("SO_TIEN_TTOAN", entityHoaDonThu.getSO_TIEN_TTOAN());
+            initialValues.put("SO_GCS", entityHoaDonThu.getSO_GCS());
+            initialValues.put("DIEN_LUC", entityHoaDonThu.getDIEN_LUC());
+            initialValues.put("SO_HO", entityHoaDonThu.getSO_HO());
+
+            initialValues.put("SO_DAU_KY", entityHoaDonThu.getSO_DAU_KY());
+            initialValues.put("SO_CUOI_KY", entityHoaDonThu.getSO_CUOI_KY());
+            initialValues.put("SO_CTO", entityHoaDonThu.getSO_CTO());
+            initialValues.put("SDT_ECPAY", entityHoaDonThu.getSDT_ECPAY());
+            initialValues.put("SDT_EVN", entityHoaDonThu.getSDT_EVN());
+            initialValues.put("GIAO_THU", entityHoaDonThu.getGIAO_THU());
+            initialValues.put("NGAY_GIAO_THU", Common.parse(entityHoaDonThu.getNGAY_GIAO_THU(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            initialValues.put("VI_TTOAN", entityHoaDonThu.getVI_TTOAN());
+
+
+
+            initialValues.put("HINH_THUC_TT", entityHoaDonThu.getHINH_THUC_TT());
+            initialValues.put("TRANG_THAI_TTOAN", entityHoaDonThu.getTRANG_THAI_TTOAN());
+            initialValues.put("TRANG_THAI_CHAM_NO", entityHoaDonThu.getTRANG_THAI_CHAM_NO());
+            initialValues.put("TRANG_THAI_HUY", entityHoaDonThu.getTRANG_THAI_HUY());
+            initialValues.put("TRANG_THAI_HOAN_TRA", entityHoaDonThu.getTRANG_THAI_HOAN_TRA());
+            initialValues.put("TRANG_THAI_XU_LY_NGHI_NGO", entityHoaDonThu.getTRANG_THAI_XU_LY_NGHI_NGO());
+            initialValues.put("IN_THONG_BAO_DIEN", entityHoaDonThu.getIN_THONG_BAO_DIEN());
+            initialValues.put("TRANG_THAI_DAY_CHAM_NO", entityHoaDonThu.getTRANG_THAI_DAY_CHAM_NO());
+            initialValues.put("SO_LAN_IN_BIEN_NHAN", entityHoaDonThu.getSO_LAN_IN_BIEN_NHAN());
+            initialValues.put("NGAY_DAY", Common.parse(entityHoaDonThu.getNGAY_DAY(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+
+            database.update(TABLE_NAME_DEBT_COLLECTION, initialValues, "MA_HOA_DON=?", new String[]{String.valueOf(entityHoaDonThu.getMA_HOA_DON())});
+        }else
+        {
+
+            ContentValues initialValues = new ContentValues();
+
+            initialValues.put("MA_KHANG", entityHoaDonThu.getMA_KHANG());
+            initialValues.put("E_DONG", entityHoaDonThu.getE_DONG());
+            initialValues.put("MA_HOA_DON", entityHoaDonThu.getMA_HOA_DON());
+            initialValues.put("SERI_HDON", entityHoaDonThu.getSERI_HDON());
+
+
+            initialValues.put("MA_THE", entityHoaDonThu.getMA_THE());
+            initialValues.put("TEN_KHANG", entityHoaDonThu.getTEN_KHANG());
+            initialValues.put("DIA_CHI", entityHoaDonThu.getDIA_CHI());
+
+            initialValues.put("THANG_TTOAN", Common.parse(entityHoaDonThu.getTHANG_TTOAN(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            initialValues.put("PHIEN_TTOAN", entityHoaDonThu.getPHIEN_TTOAN());
+            initialValues.put("SO_TIEN_TTOAN", entityHoaDonThu.getSO_TIEN_TTOAN());
+            initialValues.put("SO_GCS", entityHoaDonThu.getSO_GCS());
+            initialValues.put("DIEN_LUC", entityHoaDonThu.getDIEN_LUC());
+            initialValues.put("SO_HO", entityHoaDonThu.getSO_HO());
+
+            initialValues.put("SO_DAU_KY", entityHoaDonThu.getSO_DAU_KY());
+            initialValues.put("SO_CUOI_KY", entityHoaDonThu.getSO_CUOI_KY());
+            initialValues.put("SO_CTO", entityHoaDonThu.getSO_CTO());
+            initialValues.put("SDT_ECPAY", entityHoaDonThu.getSDT_ECPAY());
+            initialValues.put("SDT_EVN", entityHoaDonThu.getSDT_EVN());
+            initialValues.put("GIAO_THU", entityHoaDonThu.getGIAO_THU());
+            initialValues.put("NGAY_GIAO_THU", Common.parse(entityHoaDonThu.getNGAY_GIAO_THU(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            initialValues.put("VI_TTOAN", entityHoaDonThu.getVI_TTOAN());
+
+
+
+            initialValues.put("HINH_THUC_TT", entityHoaDonThu.getHINH_THUC_TT());
+            initialValues.put("TRANG_THAI_TTOAN", entityHoaDonThu.getTRANG_THAI_TTOAN());
+            initialValues.put("TRANG_THAI_CHAM_NO", entityHoaDonThu.getTRANG_THAI_CHAM_NO());
+            initialValues.put("TRANG_THAI_HUY", entityHoaDonThu.getTRANG_THAI_HUY());
+            initialValues.put("TRANG_THAI_HOAN_TRA", entityHoaDonThu.getTRANG_THAI_HOAN_TRA());
+            initialValues.put("TRANG_THAI_XU_LY_NGHI_NGO", entityHoaDonThu.getTRANG_THAI_XU_LY_NGHI_NGO());
+            initialValues.put("IN_THONG_BAO_DIEN", entityHoaDonThu.getIN_THONG_BAO_DIEN());
+            initialValues.put("TRANG_THAI_DAY_CHAM_NO", entityHoaDonThu.getTRANG_THAI_DAY_CHAM_NO());
+            initialValues.put("SO_LAN_IN_BIEN_NHAN", entityHoaDonThu.getSO_LAN_IN_BIEN_NHAN());
+            initialValues.put("NGAY_DAY", Common.parse(entityHoaDonThu.getNGAY_DAY(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+
+
+            int rowAffect = (int) database.insert(TABLE_NAME_DEBT_COLLECTION, null, initialValues);
+        }
+    }
+
     public long updateBill(BillResponse listBillResponse) {
         ContentValues initialValues = new ContentValues();
 
         views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BodyBillResponse bodyBillResponse = listBillResponse.getBodyBillResponse();
-        views.ecpay.com.postabletecpay.util.entities.response.EntityBill.FooterBillResponse footerBillResponse = listBillResponse.getFooterBillResponse();
 
-        initialValues.put("customerCode", bodyBillResponse.getCustomerCode());
-        initialValues.put("customerPayCode", "");
-        String term = bodyBillResponse.getTerm();
-        //20170414011107000 != 2015-01-01
-        if (term.length() == yyyyMMdd.toString().length()) {
-            term = Common.convertDateToDate(term, yyyyMMdd, yyyyMMddHHmmssSSS);
+        int status = Common.parseInt(bodyBillResponse.getStatus());
+        /*
+        Hoá đơn được thanh toán từ nguồn khác:
+         */
+
+        if(status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("SOURCE_OTHER")) //Hoá đơn được thanh toán từ nguồn khác:
+        {
+            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+            this.insertLichSuThanhToan(bodyBillResponse, "", "03", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "02");
+        }else if(status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("EDONG_OTHER")) //Hoá đơn được thanh toán bởi số ví khác:
+        {
+            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+            initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
+
+            this.insertLichSuThanhToan(bodyBillResponse, "", "04", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "02");
+
+            //Chấm nợ thành công
+        }else if(status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("BILLING") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong))
+        {
+            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+
+            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "07");
+            this.insertHoaDonThu(bodyBillResponse, "", "02", "02", "", "", "", "", 0, "", "");
+
+            //Chấm nợ không thành công, thanh toan bởi nguồn khác
+        }else if(status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("SOURCE_OTHER") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong))
+        {
+            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+
+            this.insertLichSuThanhToan(bodyBillResponse, "", "03", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "07");
+            this.insertHoaDonThu(bodyBillResponse, "", "03", "05", "", "01", "", "", 0, "", "");
+
+            //Chấm nợ không thành công, thanh toan bởi ví khác
+        }else if(status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("EDONG_OTHER"))
+        {
+            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+            initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
+
+            this.insertLichSuThanhToan(bodyBillResponse, "", "04", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "07");
+            this.insertHoaDonThu(bodyBillResponse, "", "04", "05", "", "01", "", "", 0, "", "");
+
+            //Chấm nợ không thành công, chấm
+        }else if(status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("ERROR") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong))
+        {
+            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
+
+            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "04", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "07");
+            this.insertHoaDonThu(bodyBillResponse, "", "02", "04", "", "", "", "", 0, "", "");
+
+            //Huỷ hoá đơn thành
+        }else if(bodyBillResponse.getBillingType().equalsIgnoreCase("REVERT")) {
+            if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
+                initialValues.put("VI_TTOAN", "");
+
+                this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "08");
+                this.insertHoaDonThu(bodyBillResponse, "", "", "", "01", "01", "", "", 0, "", "");
+
+            } else {//Huỷ hoá đơn thành, tk != tk dang nhap
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
+                initialValues.put("VI_TTOAN", "");
+
+                this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "08");
+            }
+        }else if(status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("TIMEOUT"))
+        {
+            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
+            initialValues.put("VI_TTOAN", "");
+            this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "", "01", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "09");
+            if(bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong))
+            {
+                this.insertHoaDonThu(bodyBillResponse, "", "", "", "", "01", "01", "", 0, "", "");
+            }
+
+        }else if(bodyBillResponse.getBillingType().equalsIgnoreCase("TIMEOUT"))
+        {
+            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+            initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
+            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "02", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "09");
+            if(bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong))
+            {
+                this.insertHoaDonThu(bodyBillResponse, "", "", "", "", "", "02", "", 0, "", "");
+            }
+        }else
+        {
+            return  -1;
         }
-        initialValues.put("term", term);
-        initialValues.put("strTerm", "");
-        initialValues.put("amount", bodyBillResponse.getAmount());
-        initialValues.put("period", bodyBillResponse.getPeriod());
-        initialValues.put("issueDate", bodyBillResponse.getIssueDate());
-        initialValues.put("strIssueDate", "");
 
-        int status = Integer.parseInt(bodyBillResponse.getStatus());
-        initialValues.put("status", status);
-
-        initialValues.put("seri", bodyBillResponse.getSeri());
-        initialValues.put("pcCode", bodyBillResponse.getPcCode());
-        initialValues.put("handoverCode", bodyBillResponse.getHandOverCode());
-        initialValues.put("cashierCode", bodyBillResponse.getCashierCode());
-        initialValues.put("bookCmis", bodyBillResponse.getBookCmis());
-        initialValues.put("fromDate", bodyBillResponse.getFromDate());
-        initialValues.put("toDate", bodyBillResponse.getToDate());
-        initialValues.put("strFromDate", "");
-        initialValues.put("strToDate", "");
-        initialValues.put("home", bodyBillResponse.getHome());
-        initialValues.put("tax", bodyBillResponse.getTax());
-        initialValues.put("billNum", bodyBillResponse.getBillNum());
-        initialValues.put("currency", bodyBillResponse.getCurrency());
-        initialValues.put("priceDetails", bodyBillResponse.getPriceDetail());
-        initialValues.put("numeDetails", bodyBillResponse.getNumeDetail());
-        initialValues.put("amountDetails", bodyBillResponse.getAmountDetail());
-        initialValues.put("oldIndex", bodyBillResponse.getOldIndex());
-        initialValues.put("newIndex", bodyBillResponse.getNewIndex());
-        initialValues.put("nume", bodyBillResponse.getNume());
-        initialValues.put("amountNotTax", bodyBillResponse.getAmountNotTax());
-        initialValues.put("amountTax", bodyBillResponse.getAmountTax());
-        initialValues.put("multiple", bodyBillResponse.getMultiple());
-        initialValues.put("billType", bodyBillResponse.getBillType());
-        initialValues.put("typeIndex", bodyBillResponse.getTypeIndex());
-        initialValues.put("groupTypeIndex", bodyBillResponse.getGroupTypeIndex());
-        initialValues.put("createdDate", bodyBillResponse.getCreatedDate());
-        initialValues.put("idChanged", footerBillResponse.getIdChanged());
-        initialValues.put("dateChanged", footerBillResponse.getDateChanged());
-        initialValues.put("edong", bodyBillResponse.getEdong());
-        initialValues.put("pcCodeExt", "");
-        initialValues.put("code", "");
-        initialValues.put("name", "");
-        initialValues.put("nameNosign", "");
-        initialValues.put("phoneByevn", "");
-        initialValues.put("phoneByecp", "");
-        initialValues.put("electricityMeter", "");
-        initialValues.put("inning", "");
-        initialValues.put("road", "");
-        initialValues.put("station", "");
-        initialValues.put("taxCode", bodyBillResponse.getTax());
-        initialValues.put("trade", "");
-        initialValues.put("countPeriod", "");
-        initialValues.put("team", "");
-        initialValues.put("type", bodyBillResponse.getBillType());
-        initialValues.put("lastQuery", "");
-        initialValues.put("groupType", !bodyBillResponse.getGroupTypeIndex().isEmpty() ? Integer.parseInt(bodyBillResponse.getGroupTypeIndex()) : 0);
-        initialValues.put("billingChannel", "");
-        initialValues.put("billingType", bodyBillResponse.getBillingType());
-        initialValues.put("billingBy", "");
-        initialValues.put("cashierPay", bodyBillResponse.getCashierCode());
-        initialValues.put("edongKey", bodyBillResponse.getEdong());
 
         database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_BILL, initialValues, "billId=?", new String[]{String.valueOf(bodyBillResponse.getBillId())});
+        int rowAffect = (int) database.update(TABLE_NAME_BILL, initialValues, "MA_HOA_DON=?", new String[]{String.valueOf(bodyBillResponse.getBillId())});
         return rowAffect;
     }
 
@@ -1989,7 +2307,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public long checkBillExist(String billId) {
         database = this.getReadableDatabase();
-        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE billId = '" + billId + "'";
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE MA_HOA_DON = '" + billId + "'";
         Cursor mCursor = database.rawQuery(query, null);
         if (mCursor.moveToFirst())
             return mCursor.getInt(0);
@@ -2047,90 +2365,91 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     //region DEBT Danh sách hóa đơn thu
     public int insertDebtCollection(EntityDanhSachThu entityDanhSachThu) {
 
-        if (entityDanhSachThu.getEdong() == null || entityDanhSachThu.getEdong().trim().isEmpty())
-            return SQLiteConnection.ERROR_OCCUR;
-
-        ContentValues initialValues = new ContentValues();
-        initialValues.put("customerCode", entityDanhSachThu.getCustomerCode());
-        initialValues.put("customerPayCode", entityDanhSachThu.getCustomerPayCode());
-        initialValues.put("billId", entityDanhSachThu.getBillId());
-
-        //20170414011107000 != 2015-01-01
-        String term = "";
-        if (entityDanhSachThu.getTerm().length() == yyyyMMdd.toString().length()) {
-            term = Common.convertDateToDate(entityDanhSachThu.getTerm(), yyyyMMdd, yyyyMMddHHmmssSSS);
-        }
-        initialValues.put("term", term);
-        initialValues.put("amount", entityDanhSachThu.getAmount());
-        initialValues.put("period", entityDanhSachThu.getPeriod());
-        initialValues.put("issueDate", entityDanhSachThu.getIssueDate());
-        initialValues.put("strIssueDate", entityDanhSachThu.getStrIssueDate());
-        initialValues.put("status", entityDanhSachThu.getStatus());
-        initialValues.put("seri", entityDanhSachThu.getSeri());
-        initialValues.put("pcCode", entityDanhSachThu.getPcCode());
-        initialValues.put("handoverCode", entityDanhSachThu.getHandoverCode());
-        initialValues.put("cashierCode", entityDanhSachThu.getCashierCode());
-        initialValues.put("bookCmis", entityDanhSachThu.getBookCmis());
-        initialValues.put("fromDate", entityDanhSachThu.getFromDate());
-        initialValues.put("toDate", entityDanhSachThu.getToDate());
-        initialValues.put("strFromDate", entityDanhSachThu.getStrFromDate());
-        initialValues.put("strToDate", entityDanhSachThu.getStrToDate());
-        initialValues.put("home", entityDanhSachThu.getHome());
-        initialValues.put("tax", entityDanhSachThu.getTax());
-        initialValues.put("billNum", entityDanhSachThu.getBillNum());
-        initialValues.put("currency", entityDanhSachThu.getCurrency());
-        initialValues.put("priceDetails", entityDanhSachThu.getPriceDetails());
-        initialValues.put("numeDetails", entityDanhSachThu.getNumeDetails());
-        initialValues.put("amountDetails", entityDanhSachThu.getAmountDetails());
-        initialValues.put("oldIndex", entityDanhSachThu.getOldIndex());
-        initialValues.put("newIndex", entityDanhSachThu.getNewIndex());
-        initialValues.put("nume", entityDanhSachThu.getNume());
-        initialValues.put("amountNotTax", entityDanhSachThu.getAmountNotTax());
-        initialValues.put("amountTax", entityDanhSachThu.getAmountTax());
-        initialValues.put("multiple", entityDanhSachThu.getMultiple());
-        initialValues.put("billType", entityDanhSachThu.getBillType());
-        initialValues.put("typeIndex", entityDanhSachThu.getTypeIndex());
-        initialValues.put("groupTypeIndex", entityDanhSachThu.getGroupTypeIndex());
-        initialValues.put("createdDate", entityDanhSachThu.getCreatedDate());
-        initialValues.put("idChanged", entityDanhSachThu.getIdChanged());
-        initialValues.put("dateChanged", entityDanhSachThu.getDateChanged());
-        initialValues.put("edong", entityDanhSachThu.getEdong());
-        initialValues.put("pcCodeExt", entityDanhSachThu.getPcCodeExt());
-        initialValues.put("code", entityDanhSachThu.getCode());
-        initialValues.put("name", entityDanhSachThu.getName());
-        initialValues.put("nameNosign", entityDanhSachThu.getNameNosign());
-        initialValues.put("phoneByevn", entityDanhSachThu.getPhoneByevn());
-        initialValues.put("phoneByecp", entityDanhSachThu.getPhoneByecp());
-        initialValues.put("electricityMeter", entityDanhSachThu.getElectricityMeter());
-        initialValues.put("inning", entityDanhSachThu.getInning());
-        initialValues.put("road", entityDanhSachThu.getRoad());
-        initialValues.put("station", entityDanhSachThu.getStation());
-        initialValues.put("taxCode", entityDanhSachThu.getTaxCode());
-        initialValues.put("trade", entityDanhSachThu.getTrade());
-        initialValues.put("countPeriod", entityDanhSachThu.getCountPeriod());
-        initialValues.put("team", entityDanhSachThu.getTeam());
-        initialValues.put("type", entityDanhSachThu.getType());
-        initialValues.put("lastQuery", entityDanhSachThu.getLastQuery());
-        initialValues.put("groupType", entityDanhSachThu.getGroupType());
-        initialValues.put("billingChannel", entityDanhSachThu.getBillingChannel());
-        initialValues.put("billingType", entityDanhSachThu.getBillingType());
-        initialValues.put("billingBy", entityDanhSachThu.getBillingBy());
-        initialValues.put("cashierPay", entityDanhSachThu.getCashierPay());
-        initialValues.put("edongKey", entityDanhSachThu.getEdong());
-        initialValues.put("payments", entityDanhSachThu.getPayments());
-        initialValues.put("payStatus", entityDanhSachThu.getPayStatus());
-        initialValues.put("stateOfDebt", entityDanhSachThu.getStateOfDebt());
-        initialValues.put("stateOfCancel", entityDanhSachThu.getStateOfCancel());
-        initialValues.put("stateOfReturn", entityDanhSachThu.getStateOfReturn());
-        initialValues.put("suspectedProcessingStatus", entityDanhSachThu.getSuspectedProcessingStatus());
-        initialValues.put("stateOfPush", entityDanhSachThu.getStateOfPush());
-        initialValues.put("dateOfPush", entityDanhSachThu.getDateOfPush());
-        initialValues.put("countPrintReceipt", entityDanhSachThu.getCountPrintReceipt());
-        initialValues.put("printInfo", entityDanhSachThu.getPrintInfo());
-        database = getWritableDatabase();
-        int rowAffect = (int) database.insert(TABLE_NAME_DEBT_COLLECTION, null, initialValues);
-
-        return rowAffect;
+//        if (entityDanhSachThu.getEdong() == null || entityDanhSachThu.getEdong().trim().isEmpty())
+//            return SQLiteConnection.ERROR_OCCUR;
+//
+//        ContentValues initialValues = new ContentValues();
+//        initialValues.put("customerCode", entityDanhSachThu.getCustomerCode());
+//        initialValues.put("customerPayCode", entityDanhSachThu.getCustomerPayCode());
+//        initialValues.put("billId", entityDanhSachThu.getBillId());
+//
+//        //20170414011107000 != 2015-01-01
+//        String term = "";
+//        if (entityDanhSachThu.getTerm().length() == yyyyMMdd.toString().length()) {
+//            term = Common.convertDateToDate(entityDanhSachThu.getTerm(), yyyyMMdd, yyyyMMddHHmmssSSS);
+//        }
+//        initialValues.put("term", term);
+//        initialValues.put("amount", entityDanhSachThu.getAmount());
+//        initialValues.put("period", entityDanhSachThu.getPeriod());
+//        initialValues.put("issueDate", entityDanhSachThu.getIssueDate());
+//        initialValues.put("strIssueDate", entityDanhSachThu.getStrIssueDate());
+//        initialValues.put("status", entityDanhSachThu.getTRANG_THAI_TT());
+//        initialValues.put("seri", entityDanhSachThu.getSeri());
+//        initialValues.put("pcCode", entityDanhSachThu.getPcCode());
+//        initialValues.put("handoverCode", entityDanhSachThu.getHandoverCode());
+//        initialValues.put("cashierCode", entityDanhSachThu.getCashierCode());
+//        initialValues.put("bookCmis", entityDanhSachThu.getBookCmis());
+//        initialValues.put("fromDate", entityDanhSachThu.getFromDate());
+//        initialValues.put("toDate", entityDanhSachThu.getToDate());
+//        initialValues.put("strFromDate", entityDanhSachThu.getStrFromDate());
+//        initialValues.put("strToDate", entityDanhSachThu.getStrToDate());
+//        initialValues.put("home", entityDanhSachThu.getHome());
+//        initialValues.put("tax", entityDanhSachThu.getTax());
+//        initialValues.put("billNum", entityDanhSachThu.getBillNum());
+//        initialValues.put("currency", entityDanhSachThu.getCurrency());
+//        initialValues.put("priceDetails", entityDanhSachThu.getPriceDetails());
+//        initialValues.put("numeDetails", entityDanhSachThu.getNumeDetails());
+//        initialValues.put("amountDetails", entityDanhSachThu.getAmountDetails());
+//        initialValues.put("oldIndex", entityDanhSachThu.getOldIndex());
+//        initialValues.put("newIndex", entityDanhSachThu.getNewIndex());
+//        initialValues.put("nume", entityDanhSachThu.getNume());
+//        initialValues.put("amountNotTax", entityDanhSachThu.getAmountNotTax());
+//        initialValues.put("amountTax", entityDanhSachThu.getAmountTax());
+//        initialValues.put("multiple", entityDanhSachThu.getMultiple());
+//        initialValues.put("billType", entityDanhSachThu.getBillType());
+//        initialValues.put("typeIndex", entityDanhSachThu.getTypeIndex());
+//        initialValues.put("groupTypeIndex", entityDanhSachThu.getGroupTypeIndex());
+//        initialValues.put("createdDate", entityDanhSachThu.getCreatedDate());
+//        initialValues.put("idChanged", entityDanhSachThu.getIdChanged());
+//        initialValues.put("dateChanged", entityDanhSachThu.getDateChanged());
+//        initialValues.put("edong", entityDanhSachThu.getEdong());
+//        initialValues.put("pcCodeExt", entityDanhSachThu.getPcCodeExt());
+//        initialValues.put("code", entityDanhSachThu.getCode());
+//        initialValues.put("name", entityDanhSachThu.getName());
+//        initialValues.put("nameNosign", entityDanhSachThu.getNameNosign());
+//        initialValues.put("phoneByevn", entityDanhSachThu.getPhoneByevn());
+//        initialValues.put("phoneByecp", entityDanhSachThu.getPhoneByecp());
+//        initialValues.put("electricityMeter", entityDanhSachThu.getElectricityMeter());
+//        initialValues.put("inning", entityDanhSachThu.getInning());
+//        initialValues.put("road", entityDanhSachThu.getRoad());
+//        initialValues.put("station", entityDanhSachThu.getStation());
+//        initialValues.put("taxCode", entityDanhSachThu.getTaxCode());
+//        initialValues.put("trade", entityDanhSachThu.getTrade());
+//        initialValues.put("countPeriod", entityDanhSachThu.getCountPeriod());
+//        initialValues.put("team", entityDanhSachThu.getTeam());
+//        initialValues.put("type", entityDanhSachThu.getType());
+//        initialValues.put("lastQuery", entityDanhSachThu.getLastQuery());
+//        initialValues.put("groupType", entityDanhSachThu.getGroupType());
+//        initialValues.put("billingChannel", entityDanhSachThu.getBillingChannel());
+//        initialValues.put("billingType", entityDanhSachThu.getBillingType());
+//        initialValues.put("billingBy", entityDanhSachThu.getBillingBy());
+//        initialValues.put("cashierPay", entityDanhSachThu.getCashierPay());
+//        initialValues.put("edongKey", entityDanhSachThu.getEdong());
+//        initialValues.put("payments", entityDanhSachThu.getPayments());
+//        initialValues.put("payStatus", entityDanhSachThu.getPayStatus());
+//        initialValues.put("stateOfDebt", entityDanhSachThu.getStateOfDebt());
+//        initialValues.put("stateOfCancel", entityDanhSachThu.getStateOfCancel());
+//        initialValues.put("stateOfReturn", entityDanhSachThu.getStateOfReturn());
+//        initialValues.put("suspectedProcessingStatus", entityDanhSachThu.getSuspectedProcessingStatus());
+//        initialValues.put("stateOfPush", entityDanhSachThu.getStateOfPush());
+//        initialValues.put("dateOfPush", entityDanhSachThu.getDateOfPush());
+//        initialValues.put("countPrintReceipt", entityDanhSachThu.getCountPrintReceipt());
+//        initialValues.put("printInfo", entityDanhSachThu.getPrintInfo());
+//        database = getWritableDatabase();
+//        int rowAffect = (int) database.insert(TABLE_NAME_DEBT_COLLECTION, null, initialValues);
+//
+//        return rowAffect;
+        return  -1;
     }
 
     public int updateBillDebtWith(
@@ -2226,91 +2545,92 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         database = getWritableDatabase();
 
-        if (entityLichSuThanhToan.getEdong() == null || entityLichSuThanhToan.getEdong().trim().isEmpty())
-            return SQLiteConnection.ERROR_OCCUR;
-
-        ContentValues initialValues = new ContentValues();
-        initialValues.put("customerCode", entityLichSuThanhToan.getCustomerCode());
-        initialValues.put("customerPayCode", entityLichSuThanhToan.getCustomerPayCode());
-        initialValues.put("billId", entityLichSuThanhToan.getBillId());
-
-        //20170414011107000 != 2015-01-01
-        String term = "";
-        if (entityLichSuThanhToan.getTerm().length() == yyyyMMdd.toString().length()) {
-            term = Common.convertDateToDate(entityLichSuThanhToan.getTerm(), yyyyMMdd, yyyyMMddHHmmssSSS);
-        }
-        initialValues.put("term", term);
-        initialValues.put("amount", entityLichSuThanhToan.getAmount());
-        initialValues.put("period", entityLichSuThanhToan.getPeriod());
-        initialValues.put("issueDate", entityLichSuThanhToan.getIssueDate());
-        initialValues.put("strIssueDate", entityLichSuThanhToan.getStrIssueDate());
-        initialValues.put("status", entityLichSuThanhToan.getStatus());
-        initialValues.put("seri", entityLichSuThanhToan.getSeri());
-        initialValues.put("pcCode", entityLichSuThanhToan.getPcCode());
-        initialValues.put("handoverCode", entityLichSuThanhToan.getHandoverCode());
-        initialValues.put("cashierCode", entityLichSuThanhToan.getCashierCode());
-        initialValues.put("bookCmis", entityLichSuThanhToan.getBookCmis());
-        initialValues.put("fromDate", entityLichSuThanhToan.getFromDate());
-        initialValues.put("toDate", entityLichSuThanhToan.getToDate());
-        initialValues.put("strFromDate", entityLichSuThanhToan.getStrFromDate());
-        initialValues.put("strToDate", entityLichSuThanhToan.getStrToDate());
-        initialValues.put("home", entityLichSuThanhToan.getHome());
-        initialValues.put("tax", entityLichSuThanhToan.getTax());
-        initialValues.put("billNum", entityLichSuThanhToan.getBillNum());
-        initialValues.put("currency", entityLichSuThanhToan.getCurrency());
-        initialValues.put("priceDetails", entityLichSuThanhToan.getPriceDetails());
-        initialValues.put("numeDetails", entityLichSuThanhToan.getNumeDetails());
-        initialValues.put("amountDetails", entityLichSuThanhToan.getAmountDetails());
-        initialValues.put("oldIndex", entityLichSuThanhToan.getOldIndex());
-        initialValues.put("newIndex", entityLichSuThanhToan.getNewIndex());
-        initialValues.put("nume", entityLichSuThanhToan.getNume());
-        initialValues.put("amountNotTax", entityLichSuThanhToan.getAmountNotTax());
-        initialValues.put("amountTax", entityLichSuThanhToan.getAmountTax());
-        initialValues.put("multiple", entityLichSuThanhToan.getMultiple());
-        initialValues.put("billType", entityLichSuThanhToan.getBillType());
-        initialValues.put("typeIndex", entityLichSuThanhToan.getTypeIndex());
-        initialValues.put("groupTypeIndex", entityLichSuThanhToan.getGroupTypeIndex());
-        initialValues.put("createdDate", entityLichSuThanhToan.getCreatedDate());
-        initialValues.put("idChanged", entityLichSuThanhToan.getIdChanged());
-        initialValues.put("dateChanged", entityLichSuThanhToan.getDateChanged());
-        initialValues.put("edong", entityLichSuThanhToan.getEdong());
-        initialValues.put("pcCodeExt", entityLichSuThanhToan.getPcCodeExt());
-        initialValues.put("code", entityLichSuThanhToan.getCode());
-        initialValues.put("name", entityLichSuThanhToan.getName());
-        initialValues.put("nameNosign", entityLichSuThanhToan.getNameNosign());
-        initialValues.put("phoneByevn", entityLichSuThanhToan.getPhoneByevn());
-        initialValues.put("phoneByecp", entityLichSuThanhToan.getPhoneByecp());
-        initialValues.put("electricityMeter", entityLichSuThanhToan.getElectricityMeter());
-        initialValues.put("inning", entityLichSuThanhToan.getInning());
-        initialValues.put("road", entityLichSuThanhToan.getRoad());
-        initialValues.put("station", entityLichSuThanhToan.getStation());
-        initialValues.put("taxCode", entityLichSuThanhToan.getTaxCode());
-        initialValues.put("trade", entityLichSuThanhToan.getTrade());
-        initialValues.put("countPeriod", entityLichSuThanhToan.getCountPeriod());
-        initialValues.put("team", entityLichSuThanhToan.getTeam());
-        initialValues.put("type", entityLichSuThanhToan.getType());
-        initialValues.put("lastQuery", entityLichSuThanhToan.getLastQuery());
-        initialValues.put("groupType", entityLichSuThanhToan.getGroupType());
-        initialValues.put("billingChannel", entityLichSuThanhToan.getBillingChannel());
-        initialValues.put("billingType", entityLichSuThanhToan.getBillingType());
-        initialValues.put("billingBy", entityLichSuThanhToan.getBillingBy());
-        initialValues.put("cashierPay", entityLichSuThanhToan.getCashierPay());
-        initialValues.put("edongKey", entityLichSuThanhToan.getEdong());
-        initialValues.put("payments", entityLichSuThanhToan.getPayments());
-        initialValues.put("payStatus", entityLichSuThanhToan.getPayStatus());
-        initialValues.put("stateOfDebt", entityLichSuThanhToan.getStateOfDebt());
-        initialValues.put("stateOfCancel", entityLichSuThanhToan.getStateOfCancel());
-        initialValues.put("stateOfReturn", entityLichSuThanhToan.getStateOfReturn());
-        initialValues.put("suspectedProcessingStatus", entityLichSuThanhToan.getSuspectedProcessingStatus());
-        initialValues.put("stateOfPush", entityLichSuThanhToan.getStateOfPush());
-        initialValues.put("dateOfPush", entityLichSuThanhToan.getDateOfPush());
-        initialValues.put("countPrintReceipt", entityLichSuThanhToan.getCountPrintReceipt());
-        initialValues.put("printInfo", entityLichSuThanhToan.getPrintInfo());
-        initialValues.put("dateIncurred", entityLichSuThanhToan.getDateIncurred());
-        initialValues.put("tradingCode", entityLichSuThanhToan.getTradingCode());
-        int rowAffect = (int) database.insert(TABLE_NAME_HISTORY_PAY, null, initialValues);
-
-        return rowAffect;
+//        if (entityLichSuThanhToan.getEdong() == null || entityLichSuThanhToan.getEdong().trim().isEmpty())
+//            return SQLiteConnection.ERROR_OCCUR;
+//
+//        ContentValues initialValues = new ContentValues();
+//        initialValues.put("customerCode", entityLichSuThanhToan.getCustomerCode());
+//        initialValues.put("customerPayCode", entityLichSuThanhToan.getCustomerPayCode());
+//        initialValues.put("billId", entityLichSuThanhToan.getBillId());
+//
+//        //20170414011107000 != 2015-01-01
+//        String term = "";
+//        if (entityLichSuThanhToan.getTerm().length() == yyyyMMdd.toString().length()) {
+//            term = Common.convertDateToDate(entityLichSuThanhToan.getTerm(), yyyyMMdd, yyyyMMddHHmmssSSS);
+//        }
+//        initialValues.put("term", term);
+//        initialValues.put("amount", entityLichSuThanhToan.getAmount());
+//        initialValues.put("period", entityLichSuThanhToan.getPeriod());
+//        initialValues.put("issueDate", entityLichSuThanhToan.getIssueDate());
+//        initialValues.put("strIssueDate", entityLichSuThanhToan.getStrIssueDate());
+//        initialValues.put("status", entityLichSuThanhToan.getTRANG_THAI_TT());
+//        initialValues.put("seri", entityLichSuThanhToan.getSeri());
+//        initialValues.put("pcCode", entityLichSuThanhToan.getPcCode());
+//        initialValues.put("handoverCode", entityLichSuThanhToan.getHandoverCode());
+//        initialValues.put("cashierCode", entityLichSuThanhToan.getCashierCode());
+//        initialValues.put("bookCmis", entityLichSuThanhToan.getBookCmis());
+//        initialValues.put("fromDate", entityLichSuThanhToan.getFromDate());
+//        initialValues.put("toDate", entityLichSuThanhToan.getToDate());
+//        initialValues.put("strFromDate", entityLichSuThanhToan.getStrFromDate());
+//        initialValues.put("strToDate", entityLichSuThanhToan.getStrToDate());
+//        initialValues.put("home", entityLichSuThanhToan.getHome());
+//        initialValues.put("tax", entityLichSuThanhToan.getTax());
+//        initialValues.put("billNum", entityLichSuThanhToan.getBillNum());
+//        initialValues.put("currency", entityLichSuThanhToan.getCurrency());
+//        initialValues.put("priceDetails", entityLichSuThanhToan.getPriceDetails());
+//        initialValues.put("numeDetails", entityLichSuThanhToan.getNumeDetails());
+//        initialValues.put("amountDetails", entityLichSuThanhToan.getAmountDetails());
+//        initialValues.put("oldIndex", entityLichSuThanhToan.getOldIndex());
+//        initialValues.put("newIndex", entityLichSuThanhToan.getNewIndex());
+//        initialValues.put("nume", entityLichSuThanhToan.getNume());
+//        initialValues.put("amountNotTax", entityLichSuThanhToan.getAmountNotTax());
+//        initialValues.put("amountTax", entityLichSuThanhToan.getAmountTax());
+//        initialValues.put("multiple", entityLichSuThanhToan.getMultiple());
+//        initialValues.put("billType", entityLichSuThanhToan.getBillType());
+//        initialValues.put("typeIndex", entityLichSuThanhToan.getTypeIndex());
+//        initialValues.put("groupTypeIndex", entityLichSuThanhToan.getGroupTypeIndex());
+//        initialValues.put("createdDate", entityLichSuThanhToan.getCreatedDate());
+//        initialValues.put("idChanged", entityLichSuThanhToan.getIdChanged());
+//        initialValues.put("dateChanged", entityLichSuThanhToan.getDateChanged());
+//        initialValues.put("edong", entityLichSuThanhToan.getEdong());
+//        initialValues.put("pcCodeExt", entityLichSuThanhToan.getPcCodeExt());
+//        initialValues.put("code", entityLichSuThanhToan.getCode());
+//        initialValues.put("name", entityLichSuThanhToan.getName());
+//        initialValues.put("nameNosign", entityLichSuThanhToan.getNameNosign());
+//        initialValues.put("phoneByevn", entityLichSuThanhToan.getPhoneByevn());
+//        initialValues.put("phoneByecp", entityLichSuThanhToan.getPhoneByecp());
+//        initialValues.put("electricityMeter", entityLichSuThanhToan.getElectricityMeter());
+//        initialValues.put("inning", entityLichSuThanhToan.getInning());
+//        initialValues.put("road", entityLichSuThanhToan.getRoad());
+//        initialValues.put("station", entityLichSuThanhToan.getStation());
+//        initialValues.put("taxCode", entityLichSuThanhToan.getTaxCode());
+//        initialValues.put("trade", entityLichSuThanhToan.getTrade());
+//        initialValues.put("countPeriod", entityLichSuThanhToan.getCountPeriod());
+//        initialValues.put("team", entityLichSuThanhToan.getTeam());
+//        initialValues.put("type", entityLichSuThanhToan.getType());
+//        initialValues.put("lastQuery", entityLichSuThanhToan.getLastQuery());
+//        initialValues.put("groupType", entityLichSuThanhToan.getGroupType());
+//        initialValues.put("billingChannel", entityLichSuThanhToan.getBillingChannel());
+//        initialValues.put("billingType", entityLichSuThanhToan.getBillingType());
+//        initialValues.put("billingBy", entityLichSuThanhToan.getBillingBy());
+//        initialValues.put("cashierPay", entityLichSuThanhToan.getCashierPay());
+//        initialValues.put("edongKey", entityLichSuThanhToan.getEdong());
+//        initialValues.put("payments", entityLichSuThanhToan.getPayments());
+//        initialValues.put("payStatus", entityLichSuThanhToan.getPayStatus());
+//        initialValues.put("stateOfDebt", entityLichSuThanhToan.getStateOfDebt());
+//        initialValues.put("stateOfCancel", entityLichSuThanhToan.getStateOfCancel());
+//        initialValues.put("stateOfReturn", entityLichSuThanhToan.getStateOfReturn());
+//        initialValues.put("suspectedProcessingStatus", entityLichSuThanhToan.getSuspectedProcessingStatus());
+//        initialValues.put("stateOfPush", entityLichSuThanhToan.getStateOfPush());
+//        initialValues.put("dateOfPush", entityLichSuThanhToan.getDateOfPush());
+//        initialValues.put("countPrintReceipt", entityLichSuThanhToan.getCountPrintReceipt());
+//        initialValues.put("printInfo", entityLichSuThanhToan.getPrintInfo());
+//        initialValues.put("dateIncurred", entityLichSuThanhToan.getDateIncurred());
+//        initialValues.put("tradingCode", entityLichSuThanhToan.getTradingCode());
+//        int rowAffect = (int) database.insert(TABLE_NAME_HISTORY_PAY, null, initialValues);
+//
+//        return rowAffect;
+        return  -1;
     }
 
     public String getCustomerNameByBillId(String edong, long billId) {
@@ -2411,6 +2731,15 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         database = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("notYetPushMoney", notYetPushMoney);
+        return database.update(TABLE_NAME_ACCOUNT, contentValues, "edong = ?", new String[]{String.valueOf(edong)});
+    }
+
+
+    public int updateBalance(String edong, long balance, long lockmoney) {
+        database = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("balance", balance);
+        contentValues.put("lockMoney", lockmoney);
         return database.update(TABLE_NAME_ACCOUNT, contentValues, "edong = ?", new String[]{String.valueOf(edong)});
     }
 

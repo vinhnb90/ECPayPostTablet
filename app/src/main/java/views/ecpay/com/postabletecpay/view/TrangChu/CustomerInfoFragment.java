@@ -24,6 +24,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.CustomerInfoPresenter;
+import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.Util.BarcodeScannerDialog;
@@ -36,7 +37,7 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
 {
 
 
-    public static CustomerInfoFragment newInstance(Customer customer, String edong) {
+    public static CustomerInfoFragment newInstance(EntityKhachHang customer, String edong) {
         CustomerInfoFragment customerInfoFragment = new CustomerInfoFragment();
         customerInfoFragment.mCustomer = customer;
         customerInfoFragment.mEDong = edong;
@@ -99,7 +100,7 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
     ImageButton fragment_customer_info_fragment_customer_info_btnBack1;
 
 
-    private Customer mCustomer;
+    private EntityKhachHang mCustomer;
     private String mEDong;
 
     private boolean isUpdate;
@@ -181,21 +182,21 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
     }
 
 
-    void fill(Customer customer)
+    void fill(EntityKhachHang customer)
     {
         setLoading(true);
 
-        fragment_customer_info_fragment_customer_info_eSearchCustomer.setText(this.getStringField(customer.getCardNo()));
-        fragment_customer_info_eSdtECPAY.setText(this.getStringField(customer.getPhoneByecp()));
-        fragment_customer_info_eTKNganHang.setText(this.getStringField(customer.getBankAccount()));
-        fragment_customer_info_eBookCmis.setText(this.getStringField(customer.getBookCmis()));
-        fragment_customer_info_eAddressNH.setText(this.getStringField(customer.getBankName()));
-        fragment_customer_info_fragment_customer_info_txtMaKH.setText(this.getStringField(customer.getCode()));
-        fragment_customer_info_txtTenKH.setText(this.getStringField(customer.getName()));
-        fragment_customer_info_txtDiaChi.setText(this.getStringField(customer.getAddress()));
-        fragment_customer_info_txtPhoneEvn.setText(this.getStringField(customer.getPhoneByevn()));
+        fragment_customer_info_fragment_customer_info_eSearchCustomer.setText(this.getStringField(customer.getMA_THE()));
+        fragment_customer_info_eSdtECPAY.setText(this.getStringField(customer.getSDT_ECPAY()));
+        fragment_customer_info_eTKNganHang.setText(this.getStringField(""));
+        fragment_customer_info_eBookCmis.setText(this.getStringField(customer.getSO_GCS()));
+        fragment_customer_info_eAddressNH.setText(this.getStringField(""));
+        fragment_customer_info_fragment_customer_info_txtMaKH.setText(this.getStringField(customer.getMA_KHANG()));
+        fragment_customer_info_txtTenKH.setText(this.getStringField(customer.getTEN_KHANG()));
+        fragment_customer_info_txtDiaChi.setText(this.getStringField(customer.getDIA_CHI()));
+        fragment_customer_info_txtPhoneEvn.setText(this.getStringField(customer.getSDT_EVN()));
 
-        if(customer.getCardNo() == null || customer.getCardNo().length() == 0)
+        if(customer.getMA_THE() == null || customer.getMA_THE().length() == 0)
         {
             fragment_customer_info_btnDangKy.setText("Đăng Ký");
         }else
@@ -204,7 +205,7 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
         }
 
 
-        isUpdate = !(mCustomer.getCardNo() == null || mCustomer.getCardNo().length() == 0);
+        isUpdate = !(mCustomer.getMA_THE() == null || mCustomer.getMA_THE().length() == 0);
     }
 
     String getStringField(String obj)
@@ -230,7 +231,7 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
     }
 
     @Override
-    public void refill(Customer customer) {
+    public void refill(EntityKhachHang customer) {
         this.fill(customer);
     }
 }

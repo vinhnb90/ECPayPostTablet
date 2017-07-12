@@ -1,4 +1,4 @@
-package views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill;
+package views.ecpay.com.postabletecpay.util.entities.request.EntityBalance;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -9,41 +9,49 @@ import views.ecpay.com.postabletecpay.util.entities.request.Base.HeaderRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.Base.Request;
 
 /**
- * Created by tima on 6/19/17.
+ * Created by duydatpham on 7/12/17.
  */
 
-public class PostBillRequest extends Request {
+public class BalanceRequest extends Request {
+
     @SerializedName("header")
     @Expose
     private HeaderRequest header;
     @SerializedName("body")
     @Expose
-    private BodyPostBillRequest bodyPostBillRequest;
+    private BodyBalanceRequest body;
     @SerializedName("footer")
     @Expose
-    private FooterRequest footerPostBillRequest;
+    private FooterRequest footer;
 
+
+    @Override
     public HeaderRequest getHeader() {
         return this.header;
     }
 
-    public void setHeader(HeaderRequest headerPostBillRequest) {
-        this.header = headerPostBillRequest;
+    @Override
+    public void setHeader(HeaderRequest header) {
+        this.header = header;
     }
 
+    @Override
     public BodyRequest getBody() {
-        return bodyPostBillRequest;
+        return this.body;
     }
 
-    public void setBody(BodyRequest bodyPostBillRequest) {
-        this.bodyPostBillRequest = (BodyPostBillRequest) bodyPostBillRequest;
+    @Override
+    public void setBody(BodyRequest body) {
+        this.body = (BodyBalanceRequest)body;
     }
 
+    @Override
     public FooterRequest getFooter() {
-        return footerPostBillRequest;
+        return this.footer;
     }
 
-    public void setFooter(FooterRequest footerPostBillRequest) {
-        this.footerPostBillRequest = footerPostBillRequest;
+    @Override
+    public void setFooter(FooterRequest footer) {
+        this.footer = footer;
     }
 }

@@ -6,15 +6,12 @@ import java.util.Date;
  * Created by macbook on 5/5/17.
  */
 
-public class EntityLichSuThanhToan {
-
-    private int ID;
-
-    //Hoa Don No
+public class EntityHoaDonThu {
 
     private String E_DONG;
-    private String MA_HOA_DON;
+    private int ID;
     private String SERI_HDON;
+    private String MA_HOA_DON;
     private String MA_KHANG;
     private String MA_THE;
     private String TEN_KHANG;
@@ -35,25 +32,16 @@ public class EntityLichSuThanhToan {
     private String TRANG_THAI_TTOAN;
     private String VI_TTOAN;
 
-    //Extra
 
     private String HINH_THUC_TT;
     private String TRANG_THAI_CHAM_NO;
     private String TRANG_THAI_HUY;
-    private String TRANG_THAI_NGHI_NGO;
-    private int SO_IN_BIEN_NHAN;
+    private String TRANG_THAI_HOAN_TRA;
+    private String TRANG_THAI_XU_LY_NGHI_NGO;
+    private String TRANG_THAI_DAY_CHAM_NO;
+    private Date NGAY_DAY;
+    private int SO_LAN_IN_BIEN_NHAN;
     private String IN_THONG_BAO_DIEN;
-    private Date NGAY_PHAT_SINH;
-    private String MA_GIAO_DICH;
-
-
-    public String getE_DONG() {
-        return E_DONG;
-    }
-
-    public void setE_DONG(String e_DONG) {
-        E_DONG = e_DONG;
-    }
 
     public String getMA_HOA_DON() {
         return MA_HOA_DON;
@@ -61,6 +49,14 @@ public class EntityLichSuThanhToan {
 
     public void setMA_HOA_DON(String MA_HOA_DON) {
         this.MA_HOA_DON = MA_HOA_DON;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
     }
 
     public String getSERI_HDON() {
@@ -223,14 +219,6 @@ public class EntityLichSuThanhToan {
         this.VI_TTOAN = VI_TTOAN;
     }
 
-    public int getID() {
-        return ID;
-    }
-
-    public void setID(int ID) {
-        this.ID = ID;
-    }
-
     public String getHINH_THUC_TT() {
         return HINH_THUC_TT;
     }
@@ -255,20 +243,44 @@ public class EntityLichSuThanhToan {
         this.TRANG_THAI_HUY = TRANG_THAI_HUY;
     }
 
-    public String getTRANG_THAI_NGHI_NGO() {
-        return TRANG_THAI_NGHI_NGO;
+    public String getTRANG_THAI_HOAN_TRA() {
+        return TRANG_THAI_HOAN_TRA;
     }
 
-    public void setTRANG_THAI_NGHI_NGO(String TRANG_THAI_NGHI_NGO) {
-        this.TRANG_THAI_NGHI_NGO = TRANG_THAI_NGHI_NGO;
+    public void setTRANG_THAI_HOAN_TRA(String TRANG_THAI_HOAN_TRA) {
+        this.TRANG_THAI_HOAN_TRA = TRANG_THAI_HOAN_TRA;
     }
 
-    public int getSO_IN_BIEN_NHAN() {
-        return SO_IN_BIEN_NHAN;
+    public String getTRANG_THAI_XU_LY_NGHI_NGO() {
+        return TRANG_THAI_XU_LY_NGHI_NGO;
     }
 
-    public void setSO_IN_BIEN_NHAN(int SO_IN_BIEN_NHAN) {
-        this.SO_IN_BIEN_NHAN = SO_IN_BIEN_NHAN;
+    public void setTRANG_THAI_XU_LY_NGHI_NGO(String TRANG_THAI_XU_LY_NGHI_NGO) {
+        this.TRANG_THAI_XU_LY_NGHI_NGO = TRANG_THAI_XU_LY_NGHI_NGO;
+    }
+
+    public String getTRANG_THAI_DAY_CHAM_NO() {
+        return TRANG_THAI_DAY_CHAM_NO;
+    }
+
+    public void setTRANG_THAI_DAY_CHAM_NO(String TRANG_THAI_DAY_CHAM_NO) {
+        this.TRANG_THAI_DAY_CHAM_NO = TRANG_THAI_DAY_CHAM_NO;
+    }
+
+    public Date getNGAY_DAY() {
+        return NGAY_DAY;
+    }
+
+    public void setNGAY_DAY(Date NGAY_DAY) {
+        this.NGAY_DAY = NGAY_DAY;
+    }
+
+    public int getSO_LAN_IN_BIEN_NHAN() {
+        return SO_LAN_IN_BIEN_NHAN;
+    }
+
+    public void setSO_LAN_IN_BIEN_NHAN(int SO_LAN_IN_BIEN_NHAN) {
+        this.SO_LAN_IN_BIEN_NHAN = SO_LAN_IN_BIEN_NHAN;
     }
 
     public String getIN_THONG_BAO_DIEN() {
@@ -279,84 +291,42 @@ public class EntityLichSuThanhToan {
         this.IN_THONG_BAO_DIEN = IN_THONG_BAO_DIEN;
     }
 
-    public Date getNGAY_PHAT_SINH() {
-        return NGAY_PHAT_SINH;
+    public String getE_DONG() {
+        return E_DONG;
     }
 
-    public void setNGAY_PHAT_SINH(Date NGAY_PHAT_SINH) {
-        this.NGAY_PHAT_SINH = NGAY_PHAT_SINH;
-    }
-
-    public String getMA_GIAO_DICH() {
-        return MA_GIAO_DICH;
-    }
-
-    public void setMA_GIAO_DICH(String MA_GIAO_DICH) {
-        this.MA_GIAO_DICH = MA_GIAO_DICH;
+    public void setE_DONG(String e_DONG) {
+        E_DONG = e_DONG;
     }
 
 
-
-    public static EntityLichSuThanhToan copy(EntityHoaDonThu hoadon)
+    public static EntityHoaDonThu copy(EntityHoaDonNo entityHoaDonNo)
     {
-        EntityLichSuThanhToan lichSuThanhToan = new EntityLichSuThanhToan();
+        EntityHoaDonThu entityHoaDonThu = new EntityHoaDonThu();
 
-        lichSuThanhToan.setE_DONG(hoadon.getE_DONG());
-        lichSuThanhToan.setSERI_HDON(hoadon.getSERI_HDON());
-        lichSuThanhToan.setMA_HOA_DON(hoadon.getMA_HOA_DON());
-        lichSuThanhToan.setMA_KHANG(hoadon.getMA_KHANG());
-        lichSuThanhToan.setMA_THE(hoadon.getMA_THE());
-        lichSuThanhToan.setTEN_KHANG(hoadon.getTEN_KHANG());
-        lichSuThanhToan.setDIA_CHI(hoadon.getDIA_CHI());
-        lichSuThanhToan.setTHANG_TTOAN(hoadon.getTHANG_TTOAN());
-        lichSuThanhToan.setPHIEN_TTOAN(hoadon.getPHIEN_TTOAN());
-        lichSuThanhToan.setSO_TIEN_TTOAN(hoadon.getSO_TIEN_TTOAN());
-        lichSuThanhToan.setSO_GCS(hoadon.getSO_GCS());
-        lichSuThanhToan.setDIEN_LUC(hoadon.getDIEN_LUC());
-        lichSuThanhToan.setSO_HO(hoadon.getSO_HO());
-        lichSuThanhToan.setSO_DAU_KY(hoadon.getSO_DAU_KY());
-        lichSuThanhToan.setSO_CUOI_KY(hoadon.getSO_CUOI_KY());
-        lichSuThanhToan.setSO_CTO(hoadon.getSO_CTO());
-        lichSuThanhToan.setSDT_ECPAY(hoadon.getSDT_ECPAY());
-        lichSuThanhToan.setSDT_EVN(hoadon.getSDT_EVN());
-        lichSuThanhToan.setGIAO_THU(hoadon.getGIAO_THU());
-        lichSuThanhToan.setNGAY_GIAO_THU(hoadon.getNGAY_GIAO_THU());
-        lichSuThanhToan.setTRANG_THAI_TTOAN(hoadon.getTRANG_THAI_TTOAN());
-        lichSuThanhToan.setVI_TTOAN(hoadon.getVI_TTOAN());
+        entityHoaDonThu.setE_DONG(entityHoaDonNo.getE_DONG());
+        entityHoaDonThu.setSERI_HDON(entityHoaDonNo.getSERI_HDON());
+        entityHoaDonThu.setMA_HOA_DON(entityHoaDonNo.getMA_HOA_DON());
+        entityHoaDonThu.setMA_KHANG(entityHoaDonNo.getMA_KHANG());
+        entityHoaDonThu.setMA_THE(entityHoaDonNo.getMA_THE());
+        entityHoaDonThu.setTEN_KHANG(entityHoaDonNo.getTEN_KHANG());
+        entityHoaDonThu.setDIA_CHI(entityHoaDonNo.getDIA_CHI());
+        entityHoaDonThu.setTHANG_TTOAN(entityHoaDonNo.getTHANG_TTOAN());
+        entityHoaDonThu.setPHIEN_TTOAN(entityHoaDonNo.getPHIEN_TTOAN());
+        entityHoaDonThu.setSO_TIEN_TTOAN(entityHoaDonNo.getSO_TIEN_TTOAN());
+        entityHoaDonThu.setSO_GCS(entityHoaDonNo.getSO_GCS());
+        entityHoaDonThu.setDIEN_LUC(entityHoaDonNo.getDIEN_LUC());
+        entityHoaDonThu.setSO_HO(entityHoaDonNo.getSO_HO());
+        entityHoaDonThu.setSO_DAU_KY(entityHoaDonNo.getSO_DAU_KY());
+        entityHoaDonThu.setSO_CUOI_KY(entityHoaDonNo.getSO_CUOI_KY());
+        entityHoaDonThu.setSO_CTO(entityHoaDonNo.getSO_CTO());
+        entityHoaDonThu.setSDT_ECPAY(entityHoaDonNo.getSDT_ECPAY());
+        entityHoaDonThu.setSDT_EVN(entityHoaDonNo.getSDT_EVN());
+        entityHoaDonThu.setGIAO_THU(entityHoaDonNo.getGIAO_THU());
+        entityHoaDonThu.setNGAY_GIAO_THU(entityHoaDonNo.getNGAY_GIAO_THU());
+        entityHoaDonThu.setTRANG_THAI_TTOAN(entityHoaDonNo.getTRANG_THAI_TTOAN());
+        entityHoaDonThu.setVI_TTOAN(entityHoaDonNo.getVI_TTOAN());
 
-        return lichSuThanhToan;
+        return entityHoaDonThu;
     }
-
-    public static EntityLichSuThanhToan copy(EntityHoaDonNo hoadon)
-    {
-        EntityLichSuThanhToan lichSuThanhToan = new EntityLichSuThanhToan();
-
-        lichSuThanhToan.setE_DONG(hoadon.getE_DONG());
-        lichSuThanhToan.setSERI_HDON(hoadon.getSERI_HDON());
-        lichSuThanhToan.setMA_HOA_DON(hoadon.getMA_HOA_DON());
-        lichSuThanhToan.setMA_KHANG(hoadon.getMA_KHANG());
-        lichSuThanhToan.setMA_THE(hoadon.getMA_THE());
-        lichSuThanhToan.setTEN_KHANG(hoadon.getTEN_KHANG());
-        lichSuThanhToan.setDIA_CHI(hoadon.getDIA_CHI());
-        lichSuThanhToan.setTHANG_TTOAN(hoadon.getTHANG_TTOAN());
-        lichSuThanhToan.setPHIEN_TTOAN(hoadon.getPHIEN_TTOAN());
-        lichSuThanhToan.setSO_TIEN_TTOAN(hoadon.getSO_TIEN_TTOAN());
-        lichSuThanhToan.setSO_GCS(hoadon.getSO_GCS());
-        lichSuThanhToan.setDIEN_LUC(hoadon.getDIEN_LUC());
-        lichSuThanhToan.setSO_HO(hoadon.getSO_HO());
-        lichSuThanhToan.setSO_DAU_KY(hoadon.getSO_DAU_KY());
-        lichSuThanhToan.setSO_CUOI_KY(hoadon.getSO_CUOI_KY());
-        lichSuThanhToan.setSO_CTO(hoadon.getSO_CTO());
-        lichSuThanhToan.setSDT_ECPAY(hoadon.getSDT_ECPAY());
-        lichSuThanhToan.setSDT_EVN(hoadon.getSDT_EVN());
-        lichSuThanhToan.setGIAO_THU(hoadon.getGIAO_THU());
-        lichSuThanhToan.setNGAY_GIAO_THU(hoadon.getNGAY_GIAO_THU());
-        lichSuThanhToan.setTRANG_THAI_TTOAN(hoadon.getTRANG_THAI_TTOAN());
-        lichSuThanhToan.setVI_TTOAN(hoadon.getVI_TTOAN());
-
-        return lichSuThanhToan;
-    }
-
-
 }
-

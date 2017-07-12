@@ -12,6 +12,7 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import views.ecpay.com.postabletecpay.R;
+import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.view.TrangChu.CashTranferFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.ISearchCustomerView;
@@ -22,7 +23,7 @@ import views.ecpay.com.postabletecpay.view.TrangChu.ISearchCustomerView;
 
 public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.CustomerViewHolder> {
 
-    List<Customer> Customers;
+    List<EntityKhachHang> Customers;
     ISearchCustomerView customerView;
 
     public CustomerAdapter( ISearchCustomerView _customerView) {
@@ -30,11 +31,11 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
         this.Customers = new ArrayList<>();
     }
 
-    public List<Customer> getCustomers() {
+    public List<EntityKhachHang> getCustomers() {
         return Customers;
     }
 
-    public void setCustomers(List<Customer> customers) {
+    public void setCustomers(List<EntityKhachHang> customers) {
         Customers = customers;
     }
 
@@ -48,7 +49,7 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
     @Override
     public void onBindViewHolder(CustomerViewHolder holder, int position) {
 
-        final Customer customer = Customers.get(position);
+        final EntityKhachHang customer = Customers.get(position);
         holder.fill(customer);
         holder.btnUpdateRegis.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,14 +88,14 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
             btnUpdateRegis = (Button) itemView.findViewById(R.id.btn_row_customer_update);
         }
 
-        public void fill(Customer customer) {
-            TxtName.setText(customer.getName());
-            TxtCode.setText(customer.getCode() + (customer.getCardNo() != null && customer.getCardNo().length() > 0 ? ("/" + customer.getCardNo()) : ""));
-            TxtPhone.setText(customer.getPhoneByevn() != null ? customer.getPhoneByevn() : "");
-            TxtBookCmis.setText(customer.getBookCmis() != null ? customer.getBookCmis() : "");
-            TxtAddress.setText(customer.getAddress() != null ? customer.getAddress() : "");
+        public void fill(EntityKhachHang customer) {
+            TxtName.setText(customer.getTEN_KHANG());
+            TxtCode.setText(customer.getMA_KHANG() + (customer.getMA_THE() != null && customer.getMA_THE().length() > 0 ? ("/" + customer.getMA_THE()) : ""));
+            TxtPhone.setText(customer.getSDT_EVN() != null ? customer.getSDT_EVN() : "");
+            TxtBookCmis.setText(customer.getSO_GCS() != null ? customer.getSO_GCS() : "");
+            TxtAddress.setText(customer.getDIA_CHI() != null ? customer.getDIA_CHI() : "");
 
-            if(customer.getCardNo() == null || customer.getCardNo().length() == 0)
+            if(customer.getMA_THE() == null || customer.getMA_THE().length() == 0)
             {
                 btnUpdateRegis.setText("Đăng Ký");
             }else

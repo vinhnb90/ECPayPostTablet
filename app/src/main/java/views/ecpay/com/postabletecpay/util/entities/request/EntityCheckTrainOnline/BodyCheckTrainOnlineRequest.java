@@ -19,9 +19,6 @@ private String diskDrive;
 @SerializedName("signature")
 @Expose
 private String signature;
-@SerializedName("edong")
-@Expose
-private String edong;
 @SerializedName("customer-code")
 @Expose
 private String customerCode;
@@ -68,13 +65,6 @@ public void setSignature(String signature) {
 this.signature = signature;
 }
 
-public String getEdong() {
-return edong;
-}
-
-public void setEdong(String edong) {
-this.edong = edong;
-}
 
 public String getCustomerCode() {
 return customerCode;

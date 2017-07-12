@@ -12,10 +12,12 @@ import views.ecpay.com.postabletecpay.view.ICommonView;
  * Created by VinhNB on 5/26/2017.
  */
 
-public interface IPayView extends ICommonView, MainPresenter.InteractorMainPresenter {
+public interface IPayView extends ICommonView {
 //    void showPayRecyclerFirstPage(List<PayAdapter.PayEntityAdapter> adapterList, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline);
 
     void showPayRecyclerPage(List<PayAdapter.DataAdapter> adapterList, int indexBegin, int indexEnd, int pageIndexNew, int totalPage, String infoSearch, boolean isSeachOnline);
+
+    Common.PROVIDER_CODE getProviderCodeSelected();
 
     void showSearchOnlineProcess();
 
@@ -27,7 +29,9 @@ public interface IPayView extends ICommonView, MainPresenter.InteractorMainPrese
 
     void showCountBillsAndTotalMoneyFragment(int size, long totalMoneyAllBills);
 
-    void showPayRecyclerListBills(List<PayBillsDialogAdapter.Entity> listBillChecked);
+    void showPayRecyclerListBills(List<PayAdapter.BillEntityAdapter> listBillChecked);
+
+    void refreshAdapterPayRecyclerListBills();
 
     void showCountBillsAndTotalMoneyInDialog(int totalBillsInList, long totalMoneyInList);
 
@@ -69,7 +73,18 @@ public interface IPayView extends ICommonView, MainPresenter.InteractorMainPrese
 
     void showDialogBarcode();
 
-    void showPayRecyclerListBillsAndDisableCheckBox(List<PayBillsDialogAdapter.Entity> listBillChecked, boolean isDisableAllCheckbox);
+    void showMessageNotifyPayfrag(String message);
+
+    void processDialogDeleteBillOnline(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside);
+
+    void updateBillSelectToPay(List<PayAdapter.BillEntityAdapter> lst);
+
+
+    void processCheckedBillsDialog(String edong, int pos, boolean isChecked);
+
+    void processClickMessageErrorBillDialog(String messageError);
+
+    void processUnCheckedBillDialog(String message, Common.TYPE_DIALOG typeDialog);
 
 //    void disableAllBillCheckboxWhenBillingOnline(boolean isDisableCheckbox);
 }

@@ -1,7 +1,6 @@
 package views.ecpay.com.postabletecpay.view.ThanhToan;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,14 +21,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -40,12 +44,10 @@ import butterknife.OnPageChange;
 import butterknife.OnTextChanged;
 import butterknife.Optional;
 import butterknife.Unbinder;
-import me.dm7.barcodescanner.zxing.ZXingScannerView;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
-import views.ecpay.com.postabletecpay.presenter.MainPresenter;
 import views.ecpay.com.postabletecpay.presenter.PayPresenter;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.commons.Common;
@@ -61,14 +63,10 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
  */
 
 public class PayFragment extends Fragment implements
-        IPayView {
+        IPayView, PayBillsDialogAdapter.OnInteractionBillDialogRecycler {
     public static final int FIRST_PAGE_INDEX = 1;
     public static final int PAGE_INCREMENT = 1;
     public static final int ROWS_ON_PAGE = 10;
-    private static ZXingScannerView mScannerView;
-    private String textBarcode = Common.TEXT_EMPTY;
-    private boolean isScannerBarcode = false;
-    private boolean isOKText = false;
     @Nullable
     @BindView(R.id.et_frag_thanh_toan_search)
     EditText etSearch;
@@ -114,6 +112,9 @@ public class PayFragment extends Fragment implements
     @Nullable
     @BindView(R.id.tv_fragment_thanh_toan_total_bills_money)
     TextView tvTotalBillsMoney;
+    @Nullable
+    @BindView(R.id.spine_provider)
+    Spinner spine_provider;
 
     //Search online
     @Nullable
@@ -196,21 +197,6 @@ public class PayFragment extends Fragment implements
     @BindView(R.id.card_dialog_delete_bill_online_message)
     CardView cardMessage;
 
-    //Dialog barcode
-    @Nullable
-    @BindView(R.id.btn_dialog_barcode_cancel)
-    Button btnCancelTextBarcode;
-    @Nullable
-    @BindView(R.id.btn_dialog_barcode_ok)
-    Button btnOKTextBarcode;
-    @Nullable
-    @BindView(R.id.tv_dialog_barcode_text)
-    TextView tvTextBarcode;
-    @Nullable
-    @BindView(R.id.ll_dialog_barcode)
-    LinearLayout llBarcode;
-
-    private OnPayFragmentInteractionListener listener;
     private PayAdapter payAdapter;
     private IPayPresenter mIPayPresenter;
     private String mEdong;
@@ -219,20 +205,12 @@ public class PayFragment extends Fragment implements
     private Common.TYPE_SEARCH typeSearch;
     private PayBillsDialogAdapter payBillsDialogAdapter;
     private View rootView;
-    private Dialog dialogPayingOnline, dialogDeleteBillOnline, dialogBarcode;
+    private Dialog dialogPayingOnline, dialogDeleteBillOnline;
     public static final int REQUEST_BARCODE = 999;
     public static final int RESPONSE_BARCODE = 1000;
 
-    @Override
-    public List<PayAdapter.DataAdapter> getData() {
-        return listener.getData();
-    }
 
-    @Override
-    public void refreshData() {
-        listener.refreshData();
-    }
-
+    private Common.PROVIDER_CODE ProviderSelect = Common.PROVIDER_CODE.NCCNONE ;
 
     public enum VISIBLE_BUTTON_DELETE_DIALOG {
         SHOW_ALL(0),
@@ -288,18 +266,16 @@ public class PayFragment extends Fragment implements
         return payFragment;
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof OnPayFragmentInteractionListener)
-            listener = (OnPayFragmentInteractionListener) activity;
-        else
-            throw new ClassCastException("activity must be implement OnPayFragmentInteractionListener!");
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+
+    @Override
+    public Common.PROVIDER_CODE getProviderCodeSelected() {
+        return  this.ProviderSelect;
     }
 
     @Override
@@ -318,29 +294,52 @@ public class PayFragment extends Fragment implements
         typeSearch = Common.TYPE_SEARCH.ALL;
         mPageIndex = FIRST_PAGE_INDEX;
         mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+
+
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < Common.PROVIDER_CODE.values().length; i ++)
+        {
+            list.add(Common.PROVIDER_CODE.values()[i].getMessage());
+        }
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_spinner_item, list);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spine_provider.setAdapter(dataAdapter);
+        spine_provider.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                ProviderSelect = Common.PROVIDER_CODE.values()[position];
+
+                if(ProviderSelect.getCode().equalsIgnoreCase(Common.PROVIDER_CODE.NCCNONE.getCode()))
+                    return;
+
+
+                if(checkUserNeedSearchOnline(etSearch.getText().toString()))
+                {
+                    showSearchOnlineProcess();
+                    mIPayPresenter.reseachOnline(mEdong);
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         return rootView;
     }
 
+
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnPayFragmentInteractionListener) {
-            listener = (OnPayFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement OnPayFragmentInteractionListener");
+    public void updateBillSelectToPay(List<PayAdapter.BillEntityAdapter> lst)
+    {
+        long total = 0;
+        for(int i = 0, n = lst.size(); i < n; i ++)
+        {
+            total += lst.get(i).getTIEN_THANH_TOAN();
         }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        listener.refreshData();
+        this.showCountBillsAndTotalMoneyFragment(lst.size(), total);
     }
 
     //region onClick fragment
@@ -396,14 +395,13 @@ public class PayFragment extends Fragment implements
     @OnClick(R.id.btn_frag_thanh_toan_paying)
     public void clickPaying(View view) {
         hideSearchOnlineProcess();
-        Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
+//        Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
         mIPayPresenter.callShowDialogPay();
     }
 
     @Optional
     @OnClick(R.id.ibtn_frag_thanhtoan_qrcode)
     public void clickBarcode(View view) {
-        isScannerBarcode = true;
         ((MainActivity) getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -415,7 +413,6 @@ public class PayFragment extends Fragment implements
     @Optional
     @OnClick(R.id.ibtn_frag_thanhtoan_back)
     public void clickBack(View view) {
-        listener.showMainPageFragment();
     }
 
     //endregion
@@ -431,12 +428,8 @@ public class PayFragment extends Fragment implements
     @Optional
     @OnClick(R.id.btn_dialog_thanhtoan_pay)
     public void clickPayPayingOnlineDialog(View view) {
-//        if(Common.isConnectingWifi(PayFragment.this.getActivity())) {
-        if (Common.isNetworkConnected(PayFragment.this.getActivity())) {
-            mIPayPresenter.callPayingBillOnline(mEdong);
-        } else {
-//            mIPayPresenter.callPayingBillOffline(mEdong);
-        }
+        mIPayPresenter.callPay();
+
     }
     //endregion
 
@@ -455,39 +448,16 @@ public class PayFragment extends Fragment implements
     }
     //endregion
 
-    //region onClick dialog Barcode
-    @Optional
-    @OnClick(R.id.btn_dialog_barcode_cancel)
-    public void clickRefreshBarcode(View view) {
-        if (dialogBarcode == null || mScannerView == null || tvTextBarcode == null)
-            return;
-
-        tvTextBarcode.setText(Common.TEXT_EMPTY);
-        mScannerView.setResultHandler((MainActivity) getContext()); // Register ourselves as a handler for scan results.
-        mScannerView.startCamera();
-        listener.refreshCamera(mScannerView);
-    }
-
-    @Optional
-    @OnClick(R.id.btn_dialog_barcode_ok)
-    public void clickOKBarcode(View view) {
-        if (dialogBarcode == null || tvTextBarcode == null)
-            return;
-        isOKText = true;
-        textBarcode = tvTextBarcode.getText().toString().trim();
-        dialogBarcode.dismiss();
-    }
-    //endregion
 
     //region listener etTextBarcode
-    @Optional
-    @OnTextChanged(R.id.et_frag_thanh_toan_search)
-    public void onTextChangeBarcode(CharSequence s, int start, int before, int count) {
-        if (dialogBarcode == null || tvTextBarcode == null)
-            return;
-
-        tvTextBarcode.setEnabled(!textBarcode.equals(Common.TEXT_EMPTY) ? true : false);
-    }
+//    @Optional
+//    @OnTextChanged(R.id.et_frag_thanh_toan_search)
+//    public void onTextChangeBarcode(CharSequence s, int start, int before, int count) {
+//        if (dialogBarcode == null || tvTextBarcode == null)
+//            return;
+//
+////        tvTextBarcode.setEnabled(!textBarcode.equals(Common.TEXT_EMPTY) ? true : false);
+//    }
 
     //endregion
 
@@ -497,9 +467,9 @@ public class PayFragment extends Fragment implements
     public void onPageSelected(int position) {
         mPageIndex = FIRST_PAGE_INDEX;
         typeSearch = Common.TYPE_SEARCH.findMessage(position);
-//        boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
-//        if (isSeachOnline)
-//            return;
+        boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
+        if (isSeachOnline)
+            return;
         mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString().trim(), false);
     }
 
@@ -520,7 +490,13 @@ public class PayFragment extends Fragment implements
         } else {
             tabLayout.setVisibility(View.GONE);
         }
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+//        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+    }
+
+    @Override
+    public void onDestroyView() {
+        mIPayPresenter.cancelSeachOnline();
+        super.onDestroyView();
     }
 
     @Optional
@@ -528,7 +504,7 @@ public class PayFragment extends Fragment implements
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         //first page
         mPageIndex = FIRST_PAGE_INDEX;
-        boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
+        final boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
 
         if (isSeachOnline) {
             typeSearch = Common.TYPE_SEARCH.MA_KH_SO_THE;
@@ -541,15 +517,11 @@ public class PayFragment extends Fragment implements
                 }
             });
 
-//            etSearch.post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    etSearch.setHint(etSearch.getText().toString().concat(Common.TEXT_MULTI_SPACE).concat(Common.TEXT_SEARCHING));
-//                }
-//            });
         } else {
             if (typeSearch != Common.TYPE_SEARCH.ALL)
+            {
                 mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), isSeachOnline);
+            }
             hideSearchOnlineProcess();
         }
     }
@@ -572,17 +544,6 @@ public class PayFragment extends Fragment implements
     }
     //endregion
 
-    //region barcode result
-    public void fillResultToTextBarcodeDialog(String text) {
-        if (TextUtils.isEmpty(text) || tvTextBarcode == null)
-            return;
-        tvTextBarcode.setText(text);
-//        if (TextUtils.isEmpty(text) || etSearch == null)
-//            return;
-//        etSearch.setText(text);
-    }
-
-    //endregion
 
     //region IPayView
     @Override
@@ -592,42 +553,52 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void showPayRecyclerPage(List<PayAdapter.DataAdapter> adapterList, int indexBegin, int indexEnd, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) {
-        btnPre.setEnabled(true);
-        btnNext.setEnabled(true);
-        tvPage.setText(String.valueOf(pageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
+        try
+        {
+            btnPre.setEnabled(true);
+            btnNext.setEnabled(true);
+            tvPage.setText(String.valueOf(pageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
 
-        //enable disable button pre next
-        if (pageIndex == FIRST_PAGE_INDEX) {
-            setEnablePreNext(1);
-            if (FIRST_PAGE_INDEX == totalPage)
-                setEnablePreNext(0);
-            else
+
+
+            //enable disable button pre next
+            if (pageIndex == FIRST_PAGE_INDEX) {
                 setEnablePreNext(1);
-        } else if (pageIndex == totalPage) {
-            if (totalPage == FIRST_PAGE_INDEX)
-                setEnablePreNext(0);
-            else
-                setEnablePreNext(2);
-        } else
-            setEnablePreNext(3);
+                if (FIRST_PAGE_INDEX == totalPage)
+                    setEnablePreNext(0);
+                else
+                    setEnablePreNext(1);
+            } else if (pageIndex == totalPage) {
+                if (totalPage == FIRST_PAGE_INDEX)
+                    setEnablePreNext(0);
+                else
+                    setEnablePreNext(2);
+            } else
+                setEnablePreNext(3);
+            if(payAdapter != null)
+            {
+                rvKH.removeAllViews();
+                rvKH.invalidate();
+            }
 
+            payAdapter = new PayAdapter(this.getContext(), mIPayPresenter, adapterList, indexBegin, indexEnd);
+            rvKH.setAdapter(payAdapter);
+            rvKH.setLayoutManager(new LinearLayoutManager(getContext()));
+            rvKH.setHasFixedSize(true);
+            rvKH.invalidate();
 
-        if (payAdapter != null) {
-            rvKH.removeAllViews();
-        }
-        payAdapter = new PayAdapter(this.getContext(), this, adapterList, indexBegin, indexEnd);
-        rvKH.setAdapter(payAdapter);
-        rvKH.setLayoutManager(new LinearLayoutManager(getContext()));
-        rvKH.setHasFixedSize(true);
-        rvKH.invalidate();
-
-        if (adapterList.size() == ZERO) {
+            if (adapterList.size() == ZERO) {
+                showTextNoData();
+            }
+        }catch (Exception e)
+        {
             showTextNoData();
         }
-        //if isSeachOnline
-        if (isSeachOnline == false || infoSearch == null)
-            return;
-        mIPayPresenter.callSearchOnline(mEdong, infoSearch, true);
+
+//        //if isSeachOnline
+//        if (isSeachOnline == false || infoSearch == null)
+//            return;
+//        mIPayPresenter.callSearchOnline(mEdong, infoSearch, true);
     }
 
     @Override
@@ -653,26 +624,32 @@ public class PayFragment extends Fragment implements
         if (message == null || message.isEmpty() || message.trim().equals(Common.TEXT_EMPTY))
             return;
 
-        tvTitleSearch.setVisibility(View.VISIBLE);
-        pbarSearchOnline.setVisibility(View.GONE);
-        ibtnResearchOnline.setVisibility(View.VISIBLE);
-        ibtnCancelSearchOnline.setVisibility(View.GONE);
-        Common.runAnimationClickViewScale(tvMessageNotifySearchOnlne, R.anim.scale_view_pull, TIME_DELAY_ANIM);
-        tvMessageNotifySearchOnlne.setVisibility(View.VISIBLE);
-        tvMessageNotifySearchOnlne.setText(message);
+        try
+        {
+            tvTitleSearch.setVisibility(View.VISIBLE);
+            pbarSearchOnline.setVisibility(View.GONE);
+            ibtnResearchOnline.setVisibility(View.VISIBLE);
+            ibtnCancelSearchOnline.setVisibility(View.GONE);
+            Common.runAnimationClickViewScale(tvMessageNotifySearchOnlne, R.anim.scale_view_pull, TIME_DELAY_ANIM);
+            tvMessageNotifySearchOnlne.setVisibility(View.VISIBLE);
+            tvMessageNotifySearchOnlne.setText(message);
 
-        IActionClickYesNoDialog yesNoDialog = new IActionClickYesNoDialog() {
-            @Override
-            public void doClickNo() {
+            IActionClickYesNoDialog yesNoDialog = new IActionClickYesNoDialog() {
+                @Override
+                public void doClickNo() {
 
-            }
+                }
 
-            @Override
-            public void doClickYes() {
-                //dismiss
-            }
-        };
-        Common.showDialog(getContext(), yesNoDialog, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), message, false, typeDialog);
+                @Override
+                public void doClickYes() {
+                    //dismiss
+                }
+            };
+            Common.showDialog(getContext(), yesNoDialog, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), message, false, typeDialog);
+        }catch (Exception e)
+        {
+
+        }
     }
 
     /**
@@ -680,6 +657,7 @@ public class PayFragment extends Fragment implements
      *
      * @param message
      */
+    @Override
     public void showMessageNotifyPayfrag(String message) {
         if (TextUtils.isEmpty(message))
             return;
@@ -722,14 +700,20 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
-    public void showPayRecyclerListBills(List<PayBillsDialogAdapter.Entity> listBillChecked) {
+    public void refreshAdapterPayRecyclerListBills() {
+        payBillsDialogAdapter.notifyDataSetChanged();
+        rvListBillDialog.invalidate();
+    }
+
+    @Override
+    public void showPayRecyclerListBills(List<PayAdapter.BillEntityAdapter> listBillChecked) {
         if (listBillChecked == null)
             return;
 
         setUpRecyclerDialog();
 
 //        if (payBillsDialogAdapter == null) {
-        payBillsDialogAdapter = new PayBillsDialogAdapter(this.getContext(), listBillChecked, false);
+        payBillsDialogAdapter = new PayBillsDialogAdapter(this, listBillChecked, false);
         rvListBillDialog.setAdapter(payBillsDialogAdapter);
 //        } else
 //            payBillsDialogAdapter.refreshData(listBillChecked);
@@ -752,8 +736,8 @@ public class PayFragment extends Fragment implements
         tvTotalBillsMoneyDialog.setText(Common.convertLongToMoney(totalMoneyInDialog));
     }
 
-
-    public void showMessageNotifyBillOnlineDialog(String message, Common.TYPE_DIALOG typeDialog) {
+    @Override
+    public void processUnCheckedBillDialog(String message, Common.TYPE_DIALOG typeDialog) {
         if (message == null)
             return;
         IActionClickYesNoDialog yesNoDialog = new IActionClickYesNoDialog() {
@@ -853,8 +837,6 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void showDialogPayingOnline() {
-        if (this.getActivity() instanceof CallbackPayingOnlineDialog) {
-            final CallbackPayingOnlineDialog callbackPayingOnlineDialog = (CallbackPayingOnlineDialog) getContextView();
 
             dialogPayingOnline = new Dialog(this.getActivity());
             dialogPayingOnline.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -878,12 +860,16 @@ public class PayFragment extends Fragment implements
             dialogPayingOnline.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    callbackPayingOnlineDialog.processOnDismissPayingOnlineDialog();
+
+                    for (int i = 0, n = mIPayPresenter.getPayModel().getListBillSelected().size(); i < n; i ++)
+                    {
+                        mIPayPresenter.getPayModel().getListBillSelected().get(i).setChecked(true);
+                    }
+
+                    bindViewAgain();
                 }
             });
             dialogPayingOnline.show();
-        } else
-            Log.e(TAG, "showDialogPayingOnline: fragment cannot implement CallbackPayingOnlineDialog");
     }
 
     @Override
@@ -1026,7 +1012,9 @@ public class PayFragment extends Fragment implements
     public void showRecyclerFragment() {
         if (rvKH == null || tvNoData == null)
             return;
-        rvKH.setVisibility(View.VISIBLE);
+        if(rvKH.getVisibility() != View.VISIBLE)
+            rvKH.setVisibility(View.VISIBLE);
+
         tvNoData.setVisibility(View.GONE);
     }
 
@@ -1041,78 +1029,9 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void showDialogBarcode() {
-//        if (this.getActivity() instanceof CallbackBarcodeDialog) {
-//            final CallbackBarcodeDialog callbackBarcodeDialog = (CallbackBarcodeDialog) getContextView();
-
-        dialogBarcode = new Dialog(this.getActivity());
-        dialogBarcode.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        final View view = inflater.inflate(R.layout.dialog_barcode, null);
-        dialogBarcode.setContentView(view);
-        dialogBarcode.setCanceledOnTouchOutside(true);
-        dialogBarcode.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
-        dialogBarcode.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        dialogBarcode.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        Window window = dialogBarcode.getWindow();
-        window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-
-        unbinder.unbind();
-        unbinder = ButterKnife.bind(this, dialogBarcode);
-
-
-        if (llBarcode == null)
-            return;
-        TextView textView = new TextView(getContext());
-        mScannerView = new ZXingScannerView(getContext());
-        mScannerView.setResultHandler((MainActivity) getContext());
-
-        LinearLayout ll = (LinearLayout) dialogBarcode.findViewById(R.id.ll_dialog_barcode_main);
-        ViewGroup parent = (ViewGroup) ll.getParent();
-
-
-        llBarcode.removeView(ll);
-        llBarcode.addView(mScannerView);
-        mScannerView.startCamera();
-
-        dialogBarcode.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                isScannerBarcode = false;
-
-                mScannerView.stopCamera();
-                listener.setRootViewAgain();
-                if (isOKText)
-                    listener.fillToSearchText(textBarcode);
-
-            }
-        });
-        dialogBarcode.show();
-//        } else
-//            Log.e(TAG, "showDialogBarcode: fragment cannot implement CallbackBarcodeDialog ");
+//
     }
 
-    @Override
-    public void showPayRecyclerListBillsAndDisableCheckBox(List<PayBillsDialogAdapter.Entity> listBillChecked, boolean isDisableAllCheckbox) {
-        if (listBillChecked == null)
-            return;
-
-        setUpRecyclerDialog();
-
-//        if (payBillsDialogAdapter == null) {
-        payBillsDialogAdapter = new PayBillsDialogAdapter(this.getContext(), listBillChecked, isDisableAllCheckbox);
-        rvListBillDialog.setAdapter(payBillsDialogAdapter);
-//        } else
-//            payBillsDialogAdapter.refreshData(listBillChecked);
-
-        rvListBillDialog.invalidate();
-
-    }
-
-//    @Override
-//    public void disableAllBillCheckboxWhenBillingOnline(boolean isDisableCheckbox) {
-//        ((PayBillsDialogAdapter) rvListBillDialog.getAdapter()).disableAllBillCheckbox(isDisableCheckbox);
-//    }
 
     private boolean isHasNullViewDeleteBillOnlineDialog() {
         return tvCodeCustomerDeleteDialog == null || tvNameCustomerDeleteDialog == null || tvTermBillDeleteDialog == null
@@ -1143,12 +1062,26 @@ public class PayFragment extends Fragment implements
         mIPayPresenter.callProcessDataBillFragmentChecked(edong, code, posCustomer, bill, posBillInside, indexBegin, indexEnd);
     }
 
+    @Override
     public void processDialogDeleteBillOnline(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside) {
         mIPayPresenter.callProcessDeleteBillOnline(edong, code, bill, posCustomerInside);
     }
 
-    public void showBillCheckedDialog(String edong, int pos, boolean isChecked) {
+    @Override
+    public void processCheckedBillsDialog(String edong, int pos, boolean isChecked) {
         mIPayPresenter.callProcessDataBillDialogChecked(edong, pos, isChecked);
+    }
+
+    @Override
+    public  void processClickMessageErrorBillDialog(String messageError)
+    {
+        try
+        {
+            Toast.makeText(getContext(), messageError, Toast.LENGTH_SHORT).show();
+        }catch (Exception e)
+        {
+
+        }
     }
 
     public void bindViewAgain() {
@@ -1220,14 +1153,6 @@ public class PayFragment extends Fragment implements
     }
     //endregion
 
-    public void onPauseScannerBarcode() {
-        if (mScannerView == null
-                || isScannerBarcode == false
-                )
-            return;
-
-        mScannerView.stopCamera();
-    }
 
     public void fillResultToSearchText(String textBarcode) {
         if (TextUtils.isEmpty(textBarcode) || etSearch == null)
@@ -1235,19 +1160,10 @@ public class PayFragment extends Fragment implements
         etSearch.setText(textBarcode);
     }
 
-    public interface OnPayFragmentInteractionListener extends MainPresenter.InteractorMainPresenter {
-        void fillToSearchText(String textBarcode);
 
-        void setRootViewAgain();
-
-        void refreshCamera(final ZXingScannerView mScannerView);
-
-        void showMainPageFragment();
-    }
-
-    public interface CallbackPayingOnlineDialog {
-        void processOnDismissPayingOnlineDialog();
-    }
+//    public interface CallbackPayingOnlineDialog {
+//        void processOnDismissPayingOnlineDialog();
+//    }
 
     public interface CallbackBarcodeDialog {
         void processOnDismissBarcodeDialog(String textBarcode);

@@ -26,10 +26,10 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
-import views.ecpay.com.postabletecpay.model.PayModel;
+import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
-import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
 
 import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.BillInsidePayAdapter.IS_DEBT;
 import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.BillInsidePayAdapter.NOT_DEBT;
@@ -39,16 +39,14 @@ import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.BillInside
  */
 
 public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
-    private static Context sContext;
-    private static IPayView sIPayView;
-    private static PayModel sPayModel;
+    private Context sContext;
 
     //giá trị billList[0] = mAdapterList[indexBegin] , billList[billList.size()] = mAdapterList[indexEnd]
     private int indexBegin, indexEnd;
-    private PayModel payModel;
+    private IPayPresenter payPresenter;
 
-    private static List<DataAdapter> data = new ArrayList<>();
-    private static List<PayEntityAdapter> billList = new ArrayList<>();
+    private List<DataAdapter> data = new ArrayList<>();
+//    private List<PayEntityAdapter BillEntityAdapter> billList = new ArrayList<>();
     @BindDrawable(R.drawable.bg_button_orange)
     Drawable green;
     @BindDrawable(R.drawable.bg_button)
@@ -59,19 +57,22 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     private static int positionCustomer;
     private boolean onBind;
 
-    public PayAdapter(Context sContext, IPayView sIPayView, List<DataAdapter> data, int indexBegin, int indexEnd) {
+    public PayAdapter(Context sContext, IPayPresenter presenter, List<DataAdapter> data, int indexBegin, int indexEnd) {
         this.sContext = sContext;
-        this.sIPayView = sIPayView;
         this.data = data;
-        this.billList.clear();
-        for(int index = 0; index<data.size(); index++)
-        {
-            this.billList.add(data.get(index).getInfoKH());
-        }
         this.indexBegin = indexBegin;
         this.indexEnd = indexEnd;
-        sPayModel = new PayModel(sIPayView.getContextView());
-        payModel = new PayModel(sIPayView.getContextView());
+        this.payPresenter = presenter;
+    }
+
+
+    public void UpdateAdapter(List<DataAdapter> data, int indexBegin, int indexEnd)
+    {
+        this.data = data;
+        this.indexBegin = indexBegin;
+        this.indexEnd = indexEnd;
+        this.notifyDataSetChanged();
+
     }
 
     @Override
@@ -88,23 +89,24 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         onBind = true;
 
         positionCustomer = position;
-        PayEntityAdapter entityAdapter = billList.get(position);
-        final String code = entityAdapter.getMaKH();
-        final String edong = entityAdapter.getEdong();
-        boolean isPayed = entityAdapter.isPayed();
+        EntityKhachHang entityAdapter = data.get(position).getInfoKH();
+        final String code = entityAdapter.getMA_KHANG();
+        final String edong = entityAdapter.getE_DONG();
 
-        holder.tvTenKH.setText(entityAdapter.getTenKH());
-        holder.tvDiaChi.setText(entityAdapter.getDiaChi());
-        holder.tvLoTrinh.setText(entityAdapter.getLoTrinh());
-        holder.tvTongTien.setText(Common.convertLongToMoney(entityAdapter.getTongTien()));
+        holder.tvTenKH.setText(entityAdapter.getTEN_KHANG());
+        holder.tvDiaChi.setText(entityAdapter.getDIA_CHI());
+        holder.tvLoTrinh.setText(entityAdapter.getLO_TRINH());
+        holder.tvTongTien.setText(Common.convertLongToMoney(data.get(position).getTotalMoney()));
         holder.tvMaKH.setText(code);
+
+        boolean isPayed = data.get(position).isPayed();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             holder.btnTrangThaiNo.setBackground(isPayed ? green : violet);
         } else {
             holder.btnTrangThaiNo.setBackgroundDrawable(isPayed ? green : violet);
         }
-        holder.btnTrangThaiNo.setText(isPayed ? NOT_DEBT : IS_DEBT);
+        holder.btnTrangThaiNo.setText(!isPayed ? NOT_DEBT : IS_DEBT);
 
         Common.runAnimationClickViewScale(holder.cardView, R.anim.twinking_view, Common.TIME_DELAY_ANIM);
 
@@ -113,7 +115,19 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         holder.billsInsideAdapter.setBillList(edong, code, dataAdapter.getBillKH(), positionCustomer);
         holder.rvBill.invalidate();
 
-        boolean isShowBill = billList.get(positionCustomer).isShowBill();
+
+        boolean isShowBill = false;
+        for (int i = 0, n = data.get(position).getBillKH().size(); i < n; i ++)
+        {
+            if(payPresenter.getPayModel().getListBillSelected().contains(data.get(position).getBillKH().get(i)))
+            {
+                isShowBill = true;
+                break;
+            }
+        }
+
+        data.get(position).setShowBill(isShowBill);
+
         holder.rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
 
         /*((MainActivity) sContext).runOnUiThread(new Runnable() {
@@ -138,7 +152,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         int index = 0;
         for(; index<data.size(); index++)
         {
-            if(data.get(index).getInfoKH().getMaKH().equals(code)) {
+            if(data.get(index).getInfoKH().getMA_KHANG().equals(code)) {
                 dataAdapter = data.get(index);
                 break;
             }
@@ -149,7 +163,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
     @Override
     public int getItemCount() {
-        return billList.size();
+        return data.size();
     }
 
 
@@ -186,9 +200,9 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                 @Override
                 public void onClick(View v) {
                     if (!onBind) {
-                        boolean isShowBill = billList.get(positionCustomer).isShowBill();
+                        boolean isShowBill = !data.get(positionCustomer).isShowBill();
 
-                        billList.get(positionCustomer).setShowBill(isShowBill = !isShowBill);
+                        data.get(positionCustomer).setShowBill(isShowBill);
 
                         int index = 0;
                         rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
@@ -206,141 +220,84 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
     }
 
-    public static class PayEntityAdapter {
-
-        private String edong;
-        private String tenKH;
-        private String diaChi;
-        private String loTrinh;
-        private String maKH;
-        private long tongTien;
-        private boolean isPayed;
-
-        //param extension
-        private boolean isShowBill;
-
-        public PayEntityAdapter() {
-        }
-
-        public PayEntityAdapter(String edong, String tenKH, String diaChi, String loTrinh, String maKH, long tongTien, boolean isPayed, boolean isShowBill) {
-            this.edong = edong;
-            this.tenKH = tenKH;
-            this.diaChi = diaChi;
-            this.loTrinh = loTrinh;
-            this.maKH = maKH;
-            this.tongTien = tongTien;
-            this.isPayed = isPayed;
-            this.isShowBill = isShowBill;
-        }
-
-        public String getEdong() {
-            return edong;
-        }
-
-        public String getTenKH() {
-            return tenKH;
-        }
-
-        public String getDiaChi() {
-            return diaChi;
-        }
-
-        public String getLoTrinh() {
-            return loTrinh;
-        }
-
-        public String getMaKH() {
-            return maKH;
-        }
-
-        public long getTongTien() {
-            return tongTien;
-        }
-
-        public boolean isPayed() {
-            return isPayed;
-        }
-
-        public void setPayed(boolean payed) {
-            this.isPayed = payed;
-        }
-
-        public void setEdong(String edong) {
-            this.edong = edong;
-        }
-
-        public void setTenKH(String tenKH) {
-            this.tenKH = tenKH;
-        }
-
-        public void setDiaChi(String diaChi) {
-            this.diaChi = diaChi;
-        }
-
-        public void setLoTrinh(String loTrinh) {
-            this.loTrinh = loTrinh;
-        }
-
-        public void setMaKH(String maKH) {
-            this.maKH = maKH;
-        }
-
-        public void setTongTien(long tongTien) {
-            this.tongTien = tongTien;
-        }
-
-        public boolean isShowBill() {
-            return isShowBill;
-        }
-
-        public void setShowBill(boolean showBill) {
-            isShowBill = showBill;
-        }
-    }
 
     public static class BillEntityAdapter implements Comparable<BillEntityAdapter>{
 
-        private String monthBill;
-        private long moneyBill;
+        private String THANG_THANH_TOAN;
+        private long TIEN_THANH_TOAN;
         private boolean isPrint;
-        private int status;
+        private String TRANG_THAI_TT;
         private boolean isChecked;
         private String requestDate;
+        private boolean isPrintEnable;
+        private boolean isCheckEnable;
+        private String MA_KHACH_HANG;
+        private String TEN_KHACH_HANG;
+        private String MA_DIEN_LUC;
+
+        private String messageError = "";
 
         //info extension
         private long billId;
-        private String customerPayCode;
         private String billingBy;
 
         public BillEntityAdapter() {
         }
 
-        public BillEntityAdapter(String monthBill, long moneyBill, boolean isPrint, int status, boolean isChecked, String requestDate, int billId, String customerPayCode, String billingBy) {
-            this.monthBill = monthBill;
-            this.moneyBill = moneyBill;
-            this.isPrint = isPrint;
-            this.status = status;
-            this.isChecked = isChecked;
-            this.requestDate = requestDate;
-            this.billId = billId;
-            this.customerPayCode = customerPayCode;
-            this.billingBy = billingBy;
+        public String getMessageError() {
+            return messageError;
         }
 
-        public String getMonthBill() {
-            return monthBill;
+        public void setMessageError(String messageError) {
+            this.messageError = messageError;
         }
 
-        public void setMonthBill(String monthBill) {
-            this.monthBill = monthBill;
+        public String getTEN_KHACH_HANG() {
+            return TEN_KHACH_HANG;
         }
 
-        public long getMoneyBill() {
-            return moneyBill;
+        public void setTEN_KHACH_HANG(String TEN_KHACH_HANG) {
+            this.TEN_KHACH_HANG = TEN_KHACH_HANG;
         }
 
-        public void setMoneyBill(long moneyBill) {
-            this.moneyBill = moneyBill;
+        public String getMA_KHACH_HANG() {
+            return MA_KHACH_HANG;
+        }
+
+        public void setMA_KHACH_HANG(String MA_KHACH_HANG) {
+            this.MA_KHACH_HANG = MA_KHACH_HANG;
+        }
+
+        public boolean isCheckEnable() {
+            return isCheckEnable;
+        }
+
+        public void setCheckEnable(boolean checkEnable) {
+            isCheckEnable = checkEnable;
+        }
+
+        public boolean isPrintEnable() {
+            return isPrintEnable;
+        }
+
+        public void setPrintEnable(boolean printEnable) {
+            isPrintEnable = printEnable;
+        }
+
+        public String getTHANG_THANH_TOAN() {
+            return THANG_THANH_TOAN;
+        }
+
+        public void setTHANG_THANH_TOAN(String THANG_THANH_TOAN) {
+            this.THANG_THANH_TOAN = THANG_THANH_TOAN;
+        }
+
+        public long getTIEN_THANH_TOAN() {
+            return TIEN_THANH_TOAN;
+        }
+
+        public void setTIEN_THANH_TOAN(long TIEN_THANH_TOAN) {
+            this.TIEN_THANH_TOAN = TIEN_THANH_TOAN;
         }
 
         public boolean isPrint() {
@@ -351,16 +308,24 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             isPrint = print;
         }
 
-        public int getStatus() {
-            return status;
+        public String getTRANG_THAI_TT() {
+            return TRANG_THAI_TT;
         }
 
-        public void setStatus(int status) {
-            this.status = status;
+        public void setTRANG_THAI_TT(String TRANG_THAI_TT) {
+            this.TRANG_THAI_TT = TRANG_THAI_TT;
         }
 
         public boolean isChecked() {
             return isChecked;
+        }
+
+        public String getMA_DIEN_LUC() {
+            return MA_DIEN_LUC;
+        }
+
+        public void setMA_DIEN_LUC(String MA_DIEN_LUC) {
+            this.MA_DIEN_LUC = MA_DIEN_LUC;
         }
 
         public void setChecked(boolean checked) {
@@ -383,26 +348,19 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             this.billId = billId;
         }
 
-        public String getCustomerPayCode() {
-            return customerPayCode;
-        }
-
-        public void setCustomerPayCode(String customerPayCode) {
-            this.customerPayCode = customerPayCode;
-        }
 
         public String getBillingBy() {
             return billingBy;
         }
 
-        public void setBillingBy(String billingBy) {
+        public void setVI_TTOAN(String billingBy) {
             this.billingBy = billingBy;
         }
 
         @Override
         public int compareTo(@NonNull BillEntityAdapter billEntityAdapter) {
-            long termThis = Common.convertDateToLong(this.getMonthBill(), Common.DATE_TIME_TYPE.MMyyyy);
-            long termThat = Common.convertDateToLong(billEntityAdapter.getMonthBill(), Common.DATE_TIME_TYPE.MMyyyy);
+            long termThis = Common.convertDateToLong(this.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy);
+            long termThat = Common.convertDateToLong(billEntityAdapter.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy);
 
             //giảm dần
             return (int) (termThat - termThis);
@@ -432,16 +390,11 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         private List<BillEntityAdapter> billList = new ArrayList<>();
         private String code;
         private String edong;
-        private OnInterationBillInsidePayAdapter interaction;
 
         //extends
         private int posCustomerInside;
 
         public BillInsidePayAdapter(Context context) {
-            if (context instanceof OnInterationBillInsidePayAdapter) {
-                interaction = (OnInterationBillInsidePayAdapter) context;
-            } else
-                throw new ClassCastException("Context must be implement BillInsidePayViewHolder.OnInterationBillInsidePayAdapter!");
         }
 
         public void setBillList(String edong, String code, List<BillEntityAdapter> billList, int posCustomer) {
@@ -463,25 +416,30 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         @Override
         public void onBindViewHolder(BillInsidePayAdapter.BillInsidePayViewHolder holder, int position) {
-            BillEntityAdapter entity = billList.get(position);
+            final BillEntityAdapter entity = billList.get(position);
+            holder.setData(entity);
+            holder.setPosition(position);
+
+
             holder.cb.setChecked(entity.isChecked());
-            if (entity.getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) {
+            if (entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())) {
                 holder.cb.setEnabled(true);
                 holder.ibtnDelete.setVisibility(View.INVISIBLE);
             } else {
                 holder.cb.setEnabled(false);
                 holder.ibtnDelete.setVisibility(View.VISIBLE);
             }
-            holder.tvDate.setText(entity.getMonthBill());
-            holder.tvMoneyBill.setText(Common.convertLongToMoney(entity.getMoneyBill()));
-            holder.tvStatusBill.setText(Common.STATUS_BILLING.findCodeMessage(entity.getStatus()).getMessage());
+            holder.tvDate.setText(entity.getTHANG_THANH_TOAN());
+            holder.tvMoneyBill.setText(Common.convertLongToMoney(entity.getTIEN_THANH_TOAN()));
+            holder.tvStatusBill.setText(Common.STATUS_BILLING.findCodeMessage(entity.getTRANG_THAI_TT()).getMessage());
 
-            if (Common.STATUS_BILLING.findCodeMessage(entity.getStatus()).getCode() == Common.STATUS_BILLING.DANG_CHO_HUY.getCode()) {
+            if (Common.STATUS_BILLING.findCodeMessage(entity.getTRANG_THAI_TT()).getCode().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())){
                 holder.tvStatusBill.setTextColor(ContextCompat.getColor(sContext, R.color.colorRed));
             } else {
                 holder.tvStatusBill.setTextColor(ContextCompat.getColor(sContext, R.color.colorTextGreen));
             }
             holder.ibtnPrintInside.setVisibility(entity.isPrint ? View.VISIBLE : View.INVISIBLE);
+
         }
 
         @Override
@@ -503,116 +461,82 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             @BindView(R.id.btn_row_bill_inside_pay_delete)
             ImageButton ibtnDelete;
 
+            BillEntityAdapter data;
+            int position;
+
+
             public BillInsidePayViewHolder(View itemView) {
                 super(itemView);
                 ButterKnife.bind(this, itemView);
             }
 
+
+            public void setPosition(int position) {
+                this.position = position;
+            }
+
+            public BillEntityAdapter getData() {
+                return data;
+            }
+
+            public void setData(BillEntityAdapter data) {
+                this.data = data;
+            }
+
             @OnCheckedChanged(R.id.cb_row_bill_inside_pay)
             public void onCheckedChanged(final CheckBox checkBox, boolean checked) {
                 if (checkBox.isPressed()) {
-                    int position = getAdapterPosition();
 
                     boolean isNotBillPayedTermBefore = false;
                     boolean isNotBillOldestPayedTermBefore = false;
 
-                    int index = position;
+                    int index = position + 1;
                     int indexNotPayedTermOldest = Common.NEGATIVE_ONE;
 
                     BillEntityAdapter bill = billList.get(position);
-                    String term = bill.getMonthBill();
                     //TODO check hóa đơn xa nhất
                     for (; index < billList.size(); index++) {
-                        if (billList.get(index).getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())
+                        if (billList.get(index).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && !billList.get(index).isChecked())
                             indexNotPayedTermOldest = index;
                     }
 
                     if (checked) {
                         //TODO check hóa đơn liên tục fragment khi checked
-                        index = position;
-                        for (; index < billList.size(); index++) {
-                            String termIndex = billList.get(index).getMonthBill();
-                            if (billList.get(index).getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode() && !billList.get(index).isChecked() && !termIndex.equals(term)) {
-                                isNotBillPayedTermBefore = true;
 
-                                if (index == indexNotPayedTermOldest)
-                                    isNotBillOldestPayedTermBefore = true;
-
-                            }
-                        }
-
-                        if (isNotBillPayedTermBefore) {
+                        if (indexNotPayedTermOldest != Common.NEGATIVE_ONE) {
                             ((MainActivity) sContext).runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     checkBox.setChecked(false);
                                 }
                             });
-
-//                        String nameCustomer = sPayModel.getCustomerNameByBillId(edong, bill.getBillId());
-                            String customerCode = sPayModel.getCustomerCodeByBillId(edong, bill.getBillId());
-                            if (isNotBillPayedTermBefore && isNotBillOldestPayedTermBefore) {
-                                interaction.processUnCheckedBillFragment(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage() + Common.TEXT_MULTI_SPACE + customerCode);
-                                return;
-                            }
-
-                            if (isNotBillOldestPayedTermBefore) {
-                                interaction.processUnCheckedBillFragment(Common.CODE_REPONSE_BILL_ONLINE.ex10005.getMessage() + Common.TEXT_MULTI_SPACE + customerCode);
-                                return;
-                            }
+                           payPresenter.getIPayView().showMessageNotifyPayfrag(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage() + Common.TEXT_MULTI_SPACE + bill.getMA_KHACH_HANG());
                             return;
                         }
-
+                        payPresenter.addSelectBillToPay(bill, true);
                         bill.setChecked(checked);
-                        interaction.processCheckedBillFragment(edong, code, posCustomerInside, billList, position, indexBegin, indexEnd);
+//                        interaction.processCheckedBillFragment(edong, code, posCustomerInside, billList, position, indexBegin, indexEnd);
                     } else {
                         //TODO check hóa đơn liên tục fragment khi unchecked
 
-                        //find index is checked term newest
-                        int indexTermNewestChecked = Common.NEGATIVE_ONE;
-                        for (index = 0; index < billList.size(); index++) {
-
-                            int status = billList.get(index).getStatus();
-                            boolean isChecked = billList.get(index).isChecked();
-                            if (indexTermNewestChecked != Common.NEGATIVE_ONE)
-                                break;
-                            if (status == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode() && isChecked)
-                                indexTermNewestChecked = index;
-                        }
-
-
-                        index = position;
-                        if (index == indexNotPayedTermOldest)
-                            isNotBillOldestPayedTermBefore = true;
-
-//                        for (; index <= indexTermNewestChecked; index++) {
-                        String termIndex = billList.get(index).getMonthBill();
-
-                        if (billList.get(index).getStatus() == Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) {
-                            if (!termIndex.equals(billList.get(indexTermNewestChecked).getMonthBill()))
-                                isNotBillPayedTermBefore = true;
-
-                        }
-
-//                        }
-
-                        if (isNotBillPayedTermBefore) {
-                            ((MainActivity) sContext).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    checkBox.setChecked(true);
+                        boolean hasChange = false;
+                        for (int i = 0; i <= position; i ++)
+                        {
+                            if(billList.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()))
+                            {
+                                if(i != position && billList.get(i).isChecked())
+                                {
+                                    hasChange = true;
                                 }
-                            });
+                                billList.get(i).setChecked(false);
+                                payPresenter.addSelectBillToPay(billList.get(i), false);
+                            }
                         }
 
-                        String customerCode = sPayModel.getCustomerCodeByBillId(edong, bill.getBillId());
-                        if (isNotBillPayedTermBefore && isNotBillOldestPayedTermBefore) {
-                            interaction.processUnCheckedBillFragment(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage() + Common.TEXT_MULTI_SPACE + customerCode);
-                            return;
+                        if(hasChange)
+                        {
+                            notifyDataSetChanged();
                         }
-
-                        bill.setChecked(checked);
-                        interaction.processCheckedBillFragment(edong, code, posCustomerInside, billList, position, indexBegin, indexEnd);
 
                         return;
                     }
@@ -624,7 +548,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                 int position = getAdapterPosition();
                 BillEntityAdapter bill = billList.get(position);
 
-                interaction.processDeleteBillOnlineFragment(edong, code, bill, posCustomerInside);
+                payPresenter.getIPayView().processDialogDeleteBillOnline(edong, code, bill, posCustomerInside);
             }
 
             public CheckBox getCb() {
@@ -653,24 +577,44 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
     }
 
-    public interface OnInterationBillInsidePayAdapter {
-        void processCheckedBillFragment(String edong, String code, int posCustomer, List<BillEntityAdapter> billList, int posBillInside, int indexBegin, int indexEnd);
-
-        void processDeleteBillOnlineFragment(String edong, String code, BillEntityAdapter bill, int posCustomerInside);
-
-        void processUnCheckedBillFragment(String message);
-    }
+//    public interface OnInterationBillInsidePayAdapter {
+//        void processCheckedBillFragment(String edong, String code, int posCustomer, List<BillEntityAdapter> billList, int posBillInside, int indexBegin, int indexEnd);
+//
+//        void processDeleteBillOnlineFragment(String edong, String code, BillEntityAdapter bill, int posCustomerInside);
+//
+//        void processUnCheckedBillFragment(String message);
+//    }
 
     public static class DataAdapter {
-        private PayAdapter.PayEntityAdapter infoKH;
+        private EntityKhachHang infoKH;
         private List<BillEntityAdapter> billKH;
+        private long totalMoney;
+        private boolean isShowBill;
 
-        public DataAdapter(PayEntityAdapter infoKH, List<BillEntityAdapter> billKH) {
+
+        public DataAdapter(EntityKhachHang infoKH, List<BillEntityAdapter> billKH, long total) {
             this.infoKH = infoKH;
             this.billKH = billKH;
+            this.totalMoney = total;
         }
 
-        public PayEntityAdapter getInfoKH() {
+        public long getTotalMoney() {
+            return totalMoney;
+        }
+
+        public void setTotalMoney(long totalMoney) {
+            this.totalMoney = totalMoney;
+        }
+
+        public boolean isShowBill() {
+            return isShowBill;
+        }
+
+        public void setShowBill(boolean showBill) {
+            isShowBill = showBill;
+        }
+
+        public EntityKhachHang getInfoKH() {
             return infoKH;
         }
 
@@ -678,5 +622,15 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             return billKH;
         }
 
+
+        public boolean isPayed()
+        {
+            for (int i = 0; i < billKH.size(); i ++)
+            {
+                if(billKH.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.toString()))
+                    return false;
+            }
+            return true;
+        }
     }
 }

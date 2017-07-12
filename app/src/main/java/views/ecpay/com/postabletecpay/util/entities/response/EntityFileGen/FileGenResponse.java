@@ -19,7 +19,7 @@ public class FileGenResponse {
     private ArrayList<ListBillResponse> billResponse;
     @SerializedName("id_changed")
     @Expose
-    private String id_changed;
+    private Long id_changed;
     @SerializedName("date_changed")
     @Expose
     private String date_changed;
@@ -40,11 +40,11 @@ public class FileGenResponse {
         this.billResponse = billResponse;
     }
 
-    public String getId_changed() {
+    public Long getId_changed() {
         return id_changed;
     }
 
-    public void setId_changed(String id_changed) {
+    public void setId_changed(Long id_changed) {
         this.id_changed = id_changed;
     }
 

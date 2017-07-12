@@ -9,6 +9,9 @@ public class BillInsideCustomer implements Serializable {
     @SerializedName("customerCode")
     @Expose
     private String customerCode;
+    @SerializedName("cardNo")
+    @Expose
+    private String cardNo;
     @SerializedName("customerPayCode")
     @Expose
     private String customerPayCode;
@@ -23,7 +26,7 @@ public class BillInsideCustomer implements Serializable {
     private String strTerm;
     @SerializedName("amount")
     @Expose
-    private Integer amount;
+    private Long amount;
     @SerializedName("period")
     @Expose
     private String period;
@@ -200,6 +203,15 @@ public class BillInsideCustomer implements Serializable {
     private String description;
     private final static long serialVersionUID = -3897189969590582750L;
 
+
+    public String getCardNo() {
+        return cardNo;
+    }
+
+    public void setCardNo(String cardNo) {
+        this.cardNo = cardNo;
+    }
+
     public String getCustomerCode() {
         return customerCode;
     }
@@ -240,11 +252,11 @@ public class BillInsideCustomer implements Serializable {
         this.strTerm = strTerm;
     }
 
-    public Integer getAmount() {
+    public Long getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(Long amount) {
         this.amount = amount;
     }
 

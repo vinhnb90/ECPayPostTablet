@@ -1,7 +1,9 @@
 package views.ecpay.com.postabletecpay.presenter;
 
+import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
 
 /**
  * Created by VinhNB on 5/26/2017.
@@ -22,9 +24,8 @@ public interface IPayPresenter {
 
     void callProcessDataBillDialogChecked(String edong, int pos, boolean isChecked);
 
-    void callPayingBillOnline(String edong);
 
-    void callPayingBillOffline(String edong);
+    void callPay();
 
     void refreshTextCountBillPayedSuccess();
 
@@ -37,4 +38,10 @@ public interface IPayPresenter {
     void callDeleteOnlineSoap(String edong, String reasonDeleteBill);
 
     void callShowDialogBarcode();
+
+    PayModel getPayModel();
+
+    IPayView getIPayView();
+
+    void addSelectBillToPay(PayAdapter.BillEntityAdapter bill, boolean isSelect);
 }

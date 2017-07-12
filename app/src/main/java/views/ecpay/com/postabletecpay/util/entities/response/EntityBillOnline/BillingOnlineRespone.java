@@ -4,41 +4,51 @@ import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class BillingOnlineRespone implements Serializable
-{
-@SerializedName("header")
-@Expose
-private HeaderBillingOnlineRespone headerBillingOnlineRespone;
-@SerializedName("body")
-@Expose
-private BodyBillingOnlineRespone bodyBillingOnlineRespone;
-@SerializedName("footer")
-@Expose
-private FooterBillingOnlineRespone footerBillingOnlineRespone;
-private final static long serialVersionUID = 1637014148722407909L;
+import views.ecpay.com.postabletecpay.util.entities.response.Base.BodyRespone;
+import views.ecpay.com.postabletecpay.util.entities.response.Base.FooterRespone;
+import views.ecpay.com.postabletecpay.util.entities.response.Base.HeaderRespone;
+import views.ecpay.com.postabletecpay.util.entities.response.Base.Respone;
 
-public HeaderBillingOnlineRespone getHeaderBillingOnlineRespone() {
-return headerBillingOnlineRespone;
-}
+public class BillingOnlineRespone extends Respone {
+    @SerializedName("header")
+    @Expose
+    private HeaderBillingOnlineRespone header;
+    @SerializedName("body")
+    @Expose
+    private BodyBillingOnlineRespone body;
+    @SerializedName("footer")
+    @Expose
+    private FooterBillingOnlineRespone footer;
+    private final static long serialVersionUID = 1637014148722407909L;
 
-public void setHeaderBillingOnlineRespone(HeaderBillingOnlineRespone headerBillingOnlineRespone) {
-this.headerBillingOnlineRespone = headerBillingOnlineRespone;
-}
 
-public BodyBillingOnlineRespone getBodyBillingOnlineRespone() {
-return bodyBillingOnlineRespone;
-}
+    @Override
+    public HeaderRespone getHeader() {
+        return header;
+    }
 
-public void setBodyBillingOnlineRespone(BodyBillingOnlineRespone bodyBillingOnlineRespone) {
-this.bodyBillingOnlineRespone = bodyBillingOnlineRespone;
-}
+    @Override
+    public void setHeader(HeaderRespone header) {
+        this.header = (HeaderBillingOnlineRespone) header;
+    }
 
-public FooterBillingOnlineRespone getFooterBillingOnlineRespone() {
-return footerBillingOnlineRespone;
-}
+    @Override
+    public BodyRespone getBody() {
+        return this.body;
+    }
 
-public void setFooterBillingOnlineRespone(FooterBillingOnlineRespone footerBillingOnlineRespone) {
-this.footerBillingOnlineRespone = footerBillingOnlineRespone;
-}
+    @Override
+    public void setBody(BodyRespone body) {
+        this.body = (BodyBillingOnlineRespone)body;
+    }
 
+    @Override
+    public FooterRespone getFooter() {
+        return this.footer;
+    }
+
+    @Override
+    public void setFooter(FooterRespone footer) {
+        this.footer = (FooterBillingOnlineRespone)footer;
+    }
 }

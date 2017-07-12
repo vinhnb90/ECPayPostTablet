@@ -29,6 +29,7 @@ import views.ecpay.com.postabletecpay.model.MainModel;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.ListTransactionOff;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
@@ -46,6 +47,7 @@ import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.Main.IMainView;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
+import static android.content.Context.MODE_PRIVATE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT;
 
@@ -65,6 +67,9 @@ public class MainPresenter implements IMainPresenter {
         this.mIMainView = mIMainView;
         this.mainModel = new MainModel(mIMainView.getContextView());
         this.edong = edong;
+
+        mainModel.getManagerSharedPref().addSharePref(Common.SHARE_REF_CHANGED_GEN_FILE, MODE_PRIVATE);
+
     }
 
 
@@ -214,7 +219,7 @@ public class MainPresenter implements IMainPresenter {
                 String path = Common.PATH_FOLDER_DOWNLOAD;
                 File directory = new File(path);
                 File[] allFiles = directory.listFiles();
-                if (allFiles.length == 0) {
+                if (allFiles.length < 2) {
                     synchronizeFileGen();
                 } else {
                     synchronizeData();
@@ -391,7 +396,8 @@ public class MainPresenter implements IMainPresenter {
                 bookCmis = c.getString(0);
                 File fileBookCmis = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + ".zip");
                 if (fileBookCmis.exists()) {
-
+                    long maxIdChanged = mainModel.getMaxIdChanged(bookCmis);
+                    String maxDateChanged = mainModel.getMaxDateChanged(bookCmis);
                     String jsonRequestData = SoapAPI.getJsonRequestSynData(
                             configInfo.getAGENT(),
                             configInfo.getAgentEncypted(),
@@ -402,8 +408,8 @@ public class MainPresenter implements IMainPresenter {
                             configInfo.getSignatureEncrypted(),
                             mainModel.getPcCode(),
                             c.getString(0),
-                            mainModel.getMaxIdChanged(),
-                            mainModel.getMaxDateChanged(),
+                            maxIdChanged,
+                            maxDateChanged,
                             configInfo.getAccountId());
 
 
@@ -448,6 +454,7 @@ public class MainPresenter implements IMainPresenter {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void postBill() {
 
@@ -465,33 +472,26 @@ public class MainPresenter implements IMainPresenter {
         }
 
         ConfigInfo configInfo;
-        String versionApp = "";
-        try {
-            versionApp = mIMainView.getContextView().getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
 
         try {
-            configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.PUT_TRANSACTION_OFF.toString(), versionApp, mainModel.getPcCode());
+            configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.PUT_TRANSACTION_OFF.toString(), Common.getVersionApp(mIMainView.getContextView()));////TO-DO:NEED CHECK HERE AGAIN, mainModel.getPcCode());
         } catch (Exception e) {
             mIMainView.showTextMessage(e.getMessage());
             return;
         }
 
 
-        String signatureEncrypted = "";
-        try {
-            String dataSign = Common.getDataSignRSA(
-                    configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
-                    configInfo.getDiskDriver(), mainModel.getPcCode(), configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
-            Log.d(TAG, "setupInfoRequest: " + dataSign);
-            signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
-            Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
-        } catch (Exception e) {
-        }
-        configInfo.setSignatureEncrypted(signatureEncrypted);
+//        String signatureEncrypted = "";
+//        try {
+//            String dataSign = Common.getDataSignRSA(
+//                    configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
+//                    configInfo.getDiskDriver(), mainModel.getPcCode(), configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
+//            Log.d(TAG, "setupInfoRequest: " + dataSign);
+//            signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
+//            Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
+//        } catch (Exception e) {
+//        }
+//        configInfo.setSignatureEncrypted(signatureEncrypted);
 
         ArrayList<ListTransactionOff> lstTransactionOff = new ArrayList<>();
         Cursor c = mainModel.selectOfflineBill();
@@ -521,34 +521,7 @@ public class MainPresenter implements IMainPresenter {
 
         if (jsonRequestPushBill != null) {
             try {
-                final SoapAPI.AsyncSoapPostBill soapPostBill;
 
-                soapPostBill = new SoapAPI.AsyncSoapPostBill(callBackPostBill, mIMainView.getContextView());
-
-                if (soapPostBill.getStatus() != AsyncTask.Status.RUNNING) {
-                    soapPostBill.execute(jsonRequestPushBill);
-
-                    //thread time out
-                    Thread soapDataThread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            PostBillResponse postBillResponse = null;
-
-                            //call time out
-                            try {
-                                Thread.sleep(Common.TIME_OUT_CONNECT);
-                            } catch (InterruptedException e) {
-                                mIMainView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
-                            } finally {
-                                if (postBillResponse == null) {
-                                    soapPostBill.callCountdown(soapPostBill);
-                                }
-                            }
-                        }
-                    });
-
-                    soapDataThread.start();
-                }
             } catch (Exception e) {
                 mIMainView.showTextMessage(e.getMessage());
                 return;
@@ -559,45 +532,44 @@ public class MainPresenter implements IMainPresenter {
 
     @Override
     public void refreshDataPayAdapter() {
-        mDataPayAdapter.clear();
-        List<PayAdapter.PayEntityAdapter> listKH = new ArrayList<>();
-        //get List Customer
-        List<Customer> listCustomer = mainModel.selectAllCustomer(edong);
-
-        //with every one
-        int index = 0;
-        int maxIndex = listCustomer.size();
-        for (; index < maxIndex; index++) {
-            Customer customer = listCustomer.get(index);
-
-            PayAdapter.PayEntityAdapter pay = new PayAdapter.PayEntityAdapter();
-            pay.setEdong(edong);
-            pay.setTenKH(customer.getName());
-            pay.setDiaChi(customer.getAddress());
-            //get loTrinh
-            String road = mainModel.selectRoadFirstInBill(edong, customer.getCode());
-            pay.setLoTrinh(road);
-            pay.setMaKH(customer.getCode());
-            //get totalMoney
-            long totalMoney = mainModel.countMoneyAllBillOfCustomer(edong, customer.getCode());
-            pay.setTongTien(totalMoney);
-            //check status pay
-            boolean isPayed = mainModel.checkStatusPayedOfCustormer(edong, customer.getCode());
-            pay.setPayed(isPayed);
-            pay.setShowBill(customer.isShowBill());
-
-            listKH.add(pay);
-        }
-
-        for(index = 0; index<listKH.size();index++)
-        {
-            PayAdapter.PayEntityAdapter customer = listKH.get(index);
-            String code = customer.getMaKH();
-            List<PayAdapter.BillEntityAdapter> listBill = mainModel.selectInfoBillOfCustomerToRecycler(edong, code);
-            Collections.sort(listBill, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
-            PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(customer, listBill);
-            mDataPayAdapter.add(dataAdapter);
-        }
+//        mDataPayAdapter.clear();
+//        List<PayAdapter.PayEntityAdapter> listKH = new ArrayList<>();
+//        //get List Customer
+//        List<EntityKhachHang> listCustomer = mainModel.selectAllCustomer(edong);
+//
+//        //with every one
+//        int index = 0;
+//        int maxIndex = listCustomer.size();
+//        for (; index < maxIndex; index++) {
+//            EntityKhachHang customer = listCustomer.get(index);
+//
+//            PayAdapter.PayEntityAdapter pay = new PayAdapter.PayEntityAdapter();
+//            pay.setEdong(edong);
+//            pay.setTenKH(customer.getTEN_KHANG());
+//            pay.setDiaChi(customer.getDIA_CHI());
+//            //get loTrinh
+//            pay.setLoTrinh(customer.getLO_TRINH());
+//            pay.setMaKH(customer.getMA_KHANG());
+//            //get totalMoney
+//            long totalMoney = mainModel.countMoneyAllBillOfCustomer(edong, customer.getMA_KHANG());
+//            pay.setTongTien(totalMoney);
+//            //check status pay
+////            boolean isPayed = mainModel.checkStatusPayedOfCustormer(edong, customer.getCode());
+////            pay.setPayed(isPayed);
+////            pay.setShowBill(customer.isShowBill());
+//
+//            listKH.add(pay);
+//        }
+//
+//        for(index = 0; index<listKH.size();index++)
+//        {
+//            PayAdapter.PayEntityAdapter customer = listKH.get(index);
+//            String code = customer.getMaKH();
+//            List<PayAdapter.BillEntityAdapter> listBill = mainModel.selectInfoBillOfCustomerToRecycler(edong, code);
+//            Collections.sort(listBill, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
+//            PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(customer, listBill);
+//            mDataPayAdapter.add(dataAdapter);
+//        }
     }
 
     @Override
@@ -621,6 +593,7 @@ public class MainPresenter implements IMainPresenter {
         public void onPost(ListDataZipResponse response) {
             if (response == null)
                 return;
+
 
             String sData = response.getBodyListDataResponse().getFile_data();
             if (sData != null && !sData.isEmpty()) {
@@ -650,6 +623,9 @@ public class MainPresenter implements IMainPresenter {
                                     GsonBuilder gsonBuilder = new GsonBuilder();
                                     Gson gson = gsonBuilder.create();
                                     FileGenResponse fileGenResponse = gson.fromJson(ja.toString(), FileGenResponse.class);
+
+                                    mainModel.setChangedGenFile(bookCmis, fileGenResponse.getId_changed(), fileGenResponse.getDate_changed());
+
                                     for (ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
                                         if (mainModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
                                             if (mainModel.insertCustomer(listCustomerResponse) != -1) {
@@ -747,7 +723,7 @@ public class MainPresenter implements IMainPresenter {
                         Gson gson = gsonBuilder.create();
                         BillResponse billResponse = gson.fromJson(ja.toString(), BillResponse.class);
                         billResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
-                        if (mainModel.checkBillExist(billResponse.getBodyBillResponse().getId()) == 0) {
+                        if (mainModel.checkBillExist(billResponse.getBodyBillResponse().getBillId()) == 0) {
                             if (mainModel.insertBill(billResponse) != -1) {
                                 Log.i("INFO", "SUCCESS");
                             }
@@ -777,34 +753,6 @@ public class MainPresenter implements IMainPresenter {
 
     //endregion
 
-
-    private SoapAPI.AsyncSoapPostBill.AsyncSoapPostBillCallBack callBackPostBill = new SoapAPI.AsyncSoapPostBill.AsyncSoapPostBillCallBack() {
-        @Override
-        public void onPre(SoapAPI.AsyncSoapPostBill soapPostBill) {
-
-        }
-
-        @Override
-        public void onUpdate(String message) {
-
-        }
-
-        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-        @Override
-        public void onPost(PostBillResponse response) {
-            String errorCode = response.getFooterPostBillReponse().getResponse_code();
-            if(errorCode.equals("000")) {
-                mIMainView.showTextMessage(Common.MESSAGE.PUSH_BILL_SUCSSES.toString());
-            } else {
-                mIMainView.showTextMessage(Common.MESSAGE.PUSH_BILL_FAIL.toString());
-            }
-        }
-
-        @Override
-        public void onTimeOut(SoapAPI.AsyncSoapPostBill soapPostBill) {
-        }
-    };
-    //endregion
 
     public interface InteractorMainPresenter{
         List<PayAdapter.DataAdapter> getData();

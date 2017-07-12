@@ -6,17 +6,19 @@ import java.util.Date;
  * Created by macbook on 5/5/17.
  */
 
-public class EntityHoaDon {
+public class EntityHoaDonNo {
 
+    private String E_DONG;
     private int ID;
-    private int SERI_HDON;
+    private String MA_HOA_DON;
+    private String SERI_HDON;
     private String MA_KHANG;
     private String MA_THE;
     private String TEN_KHANG;
     private String DIA_CHI;
     private Date THANG_TTOAN;
     private int PHIEN_TTOAN;
-    private double SO_TIEN_TTOAN;
+    private int SO_TIEN_TTOAN;
     private String SO_GCS;
     private String DIEN_LUC;
     private String SO_HO;
@@ -25,10 +27,19 @@ public class EntityHoaDon {
     private String SO_CTO;
     private String SDT_ECPAY;
     private String SDT_EVN;
-    private int GIAO_THU;
+    private String GIAO_THU;
     private Date NGAY_GIAO_THU;
     private String TRANG_THAI_TTOAN;
     private String VI_TTOAN;
+
+
+    public String getMA_HOA_DON() {
+        return MA_HOA_DON;
+    }
+
+    public void setMA_HOA_DON(String MA_HOA_DON) {
+        this.MA_HOA_DON = MA_HOA_DON;
+    }
 
     public int getID() {
         return ID;
@@ -38,11 +49,11 @@ public class EntityHoaDon {
         this.ID = ID;
     }
 
-    public int getSERI_HDON() {
+    public String getSERI_HDON() {
         return SERI_HDON;
     }
 
-    public void setSERI_HDON(int SERI_HDON) {
+    public void setSERI_HDON(String SERI_HDON) {
         this.SERI_HDON = SERI_HDON;
     }
 
@@ -94,11 +105,11 @@ public class EntityHoaDon {
         this.PHIEN_TTOAN = PHIEN_TTOAN;
     }
 
-    public double getSO_TIEN_TTOAN() {
+    public int getSO_TIEN_TTOAN() {
         return SO_TIEN_TTOAN;
     }
 
-    public void setSO_TIEN_TTOAN(double SO_TIEN_TTOAN) {
+    public void setSO_TIEN_TTOAN(int SO_TIEN_TTOAN) {
         this.SO_TIEN_TTOAN = SO_TIEN_TTOAN;
     }
 
@@ -166,11 +177,11 @@ public class EntityHoaDon {
         this.SDT_EVN = SDT_EVN;
     }
 
-    public int getGIAO_THU() {
+    public String getGIAO_THU() {
         return GIAO_THU;
     }
 
-    public void setGIAO_THU(int GIAO_THU) {
+    public void setGIAO_THU(String GIAO_THU) {
         this.GIAO_THU = GIAO_THU;
     }
 
@@ -196,5 +207,13 @@ public class EntityHoaDon {
 
     public void setVI_TTOAN(String VI_TTOAN) {
         this.VI_TTOAN = VI_TTOAN;
+    }
+
+    public String getE_DONG() {
+        return E_DONG;
+    }
+
+    public void setE_DONG(String e_DONG) {
+        E_DONG = e_DONG;
     }
 }

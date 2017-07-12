@@ -94,6 +94,7 @@ import static java.lang.System.lineSeparator;
 
 public class Common {
 
+
     //region param account
     public enum TYPE_ACCOUNT {
         ADMIN_IT(-1, "Admin IT"),
@@ -216,6 +217,7 @@ public class Common {
     }
 
     public enum PROVIDER_CODE {
+        NCCNONE("000", "Chọn Điện Lực"),
         NCC0498("NCC0498", "Tổng Công Ty Điện Lực Miền Nam"),
         NCC0499("NCC0499", "Tổng Công Ty Điện Lực Miền Trung"),
         NCC0483("NCC0483", "Tổng Công ty điện lực miền Bắc"),
@@ -258,19 +260,15 @@ public class Common {
     public static final String PROVIDER_DEFAULT = PROVIDER_CODE.NCC0468.getCode();
 
     public enum STATUS_BILLING {
-        CHUA_THANH_TOAN(0, "Chưa thanh toán"),
-        DA_THANH_TOAN(1, "Đã thanh toán"),
-        DA_THANH_TOAN_BOI_NGUON_KHAC(2, "Đã thanh toán bởi nguồn khác"),
-        DA_THANH_TOAN_BOI_VI_KHAC(3, "Đã thanh toán bởi ví khác"),
-        HUY_HOA_DON(4, "Đã bị hủy hóa đơn"),
-        DANG_CHO_HUY(5, "Đang chờ hủy");
+        CHUA_THANH_TOAN("01", "Chưa thanh toán"),
+        DA_THANH_TOAN("02", "Đã thanh toán");
 
-        STATUS_BILLING(int code, String message) {
+        STATUS_BILLING(String code, String message) {
             this.code = code;
             this.message = message;
         }
 
-        public int getCode() {
+        public String getCode() {
             return code;
         }
 
@@ -278,12 +276,12 @@ public class Common {
             return message;
         }
 
-        private final int code;
+        private final String code;
         private String message;
 
-        public static STATUS_BILLING findCodeMessage(int code) {
+        public static STATUS_BILLING findCodeMessage(String code) {
             for (STATUS_BILLING v : values()) {
-                if (v.getCode() == code) {
+                if (v.getCode().equalsIgnoreCase(code)) {
                     return v;
                 }
             }
@@ -859,6 +857,178 @@ public class Common {
         }
     }
 
+
+
+    public enum HINH_THUC_TTOAN
+    {
+        ONLINE ("01", "Online"),
+        OFFLINE ("02", "Offline");
+
+        HINH_THUC_TTOAN(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+
+        private final String code;
+        private String message;
+    }
+    public enum TRANG_THAI_TTOAN
+    {
+        NULL("00", "Khong Xac Dinh"),
+        DA_TTOAN ("02", "Da Thanh Toan"),
+        CHUA_TTOAN ("01", "Chua Thanh Toan"),
+        TTOAN_BOI_NGUON_KHAC ("03", "Thanh Toan Boi Nguon Khac"),
+        TTOAN_BOI_VI_KHAC ("04", "Thanh Toan Boi Vi Khac");
+
+        TRANG_THAI_TTOAN(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public boolean equal(TRANG_THAI_TTOAN e)
+        {
+            return  this.getCode().equalsIgnoreCase(e.getCode());
+        }
+
+        private final String code;
+        private String message;
+    }
+
+    public enum TRANG_THAI_GIAO_THU
+    {
+        GIAO_THU ("01", "Giao Thu"),
+        VANG_LAI ("02", "Vang Lai");
+
+        TRANG_THAI_GIAO_THU(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+
+        private final String code;
+        private String message;
+    }
+
+    public enum TRANG_THAI_CHAM_NO
+    {
+        CHUA_CHAM ("01", "Chua Cham"),
+        DA_CHAM ("02", "Chua Cham"),
+        DANG_CHO_XU_LY ("03", "Dang Cho Xu Ly Cham No"),
+        CHAM_LOI ("04", "Cham Loi"),
+        KHONG_THANH_CONG ("05", "Khong Thanh Cong");
+
+        TRANG_THAI_CHAM_NO(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+
+        private final String code;
+        private String message;
+    }
+    public enum TRANG_THAI_DAY_CHAM_NO
+    {
+        CHUA_DAY ("01", "Chua Day"),
+        KHONG_THANH_CONG ("03", "Khong Thanh Cong");
+
+        TRANG_THAI_DAY_CHAM_NO(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+
+        private final String code;
+        private String message;
+    }
+    public enum TRANG_THAI_HOAN_TRA
+    {
+        CHUA_TRA ("01", "Chua Tra");
+
+        TRANG_THAI_HOAN_TRA(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+
+        private final String code;
+        private String message;
+    }
+    public enum MA_GIAO_DICH
+    {
+        TTOAN_OFFLINE ("06", "Thanh Toan OFFLINE"),
+        CAP_NHAT_TTHAI_NO("02", "Cap Nhat Trang Thai No"),
+        TT_ONLINE_CHAM_NO_ONLINE("03", "Thanh Toan Online Cham No Online"),
+        TT_ONLINE_CHAM_NO_OFFLINE("04", "Thanh Toan Online Cham No Offline"),
+        TT_ONLINE_CHAM_NO_LOI("05", "Thanh Toan Online Cham No Loi"),
+        DAY_CHAM_NO("10", "Day Cham No");
+
+        MA_GIAO_DICH(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+
+        private final String code;
+        private String message;
+    }
+
     public enum CODE_REPONSE_BILL_ONLINE {
         e000("000", "Thực hiện nghiệp vụ thành công"),
         e040("040", "Tài khoản ví chưa được đăng ký"),
@@ -1085,7 +1255,9 @@ public class Common {
         GET_PC_INFO,
         SEARCH_CUSTOMER,
         SEARCH_CUSTOMER_BILL,
-        MAP_CUSTOMER_CARD;
+        MAP_CUSTOMER_CARD,
+        BALANCE,
+        ACCOUNT;
 
         @Override
         public String toString() {
@@ -1121,6 +1293,10 @@ public class Common {
                 return  "CUSTOMER-BILL";
             if(this == MAP_CUSTOMER_CARD)
                 return "MAP-CUSTOMER-CARD";
+            if(this == BALANCE)
+                return "BALANCE";
+            if(this == ACCOUNT)
+                return "ACCOUNT";
             return super.toString();
         }
     }
@@ -1603,6 +1779,10 @@ public class Common {
     public static String SHARE_REF_FILE_LOGIN_USER_NAME = "USERNAME";
     public static String SHARE_REF_FILE_LOGIN_PASS = "PASS";
     public static String SHARE_REF_FILE_LOGIN_IS_SAVE = "CHECKBOX";
+    public static String SHARE_REF_CHANGED_GEN_FILE = "GEN_FILE_CHANGED";
+    public static String SHARE_REF_CHANGED_GEN_FILE_DATE = "GEN_FILE_CHANGED_DATE_";
+    public static String SHARE_REF_CHANGED_GEN_FILE_ID_ = "GEN_FILE_CHANGED_ID_";
+
     //endregion
 
     //region method process ecrypt and decrypt data
@@ -2004,6 +2184,7 @@ public class Common {
 
     }
 
+
     //delay animations when view is clicked
     public static final int TIME_DELAY_ANIM = 250;
     public static final int LONG_TIME_DELAY_ANIM = 1000;
@@ -2136,6 +2317,29 @@ public class Common {
         view.startAnimation(animation);
     }
 
+
+    public static Date parseDate(String value, String format)
+    {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+        Date d=new Date();
+        try {
+            d =  dateFormat.parse(value);
+        } catch (ParseException e) {
+            Log.e("LOG", "PARSE DATE ERROR");
+        }
+        return d;
+    }
+
+    public static String parse(Date value, String format)
+    {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+        try {
+            return dateFormat.format(value);
+        } catch (Exception e) {
+            return getDateTimeNow(DATE_TIME_TYPE.valueOf(format));
+        }
+    }
+
     public static void showDialog(Context context, final IActionClickYesNoDialog clickYesNoDialog, String title, String message, boolean isHasCancel, TYPE_DIALOG typeDialog) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -2211,6 +2415,13 @@ public class Common {
     public static String convertDateToDate(String time, DATE_TIME_TYPE typeDefault, DATE_TIME_TYPE typeConvert) {
         if (time == null || time.trim().isEmpty())
             return "";
+
+        time = time.replaceAll("-", "");
+        for (int i = time.length(); i <= 17; i ++)
+        {
+            time += "0";
+        }
+
 
         long longDate = Common.convertDateToLong(time, typeDefault);
 
@@ -2354,5 +2565,14 @@ public class Common {
 
     public static int intConvertNull(Integer object) {
         return object = (object == null) ? 0 : object.intValue();
+    }
+    public static int parseInt(String object) {
+        try
+        {
+            return Integer.parseInt(object);
+        }catch (Exception e)
+        {
+            return  0;
+        }
     }
 }

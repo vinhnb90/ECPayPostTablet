@@ -172,7 +172,7 @@ public class LoginPresenter implements ILoginPresenter {
 
                 /*soapLogin = new SoapAPI.AsyncSoapLogin(soapLoginCallBack);
 
-                if (soapLogin.getStatus() != AsyncTask.Status.RUNNING) {
+                if (soapLogin.getTRANG_THAI_TT() != AsyncTask.Status.RUNNING) {
                     soapLogin.execute(jsonRequestLogin);
 
                     //thread time out

@@ -5,68 +5,26 @@ import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class BodySearchOnlineRequest implements Serializable {
-    @SerializedName("audit-number")
+import views.ecpay.com.postabletecpay.util.entities.request.Base.BodyRequest;
+
+public class BodySearchOnlineRequest extends BodyRequest {
+
+    @SerializedName("provider-code")
     @Expose
-    private Long auditNumber;
-    @SerializedName("mac")
-    @Expose
-    private String mac;
-    @SerializedName("disk-drive")
-    @Expose
-    private String diskDrive;
-    @SerializedName("signature")
-    @Expose
-    private String signature;
-    @SerializedName("direct-evn")
-    @Expose
-    private String directEvn;
+    private String providerCode;
     @SerializedName("customer-code")
     @Expose
     private String customerCode;
-    @SerializedName("pc-code")
+    @SerializedName("list-customer-code")
     @Expose
-    private String pcCode;
-    private final static long serialVersionUID = -171392060791603258L;
+    private String[] listCustomerCode;
 
-    public Long getAuditNumber() {
-        return auditNumber;
+    public String getProviderCode() {
+        return providerCode;
     }
 
-    public void setAuditNumber(Long auditNumber) {
-        this.auditNumber = auditNumber;
-    }
-
-    public String getMac() {
-        return mac;
-    }
-
-    public void setMac(String mac) {
-        this.mac = mac;
-    }
-
-    public String getDiskDrive() {
-        return diskDrive;
-    }
-
-    public void setDiskDrive(String diskDrive) {
-        this.diskDrive = diskDrive;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
-    }
-
-    public String getDirectEvn() {
-        return directEvn;
-    }
-
-    public void setDirectEvn(String directEvn) {
-        this.directEvn = directEvn;
+    public void setProviderCode(String providerCode) {
+        this.providerCode = providerCode;
     }
 
     public String getCustomerCode() {
@@ -77,12 +35,11 @@ public class BodySearchOnlineRequest implements Serializable {
         this.customerCode = customerCode;
     }
 
-    public String getPcCode() {
-        return pcCode;
+    public String[] getListCustomerCode() {
+        return listCustomerCode;
     }
 
-    public void setPcCode(String pcCode) {
-        this.pcCode = pcCode;
+    public void setListCustomerCode(String[] listCustomerCode) {
+        this.listCustomerCode = listCustomerCode;
     }
-
 }

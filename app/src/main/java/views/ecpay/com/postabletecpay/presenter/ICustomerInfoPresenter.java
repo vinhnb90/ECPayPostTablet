@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.presenter;
 
+import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 
 /**
@@ -7,6 +8,6 @@ import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
  */
 
 public interface ICustomerInfoPresenter {
-    public void register(Customer customer, String mEDong, String eCard, String phoneEcpay, String bankAcc,  String bankName);
-    public void update(Customer customer, String mEDong, String eCard, String phoneEcpay, String bankAcc, String bankName);
+    public void register(EntityKhachHang customer, String mEDong, String eCard, String phoneEcpay, String bankAcc, String bankName);
+    public void update(EntityKhachHang customer, String mEDong, String eCard, String phoneEcpay, String bankAcc, String bankName);
 }

@@ -1,6 +1,7 @@
 package views.ecpay.com.postabletecpay.model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
@@ -16,6 +18,8 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPC
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListBillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListCustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by VinhNB on 5/23/2017.
@@ -104,33 +108,19 @@ public class MainModel extends CommonModel {
         return sqLiteConnection.updateBill(listBillResponse);
     }
 
-    public long getMaxIdChanged() {
-        return sqLiteConnection.getMaxIdChanged();
+    public long getMaxIdChanged(String boockCms) {
+        return getManagerSharedPref().getSharePref(Common.SHARE_REF_CHANGED_GEN_FILE, MODE_PRIVATE).getLong(Common.SHARE_REF_CHANGED_GEN_FILE_ID_ + boockCms, 0);
     }
 
-    public String getMaxDateChanged() {
-        return sqLiteConnection.getMaxDateChanged();
+    public String getMaxDateChanged(String boockCms) {
+        return getManagerSharedPref().getSharePref(Common.SHARE_REF_CHANGED_GEN_FILE, MODE_PRIVATE).getString(Common.SHARE_REF_CHANGED_GEN_FILE_DATE + boockCms, "");
     }
 
-    public List<Customer> selectAllCustomer(String edong) {
-        return sqLiteConnection.selectAllCustomerFitterBy(edong, Common.TYPE_SEARCH.ALL, Common.TEXT_EMPTY);
+    public void setChangedGenFile(String boockCms, Long idChanged, String dateChange) {
+        sharePrefManager.getSharePref(Common.SHARE_REF_CHANGED_GEN_FILE, MODE_PRIVATE).edit().putLong(Common.SHARE_REF_CHANGED_GEN_FILE_ID_ + boockCms, idChanged)
+                .putString(Common.SHARE_REF_CHANGED_GEN_FILE_DATE + boockCms, dateChange).commit();
     }
 
-    public String selectRoadFirstInBill(String edong, String code) {
-        return sqLiteConnection.selectRoadFirstInBill(edong, code);
-    }
-
-    public long countMoneyAllBillOfCustomer(String edong, String code) {
-        return  sqLiteConnection.countMoneyAllBillOfCustomer(edong, code);
-    }
-
-    public boolean checkStatusPayedOfCustormer(String edong, String code) {
-        return sqLiteConnection.checkStatusPayedOfCustormer(edong, code);
-    }
-
-    public List<PayAdapter.BillEntityAdapter> selectInfoBillOfCustomerToRecycler(String edong, String code) {
-        return sqLiteConnection.selectInfoBillOfCustomerToRecycler(edong, code);
-    }
     //endregion
 }
 

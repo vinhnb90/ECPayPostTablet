@@ -60,7 +60,7 @@ public class LoginResponseAdapter extends TypeAdapter<LoginResponseReponse> {
 
             AccountLoginResponse accountLoginResponse = responseLoginResponse.getAccountLoginResponse();
             out.name("account").beginObject();
-            out.name("status").name(accountLoginResponse.getStatus());
+            out.name("status").name(accountLoginResponse.getTRANG_THAI_TT());
             out.name("idNumber").name(accountLoginResponse.getIdNumber());
             out.name("idNumberDate").name(accountLoginResponse.getIdNumberDate());
             out.name("idNumberPlace").name(accountLoginResponse.getIdNumberPlace());

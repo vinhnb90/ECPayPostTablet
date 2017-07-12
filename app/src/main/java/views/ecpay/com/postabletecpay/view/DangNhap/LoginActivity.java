@@ -301,6 +301,12 @@ public class LoginActivity extends BaseActivity implements ILoginView {
                 mILoginPresenter.validateInput(userName, pass);
             }
         }, TIME_DELAY_ANIM);
+
+//        ///Cheat
+//        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//        intent.putExtra(KEY_EDONG, "01666564963");
+//        startActivity(intent);
+//        this.finish();
     }
     //endregion
 

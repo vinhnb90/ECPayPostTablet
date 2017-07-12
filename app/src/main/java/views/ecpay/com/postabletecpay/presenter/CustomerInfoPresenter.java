@@ -11,6 +11,7 @@ import views.ecpay.com.postabletecpay.model.CustomerInfoModel;
 import views.ecpay.com.postabletecpay.model.CustomerSearchModel;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.util.entities.response.Base.Respone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityMapCustomerCard.MapCustomerCardRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchCustomerBill.SearchCustomerBillRespone;
@@ -34,7 +35,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void register(final Customer customer, final String mEDong, final String eCard, final String phoneEcpay, final String bankAcc,  final String bankName) {
+    public void register(final EntityKhachHang customer, final String mEDong, final String eCard, final String phoneEcpay, final String bankAcc,  final String bankName) {
         Context context = customerInfoView.getContextView();
         ConfigInfo configInfo;
         String versionApp = "";
@@ -61,11 +62,12 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                 configInfo.getDiskDriver(),
                 configInfo.getSignatureEncrypted(),
                 eCard,
-                customer.getCode(),
+                customer.getMA_KHANG(),
                 1L, //Update
                 phoneEcpay,
                 bankAcc,
-                customer.getIdNumber(),
+//                customer.getIdNumber(),
+                "",
                 bankName,
                 configInfo.getAccountId()
         );
@@ -101,10 +103,10 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                     customerInfoView.showMessageText(response.getFooter().getDescription());
                     if(response.getFooter().getResponseCode().equals("000"))
                     {
-                        customer.setCardNo(eCard);
-                        customer.setPhoneByecp(phoneEcpay);
-                        customer.setBankName(bankName);
-                        customer.setBankAccount(bankAcc);
+                        customer.setMA_THE(eCard);
+                        customer.setSDT_ECPAY(phoneEcpay);
+//                        customer.setBankName(bankName);
+//                        customer.setBankAccount(bankAcc);
                         UpdateDataBase(customer);
                     }else
                     {
@@ -150,7 +152,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void update(final Customer customer, final String mEDong, final String eCard, final String phoneEcpay, final String bankAcc,  final String bankName) {
+    public void update(final EntityKhachHang customer, final String mEDong, final String eCard, final String phoneEcpay, final String bankAcc, final String bankName) {
         Context context = customerInfoView.getContextView();
         ConfigInfo configInfo;
         String versionApp = "";
@@ -177,11 +179,11 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                 configInfo.getDiskDriver(),
                 configInfo.getSignatureEncrypted(),
                 eCard,
-                customer.getCode(),
+                customer.getMA_KHANG(),
                 2L, //Update
                 phoneEcpay,
                 bankAcc,
-                customer.getIdNumber(),
+                "",
                 bankName,
                 configInfo.getAccountId()
         );
@@ -217,10 +219,10 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                     customerInfoView.showMessageText(response.getFooter().getDescription());
                     if(response.getFooter().getResponseCode().equals("000"))
                     {
-                        customer.setCardNo(eCard);
-                        customer.setPhoneByecp(phoneEcpay);
-                        customer.setBankName(bankName);
-                        customer.setBankAccount(bankAcc);
+                        customer.setMA_THE(eCard);
+                        customer.setSDT_ECPAY(phoneEcpay);
+//                        customer.setBankName(bankName);
+//                        customer.setBankAccount(bankAcc);
                         UpdateDataBase(customer);
                     }else
                     {
@@ -264,7 +266,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
         }
     }
 
-    protected void UpdateDataBase(Customer customer)
+    protected void UpdateDataBase(EntityKhachHang customer)
     {
         customerInfoModel.UpdateCustomer(customer);
         customerInfoView.refill(customer);

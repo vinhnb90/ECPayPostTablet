@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.util.List;
 
+import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 
 /**
@@ -16,7 +17,7 @@ public class CustomerSearchModel extends CommonModel {
     }
 
 
-    public List<Customer> getListCustomer(String maKH, String tenKH, String dcKH, String phoneKH, String gtKH)
+    public List<EntityKhachHang> getListCustomer(String maKH, String tenKH, String dcKH, String phoneKH, String gtKH)
     {
         return  sqLiteConnection.selectAllCustomerFitter(maKH, tenKH, dcKH, phoneKH, gtKH);
     }
