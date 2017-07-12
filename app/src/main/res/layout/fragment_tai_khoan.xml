@@ -31,7 +31,7 @@
         android:layout_margin="@dimen/_15sdp"
         android:text="THÔNG TIN TÀI KHOẢN"
         android:textColor="@color/colorTextWhite"
-        android:textSize="@dimen/_16sdp"
+        android:textSize="@dimen/_14sdp"
         android:textStyle="bold" />
 
     <LinearLayout
@@ -47,7 +47,7 @@
 
             <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginRight="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_40sdp">
@@ -65,7 +65,7 @@
                         android:id="@+id/iv_frag_main_avatar"
                         android:layout_width="@dimen/_90sdp"
                         android:layout_height="@dimen/_90sdp"
-                        android:padding="10dp"
+                        android:padding="@dimen/_10sdp"
                         android:src="@drawable/avatar" />
 
                     <LinearLayout
@@ -294,7 +294,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:text="SỐ TÀI KHOẢN"
-                    android:textSize="@dimen/_10sdp"
+                    android:textSize="@dimen/_9sdp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -308,7 +308,7 @@
                     android:scrollbars="vertical"
                     android:text="2345"
                     android:textColor="@color/colorRed"
-                    android:textSize="@dimen/_14sdp"
+                    android:textSize="@dimen/_11sdp"
                     android:textStyle="normal" />
 
             </LinearLayout>
@@ -333,7 +333,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:text="SỐ DƯ KHẢ DỤNG"
-                    android:textSize="@dimen/_10sdp"
+                    android:textSize="@dimen/_9sdp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -347,7 +347,7 @@
                     android:scrollbars="vertical"
                     android:text="2.000.0002.000.0002.000.0002.000.0002.000.0002.000.0002.000.0002.000.000"
                     android:textColor="@color/colorRed"
-                    android:textSize="@dimen/_14sdp" />
+                    android:textSize="@dimen/_11sdp" />
 
             </LinearLayout>
 
@@ -371,7 +371,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:text="LOẠI TÀI KHOẢN"
-                    android:textSize="@dimen/_10sdp"
+                    android:textSize="@dimen/_9sdp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -385,7 +385,7 @@
                     android:scrollbars="vertical"
                     android:text="12"
                     android:textColor="@color/colorRed"
-                    android:textSize="@dimen/_14sdp" />
+                    android:textSize="@dimen/_11sdp" />
 
             </LinearLayout>
 
@@ -409,7 +409,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_orange"
-                android:textSize="@dimen/_13sdp"
+                android:textSize="@dimen/_10sdp"
                 android:text="Đổi mật khẩu"
                 android:textColor="@color/colorTextWhite" />
 
@@ -417,10 +417,10 @@
                 android:id="@+id/btn_frag_user_info_logout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/_20sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button"
-                android:textSize="@dimen/_13sdp"
+                android:textSize="@dimen/_10sdp"
                 android:text="Đăng xuất"
                 android:textColor="@color/colorTextWhite" />
 

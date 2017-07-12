@@ -193,9 +193,9 @@ app:cardElevation="3dp">
             android:layout_marginRight="@dimen/_20sdp"
             android:layout_weight="1"
             android:background="@drawable/bg_button_gray"
-            android:textSize="@dimen/_13sdp"
             android:text="Huỷ"
-            android:textAllCaps="false" />
+            android:textAllCaps="false"
+            android:textSize="@dimen/_13sdp" />
 
         <Button
             android:id="@+id/btn_dialog_thanhtoan_pay"

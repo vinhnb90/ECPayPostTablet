@@ -1321,9 +1321,19 @@ public class Common {
             if (allFilesDb != null)
                 scanFile(ctx, allFilesDb);
 
+
+            // Load log folder
+            File fileLog = new File(Common.PATH_FOLDER_HELP);
+            String[] allFilesLog = fileLog.list();
+            for (int i = 0; i < allFilesLog.length; i++) {
+                allFilesLog[i] = Common.PATH_FOLDER_HELP + allFilesLog[i];
+            }
+            if (allFilesLog != null)
+                scanFile(ctx, allFilesLog);
+
             // Load download folder
             File file_download = new File(Common.PATH_FOLDER_DOWNLOAD);
-            String[] allFilesDownload = file_db.list();
+            String[] allFilesDownload = file_download.list();
 
             for (int i = 0; i < allFilesDownload.length; i++) {
                 allFilesDownload[i] = Common.PATH_FOLDER_DOWNLOAD + allFilesDownload[i];

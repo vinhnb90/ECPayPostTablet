@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -55,28 +56,40 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM
 
 public class LoginActivity extends BaseActivity implements ILoginView {
     private static final int MY_REQUEST_CODE = 100;
+    Bundle savedInstanceState;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.hideActionBar();
-
+        this.savedInstanceState = savedInstanceState;
         setContentView(R.layout.activity_login);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
-                    checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                }, MY_REQUEST_CODE);
-            }
-        }else {
+        if (!checkPermission()) {
             initSource();
+            setAction(savedInstanceState);
         }
         ButterKnife.bind(this);
         initView();
-        setAction(savedInstanceState);
-
     }
+
+    // region Check permission
+    private boolean checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_PHONE_STATE
+                }, MY_REQUEST_CODE);
+                return true;
+            }
+            return false;
+        }else {
+            return false;
+        }
+    }
+    //end region
 
     //region ILoginView
     @Override
@@ -110,22 +123,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         tvMessage.setVisibility(View.VISIBLE);
         tvMessage.setText(message);
     }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case MY_REQUEST_CODE: {
-                if (grantResults.length == 0
-                        || grantResults[0] != PackageManager.PERMISSION_GRANTED
-                        || grantResults[1] != PackageManager.PERMISSION_GRANTED
-                        || grantResults[2] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(LoginActivity.this, "Unable to show permission required", Toast.LENGTH_LONG).show();
-                }
-                initSource();
-                return;
-            }
-        }
-    }
+
     @Override
     public void hideTextMessage() {
         tvMessage.setVisibility(View.INVISIBLE);
@@ -150,9 +148,28 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         this.finish();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_REQUEST_CODE: {
+                if (grantResults.length == 0
+                        || grantResults[0] != PackageManager.PERMISSION_GRANTED
+                        || grantResults[1] != PackageManager.PERMISSION_GRANTED
+                        || grantResults[2] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(LoginActivity.this, "Unable to show permission required", Toast.LENGTH_LONG).show();
+                    Log.e(getClass().getName(), "Unable to show permission required");
+                }else {
+                    initSource();
+                    setAction(savedInstanceState);
+                }
+                return;
+            }
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    protected  void LoadPCInfo(String edong, String phoneName)
-    {
+    protected void LoadPCInfo(String edong, String phoneName) {
         Context context = this.getContext();
         ConfigInfo configInfo;
         String versionApp = "";
@@ -207,7 +224,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
                 public void onPost(GetPCInfoRespone response, String phone) {
                     Log.d("LOG", "phone = " + phone);
 
-                    String responseLoginResponseData = ((BodyGetPCInfoRespone)response.getBody()).getListEvnPCLoginResponse();
+                    String responseLoginResponseData = ((BodyGetPCInfoRespone) response.getBody()).getListEvnPCLoginResponse();
                     // định dạng kiểu Object JSON
                     Type type = new TypeToken<List<ListEvnPCLoginResponse>>() {
                     }.getType();
@@ -279,33 +296,32 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         hidePbarLogin();
         hideTextMessage();
     }
-
     @Override
     protected void initSource() {
-        mILoginPresenter = new LoginPresenter(this);
+            mILoginPresenter = new LoginPresenter(this);
     }
 
     @Override
     protected void setAction(@Nullable Bundle savedInstanceState) {
-        Common.verifyStoragePermissions(this);
-
-        try {
+            try {
             Common.makeRootFolderAndGetDataConfig(this);
             Common.makeRootFolderAndGetDataHelp(this);
             Common.makeRootFolderLog();
-        } catch (Exception e) {
+         } catch (Exception e) {
             showTextMessage(e.getMessage());
             return;
-        }
-        SQLiteConnection.getInstance(this).getWritableDatabase();
+            }
+         SQLiteConnection.getInstance(this).getWritableDatabase();
 
-        Common.loadFolder(this);
+         Common.loadFolder(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mILoginPresenter.showInfoSharePrefLogin();
+        if (!checkPermission())
+            mILoginPresenter.showInfoSharePrefLogin();
+
     }
 
     //endregion

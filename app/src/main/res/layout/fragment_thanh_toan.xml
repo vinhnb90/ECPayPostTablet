@@ -34,10 +34,10 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/ibtn_frag_thanhtoan_back"
             android:layout_centerHorizontal="true"
-            android:layout_margin="@dimen/_15sdp"
+            android:layout_margin="@dimen/_10sdp"
             android:text="DANH SÁCH HOÁ ĐƠN"
             android:textColor="@color/colorTextWhite"
-            android:textSize="@dimen/_16sdp" />
+            android:textSize="@dimen/_14sdp" />
 
         <RelativeLayout
             android:id="@+id/rvSearch"
@@ -73,9 +73,9 @@
                 android:lines="1"
                 android:paddingBottom="@dimen/_10sdp"
                 android:paddingLeft="@dimen/_10sdp"
-                android:paddingRight="@dimen/_40sdp"
-                android:paddingTop="@dimen/_10sdp"
-                android:textSize="@dimen/_13sdp"
+                android:paddingRight="@dimen/_30sdp"
+                android:paddingTop="@dimen/_8sdp"
+                android:textSize="@dimen/_10sdp"
                 android:scrollHorizontally="true"
                 android:text="" />
 
@@ -108,7 +108,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_button_orange"
                 android:clickable="false"
-                android:textSize="@dimen/_12sdp"
+                android:textSize="@dimen/_10sdp"
                 android:text="@string/pre"
                 android:textColor="@android:color/white" />
 
@@ -118,7 +118,7 @@
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
                 android:text="Trang"
-                android:textSize="@dimen/_12sdp"
+                android:textSize="@dimen/_10sdp"
                 android:textColor="@color/colorTextWhite"
                 android:textStyle="bold" />
 
@@ -139,9 +139,9 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_button_orange"
                 android:clickable="false"
-                android:textSize="@dimen/_12sdp"
                 android:text="@string/next"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/_10sdp" />
 
         </LinearLayout>
 
@@ -363,7 +363,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/ll_frag_thanh_toan_count"
                 android:layout_margin="@dimen/_10sdp"
-                android:textSize="@dimen/_12sdp"
+                android:textSize="@dimen/_10sdp"
                 android:background="@drawable/bg_button"
                 android:text="THANH TOÁN"
                 android:textColor="@color/colorTextWhite" />
@@ -385,9 +385,9 @@
                 android:id="@+id/rv_frag_thanh_toan_customer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="10dp"
+                android:layout_margin="@dimen/_10sdp"
                 android:background="@android:color/transparent"
-                android:visibility="visible"></android.support.v7.widget.RecyclerView>
+                android:visibility="visible"/>
 
             <TextView
                 android:visibility="gone"
@@ -396,12 +396,9 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:text="Không có khách hàng"
-                android:textSize="35sp"
+                android:textSize="@dimen/_16sdp"
                 android:textStyle="bold" />
 
         </LinearLayout>
-
-
     </RelativeLayout>
-
 </LinearLayout>
