@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
+        android:textSize="@dimen/_12sdp"
         android:text="Tên khách hàng:"/>
 
     <TextView
@@ -19,6 +20,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:text="Tên khách hàng"
+        android:textSize="@dimen/_12sdp"
         android:textStyle="bold"/>
 
     <View
@@ -26,8 +28,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/tvTenKH"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginBottom="@dimen/_8sdp"
         android:background="@color/colorLightGray" />
 
     <TextView
@@ -36,24 +38,27 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/view1"
         android:layout_alignParentLeft="true"
+        android:textSize="@dimen/_12sdp"
         android:text="Mã khách hàng:"/>
 
     <TextView
         android:id="@+id/tvMaKH"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="PD11248"
+        android:textStyle="bold"
         android:layout_below="@+id/view1"
         android:layout_alignParentRight="true"
-        android:text="PD11248"
-        android:textStyle="bold"/>
+        android:textSize="@dimen/_12sdp" />
 
     <View
         android:id="@+id/view2"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/tvMaKH"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginBottom="@dimen/_8sdp"
+        android:textSize="@dimen/_12sdp"
         android:background="@color/colorLightGray" />
 
     <TextView
@@ -62,6 +67,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/view2"
         android:layout_alignParentLeft="true"
+        android:textSize="@dimen/_12sdp"
         android:text="Kỳ thanh toán:"/>
 
     <TextView
@@ -70,6 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/view2"
         android:layout_alignParentRight="true"
+        android:textSize="@dimen/_12sdp"
         android:text="03/2017"
         android:textStyle="bold"/>
 
@@ -78,8 +85,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/tvKyThanhToan"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginBottom="@dimen/_8sdp"
         android:background="@color/colorLightGray" />
 
     <TextView
@@ -87,6 +94,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/view3"
+        android:textSize="@dimen/_12sdp"
         android:layout_alignParentLeft="true"
         android:text="Ngày phát sinh:"/>
 
@@ -95,6 +103,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/view3"
+        android:textSize="@dimen/_12sdp"
         android:layout_alignParentRight="true"
         android:text="25/03/2017"
         android:textStyle="bold"/>
@@ -104,8 +113,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/tvNgayPhatSinh"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginBottom="@dimen/_8sdp"
         android:background="@color/colorLightGray" />
 
     <TextView
@@ -113,6 +122,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/view4"
+        android:textSize="@dimen/_12sdp"
         android:layout_alignParentLeft="true"
         android:text="Số tiền:"/>
 
@@ -122,6 +132,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/view4"
         android:layout_alignParentRight="true"
+        android:textSize="@dimen/_12sdp"
         android:textColor="@color/colorRed"
         android:text="700.000 đ"
         android:textStyle="bold"/>
@@ -131,8 +142,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/tvSoTien"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginBottom="@dimen/_8sdp"
         android:background="@color/colorLightGray" />
 
     <TextView
@@ -140,6 +151,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/view5"
+        android:textSize="@dimen/_12sdp"
         android:layout_alignParentLeft="true"
         android:text="Trạng thái:"/>
 
@@ -149,6 +161,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/view5"
         android:layout_alignParentRight="true"
+        android:textSize="@dimen/_12sdp"
         android:text="Đã thanh toán"
         android:textColor="@color/colorTextGreen"
         android:textStyle="bold"/>

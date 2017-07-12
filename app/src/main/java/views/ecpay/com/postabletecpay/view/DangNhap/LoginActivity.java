@@ -62,20 +62,20 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
         setContentView(R.layout.activity_login);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED &&
-                    checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
                     checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{
-                        Manifest.permission.CAMERA,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.READ_EXTERNAL_STORAGE
                 }, MY_REQUEST_CODE);
             }
+        }else {
+            initSource();
         }
         ButterKnife.bind(this);
-        initSource();
         initView();
         setAction(savedInstanceState);
+
     }
 
     //region ILoginView
@@ -121,6 +121,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
                         || grantResults[2] != PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(LoginActivity.this, "Unable to show permission required", Toast.LENGTH_LONG).show();
                 }
+                initSource();
                 return;
             }
         }

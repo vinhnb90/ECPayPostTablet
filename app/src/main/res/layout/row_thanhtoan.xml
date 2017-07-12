@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_margin="5dp" />
+        android:layout_margin="@dimen/_5sdp" />
 
     <LinearLayout
         android:id="@+id/ll1"
@@ -27,13 +27,15 @@
             android:layout_height="wrap_content"
             android:lines="1"
             android:scrollHorizontally="true"
+            android:textSize="@dimen/_12sdp"
             android:text="PD384728938" />
 
         <TextView
             android:id="@+id/tvKy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:textSize="@dimen/_12sdp"
             android:lines="1"
             android:scrollHorizontally="true"
             android:text="Kỳ 03/2017" />
@@ -53,6 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:textSize="@dimen/_12sdp"
             android:text="Ten"
             android:textStyle="bold" />
 
@@ -61,7 +64,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:textSize="@dimen/_12sdp"
             android:lines="1"
             android:scrollHorizontally="true"
             android:text="100.000 đ" />
@@ -75,14 +79,11 @@
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="5dp"
+        android:layout_marginRight="@dimen/_5sdp"
         android:layout_weight="1"
         android:gravity="center_horizontal|center_vertical"
         android:lines="1"
         android:scrollHorizontally="true"
         android:text="Chưa thanh toán"
         android:textColor="@color/colorDarkOrange" />
-
-
-
 </LinearLayout>

@@ -5,7 +5,7 @@
     >
 
     <LinearLayout
-        android:layout_margin="10dp"
+        android:layout_margin="@dimen/_8sdp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal|center_vertical"
@@ -29,7 +29,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="@dimen/_5sdp"
                 android:gravity="left"
                 android:orientation="vertical">
 
@@ -39,6 +39,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@+id/cb_row_thanhtoan_list_bills_choose"
                     android:lines="1"
+                    android:textSize="@dimen/_12sdp"
                     android:scrollHorizontally="true"
                     android:text="PD384728938" />
 
@@ -47,10 +48,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/tv_row_thanhtoan_list_bills_code"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:layout_toRightOf="@+id/cb_row_thanhtoan_list_bills_choose"
                     android:lines="1"
                     android:scrollHorizontally="true"
+                    android:textSize="@dimen/_12sdp"
                     android:text="Kỳ 03/2017" />
             </LinearLayout>
 
@@ -60,7 +62,7 @@
             android:id="@+id/ll2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="@dimen/_5sdp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -70,6 +72,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:lines="1"
+                android:textSize="@dimen/_12sdp"
                 android:scrollHorizontally="true"
                 android:text="Ten"
                 android:textStyle="bold" />
@@ -78,10 +81,11 @@
                 android:id="@+id/tv_row_thanhtoan_list_bills_amount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:gravity="center_horizontal"
                 android:lines="1"
                 android:scrollHorizontally="true"
+                android:textSize="@dimen/_12sdp"
                 android:text="100.000 đ100100.000 đ.000 đ100100.000 đ.000 đ100.000 đ100.000 đ" />
 
         </LinearLayout>
@@ -89,7 +93,7 @@
         <RelativeLayout
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="@dimen/_5sdp"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent">
@@ -103,7 +107,7 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="@dimen/_5sdp"
                 android:id="@+id/tv_row_thanhtoan_list_bills_status_pay"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -112,11 +116,9 @@
                 android:lines="1"
                 android:scrollHorizontally="true"
                 android:text="Chưa thanh toán"
+                android:textSize="@dimen/_12sdp"
                 android:textColor="@color/colorDarkOrange" />
 
         </RelativeLayout>
-
     </LinearLayout>
-
-
 </RelativeLayout>
