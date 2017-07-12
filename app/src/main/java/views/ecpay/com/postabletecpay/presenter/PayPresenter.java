@@ -200,7 +200,7 @@ public class PayPresenter implements IPayPresenter {
 
         //param is setup request by ECPAY, please contact ECPAY Server service if rechange.
         String directEvn = Common.DIRECT_EVN;
-        String customerCode = infoSearch;
+        String customerCode = infoSearch.toUpperCase();
         String pcCode = configInfo.getPC_CODE().trim();
         String bookCmis = Common.TEXT_EMPTY;
 
