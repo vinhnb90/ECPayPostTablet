@@ -11,7 +11,7 @@ import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 public interface IMainPresenter {
     void callPutTransactionOffBill(String edong);
 
-    void synchronizePC();
+    void synchronizePC() throws Exception;
 
     void postBill();
 

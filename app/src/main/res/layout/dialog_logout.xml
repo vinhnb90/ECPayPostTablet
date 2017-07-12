@@ -29,12 +29,13 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimary"
                 android:gravity="center_horizontal"
-                android:padding="15dp"
+                android:padding="@dimen/_5sdp"
+
                 android:text="ĐĂNG XUẤT"
                 android:textAllCaps="true"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/_16sdp"
-                android:textStyle="normal" />
+                android:textSize="@dimen/_12sdp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_dialog_layout_message"
@@ -42,9 +43,9 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:gravity="center_horizontal"
-                android:padding="@dimen/_14sdp"
+                android:padding="@dimen/_5sdp"
                 android:text="Đăng xuất phiên làm việc trên thiết bị này."
-                android:textSize="@dimen/_16sdp" />
+                android:textSize="@dimen/_10sdp" />
         </LinearLayout>
 
         <RelativeLayout
@@ -58,18 +59,18 @@
             android:orientation="horizontal">
 
             <TextView
-                android:padding="5dp"
+                android:padding="@dimen/_2sdp"
                 android:id="@+id/tv_diaglog_logout_response"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:textColor="@color/colorTextWhite"
-                android:textSize="@dimen/_12sdp"
+                android:textSize="@dimen/_10sdp"
                 android:visibility="visible"
                 tools:text="Message Lỗi" />
 
             <ProgressBar
-                android:padding="@dimen/_5sdp"
+                android:padding="@dimen/_2sdp"
                 android:id="@+id/pbar_diaglog_logout"
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
@@ -95,8 +96,8 @@
             <Button
                 android:id="@+id/btn_dialog_logout_cancel"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/_50sdp"
+                android:layout_height="@dimen/_24sdp"
+                android:layout_marginRight="@dimen/_20sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_gray"
                 android:textSize="@dimen/_10sdp"
@@ -106,7 +107,7 @@
             <Button
                 android:id="@+id/btn_dialog_logout_ok"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_24sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_orange"
                 android:textSize="@dimen/_10sdp"

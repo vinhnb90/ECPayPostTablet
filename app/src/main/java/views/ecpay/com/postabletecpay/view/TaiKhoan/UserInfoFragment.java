@@ -199,12 +199,17 @@ public class UserInfoFragment extends Fragment implements IUserInfoView, ILogout
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Fragment fragment = null;
-                fragment = MainPageFragment.newInstance(mEdong);
-                if (fragment != null) {
-                    FragmentTransaction fragmentTransaction = UserInfoFragment.this.getActivity().getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.frameLayout, fragment);
-                    fragmentTransaction.commit();
+                try {
+                    Fragment fragment = MainPageFragment.newInstance(mEdong);
+                    if (fragment != null) {
+                        FragmentTransaction fragmentTransaction = UserInfoFragment.this.getActivity().getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.replace(R.id.frameLayout, fragment);
+                        fragmentTransaction.commit();
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
                 }
             }
         }, Common.TIME_DELAY_ANIM);

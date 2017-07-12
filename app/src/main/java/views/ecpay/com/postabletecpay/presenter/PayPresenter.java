@@ -11,6 +11,8 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import org.apache.log4j.chainsaw.Main;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -101,7 +103,7 @@ public class PayPresenter implements IPayPresenter {
     }
 
     @Override
-    public void callPayRecycler(String edong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch, boolean isSeachOnline) {
+    public void callPayRecycler(String edong, int pageIndex, Common.TYPE_SEARCH typeSearch, String infoSearch, boolean isSeachOnline) throws Exception{
 
         if (edong == null)
             return;
@@ -110,65 +112,72 @@ public class PayPresenter implements IPayPresenter {
         if (typeSearch == null)
             return;
 
-        mIPayView.showRecyclerFragment();
+        try {
+            mIPayView.showRecyclerFragment();
 
-        this.mTypeSearch = typeSearch;
-        List<PayAdapter.DataAdapter> fitter = new ArrayList<>();
-        int indexBegin = 0;
-        int indexEnd = 0;
+            this.mTypeSearch = typeSearch;
+            List<PayAdapter.DataAdapter> fitter = new ArrayList<>();
+            int indexBegin = 0;
+            int indexEnd = 0;
 
-        if (pageIndex == PayFragment.FIRST_PAGE_INDEX) {
-            mAdapterList.clear();
-            int index = 0;
-            if (typeSearch == Common.TYPE_SEARCH.ALL)
-                for (; index < mDataCustomerBill.size(); index++) {
-                    mAdapterList.add(mDataCustomerBill.get(index).getInfoKH());
-                }
-            else
-                mAdapterList = mPayModel.getInforRowCustomerFitterBy(edong, typeSearch, infoSearch);
+            if (pageIndex == PayFragment.FIRST_PAGE_INDEX) {
+                mAdapterList.clear();
+                int index = 0;
+                if (typeSearch == Common.TYPE_SEARCH.ALL)
+                    for (; index < mDataCustomerBill.size(); index++) {
+                        mAdapterList.add(mDataCustomerBill.get(index).getInfoKH());
+                    }
+                else
+                    mAdapterList = mPayModel.getInforRowCustomerFitterBy(edong, typeSearch, infoSearch);
 
-            totalPage = mAdapterList.size() / ROWS_ON_PAGE + PAGE_INCREMENT;
+                totalPage = mAdapterList.size() / ROWS_ON_PAGE + PAGE_INCREMENT;
 
-            indexEnd = pageIndex * ROWS_ON_PAGE;
+                indexEnd = pageIndex * ROWS_ON_PAGE;
 
-            if (indexEnd > mAdapterList.size())
-                indexEnd = mAdapterList.size();
+                if (indexEnd > mAdapterList.size())
+                    indexEnd = mAdapterList.size();
 
-            fitter = mDataCustomerBill.subList(indexBegin, indexEnd);
+                fitter = mDataCustomerBill.subList(indexBegin, indexEnd);
 
-        } else {
-            if (pageIndex > totalPage)
-                return;
+            } else {
+                if (pageIndex > totalPage)
+                    return;
 
-            indexBegin = ROWS_ON_PAGE * (pageIndex - PAGE_INCREMENT);
-            indexEnd = ROWS_ON_PAGE * (pageIndex);
-            if (indexEnd > mAdapterList.size())
-                indexEnd = mAdapterList.size();
+                indexBegin = ROWS_ON_PAGE * (pageIndex - PAGE_INCREMENT);
+                indexEnd = ROWS_ON_PAGE * (pageIndex);
+                if (indexEnd > mAdapterList.size())
+                    indexEnd = mAdapterList.size();
 
-            int index = indexBegin;
-            int maxIndex = indexEnd;
+                int index = indexBegin;
+                int maxIndex = indexEnd;
 
-            fitter = mDataCustomerBill.subList(index, maxIndex);
+                fitter = mDataCustomerBill.subList(index, maxIndex);
+            }
+
+            listBillCheckedFragment = mPayModel.getAllBillOfCustomerCheckedWithStatusPay(edong, Common.STATUS_BILLING.CHUA_THANH_TOAN);
+            refreshTotalBillsAndTotalMoneyInFragment(edong, Common.STATUS_BILLING.CHUA_THANH_TOAN);
+
+            mIPayView.showPayRecyclerPage(fitter, indexBegin, indexEnd, pageIndex, totalPage, infoSearch, isSeachOnline);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
         }
-
-        listBillCheckedFragment = mPayModel.getAllBillOfCustomerCheckedWithStatusPay(edong, Common.STATUS_BILLING.CHUA_THANH_TOAN);
-        refreshTotalBillsAndTotalMoneyInFragment(edong, Common.STATUS_BILLING.CHUA_THANH_TOAN);
-
-        mIPayView.showPayRecyclerPage(fitter, indexBegin, indexEnd, pageIndex, totalPage, infoSearch, isSeachOnline);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void callSearchOnline(String mEdong, String infoSearch, boolean isReseach) {
+    public void callSearchOnline(String mEdong, String infoSearch, boolean isReseach) throws Exception{
         String textMessage = "";
         Context context = mIPayView.getContextView();
         Boolean isErr = false;
 
+        try {
+
         if (mEdong == null || mEdong.isEmpty() || mEdong.trim().equals("") && !isErr) {
-            return;
+            throw new Exception("Edong truyền vào khi search online rỗng");
         }
         if (infoSearch == null && !isErr) {
-            return;
+            throw new Exception("Thông tin search rỗng");
         }
 
         mIPayView.showSearchOnlineProcess();
@@ -194,7 +203,7 @@ public class PayPresenter implements IPayPresenter {
         try {
             configInfo = Common.setupInfoRequest(context, mEdong, Common.COMMAND_ID.CUSTOMER_BILL.toString(), versionApp);
         } catch (Exception e) {
-            mIPayView.showMessageNotifySearchOnline(textMessage, Common.TYPE_DIALOG.LOI);
+            mIPayView.showMessageNotifySearchOnline("Gặp vấn đề khi gửi yêu cầu search online tới máy chủ  ", Common.TYPE_DIALOG.LOI);
             return;
         }
 
@@ -221,7 +230,6 @@ public class PayPresenter implements IPayPresenter {
         if (jsonRequestSearchOnline == null)
             return;
 
-        try {
             if (soapSearchOnline == null) {
                 //if null then create new
                 soapSearchOnline = new SoapAPI.AsyncSoapSearchOnline(mTypeSearch, mEdong, infoSearch, soapSearchOnlineCallBack);
@@ -257,83 +265,91 @@ public class PayPresenter implements IPayPresenter {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void callPayingBillOnline(final String edong) {
-        if (totalBillsChooseDialog == 0) {
-            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10000.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
-            return;
-        }
-
-        //disable click checkbox list dialog
-        ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mIPayView.showPayRecyclerListBillsAndDisableCheckBox(listBillDialog, true);
+        try {
+            if (totalBillsChooseDialog == 0) {
+                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10000.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+                return;
             }
-        });
 
-        //totalBillsChooseDialog will minus - 1 change value when every billDeleteOnline is payed online
-        //totalBillsChooseDialogTemp to visible count billDeleteOnline paying succes and will be save value begin
-        totalBillsChooseDialogTemp = totalBillsChooseDialog;
+            //disable click checkbox list dialog
+            ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mIPayView.showPayRecyclerListBillsAndDisableCheckBox(listBillDialog, true);
+                }
+            });
 
-        mIPayView.showPayingRViewDialogStart();
+            //totalBillsChooseDialog will minus - 1 change value when every billDeleteOnline is payed online
+            //totalBillsChooseDialogTemp to visible count billDeleteOnline paying succes and will be save value begin
+            totalBillsChooseDialogTemp = totalBillsChooseDialog;
 
-        Context context = mIPayView.getContextView();
-        String versionApp = Common.getVersionApp(context);
+            mIPayView.showPayingRViewDialogStart();
 
-        int index = 0;
+            Context context = mIPayView.getContextView();
+            String versionApp = Common.getVersionApp(context);
 
-        //stop all thread
-        int maxIndex = billOnlineAsyncList.size();
+            int index = 0;
 
-        //start again count billDeleteOnline pay
-        countBillPayedSuccess = 0;
-        totalAmountBillPayedSuccess = 0;
+            //stop all thread
+            int maxIndex = billOnlineAsyncList.size();
 
-        for (; index < maxIndex; index++) {
-            SoapAPI.AsyncSoapBillOnline billOnline = billOnlineAsyncList.get(index);
-            billOnline.setEndCallSoap(true);
-            billOnline.getHandlerDelay().removeCallbacks(runnableCountTimeSearchOnline);
-            billOnline.cancel(true);
-        }
-        billOnlineAsyncList = new ArrayList<>();
+            //start again count billDeleteOnline pay
+            countBillPayedSuccess = 0;
+            totalAmountBillPayedSuccess = 0;
 
-        index = 0;
-        maxIndex = listBillDialog.size();
-        double amount = 0d;
-        for (; index < maxIndex; index++) {
-            PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
-            if (entity.isChecked())
-                amount += entity.getAmount();
-        }
+            for (; index < maxIndex; index++) {
+                SoapAPI.AsyncSoapBillOnline billOnline = billOnlineAsyncList.get(index);
+                billOnline.setEndCallSoap(true);
+                billOnline.getHandlerDelay().removeCallbacks(runnableCountTimeSearchOnline);
+                billOnline.cancel(true);
+            }
+            billOnlineAsyncList = new ArrayList<>();
 
-        //TODO FR 001.1 (Thanh toán online): Kiểm tra thông tin và thanh toán theo trình tự sau
-        //Kiểm tra số dư khả dụng của tài khoản thanh toán
-        if (mPayModel.selectBalance(edong) < amount) {
-            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e03.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
-            return;
-        }
+            index = 0;
+            maxIndex = listBillDialog.size();
 
-        //Kiểm tra trạng thái thanh toán của hóa đơn trong danh sách hóa đơn nợ đã lưu trong máy. Chỉ trạng thái payStatus trong bảng debt = 01 mới tiếp tục thanh toán
-        /**
-         * 01_Chưa thanh toán
-         * 02_Đã thanh toán
-         * 03_Đã thanh toán bởi nguồn khác
-         * 04_Đã thanh toán bởi số ví khác
-         */
+            //TODO FR 001.1 (Thanh toán online): Kiểm tra thông tin và thanh toán theo trình tự sau
+            /**
+             * Kiểm tra số dư khả dụng tài khoản >= Tổng số tiền thanh toán. Nếu không thỏa mãn hiển thị thông báo như sau:
+             * Số dư không đủ thanh toán
+             */
 
-        /**
-         * Lấy list hóa đơn lỗi và lọc ra không khởi động thread thanh toán hóa đơn đó
-         */
-        boolean[] errorBills = new boolean[listBillDialog.size()];
-        index = 0;
-        maxIndex = listBillDialog.size();
-        for (; index < maxIndex; index++) {
-            PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
+            /**
+             * Lấy list hóa đơn lỗi và lọc ra không khởi động thread thanh toán hóa đơn đó
+             */
+            boolean[] errorBills = new boolean[listBillDialog.size()];
+            index = 0;
+            double totalAmount = 0;
+            for (; index < maxIndex; index++) {
+                PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
 
-            int payStatusDebt = mPayModel.checkPayStatusDebt(edong, entity.getCode(), entity.getBillId());
-            if (payStatusDebt != Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode() || payStatusDebt == ERROR_OCCUR) {
-                errorBills[index] = true;
-                String messageError = Common.CODE_REPONSE_BILL_ONLINE.ex10009.getMessage();
-                listBillDialog.get(index).setMessageError(messageError);
+                if (entity.isChecked() && !errorBills[index])
+                    totalAmount += entity.getAmount();
+            }
+
+            if (mPayModel.selectBalance(edong) > totalAmount) {
+                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e03.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+                return;
+            }
+            //Kiểm tra trạng thái thanh toán của hóa đơn trong danh sách hóa đơn nợ đã lưu trong máy. Chỉ trạng thái payStatus trong bảng debt = 01 mới tiếp tục thanh toán
+            /**
+             * 01_Chưa thanh toán
+             * 02_Đã thanh toán
+             * 03_Đã thanh toán bởi nguồn khác
+             * 04_Đã thanh toán bởi số ví khác
+             */
+
+
+            index = 0;
+            maxIndex = listBillDialog.size();
+            for (; index < maxIndex; index++) {
+                PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
+
+                int payStatusDebt = mPayModel.checkPayStatusDebt(edong, entity.getCode(), entity.getBillId());
+                if (payStatusDebt != Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode() || payStatusDebt == ERROR_OCCUR) {
+                    errorBills[index] = true;
+                    String messageError = Common.CODE_REPONSE_BILL_ONLINE.ex10009.getMessage();
+                    listBillDialog.get(index).setMessageError(messageError);
 
                /*
   final int positionIndex = index;
@@ -357,25 +373,21 @@ public class PayPresenter implements IPayPresenter {
                 Log.e(TAG, "callPayingBillOnline: Hóa đơn không có trong danh sách thu");
                 break;
             }*/
+                }
+            }
+            //TODO Khởi động quá trình thanh toán online
+            index = 0;
+            for (; index < maxIndex; index++) {
+                PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
 
-
+                if (entity.isChecked() && !errorBills[index])
+//                callAPICheckTransAndRequestPayingBill(versionApp, edong, entity);
+                    payOnlineTheBill(versionApp, edong, entity, index);
             }
 
-        }
-        //TODO Khởi động quá trình thanh toán online
-        /**
-         * Quá trình này thực chất gồm 2 giai đoạn (trong SRS chỉ mô tả chung yêu cầu gồm cả 2
-         * Kiểm tra trạng thái hóa đơn hiện tại (gọi API Check-Trains)
-         *
-         */
-
-        index = 0;
-        for (; index < maxIndex; index++) {
-            PayBillsDialogAdapter.Entity entity = listBillDialog.get(index);
-
-            if (entity.isChecked() && !errorBills[index])
-//                callAPICheckTransAndRequestPayingBill(versionApp, edong, entity);
-                payOnlineTheBill(versionApp, edong, entity, index);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -760,15 +772,16 @@ public class PayPresenter implements IPayPresenter {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void payOnlineTheBill(String versionApp, String edong, PayBillsDialogAdapter.Entity entity, final int position) {
+    private void payOnlineTheBill(String versionApp, String edong, PayBillsDialogAdapter.Entity entity, final int position) throws Exception{
+
         ConfigInfo configInfo = null;
         try {
             configInfo = Common.setupInfoRequest(mIPayView.getContextView(), edong, Common.COMMAND_ID.BILLING.toString(), versionApp);
         } catch (Exception e) {
             listBillDialog.get(position).setMessageError(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
-            return;
+            throw e;
         }
-
+        try {
         //delete all message Error fill in listBillDialog and refreshData
         int index = 0;
         int maxIndex = listBillDialog.size();
@@ -867,7 +880,6 @@ public class PayPresenter implements IPayPresenter {
                 Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy), Common.TRADING_CODE.DAY_CHAM_NO.getCode());
         Log.d(TAG, "rowAffect updateBillHistoryWith = " + rowAffect);
 
-        try {
             //get position stack of  List<SoapAPI.AsyncSoapBillOnline> asyntask object
             final int positionIndex = billOnlineAsyncList.size();
 
@@ -930,13 +942,18 @@ public class PayPresenter implements IPayPresenter {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void reseachOnline(String edong) {
-        cancelSeachOnline();
-        if (soapSearchOnline != null) {
-            mIPayView.showEditTextSearch(soapSearchOnline.getInfoSearch());
-            callSearchOnline(edong, soapSearchOnline.getInfoSearch(), true);
-        } else {
-            mIPayView.showMessageNotifySearchOnline(Common.CODE_REPONSE_SEARCH_ONLINE.e9999.getMessage(), Common.TYPE_DIALOG.LOI);
-            Log.e(TAG, "reseachOnline: soapSearchOnline không được khởi tạo");
+        try {
+            cancelSeachOnline();
+            if (soapSearchOnline != null) {
+                mIPayView.showEditTextSearch(soapSearchOnline.getInfoSearch());
+                callSearchOnline(edong, soapSearchOnline.getInfoSearch(), true);
+            } else {
+                mIPayView.showMessageNotifySearchOnline(Common.CODE_REPONSE_SEARCH_ONLINE.e9999.getMessage(), Common.TYPE_DIALOG.LOI);
+                Log.e(TAG, "reseachOnline: soapSearchOnline không được khởi tạo");
+            }
+        }catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -1060,53 +1077,68 @@ public class PayPresenter implements IPayPresenter {
                 return;
             }
 
-            Common.CODE_REPONSE_SEARCH_ONLINE codeResponse = Common.CODE_REPONSE_SEARCH_ONLINE.findCodeMessage(response.getFooterSearchOnlineResponse().getResponseCode());
-            if (codeResponse != Common.CODE_REPONSE_SEARCH_ONLINE.e000) {
-                mIPayView.showMessageNotifySearchOnline(codeResponse.getMessage(), Common.TYPE_DIALOG.LOI);
-                return;
-            }
-
-            //get responseLoginResponse from body response
-            //because server return string not object
-            String customerData = response.getBodySearchOnlineResponse().getCustomer();
-
-            // định dạng kiểu Object JSON
-            CustomerInsideBody customerResponse = null;
             try {
-                customerResponse = new Gson().fromJson(customerData, CustomerInsideBody.class);
-            } catch (JsonSyntaxException e) {
+                Common.CODE_REPONSE_SEARCH_ONLINE codeResponse = Common.CODE_REPONSE_SEARCH_ONLINE.findCodeMessage(response.getFooterSearchOnlineResponse().getResponseCode());
+                if (codeResponse != Common.CODE_REPONSE_SEARCH_ONLINE.e000) {
+                    mIPayView.showMessageNotifySearchOnline(codeResponse.getMessage(), Common.TYPE_DIALOG.LOI);
+                    return;
+                }
+
+                //get responseLoginResponse from body response
+                //because server return string not object
+                String customerData = response.getBodySearchOnlineResponse().getCustomer();
+
+                // định dạng kiểu Object JSON
+                CustomerInsideBody customerResponse = null;
+                try {
+                    customerResponse = new Gson().fromJson(customerData, CustomerInsideBody.class);
+                } catch (JsonSyntaxException e) {
+                    e.printStackTrace();
+                }
+
+                if (customerResponse == null)
+                    return;
+
+                int rowEffect = mPayModel.writeSQLiteCustomerTableFromSearchOnline(edong, customerResponse);
+                if (rowEffect == ERROR_OCCUR) {
+                    Log.d(TAG, "Cannot insert customer to database.");
+                }
+
+                List<BillInsideCustomer> listBill = customerResponse.getListBill();
+                if (listBill == null)
+                    return;
+                int index = 0;
+                int indexMax = listBill.size();
+                boolean isOccurInsertBill = false;
+
+                for (; index < indexMax; index++) {
+                    rowEffect = mPayModel.writeSQliteBillTableOfCustomer(edong, listBill.get(index));
+
+                    if (rowEffect == ERROR_OCCUR) {
+                        isOccurInsertBill = true;
+                    }
+                }
+
+                if (isOccurInsertBill) {
+                    Log.d(TAG, "Has several billDeleteOnline of customer cannot insert to database.");
+                }
+
+                mIPayView.hideSearchOnlineProcess();
+                ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            callPayRecycler(edong, PayFragment.FIRST_PAGE_INDEX, mTypeSearch, infoSearch, false);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+            }catch (Exception e)
+            {
                 e.printStackTrace();
             }
-
-            if (customerResponse == null)
-                return;
-
-            int rowEffect = mPayModel.writeSQLiteCustomerTableFromSearchOnline(edong, customerResponse);
-            if (rowEffect == ERROR_OCCUR) {
-                Log.d(TAG, "Cannot insert customer to database.");
-            }
-
-            List<BillInsideCustomer> listBill = customerResponse.getListBill();
-            if (listBill == null)
-                return;
-            int index = 0;
-            int indexMax = listBill.size();
-            boolean isOccurInsertBill = false;
-
-            for (; index < indexMax; index++) {
-                rowEffect = mPayModel.writeSQliteBillTableOfCustomer(edong, listBill.get(index));
-
-                if (rowEffect == ERROR_OCCUR) {
-                    isOccurInsertBill = true;
-                }
-            }
-
-            if (isOccurInsertBill) {
-                Log.d(TAG, "Has several billDeleteOnline of customer cannot insert to database.");
-            }
-
-            mIPayView.hideSearchOnlineProcess();
-            callPayRecycler(edong, PayFragment.FIRST_PAGE_INDEX, mTypeSearch, infoSearch, false);
         }
 
         @Override
@@ -1540,7 +1572,6 @@ public class PayPresenter implements IPayPresenter {
             mIPayView.showPayingRViewDialogStart();
 
             //check wifi
-            boolean isHasWifi = Common.isConnectingWifi(mIPayView.getContextView());
             boolean isHasNetwork = Common.isNetworkConnected(mIPayView.getContextView());
 
 //            if (!isHasWifi) {
@@ -1563,46 +1594,52 @@ public class PayPresenter implements IPayPresenter {
             if (message == null || message.isEmpty() || message.trim().equals(""))
                 return;
 
-            /**
-             * Các trường hợp không nhận được kết quả trả về từ Server
-             * Connection Reset: Client gửi giao dịch lên Server vào đúng thời điểm Server khởi động lại
-             * Connection Refused: Client gửi giao dịch lên Server vào đúng thời điểm Service bị dừng hoạt dộng
-             * Connection Timeout: Client gửi giao dịch lên Server nhưng không nhận được kết quả trả lời của Server
-             */
+            try {
 
-            processCasePayedBySupected(null, positionIndex, edong, entity);
+                /**
+                 * Các trường hợp không nhận được kết quả trả về từ Server
+                 * Connection Reset: Client gửi giao dịch lên Server vào đúng thời điểm Server khởi động lại
+                 * Connection Refused: Client gửi giao dịch lên Server vào đúng thời điểm Service bị dừng hoạt dộng
+                 * Connection Timeout: Client gửi giao dịch lên Server nhưng không nhận được kết quả trả lời của Server
+                 */
 
-            //update text count billDeleteOnline payed success
-            countBillPayedSuccess++;
-            totalAmountBillPayedSuccess += entity.getAmount();
-            /**
-             * Hiển thị thông tin thanh toán thành công lên màn hình
-             * Số hóa đơn = số hóa đơn thanh toán thành công
-             * Tổng tiền = tổng tiền của các hóa đơn thanh toán thành công
-             */
-            boolean isFinishAllThread = checkIsAllThreadFinish();
-            if (isFinishAllThread) {
-                mIPayView.hidePayingRViewDialog();
-                String messageNotify = Common.CODE_REPONSE_BILL_ONLINE.getMessageSuccess(countBillPayedSuccess, totalAmountBillPayedSuccess);
-                mIPayView.showMessageNotifyBillOnlineDialog(messageNotify, false, Common.TYPE_DIALOG.THANH_CONG, true);
-            }
+                processCasePayedBySupected(null, positionIndex, edong, entity);
 
-            /**
-             * Gửi yêu cầu cập nhật thông tin tài khoản ví TNV
-             */
+                //update text count billDeleteOnline payed success
+                countBillPayedSuccess++;
+                totalAmountBillPayedSuccess += entity.getAmount();
+                /**
+                 * Hiển thị thông tin thanh toán thành công lên màn hình
+                 * Số hóa đơn = số hóa đơn thanh toán thành công
+                 * Tổng tiền = tổng tiền của các hóa đơn thanh toán thành công
+                 */
+                boolean isFinishAllThread = checkIsAllThreadFinish();
+                if (isFinishAllThread) {
+                    mIPayView.hidePayingRViewDialog();
+                    String messageNotify = Common.CODE_REPONSE_BILL_ONLINE.getMessageSuccess(countBillPayedSuccess, totalAmountBillPayedSuccess);
+                    mIPayView.showMessageNotifyBillOnlineDialog(messageNotify, false, Common.TYPE_DIALOG.THANH_CONG, true);
+                }
 
-            callAPIUpdateEdongAccount(edong, entity, positionIndex);
+                /**
+                 * Gửi yêu cầu cập nhật thông tin tài khoản ví TNV
+                 */
 
-            ((MainActivity) mIPayView.getContextView()).runOnUiThread(
-                    new Runnable() {
-                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                        @Override
-                        public void run() {
-                            totalBillsChooseDialog--;
-                            refreshStatusPaySuccessDialog(edong);
+                callAPIUpdateEdongAccount(edong, entity, positionIndex);
+
+                ((MainActivity) mIPayView.getContextView()).runOnUiThread(
+                        new Runnable() {
+                            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                            @Override
+                            public void run() {
+                                totalBillsChooseDialog--;
+                                refreshStatusPaySuccessDialog(edong);
+                            }
                         }
-                    }
-            );
+                );
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
 
         @Override

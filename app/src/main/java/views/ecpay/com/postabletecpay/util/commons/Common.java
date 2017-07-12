@@ -636,10 +636,10 @@ public class Common {
                 return "Kiểm tra kết nối internet của wifi!";
 
             if (LOGIN_ERR_USER == this)
-                return "Tên đăng nhập là chữ thường, chữ hoa, các kí tự đặc biệt, từ 6 tới 18 kí tự và không để trống!";
+                return "Tên đăng nhập là chữ thường, chữ hoa, các kí tự đặc biệt, dưới 8 kí tự và không để trống!";
 
             if (LOGIN_ERR_PASS == this)
-                return "Mật khẩu là chữ thường, chữ hoa, các kí tự đặc biệt, từ 6 tới 18 kí tự và không để trống!";
+                return "Mật khẩu là chữ thường, chữ hoa, các kí tự đặc biệt, dưới 8 kí tự và không để trống!";
 
             if (ERR_CREATE_FOLDER == this)
                 return "Xảy ra vấn đề khi tạo thư mục chứa tài nguyên trên SDCard!";
@@ -666,13 +666,13 @@ public class Common {
                 return "Quá thời gian kết nối cho phép tới máy chủ " + TIME_OUT_CONNECT / 1000 + " s";
 
             if (CHANGE_PASS_ERR_PASS_OLD == this)
-                return "Mật khẩu cũ không hợp lệ, số kí tự giới hạn từ 6 tới 18 kí tự!";
+                return "Mật khẩu cũ không hợp lệ, giới hạn 8 kí tự!";
 
             if (CHANGE_PASS_ERR_PASS_NEW == this)
-                return "Mật khẩu mới không hợp lệ, số kí tự giới hạn từ 6 tới 18 kí tự!";
+                return "Mật khẩu mới không hợp lệ, giới hạn 8 kí tự!";
 
             if (CHANGE_PASS_ERR_PASS_RETYPE == this)
-                return "Mật khẩu mới nhập lại không hợp lệ, số kí tự giới hạn từ 6 tới 18 kí tự!";
+                return "Mật khẩu mới nhập lại không hợp lệ, giới hạn 8 kí tự!";
 
             if (CHANGE_PASS_ERR_PASS_NEW_NOT_EQUAL_PASS_OLD == this)
                 return "Mật khẩu mới không trùng với mật khẩu cũ!";
@@ -1269,8 +1269,14 @@ public class Common {
         if (!isExternalStorageWritable())
             return null;
 
+        File folderRoot = new File(PATH_FOLDER_ROOT);
+        if (!folderRoot.isDirectory()) {
+            folderRoot.mkdir();
+        }
+
+
         File folderLog = new File(PATH_FOLDER_LOG);
-        if (!folderLog.exists()) {
+        if (!folderLog.isDirectory()) {
             folderLog.mkdir();
         }
 
@@ -1293,6 +1299,15 @@ public class Common {
             return;
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            // Load root folder
+            File rootFolder = new File(Common.PATH_FOLDER_ROOT);
+            String[] allFilesRoot = rootFolder.list();
+            for (int i = 0; i < allFilesRoot.length; i++) {
+                allFilesRoot[i] = Common.PATH_FOLDER_ROOT + allFilesRoot[i];
+            }
+            if (allFilesRoot != null)
+                scanFile(ctx, allFilesRoot);
+
             // Load config folder
             File file_config = new File(Common.PATH_FOLDER_CONFIG);
             String[] allFilesConfig = file_config.list();
@@ -1323,10 +1338,10 @@ public class Common {
 
 
             // Load log folder
-            File fileLog = new File(Common.PATH_FOLDER_HELP);
+            File fileLog = new File(Common.PATH_FOLDER_LOG);
             String[] allFilesLog = fileLog.list();
             for (int i = 0; i < allFilesLog.length; i++) {
-                allFilesLog[i] = Common.PATH_FOLDER_HELP + allFilesLog[i];
+                allFilesLog[i] = Common.PATH_FOLDER_LOG + allFilesLog[i];
             }
             if (allFilesLog != null)
                 scanFile(ctx, allFilesLog);
@@ -1642,8 +1657,8 @@ public class Common {
     //endregion
 
     //region method process ecrypt and decrypt data
-    public static int MAX_LENGTH = 18;
-    public static int MIN_LENGTH = 6;
+    public static int MAX_LENGTH = 8;
+    public static int MIN_LENGTH = 1;
 
     public static int LENGTH_PASS = 8;
 

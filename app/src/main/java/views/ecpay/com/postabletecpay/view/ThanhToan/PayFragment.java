@@ -154,9 +154,9 @@ public class PayFragment extends Fragment implements
     @Nullable
     @BindView(R.id.tv_diaglog_thanhtoan_message)
     TextView tvMessageDialog;
-   /* @Nullable
-    @BindView(R.id.tv_diaglog_thanhtoan_count_bill_payed)
-    TextView tvCountBillPayedSuccessDialog;*/
+    /* @Nullable
+     @BindView(R.id.tv_diaglog_thanhtoan_count_bill_payed)
+     TextView tvCountBillPayedSuccessDialog;*/
     @Nullable
     @BindView(R.id.pbar_diaglog_thanhtoan)
     ProgressBar pbarDialogBilling;
@@ -318,7 +318,11 @@ public class PayFragment extends Fragment implements
         //first page
         typeSearch = Common.TYPE_SEARCH.ALL;
         mPageIndex = FIRST_PAGE_INDEX;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        try {
+            mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return rootView;
     }
 
@@ -348,11 +352,17 @@ public class PayFragment extends Fragment implements
     @Optional
     @OnClick(R.id.btn_frag_thanh_toan_next)
     public void clickNext(View view) {
-        if (payAdapter == null)
-            return;
+        try {
+            if (payAdapter == null)
+                return;
 
-        mPageIndex += PAGE_INCREMENT;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+            mPageIndex += PAGE_INCREMENT;
+            mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Optional
@@ -362,7 +372,11 @@ public class PayFragment extends Fragment implements
             return;
 
         mPageIndex -= PAGE_INCREMENT;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        try {
+            mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Optional
@@ -416,7 +430,11 @@ public class PayFragment extends Fragment implements
     @Optional
     @OnClick(R.id.ibtn_frag_thanhtoan_back)
     public void clickBack(View view) {
-        listener.showMainPageFragment();
+        try {
+            listener.showMainPageFragment();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //endregion
@@ -501,7 +519,11 @@ public class PayFragment extends Fragment implements
 //        boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
 //        if (isSeachOnline)
 //            return;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString().trim(), false);
+        try {
+            mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString().trim(), false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean checkUserNeedSearchOnline(String infoSearch) {
@@ -521,26 +543,31 @@ public class PayFragment extends Fragment implements
         } else {
             tabLayout.setVisibility(View.GONE);
         }
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        try {
+            mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Optional
     @OnTextChanged(R.id.et_frag_thanh_toan_search)
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        //first page
-        mPageIndex = FIRST_PAGE_INDEX;
-        boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
+        try {
+            //first page
+            mPageIndex = FIRST_PAGE_INDEX;
+            boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
 
-        if (isSeachOnline) {
-            typeSearch = Common.TYPE_SEARCH.MA_KH_SO_THE;
-            mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), isSeachOnline);
-            this.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    viewPager.setCurrentItem(typeSearch.getPosition());
-                    tabLayout.setupWithViewPager(viewPager);
-                }
-            });
+            if (isSeachOnline) {
+                typeSearch = Common.TYPE_SEARCH.MA_KH_SO_THE;
+                mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), isSeachOnline);
+                this.getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        viewPager.setCurrentItem(typeSearch.getPosition());
+                        tabLayout.setupWithViewPager(viewPager);
+                    }
+                });
 
 //            etSearch.post(new Runnable() {
 //                @Override
@@ -548,10 +575,13 @@ public class PayFragment extends Fragment implements
 //                    etSearch.setHint(etSearch.getText().toString().concat(Common.TEXT_MULTI_SPACE).concat(Common.TEXT_SEARCHING));
 //                }
 //            });
-        } else {
-            if (typeSearch != Common.TYPE_SEARCH.ALL)
-                mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), isSeachOnline);
-            hideSearchOnlineProcess();
+            } else {
+                if (typeSearch != Common.TYPE_SEARCH.ALL)
+                    mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), isSeachOnline);
+                hideSearchOnlineProcess();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -592,43 +622,48 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
-    public void showPayRecyclerPage(List<PayAdapter.DataAdapter> adapterList, int indexBegin, int indexEnd, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) {
-        btnPre.setEnabled(true);
-        btnNext.setEnabled(true);
-        tvPage.setText(String.valueOf(pageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
+    public void showPayRecyclerPage(List<PayAdapter.DataAdapter> adapterList, int indexBegin, int indexEnd, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) throws Exception{
+        try {
+            btnPre.setEnabled(true);
+            btnNext.setEnabled(true);
+            tvPage.setText(String.valueOf(pageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
 
-        //enable disable button pre next
-        if (pageIndex == FIRST_PAGE_INDEX) {
-            setEnablePreNext(1);
-            if (FIRST_PAGE_INDEX == totalPage)
-                setEnablePreNext(0);
-            else
+            //enable disable button pre next
+            if (pageIndex == FIRST_PAGE_INDEX) {
                 setEnablePreNext(1);
-        } else if (pageIndex == totalPage) {
-            if (totalPage == FIRST_PAGE_INDEX)
-                setEnablePreNext(0);
-            else
-                setEnablePreNext(2);
-        } else
-            setEnablePreNext(3);
+                if (FIRST_PAGE_INDEX == totalPage)
+                    setEnablePreNext(0);
+                else
+                    setEnablePreNext(1);
+            } else if (pageIndex == totalPage) {
+                if (totalPage == FIRST_PAGE_INDEX)
+                    setEnablePreNext(0);
+                else
+                    setEnablePreNext(2);
+            } else
+                setEnablePreNext(3);
 
 
-        if (payAdapter != null) {
-            rvKH.removeAllViews();
+            if (payAdapter != null) {
+                rvKH.removeAllViews();
+            }
+            payAdapter = new PayAdapter(this.getContext(), this, adapterList, indexBegin, indexEnd);
+            rvKH.setAdapter(payAdapter);
+            rvKH.setLayoutManager(new LinearLayoutManager(getContext()));
+            rvKH.setHasFixedSize(true);
+            rvKH.invalidate();
+
+            if (adapterList.size() == ZERO) {
+                showTextNoData();
+            }
+            //if isSeachOnline
+            if (isSeachOnline == false || infoSearch == null)
+                return;
+            mIPayPresenter.callSearchOnline(mEdong, infoSearch, true);
+        }catch (Exception e)
+        {
+            throw e;
         }
-        payAdapter = new PayAdapter(this.getContext(), this, adapterList, indexBegin, indexEnd);
-        rvKH.setAdapter(payAdapter);
-        rvKH.setLayoutManager(new LinearLayoutManager(getContext()));
-        rvKH.setHasFixedSize(true);
-        rvKH.invalidate();
-
-        if (adapterList.size() == ZERO) {
-            showTextNoData();
-        }
-        //if isSeachOnline
-        if (isSeachOnline == false || infoSearch == null)
-            return;
-        mIPayPresenter.callSearchOnline(mEdong, infoSearch, true);
     }
 
     @Override
@@ -1214,7 +1249,11 @@ public class PayFragment extends Fragment implements
     }
 
     public void refreshRecyclerListFragment() {
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        try {
+            mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void setUpRecyclerFragment(final View view) {

@@ -10,14 +10,14 @@
 
     <LinearLayout
         android:id="@+id/ll_navigation"
-        android:background="@color/colorLightGray"
+        android:background="@color/colorTextWhite"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_60sdp">
+        android:layout_height="@dimen/_40sdp">
         <android.support.design.widget.BottomNavigationView
             android:id="@+id/navigation_ac_main"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="@dimen/_40sdp"
             app:itemBackground="@android:color/transparent"
             app:menu="@menu/navigation"/>
     </LinearLayout>

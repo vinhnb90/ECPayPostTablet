@@ -18,15 +18,16 @@
             android:checked="false"
             android:id="@+id/cb_row_bill_inside_pay"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="@dimen/_18sdp"
+            />
 
         <TextView
             android:id="@+id/tv_row_bill_inside_pay_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/_15sdp"
-            android:layout_marginRight="@dimen/_15sdp"
-            android:textSize="@dimen/_12sdp"
+            android:layout_marginLeft="@dimen/_2sdp"
+            android:layout_marginRight="@dimen/_2sdp"
+            android:textSize="@dimen/_9sdp"
             android:text="03/2017" />
 
         <TextView
@@ -36,7 +37,7 @@
             android:gravity="center_horizontal"
             android:lines="1"
             android:scrollHorizontally="true"
-            android:textSize="@dimen/_12sdp"
+            android:textSize="@dimen/_9sdp"
             android:text="2500000" />
 
     </LinearLayout>
@@ -50,21 +51,23 @@
         android:gravity="center_vertical">
 
         <ImageButton
+            android:layout_marginTop="@dimen/_3sdp"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
+            android:layout_marginRight="@dimen/_4sdp"
             android:id="@+id/btn_row_bill_inside_pay_delete"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="@dimen/_8sdp"
             android:background="@android:color/transparent"
             android:elevation="@dimen/_5sdp"
             app:srcCompat="@drawable/ic_delete" />
 
         <ImageButton
             android:id="@+id/btn_row_bill_inside_pay_print"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:layout_alignBaseline="@+id/btn_row_bill_inside_pay_delete"
+            android:layout_marginTop="@dimen/_3sdp"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
             android:layout_marginRight="@dimen/_8sdp"
+            android:layout_alignBaseline="@+id/btn_row_bill_inside_pay_delete"
             android:layout_toLeftOf="@+id/btn_row_bill_inside_pay_delete"
             android:background="@android:color/transparent"
             app:srcCompat="@drawable/ic_print" />
@@ -76,8 +79,8 @@
             android:layout_height="match_parent"
             android:layout_alignBaseline="@+id/btn_row_bill_inside_pay_delete"
             android:layout_alignParentLeft="true"
-            android:layout_marginRight="@dimen/_8sdp"
-            android:textSize="@dimen/_12sdp"
+            android:layout_marginRight="@dimen/_2sdp"
+            android:textSize="@dimen/_9sdp"
             android:layout_toLeftOf="@+id/btn_row_bill_inside_pay_print"
             android:gravity="center_horizontal|center_vertical"
             android:text="Đã thanh toán"

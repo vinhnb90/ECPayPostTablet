@@ -23,7 +23,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="@dimen/_40sdp"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:orientation="horizontal">
@@ -43,6 +43,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/_35sdp"
                     android:gravity="center"
+                    android:textStyle="bold"
                     android:text="ĐỔI MẬT KHẨU"
                     android:textColor="@color/colorTextWhite"
                     android:textSize="@dimen/_16sdp" />
@@ -103,8 +104,8 @@
             android:drawableLeft="@mipmap/ic_tick"
             android:hint="Mật khẩu cũ"
             android:inputType="textPassword"
-            android:maxLength="18"
-            android:textSize="@dimen/_13sdp" />
+            android:maxLength="8"
+            android:textSize="@dimen/_10sdp" />
 
         <EditText
             android:id="@+id/etMatKhauMoi"
@@ -116,8 +117,8 @@
             android:drawableLeft="@mipmap/ic_matkhau"
             android:hint="Mật khẩu mới"
             android:inputType="textPassword"
-            android:maxLength="18"
-            android:textSize="@dimen/_13sdp" />
+            android:maxLength="8"
+            android:textSize="@dimen/_10sdp" />
 
         <EditText
             android:id="@+id/etNhapLaiMatKhauMoi"
@@ -130,8 +131,8 @@
             android:hint="Nhập lại mật khẩu mới"
             android:imeOptions="actionDone"
             android:inputType="textPassword"
-            android:maxLength="18"
-            android:textSize="@dimen/_13sdp" />
+            android:maxLength="8"
+            android:textSize="@dimen/_10sdp" />
     </LinearLayout>
 
     <LinearLayout
@@ -160,8 +161,8 @@
             android:id="@+id/ll_ac_dangnhap_login"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginBottom="@dimen/_10sdp"
-            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_5sdp"
             android:layout_weight="1"
             android:orientation="vertical"
             android:weightSum="1">
@@ -174,7 +175,7 @@
                 android:background="@drawable/bg_button"
                 android:text="Đổi mật khẩu"
                 android:textColor="@color/colorTextWhite"
-                android:textSize="@dimen/_13sdp"
+                android:textSize="@dimen/_12sdp"
                 android:textStyle="bold"
                 android:visibility="visible" />
 

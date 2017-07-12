@@ -552,7 +552,6 @@ public class SoapAPI {
         return jsonResult;
     }
 
-
     //region create JSON Request service
     public static String getJsonSyncPC(String agent, String agentEncypted, String commandId, long auditNumber, String mac, String diskDriver, String signatureEncrypted, String edong, String accountId) {
         if (agent == null || agent.isEmpty() || agent.trim().equals(""))
@@ -1281,7 +1280,6 @@ public class SoapAPI {
         }
     }
 
-
     public static class AsyncSoapCashTranfer extends AsyncTask<String, String, CashTranferRespone> {
 
         //request action to eStore
@@ -1523,7 +1521,6 @@ public class SoapAPI {
             isEndCallSoap = endCallSoap;
         }
     }
-
 
     public static class AsyncSoapSearchCustomer extends AsyncTask<String, String, SearchCustomerRespone> {
 
@@ -1863,7 +1860,6 @@ public class SoapAPI {
             isEndCallSoap = endCallSoap;
         }
     }
-
 
     public static class AsyncSoapSearchOnline extends AsyncTask<String, String, SearchOnlineResponse> {
 

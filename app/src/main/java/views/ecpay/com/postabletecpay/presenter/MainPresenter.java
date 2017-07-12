@@ -86,22 +86,16 @@ public class MainPresenter implements IMainPresenter {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void synchronizePC() {
+    public void synchronizePC() throws Exception{
         String textMessage = "";
         Context context = mIMainView.getContextView();
         Boolean isErr = false;
-
-//        if (!Common.isConnectingWifi(context) && !isErr) {
-//            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
-//            isErr = true;
-//        }
         if (!Common.isNetworkConnected(context) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
             isErr = true;
         }
         if (isErr) {
-            mIMainView.showTextMessage(textMessage);
-            return;
+            throw new Exception(textMessage);
         }
 
         ConfigInfo configInfo;
@@ -110,14 +104,13 @@ public class MainPresenter implements IMainPresenter {
             versionApp = mIMainView.getContextView().getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            throw e;
         }
 
         try {
             configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER.toString(), versionApp);
         } catch (Exception e) {
-            mIMainView.showTextMessage(e.getMessage());
-            return;
+            throw e;
         }
 
         String jsonRequestEVN = SoapAPI.getJsonSyncPC(
@@ -162,8 +155,7 @@ public class MainPresenter implements IMainPresenter {
                     soapevnThread.start();
                 }
             } catch (Exception e) {
-                mIMainView.showTextMessage(e.getMessage());
-                return;
+                throw e;
             }
 
         }

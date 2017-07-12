@@ -13,9 +13,11 @@
 
         <ImageButton
             android:id="@+id/btnBack1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_5sdp"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/_8sdp"
             android:background="@null"
             android:src="@mipmap/ic_back" />
 
@@ -27,6 +29,7 @@
             android:layout_margin="@dimen/_10sdp"
             android:text="CHUYỂN TIỀN VÍ TỔNG"
             android:textColor="@color/colorTextWhite"
+            android:textStyle="bold"
             android:textSize="@dimen/_16sdp" />
 
     </RelativeLayout>

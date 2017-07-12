@@ -48,41 +48,44 @@
         android:text="Tài khoản hoặc mật khẩu không chính xác"
         android:textColor="@color/colorRed"
         android:textStyle="italic"
-        android:visibility="visible" />
+        android:visibility="invisible" />
 
     <EditText
         android:id="@+id/etTaiKhoan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_ac_login_message"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginBottom="@dimen/_5sdp"
+        android:layout_marginLeft="@dimen/_5sdp"
+        android:layout_marginRight="@dimen/_5sdp"
+        android:textSize="@dimen/_10sdp"
         android:drawableLeft="@mipmap/ic_taikhoan"
         android:hint="Số tài khoản"
         android:inputType="textNoSuggestions|textVisiblePassword"
-        android:padding="5dp" />
+        android:padding="@dimen/_2sdp" />
 
     <EditText
+        android:layout_marginBottom="@dimen/_5sdp"
+        android:layout_marginLeft="@dimen/_5sdp"
+        android:layout_marginRight="@dimen/_5sdp"
+        android:textSize="@dimen/_10sdp"
         android:id="@+id/etMatKhau"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/etTaiKhoan"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
         android:drawableLeft="@mipmap/ic_matkhau"
         android:hint="Mật khẩu"
         android:inputType="textPassword"
-        android:padding="5dp" />
+        android:padding="@dimen/_5sdp" />
 
     <CheckBox
+        android:layout_marginBottom="@dimen/_5sdp"
+        android:layout_marginLeft="@dimen/_5sdp"
+        android:layout_marginRight="@dimen/_5sdp"
         android:id="@+id/cb_ac_login_save_info_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/etMatKhau"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="20dp"
         android:text="Nhớ mật khẩu"
         android:textColor="@color/colorGray" />
 
@@ -91,9 +94,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/cb_ac_login_save_info_login"
-        android:layout_marginBottom="80dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginBottom="@dimen/_5sdp"
+        android:layout_marginLeft="@dimen/_5sdp"
+        android:layout_marginRight="@dimen/_5sdp"
         android:background="@drawable/bg_button"
         android:orientation="vertical">
 
@@ -112,7 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/pbar_cricle"
-            android:visibility="visible" />
+            android:visibility="gone" />
     </LinearLayout>
 
 </RelativeLayout>
