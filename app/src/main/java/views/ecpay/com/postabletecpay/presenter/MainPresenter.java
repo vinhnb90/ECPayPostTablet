@@ -22,15 +22,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.MainModel;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
-import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
-import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.ListTransactionOff;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.TransactionOffItem;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
@@ -41,8 +39,6 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPC
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.FileGenResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListBillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListCustomerResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityPostBill.PostBillResponse;
-import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.Main.IMainView;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
@@ -456,20 +452,14 @@ public class MainPresenter implements IMainPresenter {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void postBill() {
+    public void checkAndPostBill() {
 
-        String textMessage = "";
-        Context context = mIMainView.getContextView();
-        Boolean isErr = false;
-
-        if (!Common.isNetworkConnected(context) && !isErr) {
-            textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
-            isErr = true;
-        }
-        if (isErr) {
-            mIMainView.showTextMessage(textMessage);
+        ArrayList<TransactionOffItem> lstTransactionOff = (ArrayList<TransactionOffItem>)mainModel.selectOfflineBill();
+        if(lstTransactionOff.size() == 0)
             return;
-        }
+
+        Context context = mIMainView.getContextView();
+
 
         ConfigInfo configInfo;
 
@@ -493,20 +483,12 @@ public class MainPresenter implements IMainPresenter {
 //        }
 //        configInfo.setSignatureEncrypted(signatureEncrypted);
 
-        ArrayList<ListTransactionOff> lstTransactionOff = new ArrayList<>();
-        Cursor c = mainModel.selectOfflineBill();
-        if (c.moveToFirst()) {
-            do {
-                ListTransactionOff listTransactionOff = new ListTransactionOff();
-                listTransactionOff.setCustomer_code(c.getString(c.getColumnIndex("customerCode")));
-                listTransactionOff.setProvide_code(Common.PROVIDER_DEFAULT);
-                listTransactionOff.setAmount(c.getString(c.getColumnIndex("amount")));
-                listTransactionOff.setBill_id(c.getString(c.getColumnIndex("billId")));
-                listTransactionOff.setEdong(c.getString(c.getColumnIndex("edong")));
-                listTransactionOff.setAudit_number(String.valueOf(configInfo.getAuditNumber()));
-                lstTransactionOff.add(listTransactionOff);
-            } while (c.moveToNext());
+        for (int i = 0, n = lstTransactionOff.size(); i < n; i ++)
+        {
+            lstTransactionOff.get(i).setProvide_code(Common.PROVIDER_DEFAULT);
+            lstTransactionOff.get(i).setAudit_number(String.valueOf(configInfo.getAuditNumber()));
         }
+
         String jsonRequestPushBill = SoapAPI.getJsonRequestPostBill(
                 configInfo.getAGENT(),
                 configInfo.getAgentEncypted(),

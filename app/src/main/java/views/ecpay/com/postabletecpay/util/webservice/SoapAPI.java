@@ -59,8 +59,6 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityDataZip.Header
 import views.ecpay.com.postabletecpay.util.entities.request.EntityDataZip.ListDataZipRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityDeleteBillOnline.BodyDeleteBillOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityDeleteBillOnline.DeleteBillOnlineRequest;
-import views.ecpay.com.postabletecpay.util.entities.request.EntityDeleteBillOnline.FooterDeleteBillOnlineRequest;
-import views.ecpay.com.postabletecpay.util.entities.request.EntityDeleteBillOnline.HeaderDeleteBillOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityEVN.BodyEVNRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityEVN.EVNRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityEVN.FooterEVNRequest;
@@ -76,7 +74,7 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityLogout.LogoutR
 import views.ecpay.com.postabletecpay.util.entities.request.EntityMapCustomerCard.BodyMapCustomerCardRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityMapCustomerCard.MapCustomerCardRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.BodyPostBillRequest;
-import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.ListTransactionOff;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.TransactionOffItem;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.PostBillRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchCustomer.BodySearchCustomerRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchCustomer.SearchCustomerRequest;
@@ -724,7 +722,7 @@ public class SoapAPI {
     }
 
     public static String getJsonRequestPostBill(String agent, String agentEncypted, String commandId, long auditNumber, String mac,
-                                                String diskDriver, String signatureEncrypted, ArrayList<ListTransactionOff> listTransactionOff,
+                                                String diskDriver, String signatureEncrypted, ArrayList<TransactionOffItem> listTransactionOff,
                                                 String accountId) {
         if (agent == null || agent.isEmpty() || agent.trim().equals(""))
             return null;
@@ -1103,10 +1101,10 @@ public class SoapAPI {
             return null;
 
 
-        HeaderDeleteBillOnlineRequest headerDeleteBillOnlineRequest = new HeaderDeleteBillOnlineRequest();
-        headerDeleteBillOnlineRequest.setAgent(agent);
-        headerDeleteBillOnlineRequest.setPassword(agentEncypted);
-        headerDeleteBillOnlineRequest.setCommandId(commandId);
+        HeaderRequest header = new HeaderRequest();
+        header.setAgent(agent);
+        header.setPassword(agentEncypted);
+        header.setCommandId(commandId);
 
         BodyDeleteBillOnlineRequest bodyDeleteBillOnlineRequest = new BodyDeleteBillOnlineRequest();
         bodyDeleteBillOnlineRequest.setAuditNumber(auditNumber);
@@ -1121,13 +1119,13 @@ public class SoapAPI {
         bodyDeleteBillOnlineRequest.setTraceNumber(traceNumber);
         bodyDeleteBillOnlineRequest.setReason(reasonDeleteBill);
 
-        FooterDeleteBillOnlineRequest footerDeleteBillOnlineRequest = new FooterDeleteBillOnlineRequest();
-        footerDeleteBillOnlineRequest.setAccountIdt(accountId);
+        FooterRequest footer = new FooterRequest();
+        footer.setAccountIdt(accountId);
 
         final DeleteBillOnlineRequest deleteBillOnlineRequest = new DeleteBillOnlineRequest();
-        deleteBillOnlineRequest.setHeader(headerDeleteBillOnlineRequest);
+        deleteBillOnlineRequest.setHeader(header);
         deleteBillOnlineRequest.setBody(bodyDeleteBillOnlineRequest);
-        deleteBillOnlineRequest.setFooter(footerDeleteBillOnlineRequest);
+        deleteBillOnlineRequest.setFooter(footer);
 
         final GsonBuilder gsonBuilder = new GsonBuilder();
         Type type = new TypeToken<DeleteBillOnlineRequest>() {

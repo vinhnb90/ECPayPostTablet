@@ -5,40 +5,45 @@ import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class DeleteBillOnlineRequest implements Serializable {
+import views.ecpay.com.postabletecpay.util.entities.request.Base.BodyRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.Base.FooterRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.Base.HeaderRequest;
+import views.ecpay.com.postabletecpay.util.entities.request.Base.Request;
+import views.ecpay.com.postabletecpay.util.entities.response.Base.Respone;
+
+public class DeleteBillOnlineRequest extends Request {
 
     @SerializedName("header")
     @Expose
-    private HeaderDeleteBillOnlineRequest header;
+    private HeaderRequest header;
     @SerializedName("body")
     @Expose
     private BodyDeleteBillOnlineRequest body;
     @SerializedName("footer")
     @Expose
-    private FooterDeleteBillOnlineRequest footer;
-    private final static long serialVersionUID = 6743274675011955698L;
+    private FooterRequest footer;
 
-    public HeaderDeleteBillOnlineRequest getHeader() {
+    public HeaderRequest getHeader() {
         return header;
     }
 
-    public void setHeader(HeaderDeleteBillOnlineRequest header) {
+    public void setHeader(HeaderRequest header) {
         this.header = header;
     }
 
-    public BodyDeleteBillOnlineRequest getBody() {
+    public BodyRequest getBody() {
         return body;
     }
 
-    public void setBody(BodyDeleteBillOnlineRequest body) {
-        this.body = body;
+    public void setBody(BodyRequest body) {
+        this.body = (BodyDeleteBillOnlineRequest)body;
     }
 
-    public FooterDeleteBillOnlineRequest getFooter() {
+    public FooterRequest getFooter() {
         return footer;
     }
 
-    public void setFooter(FooterDeleteBillOnlineRequest footer) {
+    public void setFooter(FooterRequest footer) {
         this.footer = footer;
     }
 }

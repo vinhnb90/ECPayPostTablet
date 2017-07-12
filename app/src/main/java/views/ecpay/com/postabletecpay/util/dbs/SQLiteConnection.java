@@ -25,6 +25,7 @@ import views.ecpay.com.postabletecpay.util.entities.EntityHoaDonNo;
 import views.ecpay.com.postabletecpay.util.entities.EntityHoaDonThu;
 import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.util.entities.EntityLichSuThanhToan;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.TransactionOffItem;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
@@ -701,10 +702,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
 
-    public void selectOfflineBill() {
+    public List<TransactionOffItem> selectOfflineBill() {
         database = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + MainActivity.mEdong + "' and HINH_THUC_TT = '" + Common.HINH_THUC_TTOAN.OFFLINE.getCode() + "' and TRANG_THAI_DAY_CHAM_NO = '" + Common.TRANG_THAI_DAY_CHAM_NO.CHUA_DAY.getCode() + "'";
         Cursor mCursor = database.rawQuery(query, null);
+
+        List<TransactionOffItem> lst = new ArrayList<>();
+
         if(mCursor != null && mCursor.moveToFirst())
         {
             do {
@@ -740,8 +744,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.CHUA_TTOAN))
                 {
 
-                    
-                    continue;
+                    TransactionOffItem item = new TransactionOffItem();
+                    item.setCustomer_code(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
+                    item.setAmount(mCursor.getLong(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
+                    item.setBill_id(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON"))));
+                    item.setEdong(mCursor.getString(mCursor.getColumnIndex("E_DONG")));
+                    lst.add(item);
                 }
 
 
@@ -752,6 +760,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (mCursor != null && !mCursor.isClosed()) {
             mCursor.close();
         }
+        return  lst;
     }
 
 

@@ -15,13 +15,13 @@ public class BodyPostBillRequest extends BodyRequest {
 
     @SerializedName("list-transaction-off")
     @Expose
-    private ArrayList<ListTransactionOff> list_transaction_off;
+    private ArrayList<TransactionOffItem> list_transaction_off;
 
-    public ArrayList<ListTransactionOff> getList_transaction_off() {
+    public ArrayList<TransactionOffItem> getList_transaction_off() {
         return list_transaction_off;
     }
 
-    public void setList_transaction_off(ArrayList<ListTransactionOff> list_transaction_off) {
+    public void setList_transaction_off(ArrayList<TransactionOffItem> list_transaction_off) {
         this.list_transaction_off = list_transaction_off;
     }
 }

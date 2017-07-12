@@ -1,32 +1,23 @@
 package views.ecpay.com.postabletecpay.view.Main;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.google.zxing.Result;
-
-import java.util.List;
-
-import me.dm7.barcodescanner.zxing.ZXingScannerView;
 import views.ecpay.com.postabletecpay.R;
-import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
-import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
 import views.ecpay.com.postabletecpay.presenter.IMainPresenter;
 import views.ecpay.com.postabletecpay.presenter.MainPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
@@ -34,11 +25,8 @@ import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
-import views.ecpay.com.postabletecpay.view.TrangChu.SearchCustomerFragment;
-import views.ecpay.com.postabletecpay.view.Util.BarcodeScannerDialog;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
-import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.REQUEST_BARCODE;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.RESPONSE_BARCODE;
 
@@ -55,6 +43,25 @@ public class MainActivity extends AppCompatActivity implements
     public static String mEdong;
     private IMainPresenter iMainPresenter;
     private static boolean isLoginCall;
+
+    private Handler mHander = new Handler();
+    private Runnable mRunableCheckPostBill = new Runnable() {
+        @Override
+        public void run() {
+            boolean currentConnect = Common.isNetworkConnected(MainActivity.this);
+            if (!hasNetworkLast && currentConnect) {
+                if (iMainPresenter != null) {
+                    iMainPresenter.checkAndPostBill();
+                }
+            }
+            hasNetworkLast = currentConnect;
+            if(mHander != null && mRunableCheckPostBill != null)
+                mHander.postDelayed(mRunableCheckPostBill, Common.TIME_OUT_CHECK_CONNECTION);
+        }
+    };
+
+
+    private boolean hasNetworkLast;
 
     @Override
     public Context getContextView() {
@@ -135,6 +142,9 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        hasNetworkLast = Common.isNetworkConnected(this);
+        mHander.postDelayed(mRunableCheckPostBill, Common.TIME_OUT_CHECK_CONNECTION);
         try {
             getSupportActionBar().hide();
             if (Build.VERSION.SDK_INT < 16) {
@@ -197,6 +207,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onDestroy() {
+        if(mHander != null && mRunableCheckPostBill != null)
+            mHander.removeCallbacks(mRunableCheckPostBill);
         super.onDestroy();
     }
 

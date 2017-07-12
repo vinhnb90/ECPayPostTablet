@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by tima on 6/19/17.
  */
 
-public class ListTransactionOff {
+public class TransactionOffItem {
     @SerializedName("customer-code")
     @Expose
     private String customer_code;
@@ -16,10 +16,10 @@ public class ListTransactionOff {
     private String provide_code;
     @SerializedName("amount")
     @Expose
-    private String amount;
+    private Long amount;
     @SerializedName("bill-id")
     @Expose
-    private String bill_id;
+    private Long bill_id;
     @SerializedName("edong")
     @Expose
     private String edong;
@@ -43,19 +43,19 @@ public class ListTransactionOff {
         this.provide_code = provide_code;
     }
 
-    public String getAmount() {
+    public Long getAmount() {
         return amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(Long amount) {
         this.amount = amount;
     }
 
-    public String getBill_id() {
+    public Long getBill_id() {
         return bill_id;
     }
 
-    public void setBill_id(String bill_id) {
+    public void setBill_id(Long bill_id) {
         this.bill_id = bill_id;
     }
 

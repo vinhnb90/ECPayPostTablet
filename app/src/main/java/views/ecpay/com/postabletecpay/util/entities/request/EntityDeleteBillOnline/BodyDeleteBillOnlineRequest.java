@@ -5,14 +5,13 @@ import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class BodyDeleteBillOnlineRequest implements Serializable {
+import views.ecpay.com.postabletecpay.util.entities.request.Base.BodyRequest;
+
+public class BodyDeleteBillOnlineRequest extends BodyRequest{
 
     @SerializedName("amount")
     @Expose
     private Long amount;
-    @SerializedName("audit-number")
-    @Expose
-    private Long auditNumber;
     @SerializedName("bill-id")
     @Expose
     private Long billId;
@@ -28,15 +27,6 @@ public class BodyDeleteBillOnlineRequest implements Serializable {
     @SerializedName("reason")
     @Expose
     private String reason;
-    @SerializedName("disk-drive")
-    @Expose
-    private String diskDrive;
-    @SerializedName("mac")
-    @Expose
-    private String mac;
-    @SerializedName("signature")
-    @Expose
-    private String signature;
     private final static long serialVersionUID = -7810941760801107607L;
 
     public Long getAmount() {
@@ -45,14 +35,6 @@ public class BodyDeleteBillOnlineRequest implements Serializable {
 
     public void setAmount(Long amount) {
         this.amount = amount;
-    }
-
-    public Long getAuditNumber() {
-        return auditNumber;
-    }
-
-    public void setAuditNumber(Long auditNumber) {
-        this.auditNumber = auditNumber;
     }
 
     public Long getBillId() {
@@ -95,28 +77,5 @@ public class BodyDeleteBillOnlineRequest implements Serializable {
         this.reason = reason;
     }
 
-    public String getDiskDrive() {
-        return diskDrive;
-    }
-
-    public void setDiskDrive(String diskDrive) {
-        this.diskDrive = diskDrive;
-    }
-
-    public String getMac() {
-        return mac;
-    }
-
-    public void setMac(String mac) {
-        this.mac = mac;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
-    }
 
 }

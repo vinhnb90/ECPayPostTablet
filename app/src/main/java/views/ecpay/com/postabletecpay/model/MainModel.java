@@ -11,6 +11,7 @@ import java.util.List;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
+import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.TransactionOffItem;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
@@ -72,8 +73,8 @@ public class MainModel extends CommonModel {
         return sqLiteConnection.getAllBookCmis();
     }
 
-    public Cursor selectOfflineBill() {
-        return null;//sqLiteConnection.selectOfflineBill();
+    public List<TransactionOffItem> selectOfflineBill() {
+        return sqLiteConnection.selectOfflineBill();
     }
 
     public long checkCustomerExist(String code) {

@@ -1,52 +1,23 @@
 package views.ecpay.com.postabletecpay.presenter;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import org.ecpay.client.test.SecurityUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import views.ecpay.com.postabletecpay.model.MainPageModel;
 import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
-import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.ListTransactionOff;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityDataZip.ListDataZipResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEVNReponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPCResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.FileGenResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListBillResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListCustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogout.LogoutResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityPostBill.PostBillResponse;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.TrangChu.IMainPageView;
 
-import static android.content.Context.MODE_PRIVATE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT;
 

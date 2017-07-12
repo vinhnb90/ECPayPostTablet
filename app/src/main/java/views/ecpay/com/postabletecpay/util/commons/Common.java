@@ -1240,6 +1240,8 @@ public class Common {
     //unit: seconds
     public static long TIME_OUT_CONNECT = 50000;
 
+    public static long TIME_OUT_CHECK_CONNECTION = 10000;
+
     public enum COMMAND_ID {
         LOGIN,
         CHANGE_PIN,
