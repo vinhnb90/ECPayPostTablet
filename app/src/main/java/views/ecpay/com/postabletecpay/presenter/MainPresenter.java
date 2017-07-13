@@ -29,6 +29,7 @@ import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.TransactionOffItem;
+import views.ecpay.com.postabletecpay.util.entities.response.Base.Respone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
@@ -39,6 +40,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPC
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.FileGenResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListBillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListCustomerResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityPostBill.PostBillResponse;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.Main.IMainView;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
@@ -58,6 +60,9 @@ public class MainPresenter implements IMainPresenter {
     private String edong;
     private String bookCmis;
     private static List<PayAdapter.DataAdapter> mDataPayAdapter = new ArrayList<>();
+
+
+    private SoapAPI.AsyncSoap<PostBillResponse> CurrentPostBillAsync = null;
 
     public MainPresenter(IMainView mIMainView, String edong) {
         this.mIMainView = mIMainView;
@@ -458,6 +463,12 @@ public class MainPresenter implements IMainPresenter {
         if(lstTransactionOff.size() == 0)
             return;
 
+
+        if(CurrentPostBillAsync != null && !CurrentPostBillAsync.isEndCallSoap())
+        {
+            CurrentPostBillAsync.cancel(true);
+        }
+
         Context context = mIMainView.getContextView();
 
 
@@ -503,8 +514,33 @@ public class MainPresenter implements IMainPresenter {
 
         if (jsonRequestPushBill != null) {
             try {
+                CurrentPostBillAsync = new SoapAPI.AsyncSoap<PostBillResponse>(PostBillResponse.class, new SoapAPI.AsyncSoap.AsyncSoapCallBack() {
+                    @Override
+                    public void onPre(SoapAPI.AsyncSoap soap) {
 
+                    }
+
+                    @Override
+                    public void onUpdate(String message) {
+
+                    }
+
+                    @Override
+                    public void onPost(Respone response) {
+                        if(response != null)
+                        {
+
+                        }
+                    }
+
+                    @Override
+                    public void onTimeOut(SoapAPI.AsyncSoap soap) {
+
+                    }
+                });
+                CurrentPostBillAsync.execute(jsonRequestPushBill);
             } catch (Exception e) {
+                CurrentPostBillAsync = null;
                 mIMainView.showTextMessage(e.getMessage());
                 return;
             }
@@ -662,6 +698,8 @@ public class MainPresenter implements IMainPresenter {
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onPost(ListDataResponse response) {
+            if(response == null)
+                return;
             String sDataCustomer = response.getBodyListDataResponse().getCustomer();
             if (sDataCustomer != null && !sDataCustomer.isEmpty()) {
                 byte[] zipByteCustomer = org.apache.commons.codec.binary.Base64.decodeBase64(sDataCustomer.getBytes());

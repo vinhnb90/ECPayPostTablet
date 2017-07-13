@@ -61,46 +61,6 @@ public class MainPageModel extends CommonModel {
         return sqLiteConnection.getAllBookCmis();
     }
 
-
-    public  long checkCustomerExist(String code) {
-        return sqLiteConnection.checkCustomerExist(code);
-    }
-
-    public long insertCustomer(ListCustomerResponse listCustomerResponse) {
-        return sqLiteConnection.insertCustomer(listCustomerResponse);
-    }
-
-    public long insertCustomer(CustomerResponse customerResponse) {
-        return sqLiteConnection.insertCustomer(customerResponse);
-    }
-
-    public long updateCustomer(CustomerResponse customerResponse) {
-        return sqLiteConnection.updateCustomer(customerResponse);
-    }
-
-    public  long checkBillExist(String billId) {
-        return sqLiteConnection.checkBillExist(billId);
-    }
-
-    public long insertBill(ListBillResponse listBillResponse) {
-        return sqLiteConnection.insertBill(listBillResponse);
-    }
-
-    public long insertBill(BillResponse listBillResponse) {
-        return sqLiteConnection.insertBill(listBillResponse);
-    }
-
-    public long updateBill(BillResponse listBillResponse) {
-        return sqLiteConnection.updateBill(listBillResponse);
-    }
-
-    public long getMaxIdChanged() {
-        return sqLiteConnection.getMaxIdChanged();
-    }
-
-    public String getMaxDateChanged() {
-        return sqLiteConnection.getMaxDateChanged();
-    }
     //endregion
 }
 

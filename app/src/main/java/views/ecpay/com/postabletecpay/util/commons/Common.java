@@ -217,7 +217,7 @@ public class Common {
     }
 
     public enum PROVIDER_CODE {
-        NCCNONE("000", "Chọn Điện Lực"),
+        NCCNONE("", "Chọn Điện Lực"),
         NCC0498("NCC0498", "Tổng Công Ty Điện Lực Miền Nam"),
         NCC0499("NCC0499", "Tổng Công Ty Điện Lực Miền Trung"),
         NCC0483("NCC0483", "Tổng Công ty điện lực miền Bắc"),

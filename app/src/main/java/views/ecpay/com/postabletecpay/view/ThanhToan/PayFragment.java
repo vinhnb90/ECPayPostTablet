@@ -627,20 +627,30 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void showSearchOnlineProcess() {
-        if (rvProgressSearchOnline.getVisibility() == View.GONE)
-            rvProgressSearchOnline.setVisibility(View.VISIBLE);
-        tvTitleSearch.setVisibility(View.VISIBLE);
-        pbarSearchOnline.setVisibility(View.VISIBLE);
-        pbarSearchOnline.setIndeterminate(true);
-        ibtnResearchOnline.setVisibility(View.GONE);
-        ibtnCancelSearchOnline.setVisibility(View.VISIBLE);
-        tvMessageNotifySearchOnlne.setVisibility(View.GONE);
+        try
+        {
+            if (rvProgressSearchOnline.getVisibility() == View.GONE)
+                rvProgressSearchOnline.setVisibility(View.VISIBLE);
+            tvTitleSearch.setVisibility(View.VISIBLE);
+            pbarSearchOnline.setVisibility(View.VISIBLE);
+            pbarSearchOnline.setIndeterminate(true);
+            ibtnResearchOnline.setVisibility(View.GONE);
+            ibtnCancelSearchOnline.setVisibility(View.VISIBLE);
+            tvMessageNotifySearchOnlne.setVisibility(View.GONE);
+        }catch (Exception e)
+        {
+
+        }
     }
 
     @Override
     public void hideSearchOnlineProcess() {
-        if (rvProgressSearchOnline.getVisibility() == View.VISIBLE)
-            rvProgressSearchOnline.setVisibility(View.GONE);
+        try {
+            if (rvProgressSearchOnline.getVisibility() == View.VISIBLE)
+                rvProgressSearchOnline.setVisibility(View.GONE);
+        } catch (Exception e) {
+
+        }
     }
 
     @Override
