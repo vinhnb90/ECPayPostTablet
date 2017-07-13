@@ -202,7 +202,7 @@ public class MainPresenter implements IMainPresenter {
                 JSONArray jaEvnPC = new JSONArray(dataEvnPC);
                 for (int i = 0; i < jaEvnPC.length(); i++) {
                     listEvnPCResponse = gson.fromJson(jaEvnPC.getString(i), ListEvnPCResponse.class);
-                    if (mainModel.deleteAllPC() != -1) {
+                    if (mainModel.checkEvnPCExist(listEvnPCResponse.getPcId()) == 0) {
                         mainModel.insertEvnPC(listEvnPCResponse);
                     }
                 }

@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements
         MainPageFragment.OnFragmentInteractionListener,
         PayFragment.CallbackDeleteBillOnlineDialog,
         BaoCaoFragment.OnFragmentInteractionListener,
-        UserInfoFragment.OnFragmentInteractionListener{
+        UserInfoFragment.OnFragmentInteractionListener {
 
     private IOnPauseScannerBarcodeListner pauseScannerBarcodeListner;
 
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
             hasNetworkLast = currentConnect;
-            if(mHander != null && mRunableCheckPostBill != null)
+            if (mHander != null && mRunableCheckPostBill != null)
                 mHander.postDelayed(mRunableCheckPostBill, Common.TIME_OUT_CHECK_CONNECTION);
         }
     };
@@ -201,13 +201,16 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        this.refreshInfoMain();
+        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragmentVisibling instanceof MainPageFragment) {
+            ((MainPageFragment) fragmentVisibling).refreshInfoMain();
+        }
     }
 
 
     @Override
     protected void onDestroy() {
-        if(mHander != null && mRunableCheckPostBill != null)
+        if (mHander != null && mRunableCheckPostBill != null)
             mHander.removeCallbacks(mRunableCheckPostBill);
         super.onDestroy();
     }
