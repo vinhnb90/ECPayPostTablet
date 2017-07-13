@@ -1211,6 +1211,42 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return rowAffect;
     }
 
+    public long updateEvnPC(ListEvnPCResponse listEvnPCResponse) {
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("parentId", listEvnPCResponse.getParentId());
+        initialValues.put("strParentId", listEvnPCResponse.getStrParentId());
+        initialValues.put("pcId", listEvnPCResponse.getPcId());
+        initialValues.put("strPcId", listEvnPCResponse.getStrPcId());
+        initialValues.put("code", listEvnPCResponse.getCode());
+        initialValues.put("ext", listEvnPCResponse.getExt());
+        initialValues.put("fullName", listEvnPCResponse.getFullName());
+        initialValues.put("shortName", listEvnPCResponse.getShortName());
+        initialValues.put("address", listEvnPCResponse.getAddress());
+        initialValues.put("taxCode", listEvnPCResponse.getTaxCode());
+        initialValues.put("phone1", listEvnPCResponse.getPhone1());
+        initialValues.put("phone2", listEvnPCResponse.getPhone2());
+        initialValues.put("fax", listEvnPCResponse.getFax());
+        initialValues.put("level", listEvnPCResponse.getLevel());
+        initialValues.put("strLevel", listEvnPCResponse.getStrLevel());
+        initialValues.put("mailTo", listEvnPCResponse.getMailTo());
+        initialValues.put("mailCc", listEvnPCResponse.getMailCc());
+        initialValues.put("status", listEvnPCResponse.getStatus());
+        initialValues.put("strStatus", listEvnPCResponse.getStrStatus());
+        initialValues.put("dateCreated", listEvnPCResponse.getDateCreated());
+        initialValues.put("strDateCreated", listEvnPCResponse.getStrDateCreated());
+        initialValues.put("idChanged", listEvnPCResponse.getIdChanged());
+        initialValues.put("dateChanged", listEvnPCResponse.getDateChanged());
+        initialValues.put("strDateChanged", listEvnPCResponse.getStrDateChanged());
+        initialValues.put("regionId", listEvnPCResponse.getRegionId());
+        initialValues.put("parentPcCode", listEvnPCResponse.getParentPcCode());
+        initialValues.put("cardPrefix", listEvnPCResponse.getCardPrefix());
+
+        database = getWritableDatabase();
+        int rowAffect = (int) database.update(TABLE_NAME_EVN_PC, initialValues, "pcId=?", new String[]{String.valueOf(listEvnPCResponse.getPcId())});
+        return rowAffect;
+    }
+
     public long deleteAllPC() {
         database = this.getWritableDatabase();
         return database.delete(TABLE_NAME_EVN_PC, null, null);
