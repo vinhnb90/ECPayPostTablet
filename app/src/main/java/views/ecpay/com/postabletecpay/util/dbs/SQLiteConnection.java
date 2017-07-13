@@ -747,11 +747,11 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         Cursor mCursor = database.rawQuery(query, null);
         if(mCursor != null && mCursor.moveToFirst())
         {
-
+            Common.TRANG_THAI_TTOAN result = Common.TRANG_THAI_TTOAN.findCodeMessage(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN")));
             if (mCursor != null && !mCursor.isClosed()) {
                 mCursor.close();
             }
-            return Common.TRANG_THAI_TTOAN.valueOf(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN")));
+            return result;
         }
 
 

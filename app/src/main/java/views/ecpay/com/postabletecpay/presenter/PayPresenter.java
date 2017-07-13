@@ -254,7 +254,10 @@ public class PayPresenter implements IPayPresenter {
                 configInfo.getAccountId());
 
         if (jsonRequestSearchOnline == null)
+        {
+            finishSearchOnline(null);
             return;
+        }
 
         try {
             currentAsyncSearchOnline = new SoapAPI.AsyncSoapIncludeTimout<SearchOnlineResponse>(handlerDelay, SearchOnlineResponse.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
@@ -455,7 +458,7 @@ public class PayPresenter implements IPayPresenter {
         }
 
 
-        if(!isPayOnline) { //Thanh Toan Offline
+        if(isPayOnline){//if(!isPayOnline) { //Thanh Toan Offline
             //Kiểm tra địa bàn thanh toán
 
             List<String> pcCodes = mPayModel.getPcCodes();
