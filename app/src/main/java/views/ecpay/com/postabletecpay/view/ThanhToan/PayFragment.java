@@ -56,6 +56,7 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
+import views.ecpay.com.postabletecpay.view.Util.BarcodeScannerDialog;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
@@ -1086,7 +1087,13 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void showDialogBarcode() {
-        
+        BarcodeScannerDialog dialog = new BarcodeScannerDialog((MainActivity) this.getActivity(), new BarcodeScannerDialog.OnResultListener() {
+            @Override
+            public void onResult(String text) {
+                fillResultToSearchText(text);
+            }
+        });
+        dialog.show();
     }
 
 
@@ -1213,14 +1220,6 @@ public class PayFragment extends Fragment implements
         etSearch.setText(textBarcode);
     }
 
-
-//    public interface CallbackPayingOnlineDialog {
-//        void processOnDismissPayingOnlineDialog();
-//    }
-
-    public interface CallbackBarcodeDialog {
-        void processOnDismissBarcodeDialog(String textBarcode);
-    }
 
     public interface CallbackDeleteBillOnlineDialog {
         void processOnDismissDeleteBillOnlineDialog();

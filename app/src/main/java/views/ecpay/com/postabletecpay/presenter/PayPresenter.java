@@ -458,7 +458,7 @@ public class PayPresenter implements IPayPresenter {
         }
 
 
-        if(isPayOnline){//if(!isPayOnline) { //Thanh Toan Offline
+        if(!isPayOnline){//if(!isPayOnline) { //Thanh Toan Offline
             //Kiểm tra địa bàn thanh toán
 
             List<String> pcCodes = mPayModel.getPcCodes();
