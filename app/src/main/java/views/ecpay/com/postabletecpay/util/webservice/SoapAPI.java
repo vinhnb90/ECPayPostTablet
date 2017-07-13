@@ -2109,7 +2109,6 @@ public class SoapAPI {
         }
     }
 
-
     public static class AsyncSoapSearchOnline extends AsyncTask<String, String, SearchOnlineResponse> {
 
         //request action to eStore

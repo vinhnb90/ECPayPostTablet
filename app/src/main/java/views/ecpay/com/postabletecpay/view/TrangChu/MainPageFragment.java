@@ -293,8 +293,12 @@ public class MainPageFragment extends Fragment implements
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-//                mIMainPagePresenter.callLogout(mEdong);
-                mILogoutPresenter.callLogout(mEdong);
+                try{
+                    mILogoutPresenter.callLogout(mEdong);
+                }catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         }, TIME_DELAY_ANIM);
     }

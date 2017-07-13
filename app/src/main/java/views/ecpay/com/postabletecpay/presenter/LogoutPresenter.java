@@ -137,15 +137,8 @@ public class LogoutPresenter implements  ILogoutPresenter{
             iLogoutView.showStatusProgressLogout(Common.STATUS_PROGRESS.BEGIN);
 
             //check wifi
-            boolean isHasWifi = Common.isConnectingWifi(iLogoutView.getContextView());
             boolean isHasNetwork = Common.isNetworkConnected(iLogoutView.getContextView());
 
-//            if (!isHasWifi) {
-//                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
-//
-//                soapSearchOnline.setEndCallSoap(true);
-//                soapSearchOnline.cancel(true);
-//            }
             if (!isHasNetwork) {
                 iLogoutView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
                 iLogoutView.showMessageLogout(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
@@ -161,7 +154,7 @@ public class LogoutPresenter implements  ILogoutPresenter{
                 return;
 
             iLogoutView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
-            iLogoutView.showMessageLogout(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+            iLogoutView.showMessageLogout(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
 
         }
 
@@ -184,7 +177,15 @@ public class LogoutPresenter implements  ILogoutPresenter{
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    iLogoutView.showLoginForm();
+                    try {
+                        Common.deleteAllFileFolderDownload();
+                        Common.loadFolder((MainActivity)iLogoutView.getContextView());
+                        iLogoutView.showLoginForm();
+                    }catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
                 }
             }, Common.MORE_LONG_TIME_DELAY_ANIM);
         }

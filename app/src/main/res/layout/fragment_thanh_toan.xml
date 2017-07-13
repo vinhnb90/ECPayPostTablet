@@ -55,21 +55,31 @@
                 android:layout_marginRight="@dimen/_10sdp"
                 android:background="@drawable/bg_edittext"
                 android:src="@mipmap/ic_barcode"
-                android:layout_toLeftOf="@+id/spine_provider"
-                android:layout_toStartOf="@+id/spine_provider" />
+                />
+
+            <Spinner
+                android:layout_marginRight="@dimen/_3sdp"
+                android:background="@drawable/bg_button_white"
+                android:layout_toLeftOf="@+id/ibtn_frag_thanhtoan_qrcode"
+                android:id="@+id/spine_provider"
+                android:layout_alignBaseline="@+id/ibtn_frag_thanhtoan_qrcode"
+                android:layout_centerVertical="true"
+                android:layout_width="100dp"
+                android:layout_height="@dimen/_24sdp"
+                android:layout_alignTop="@+id/et_frag_thanh_toan_search" />
 
             <EditText
                 android:id="@+id/et_frag_thanh_toan_search"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_24sdp"
                 android:layout_alignBaseline="@+id/ibtn_frag_thanhtoan_qrcode"
-                android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
                 android:layout_marginBottom="@dimen/_8sdp"
                 android:layout_marginLeft="@dimen/_8sdp"
-                android:layout_marginRight="@dimen/_8sdp"
+                android:layout_marginRight="@dimen/_3sdp"
                 android:paddingRight="@dimen/_26sdp"
-                android:layout_toLeftOf="@+id/ibtn_frag_thanhtoan_qrcode"
+                android:layout_toLeftOf="@+id/spine_provider"
                 android:background="@drawable/bg_edittext"
                 android:drawableLeft="@drawable/ic_search_black_24dp"
                 android:imeOptions="actionSearch"
@@ -96,14 +106,6 @@
                 android:paddingLeft="@dimen/_5sdp"
                 app:srcCompat="@drawable/ic_cancel" />
 
-            <Spinner
-                android:id="@+id/spine_provider"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/ibtn_frag_thanhtoan_qrcode"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignTop="@+id/et_frag_thanh_toan_search" />
         </RelativeLayout>
 
         <LinearLayout

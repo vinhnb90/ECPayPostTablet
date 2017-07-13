@@ -95,7 +95,6 @@ import static java.lang.System.lineSeparator;
 
 public class Common {
 
-
     //region param account
     public enum TYPE_ACCOUNT {
         ADMIN_IT(-1, "Admin IT"),
@@ -1472,6 +1471,30 @@ public class Common {
         return fileLog;
     }
 
+    public static void deleteAllFileFolderDownload() throws Exception{
+        if (!isExternalStorageWritable())
+            return ;
+
+        File folderRoot = new File(PATH_FOLDER_ROOT);
+        if (!folderRoot.isDirectory()) {
+            return;
+        }
+
+        File folderDownload = new File(PATH_FOLDER_DOWNLOAD);
+        if (!folderDownload.isDirectory()) {
+            return;
+        }
+
+        String[] allFilesDownload = folderDownload.list();
+        for (int i = 0; i < allFilesDownload.length; i++) {
+            allFilesDownload[i] = Common.PATH_FOLDER_DOWNLOAD + allFilesDownload[i];
+            File aFile = new File(allFilesDownload[i]);
+            if(aFile.exists())
+                aFile.delete();
+        }
+
+    }
+
     public static void loadFolder(ContextWrapper ctx) {
         if (ctx == null)
             return;
@@ -2619,6 +2642,7 @@ public class Common {
     public static int intConvertNull(Integer object) {
         return object = (object == null) ? 0 : object.intValue();
     }
+
     public static int parseInt(String object) {
         try {
             return Integer.parseInt(object);
