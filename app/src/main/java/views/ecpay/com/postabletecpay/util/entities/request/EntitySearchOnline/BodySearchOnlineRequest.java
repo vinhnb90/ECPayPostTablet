@@ -9,9 +9,9 @@ import views.ecpay.com.postabletecpay.util.entities.request.Base.BodyRequest;
 
 public class BodySearchOnlineRequest extends BodyRequest {
 
-    @SerializedName("provider-code")
-    @Expose
-    private String providerCode;
+//    @SerializedName("provider-code")
+//    @Expose
+//    private String providerCode;
     @SerializedName("customer-code")
     @Expose
     private String customerCode;
@@ -19,13 +19,13 @@ public class BodySearchOnlineRequest extends BodyRequest {
     @Expose
     private String[] listCustomerCode;
 
-    public String getProviderCode() {
-        return providerCode;
-    }
-
-    public void setProviderCode(String providerCode) {
-        this.providerCode = providerCode;
-    }
+//    public String getProviderCode() {
+//        return providerCode;
+//    }
+//
+//    public void setProviderCode(String providerCode) {
+//        this.providerCode = providerCode;
+//    }
 
     public String getCustomerCode() {
         return customerCode;

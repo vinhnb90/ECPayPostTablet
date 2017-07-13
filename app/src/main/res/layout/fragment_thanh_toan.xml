@@ -58,15 +58,16 @@
                 />
 
             <Spinner
-                android:layout_marginRight="@dimen/_3sdp"
-                android:background="@drawable/bg_button_white"
-                android:layout_toLeftOf="@+id/ibtn_frag_thanhtoan_qrcode"
                 android:id="@+id/spine_provider"
-                android:layout_alignBaseline="@+id/ibtn_frag_thanhtoan_qrcode"
-                android:layout_centerVertical="true"
                 android:layout_width="100dp"
                 android:layout_height="@dimen/_24sdp"
-                android:layout_alignTop="@+id/et_frag_thanh_toan_search" />
+                android:layout_alignBaseline="@+id/ibtn_frag_thanhtoan_qrcode"
+                android:layout_alignTop="@+id/et_frag_thanh_toan_search"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/_3sdp"
+                android:layout_toLeftOf="@+id/ibtn_frag_thanhtoan_qrcode"
+                android:background="@drawable/bg_button_white"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/et_frag_thanh_toan_search"

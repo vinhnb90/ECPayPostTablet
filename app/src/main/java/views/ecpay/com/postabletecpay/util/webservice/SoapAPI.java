@@ -796,7 +796,7 @@ public class SoapAPI {
         bodySearchOnlineRequest.setDiskDrive(diskDriver);
         bodySearchOnlineRequest.setSignature(signatureEncrypted);
         bodySearchOnlineRequest.setCustomerCode(customerCode);
-        bodySearchOnlineRequest.setProviderCode(providerCode);
+//        bodySearchOnlineRequest.setProviderCode(providerCode);
 
         FooterRequest footer = new FooterRequest();
         footer.setAccountIdt(accountId);
