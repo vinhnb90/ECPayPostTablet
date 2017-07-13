@@ -1086,7 +1086,7 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void showDialogBarcode() {
-//
+        
     }
 
 
