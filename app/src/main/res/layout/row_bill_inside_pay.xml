@@ -15,11 +15,10 @@
         android:orientation="horizontal">
 
         <CheckBox
-            android:checked="false"
             android:id="@+id/cb_row_bill_inside_pay"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/_18sdp"
-            />
+            android:checked="false" />
 
         <TextView
             android:id="@+id/tv_row_bill_inside_pay_date"
@@ -27,8 +26,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/_2sdp"
             android:layout_marginRight="@dimen/_2sdp"
-            android:textSize="@dimen/_9sdp"
-            android:text="03/2017" />
+            android:text="03/2017"
+            android:textSize="@dimen/_9sdp" />
 
         <TextView
             android:id="@+id/tv_row_bill_inside_pay_money"
@@ -37,8 +36,8 @@
             android:gravity="center_horizontal"
             android:lines="1"
             android:scrollHorizontally="true"
-            android:textSize="@dimen/_9sdp"
-            android:text="2500000" />
+            android:text="2500000"
+            android:textSize="@dimen/_9sdp" />
 
     </LinearLayout>
 
@@ -46,45 +45,43 @@
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1"
-        android:gravity="center_vertical">
+        android:layout_weight="1">
 
-        <ImageButton
-            android:layout_marginTop="@dimen/_3sdp"
-            android:layout_width="@dimen/_18sdp"
-            android:layout_height="@dimen/_18sdp"
-            android:layout_marginRight="@dimen/_4sdp"
-            android:id="@+id/btn_row_bill_inside_pay_delete"
+        <LinearLayout
+            android:id="@+id/ll_row_bill_inside_pay_status"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentRight="true"
-            android:background="@android:color/transparent"
-            android:elevation="@dimen/_5sdp"
-            app:srcCompat="@drawable/ic_delete" />
+            android:gravity="center_vertical">
 
-        <ImageButton
-            android:id="@+id/btn_row_bill_inside_pay_print"
-            android:layout_marginTop="@dimen/_3sdp"
-            android:layout_width="@dimen/_18sdp"
-            android:layout_height="@dimen/_18sdp"
-            android:layout_marginRight="@dimen/_8sdp"
-            android:layout_alignBaseline="@+id/btn_row_bill_inside_pay_delete"
-            android:layout_toLeftOf="@+id/btn_row_bill_inside_pay_delete"
-            android:background="@android:color/transparent"
-            app:srcCompat="@drawable/ic_print" />
+            <ImageButton
+                android:id="@+id/btn_row_bill_inside_pay_delete"
+                android:layout_width="@dimen/_12sdp"
+                android:layout_height="@dimen/_12sdp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="@dimen/_8sdp"
+                android:background="@drawable/ic_delete" />
+
+            <ImageButton
+                android:id="@+id/btn_row_bill_inside_pay_print"
+                android:layout_width="@dimen/_12sdp"
+                android:layout_height="@dimen/_12sdp"
+                android:layout_marginRight="@dimen/_8sdp"
+                android:background="@drawable/ic_print" />
+        </LinearLayout>
 
 
         <TextView
             android:id="@+id/tv_row_bill_inside_pay_trang_thai"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignBaseline="@+id/btn_row_bill_inside_pay_delete"
             android:layout_alignParentLeft="true"
             android:layout_marginRight="@dimen/_2sdp"
-            android:textSize="@dimen/_9sdp"
-            android:layout_toLeftOf="@+id/btn_row_bill_inside_pay_print"
+            android:layout_toLeftOf="@+id/ll_row_bill_inside_pay_status"
             android:gravity="center_horizontal|center_vertical"
             android:text="Đã thanh toán"
-            android:textColor="@color/colorTextGreen" />
+            android:textColor="@color/colorTextGreen"
+            android:textSize="@dimen/_9sdp" />
 
 
     </RelativeLayout>

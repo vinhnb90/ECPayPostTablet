@@ -310,7 +310,7 @@ public class PayFragment extends Fragment implements
             list.add(Common.PROVIDER_CODE.values()[i].getMessage());
         }
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_spinner_item, list);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dataAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item_provider);
         spine_provider.setAdapter(dataAdapter);
         spine_provider.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

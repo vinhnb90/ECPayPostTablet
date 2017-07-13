@@ -650,7 +650,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         database = this.getReadableDatabase();
 
-        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "'";// + "' and status = " + ZERO;
+//        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "'";// + "' and status = " + ZERO;
+        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status = " + ZERO;
         Cursor mCursor = database.rawQuery(query, null);
         int count = mCursor.getCount();
         if (count != ZERO) {
@@ -1025,7 +1026,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public int countMoneyAllBill(String edong) {
         database = this.getReadableDatabase();
-        String query = "SELECT SUM(SO_TIEN_TTOAN) FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "'";// and status = " + ZERO;
+//        String query = "SELECT SUM(SO_TIEN_TTOAN) FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "'";// and status = " + ZERO;
+        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status = " + ZERO;
         Cursor mCursor = database.rawQuery(query, null);
         int totalMoney = ERROR_OCCUR;
         if (mCursor.moveToFirst())
