@@ -296,18 +296,18 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public ReportModel.BillInfo countBillDuocGiao(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
-        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "'";
-        Cursor mCursor = database.rawQuery(query, null);
-
-        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-        {
-            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
-            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
-        }
-
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
+//        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "'";
+//        Cursor mCursor = database.rawQuery(query, null);
+//
+//        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
+//        {
+//            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
+//            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
+//        }
+//
+//        if (mCursor != null && !mCursor.isClosed()) {
+//            mCursor.close();
+//        }
 
         return bill;
 
@@ -317,18 +317,18 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public ReportModel.BillInfo countBillDaThu(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
-        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status != 0";
-        Cursor mCursor = database.rawQuery(query, null);
-
-        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-        {
-            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
-            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
-        }
-
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
+//        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status != 0";
+//        Cursor mCursor = database.rawQuery(query, null);
+//
+//        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
+//        {
+//            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
+//            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
+//        }
+//
+//        if (mCursor != null && !mCursor.isClosed()) {
+//            mCursor.close();
+//        }
 
         return bill;
 
@@ -338,18 +338,18 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public ReportModel.BillInfo countBillHoanTra(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
-        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status != 0 and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
-        Cursor mCursor = database.rawQuery(query, null);
-
-        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-        {
-            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
-            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
-        }
-
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
+//        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status != 0 and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
+//        Cursor mCursor = database.rawQuery(query, null);
+//
+//        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
+//        {
+//            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
+//            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
+//        }
+//
+//        if (mCursor != null && !mCursor.isClosed()) {
+//            mCursor.close();
+//        }
 
         return bill;
 
@@ -358,160 +358,142 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public ReportModel.BillInfo countBillVangLai(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
-        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " bill WHERE bill.edongKey = '" + edong +
-                "' and bill.status != 0 and  NOT EXISTS (SELECT * FROM " + TABLE_NAME_CUSTOMER + " customer WHERE bill.customerCode = customer.code)";
-//                "                  FROM employees" +
-//                "                  WHERE departments.department_id = employees.department_id)";
-        Cursor mCursor = database.rawQuery(query, null);
-
-        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-        {
-            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
-            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
-        }
-
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
+//        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " bill WHERE bill.edongKey = '" + edong +
+//                "' and bill.status != 0 and  NOT EXISTS (SELECT * FROM " + TABLE_NAME_CUSTOMER + " customer WHERE bill.customerCode = customer.code)";
+////                "                  FROM employees" +
+////                "                  WHERE departments.department_id = employees.department_id)";
+//        Cursor mCursor = database.rawQuery(query, null);
+//
+//        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
+//        {
+//            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
+//            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
+//        }
+//
+//        if (mCursor != null && !mCursor.isClosed()) {
+//            mCursor.close();
+//        }
 
         return bill;
 
     }
 
 
-    private String getCustomerCodeByCardNo(String cardNo) {
-        String query = "SELECT code FROM " + TABLE_NAME_CUSTOMER + " WHERE cardNo like '%" + cardNo + "%'";
-        Cursor mCursor = database.rawQuery(query, null);
-
-
-        String code = null;
-
-        int count = mCursor.getCount();
-        if (count != ZERO && mCursor.moveToFirst()) {
-            mCursor.moveToFirst();
-            code = mCursor.getString(mCursor.getColumnIndex("code"));
-        }
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
-        return code;
-    }
-
     public List<Bill> getBillThuByCodeAndDate(String edong, boolean isMaKH, String customerCode, Calendar dateFrom, Calendar dateTo)
     {
         List<Bill> lst = new ArrayList<>();
 
 
-        String query;
-
-        if(isMaKH)
-        {
-            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
-                    "' and status != 0 and customerCode like '%" + customerCode + "%'";
-        }else
-        {
-            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
-                    "' and status != 0 and name like '%" + customerCode + "%'";
-        }
-
-        Cursor mCursor = database.rawQuery(query, null);
-
-        if (mCursor != null && mCursor.moveToFirst()) {
-            int count = mCursor.getCount();
-            do {
-                String _requestDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
-                if(_requestDate.length() == 0)
-                {
-                    continue;
-                }
-
-                String[] arr = _requestDate.split("/");
-                if (arr.length != 3)
-                {
-                    continue;
-                }
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(intConvertNull(Integer.parseInt(arr[2])), intConvertNull(Integer.parseInt(arr[1])) - 1, intConvertNull(Integer.parseInt(arr[0])));
-
-                if((dateFrom != null && calendar.before(dateFrom)) || (dateTo != null && calendar.after(dateTo)))
-                {
-                    continue;
-                }
-
-
-
-                String _customerCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode")));
-                String _customerPayCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerPayCode")));
-                String _billId = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billId")));
-                String _term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
-                int _amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
-                String _period = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("period")));
-                String _issueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("issueDate")));
-                String _strIssueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strIssueDate")));
-                int _status = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")));
-                String _seri = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("seri")));
-                String _pcCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCode")));
-                String _handoverCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("handoverCode")));
-                String _cashierCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierCode")));
-                String _bookCmis = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bookCmis")));
-                String _fromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("fromDate")));
-                String _toDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("toDate")));
-                String _strFromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strFromDate")));
-                String _strToDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strToDate")));
-                String _home = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("home")));
-                String _tax = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("tax")));
-                String _billNum = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billNum")));
-                String _currency = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("currency")));
-                String _priceDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("priceDetails")));
-                String _numeDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("numeDetails")));
-                String _amountDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("amountDetails")));
-                String _oldIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("oldIndex")));
-                String _newIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("newIndex")));
-                String _nume = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nume")));
-                int _amountNotTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountNotTax")));
-                int _amountTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountTax")));
-                String _multiple = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("multiple")));
-                String _billType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billType")));
-                String _typeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("typeIndex")));
-                String _groupTypeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("groupTypeIndex")));
-                String _createdDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("createdDate")));
-                int _idChanged = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("idChanged")));
-                String _dateChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("dateChanged")));
-                String _edong = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edong")));
-                String _pcCodeExt = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCodeExt")));
-                String _code = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("code")));
-                String _name = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name")));
-                String _nameNosign = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nameNosign")));
-                String _phoneByevn = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByevn")));
-                String _phoneByecp = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByecp")));
-                String _electricityMeter = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("electricityMeter")));
-                String _inning = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("inning")));
-                String _road = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("road")));
-                String _station = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("station")));
-                String _taxCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("taxCode")));
-                String _trade = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("trade")));
-                String _countPeriod = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("countPeriod")));
-                String _team = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("team")));
-                int _type = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("type")));
-                String _lastQuery = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("lastQuery")));
-                int _groupType = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("groupType")));
-                String _billingChannel = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingChannel")));
-                String _billingType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingType")));
-                String _billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
-                String _cashierPay = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierPay")));
-                String _edongKey = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edongKey")));
-                int _isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked")));
-                long _traceNumber = longConvertNull(mCursor.getLong(mCursor.getColumnIndex("customerPayCode")));
-
-                Bill bill = new Bill(_customerCode, _customerPayCode, _billId, _term, _amount, _period, _issueDate, _strIssueDate, _status, _seri, _pcCode, _handoverCode, _cashierCode, _bookCmis, _fromDate, _toDate, _strFromDate, _strToDate, _home, _tax, _billNum, _currency, _priceDetails, _numeDetails, _amountDetails, _oldIndex, _newIndex, _nume, _amountNotTax, _amountTax, _multiple, _billType, _typeIndex, _groupTypeIndex, _createdDate, _idChanged, _dateChanged, _edong, _pcCodeExt, _code, _name, _nameNosign, _phoneByevn, _phoneByecp, _electricityMeter, _inning, _road, _station, _taxCode, _trade, _countPeriod, _team, _type, _lastQuery, _groupType, _billingChannel, _billingType, _billingBy, _cashierPay, _requestDate, _edongKey, _isChecked, _traceNumber);
-                bill.setRequestDateCal(calendar);
-                lst.add(bill);
-
-            }
-            while (mCursor.moveToNext());
-
-            mCursor.close();
-        }
+//        String query;
+//
+//        if(isMaKH)
+//        {
+//            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
+//                    "' and status != 0 and customerCode like '%" + customerCode + "%'";
+//        }else
+//        {
+//            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
+//                    "' and status != 0 and name like '%" + customerCode + "%'";
+//        }
+//
+//        Cursor mCursor = database.rawQuery(query, null);
+//
+//        if (mCursor != null && mCursor.moveToFirst()) {
+//            int count = mCursor.getCount();
+//            do {
+//                String _requestDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
+//                if(_requestDate.length() == 0)
+//                {
+//                    continue;
+//                }
+//
+//                String[] arr = _requestDate.split("/");
+//                if (arr.length != 3)
+//                {
+//                    continue;
+//                }
+//                Calendar calendar = Calendar.getInstance();
+//                calendar.set(intConvertNull(Integer.parseInt(arr[2])), intConvertNull(Integer.parseInt(arr[1])) - 1, intConvertNull(Integer.parseInt(arr[0])));
+//
+//                if((dateFrom != null && calendar.before(dateFrom)) || (dateTo != null && calendar.after(dateTo)))
+//                {
+//                    continue;
+//                }
+//
+//
+//
+//                String _customerCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode")));
+//                String _customerPayCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerPayCode")));
+//                String _billId = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billId")));
+//                String _term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
+//                int _amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
+//                String _period = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("period")));
+//                String _issueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("issueDate")));
+//                String _strIssueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strIssueDate")));
+//                int _status = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")));
+//                String _seri = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("seri")));
+//                String _pcCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCode")));
+//                String _handoverCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("handoverCode")));
+//                String _cashierCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierCode")));
+//                String _bookCmis = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bookCmis")));
+//                String _fromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("fromDate")));
+//                String _toDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("toDate")));
+//                String _strFromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strFromDate")));
+//                String _strToDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strToDate")));
+//                String _home = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("home")));
+//                String _tax = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("tax")));
+//                String _billNum = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billNum")));
+//                String _currency = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("currency")));
+//                String _priceDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("priceDetails")));
+//                String _numeDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("numeDetails")));
+//                String _amountDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("amountDetails")));
+//                String _oldIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("oldIndex")));
+//                String _newIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("newIndex")));
+//                String _nume = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nume")));
+//                int _amountNotTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountNotTax")));
+//                int _amountTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountTax")));
+//                String _multiple = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("multiple")));
+//                String _billType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billType")));
+//                String _typeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("typeIndex")));
+//                String _groupTypeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("groupTypeIndex")));
+//                String _createdDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("createdDate")));
+//                int _idChanged = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("idChanged")));
+//                String _dateChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("dateChanged")));
+//                String _edong = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edong")));
+//                String _pcCodeExt = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCodeExt")));
+//                String _code = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("code")));
+//                String _name = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name")));
+//                String _nameNosign = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nameNosign")));
+//                String _phoneByevn = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByevn")));
+//                String _phoneByecp = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByecp")));
+//                String _electricityMeter = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("electricityMeter")));
+//                String _inning = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("inning")));
+//                String _road = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("road")));
+//                String _station = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("station")));
+//                String _taxCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("taxCode")));
+//                String _trade = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("trade")));
+//                String _countPeriod = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("countPeriod")));
+//                String _team = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("team")));
+//                int _type = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("type")));
+//                String _lastQuery = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("lastQuery")));
+//                int _groupType = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("groupType")));
+//                String _billingChannel = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingChannel")));
+//                String _billingType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingType")));
+//                String _billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
+//                String _cashierPay = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierPay")));
+//                String _edongKey = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edongKey")));
+//                int _isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked")));
+//                long _traceNumber = longConvertNull(mCursor.getLong(mCursor.getColumnIndex("customerPayCode")));
+//
+//                Bill bill = new Bill(_customerCode, _customerPayCode, _billId, _term, _amount, _period, _issueDate, _strIssueDate, _status, _seri, _pcCode, _handoverCode, _cashierCode, _bookCmis, _fromDate, _toDate, _strFromDate, _strToDate, _home, _tax, _billNum, _currency, _priceDetails, _numeDetails, _amountDetails, _oldIndex, _newIndex, _nume, _amountNotTax, _amountTax, _multiple, _billType, _typeIndex, _groupTypeIndex, _createdDate, _idChanged, _dateChanged, _edong, _pcCodeExt, _code, _name, _nameNosign, _phoneByevn, _phoneByecp, _electricityMeter, _inning, _road, _station, _taxCode, _trade, _countPeriod, _team, _type, _lastQuery, _groupType, _billingChannel, _billingType, _billingBy, _cashierPay, _requestDate, _edongKey, _isChecked, _traceNumber);
+//                bill.setRequestDateCal(calendar);
+//                lst.add(bill);
+//
+//            }
+//            while (mCursor.moveToNext());
+//
+//            mCursor.close();
+//        }
 
 
         if (lst.size() > 1)
@@ -535,116 +517,116 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         List<Bill> lst = new ArrayList<>();
 
 
-        String query;
-
-        if(isMaKH)
-        {
-            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
-                    "' and status != 0 and customerCode like '%" + customerCode + "%' and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
-        }else
-        {
-            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
-                    "' and status != 0 and name like '%" + customerCode + "%' and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
-        }
-
-        Cursor mCursor = database.rawQuery(query, null);
-
-        if (mCursor != null && mCursor.moveToFirst()) {
-            int count = mCursor.getCount();
-            do {
-                String _requestDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
-                if(_requestDate.length() == 0)
-                {
-                    continue;
-                }
-
-                String[] arr = _requestDate.split("/");
-                if (arr.length != 3)
-                {
-                    continue;
-                }
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(intConvertNull(Integer.parseInt(arr[2])), intConvertNull(Integer.parseInt(arr[1])) - 1, intConvertNull(Integer.parseInt(arr[0])));
-
-                if((dateFrom != null && calendar.before(dateFrom)) || (dateTo != null && calendar.after(dateTo)))
-                {
-                    continue;
-                }
-
-
-
-                String _customerCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode")));
-                String _customerPayCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerPayCode")));
-                String _billId = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billId")));
-                String _term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
-                int _amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
-                String _period = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("period")));
-                String _issueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("issueDate")));
-                String _strIssueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strIssueDate")));
-                int _status = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")));
-                String _seri = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("seri")));
-                String _pcCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCode")));
-                String _handoverCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("handoverCode")));
-                String _cashierCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierCode")));
-                String _bookCmis = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bookCmis")));
-                String _fromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("fromDate")));
-                String _toDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("toDate")));
-                String _strFromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strFromDate")));
-                String _strToDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strToDate")));
-                String _home = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("home")));
-                String _tax = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("tax")));
-                String _billNum = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billNum")));
-                String _currency = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("currency")));
-                String _priceDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("priceDetails")));
-                String _numeDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("numeDetails")));
-                String _amountDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("amountDetails")));
-                String _oldIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("oldIndex")));
-                String _newIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("newIndex")));
-                String _nume = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nume")));
-                int _amountNotTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountNotTax")));
-                int _amountTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountTax")));
-                String _multiple = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("multiple")));
-                String _billType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billType")));
-                String _typeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("typeIndex")));
-                String _groupTypeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("groupTypeIndex")));
-                String _createdDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("createdDate")));
-                int _idChanged = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("idChanged")));
-                String _dateChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("dateChanged")));
-                String _edong = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edong")));
-                String _pcCodeExt = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCodeExt")));
-                String _code = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("code")));
-                String _name = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name")));
-                String _nameNosign = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nameNosign")));
-                String _phoneByevn = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByevn")));
-                String _phoneByecp = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByecp")));
-                String _electricityMeter = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("electricityMeter")));
-                String _inning = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("inning")));
-                String _road = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("road")));
-                String _station = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("station")));
-                String _taxCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("taxCode")));
-                String _trade = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("trade")));
-                String _countPeriod = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("countPeriod")));
-                String _team = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("team")));
-                int _type = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("type")));
-                String _lastQuery = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("lastQuery")));
-                int _groupType = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("groupType")));
-                String _billingChannel = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingChannel")));
-                String _billingType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingType")));
-                String _billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
-                String _cashierPay = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierPay")));
-                String _edongKey = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edongKey")));
-                int _isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked")));
-                long _traceNumber = longConvertNull(mCursor.getLong(mCursor.getColumnIndex("customerPayCode")));
-
-                Bill bill = new Bill(_customerCode, _customerPayCode, _billId, _term, _amount, _period, _issueDate, _strIssueDate, _status, _seri, _pcCode, _handoverCode, _cashierCode, _bookCmis, _fromDate, _toDate, _strFromDate, _strToDate, _home, _tax, _billNum, _currency, _priceDetails, _numeDetails, _amountDetails, _oldIndex, _newIndex, _nume, _amountNotTax, _amountTax, _multiple, _billType, _typeIndex, _groupTypeIndex, _createdDate, _idChanged, _dateChanged, _edong, _pcCodeExt, _code, _name, _nameNosign, _phoneByevn, _phoneByecp, _electricityMeter, _inning, _road, _station, _taxCode, _trade, _countPeriod, _team, _type, _lastQuery, _groupType, _billingChannel, _billingType, _billingBy, _cashierPay, _requestDate, _edongKey, _isChecked, _traceNumber);
-                bill.setRequestDateCal(calendar);
-                lst.add(bill);
-
-            }
-            while (mCursor.moveToNext());
-
-            mCursor.close();
-        }
+//        String query;
+//
+//        if(isMaKH)
+//        {
+//            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
+//                    "' and status != 0 and customerCode like '%" + customerCode + "%' and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
+//        }else
+//        {
+//            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
+//                    "' and status != 0 and name like '%" + customerCode + "%' and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
+//        }
+//
+//        Cursor mCursor = database.rawQuery(query, null);
+//
+//        if (mCursor != null && mCursor.moveToFirst()) {
+//            int count = mCursor.getCount();
+//            do {
+//                String _requestDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
+//                if(_requestDate.length() == 0)
+//                {
+//                    continue;
+//                }
+//
+//                String[] arr = _requestDate.split("/");
+//                if (arr.length != 3)
+//                {
+//                    continue;
+//                }
+//                Calendar calendar = Calendar.getInstance();
+//                calendar.set(intConvertNull(Integer.parseInt(arr[2])), intConvertNull(Integer.parseInt(arr[1])) - 1, intConvertNull(Integer.parseInt(arr[0])));
+//
+//                if((dateFrom != null && calendar.before(dateFrom)) || (dateTo != null && calendar.after(dateTo)))
+//                {
+//                    continue;
+//                }
+//
+//
+//
+//                String _customerCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode")));
+//                String _customerPayCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerPayCode")));
+//                String _billId = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billId")));
+//                String _term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
+//                int _amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
+//                String _period = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("period")));
+//                String _issueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("issueDate")));
+//                String _strIssueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strIssueDate")));
+//                int _status = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")));
+//                String _seri = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("seri")));
+//                String _pcCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCode")));
+//                String _handoverCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("handoverCode")));
+//                String _cashierCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierCode")));
+//                String _bookCmis = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bookCmis")));
+//                String _fromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("fromDate")));
+//                String _toDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("toDate")));
+//                String _strFromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strFromDate")));
+//                String _strToDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strToDate")));
+//                String _home = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("home")));
+//                String _tax = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("tax")));
+//                String _billNum = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billNum")));
+//                String _currency = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("currency")));
+//                String _priceDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("priceDetails")));
+//                String _numeDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("numeDetails")));
+//                String _amountDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("amountDetails")));
+//                String _oldIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("oldIndex")));
+//                String _newIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("newIndex")));
+//                String _nume = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nume")));
+//                int _amountNotTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountNotTax")));
+//                int _amountTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountTax")));
+//                String _multiple = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("multiple")));
+//                String _billType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billType")));
+//                String _typeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("typeIndex")));
+//                String _groupTypeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("groupTypeIndex")));
+//                String _createdDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("createdDate")));
+//                int _idChanged = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("idChanged")));
+//                String _dateChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("dateChanged")));
+//                String _edong = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edong")));
+//                String _pcCodeExt = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCodeExt")));
+//                String _code = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("code")));
+//                String _name = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name")));
+//                String _nameNosign = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nameNosign")));
+//                String _phoneByevn = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByevn")));
+//                String _phoneByecp = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByecp")));
+//                String _electricityMeter = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("electricityMeter")));
+//                String _inning = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("inning")));
+//                String _road = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("road")));
+//                String _station = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("station")));
+//                String _taxCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("taxCode")));
+//                String _trade = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("trade")));
+//                String _countPeriod = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("countPeriod")));
+//                String _team = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("team")));
+//                int _type = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("type")));
+//                String _lastQuery = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("lastQuery")));
+//                int _groupType = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("groupType")));
+//                String _billingChannel = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingChannel")));
+//                String _billingType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingType")));
+//                String _billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
+//                String _cashierPay = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierPay")));
+//                String _edongKey = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edongKey")));
+//                int _isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked")));
+//                long _traceNumber = longConvertNull(mCursor.getLong(mCursor.getColumnIndex("customerPayCode")));
+//
+//                Bill bill = new Bill(_customerCode, _customerPayCode, _billId, _term, _amount, _period, _issueDate, _strIssueDate, _status, _seri, _pcCode, _handoverCode, _cashierCode, _bookCmis, _fromDate, _toDate, _strFromDate, _strToDate, _home, _tax, _billNum, _currency, _priceDetails, _numeDetails, _amountDetails, _oldIndex, _newIndex, _nume, _amountNotTax, _amountTax, _multiple, _billType, _typeIndex, _groupTypeIndex, _createdDate, _idChanged, _dateChanged, _edong, _pcCodeExt, _code, _name, _nameNosign, _phoneByevn, _phoneByecp, _electricityMeter, _inning, _road, _station, _taxCode, _trade, _countPeriod, _team, _type, _lastQuery, _groupType, _billingChannel, _billingType, _billingBy, _cashierPay, _requestDate, _edongKey, _isChecked, _traceNumber);
+//                bill.setRequestDateCal(calendar);
+//                lst.add(bill);
+//
+//            }
+//            while (mCursor.moveToNext());
+//
+//            mCursor.close();
+//        }
 
 
         if (lst.size() > 1)
@@ -679,26 +661,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             mCursor.close();
         }
         return count;
-    }
-
-    public long countMoneyAllBillOfCustomer(String edong, String customerCode) {
-        if (edong == null)
-            return 0;
-
-        database = this.getReadableDatabase();
-        long totalMoney = 0;
-        String query = "SELECT SUM(SO_TIEN_TTOAN) AS totalMoney FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and MA_KHANG ='" + customerCode + "'";
-        Cursor mCursor = database.rawQuery(query, null);
-        int count = mCursor.getCount();
-
-        if (count != ZERO) {
-            mCursor.moveToFirst();
-            totalMoney = longConvertNull(mCursor.getLong(mCursor.getColumnIndex("totalMoney")));
-        }
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
-        return totalMoney;
     }
 
 
@@ -800,23 +762,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return Common.TRANG_THAI_TTOAN.NULL;
     }
 
-
-    public List<EntityKhachHang> selectAllCustomer(String edong) {
-        return this.selectAllCustomerFitterBy(edong, Common.TYPE_SEARCH.ALL, Common.TEXT_EMPTY);
-    }
-
-    public boolean checkStatusPayedOfCustormer(String edong, String code) {
-        String query = "SELECT status FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode ='" + code + "' and status = 0";
-        boolean isPayed = false;
-        database = this.getReadableDatabase();
-        Cursor mCursor = database.rawQuery(query, null);
-        isPayed = (mCursor.getCount() == 0) ? true : false;
-
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
-        return isPayed;
-    }
 
     public long updateHoaDonNo(long billID, String status, String edong) {
         database = getWritableDatabase();
@@ -1180,93 +1125,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     }
 
-    public void updateBillOfCustomerIsChecked(String edong, String code, int billId, boolean checked) {
-        ContentValues initialValues = new ContentValues();
-        initialValues.put("isChecked", checked == true ? ONE : ZERO);
-
-        database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_BILL, initialValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, code, String.valueOf(billId)});
-        Log.d(TAG, "updateBillOfCustomerIsChecked: rowAffect is " + rowAffect);
-    }
-
-    public int countMoneyAllBillIsChecked(String edong) {
-        database = this.getReadableDatabase();
-        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and isChecked = " + Common.ONE;
-        Cursor mCursor = database.rawQuery(query, null);
-
-        int totalMoney = ERROR_OCCUR;
-        if (mCursor.moveToFirst())
-            totalMoney = mCursor.getInt(0);
-
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
-        return totalMoney;
-    }
-
-    public long countMoneyAllBillIsCheckedWithStatusPay(String edong, Common.STATUS_BILLING statusBilling) {
-        if (edong == null || edong.trim().isEmpty())
-            return ERROR_OCCUR;
-
-//        database = this.getReadableDatabase();
-//        String query = "SELECT SUM(amount) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and isChecked = " + Common.ONE + " and status = " + statusBilling.getCode();
-//        Cursor mCursor = database.rawQuery(query, null);
-//
-//        int totalMoney = ERROR_OCCUR;
-//        if (mCursor.moveToFirst())
-//            totalMoney = mCursor.getInt(0);
-//
-//        if (mCursor != null && !mCursor.isClosed()) {
-//            mCursor.close();
-//        }
-//        return totalMoney;
-        return  -1;
-    }
-
-
-    public int countAllBillsIsChecked(String edong) {
-        database = this.getReadableDatabase();
-        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and isChecked = " + Common.ONE;
-        Cursor mCursor = database.rawQuery(query, null);
-
-        int totalBills = ERROR_OCCUR;
-        if (mCursor.moveToFirst())
-            totalBills = mCursor.getInt(0);
-
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
-        return totalBills;
-    }
-
-    public int countAllBillsIsCheckedWithStatusPay(String edong, Common.STATUS_BILLING statusBilling) {
-        database = this.getReadableDatabase();
-        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and isChecked = " + Common.ONE + " and status = " + statusBilling.getCode();
-        Cursor mCursor = database.rawQuery(query, null);
-
-        int totalBills = ERROR_OCCUR;
-        if (mCursor.moveToFirst())
-            totalBills = mCursor.getInt(0);
-
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
-        }
-        return totalBills;
-    }
-
-
-    private boolean booleanConvertNull(int isChecked) {
-        return isChecked == Common.ONE ? true : false;
-    }
-
-    public void updateCustomerIsShowBill(String edong, String code, boolean checked) {
-        ContentValues initialValues = new ContentValues();
-        initialValues.put("isShowBill", checked == true ? ONE : ZERO);
-
-        database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_CUSTOMER, initialValues, "edongKey = ? and code = ?", new String[]{edong, code});
-        Log.d(TAG, "updateBillOfCustomerIsChecked: rowAffect is " + rowAffect);
-    }
 
     public String selectSessionAccount(String edong) {
         if (TextUtils.isEmpty(edong))
@@ -1290,191 +1148,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return session;
     }
 
-    public int updateBillStatusPay(String edong, String customerCode, Long billId, Common.STATUS_BILLING statusBilling) {
-        boolean failInput =
-                TextUtils.isEmpty(edong) ||
-                        TextUtils.isEmpty(customerCode);
-        if (failInput)
-            return ERROR_OCCUR;
-        database = this.getReadableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("status", statusBilling.getCode());
-        return database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, customerCode, String.valueOf(billId)});
-    }
-
-    public int countMoneyAllBillIsCheckedWithStatusPay(String edong, String customerCode, Long billId, String dateNow, Long traceNumber) {
-        boolean failInput =
-                TextUtils.isEmpty(edong) ||
-                        TextUtils.isEmpty(customerCode) ||
-                        TextUtils.isEmpty(dateNow);
-        if (failInput)
-            return ERROR_OCCUR;
-
-        database = this.getReadableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("requestDate", dateNow);
-        contentValues.put("traceNumber", traceNumber);
-        return database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, customerCode, String.valueOf(billId)});
-    }
-
-    public Long selectTraceNumberBill(String edong, String code, Long billId) {
-        database = this.getReadableDatabase();
-        String query = "SELECT traceNumber FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and billId = " + billId;
-        Cursor mCursor = database.rawQuery(query, null);
-        if (mCursor.moveToFirst())
-            return longConvertNull(mCursor.getLong(mCursor.getColumnIndex("traceNumber")));
-
-        return 0l;
-    }
-
-    public void updateBillReasonDelete(String edong, String code, Long billId, String reasonDeleteBill, Common.STATUS_BILLING statusBilling) {
-        database = this.getReadableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("causeCancelBillOnline", reasonDeleteBill);
-        contentValues.put("status", statusBilling.getCode());
-
-        database.update(TABLE_NAME_BILL, contentValues, "edongKey = ? and customerCode = ? and billId = ?", new String[]{edong, code, String.valueOf(billId)});
-    }
-
-    public EntityDanhSachThu selectDebtColectionForDanhSachThu(int billId) {
-        database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE billId = " + billId;
-        Cursor c = database.rawQuery(query, null);
-        EntityDanhSachThu entityDanhSachThu = new EntityDanhSachThu();
-        if (c.moveToFirst()) {
-//            entityDanhSachThu.setEdong(c.getString(c.getColumnIndex("edong")));
-//            entityDanhSachThu.setCustomerCode(c.getString(c.getColumnIndex("customerCode")));
-//            entityDanhSachThu.setCustomerPayCode(c.getString(c.getColumnIndex("customerPayCode")));
-//            entityDanhSachThu.setBillId(c.getInt(c.getColumnIndex("billId")));
-//            entityDanhSachThu.setTerm(c.getString(c.getColumnIndex("term")));
-//            entityDanhSachThu.setAmount(c.getInt(c.getColumnIndex("amount")));
-//            entityDanhSachThu.setPeriod(c.getString(c.getColumnIndex("period")));
-//            entityDanhSachThu.setIssueDate(c.getString(c.getColumnIndex("issueDate")));
-//            entityDanhSachThu.setStrIssueDate(c.getString(c.getColumnIndex("strIssueDate")));
-//            entityDanhSachThu.setTRANG_THAI_TT(c.getInt(c.getColumnIndex("status")));
-//            entityDanhSachThu.setSeri(c.getString(c.getColumnIndex("seri")));
-//            entityDanhSachThu.setPcCode(c.getString(c.getColumnIndex("pcCode")));
-//            entityDanhSachThu.setHandoverCode(c.getString(c.getColumnIndex("handoverCode")));
-//            entityDanhSachThu.setCashierCode(c.getString(c.getColumnIndex("cashierCode")));
-//            entityDanhSachThu.setBookCmis(c.getString(c.getColumnIndex("bookCmis")));
-//            entityDanhSachThu.setFromDate(c.getString(c.getColumnIndex("fromDate")));
-//            entityDanhSachThu.setToDate(c.getString(c.getColumnIndex("toDate")));
-//            entityDanhSachThu.setStrFromDate(c.getString(c.getColumnIndex("strFromDate")));
-//            entityDanhSachThu.setStrToDate(c.getString(c.getColumnIndex("strToDate")));
-//            entityDanhSachThu.setHome(c.getString(c.getColumnIndex("home")));
-//            entityDanhSachThu.setTax(c.getFloat(c.getColumnIndex("tax")));
-//            entityDanhSachThu.setBillNum(c.getString(c.getColumnIndex("billNum")));
-//            entityDanhSachThu.setCurrency(c.getString(c.getColumnIndex("currency")));
-//            entityDanhSachThu.setPriceDetails(c.getString(c.getColumnIndex("priceDetails")));
-//            entityDanhSachThu.setNumeDetails(c.getString(c.getColumnIndex("numeDetails")));
-//            entityDanhSachThu.setAmountDetails(c.getString(c.getColumnIndex("amountDetails")));
-//            entityDanhSachThu.setOldIndex(c.getString(c.getColumnIndex("oldIndex")));
-//            entityDanhSachThu.setNewIndex(c.getString(c.getColumnIndex("newIndex")));
-//            entityDanhSachThu.setNume(c.getString(c.getColumnIndex("nume")));
-//            entityDanhSachThu.setAmountNotTax(c.getInt(c.getColumnIndex("amountNotTax")));
-//            entityDanhSachThu.setAmountTax(c.getString(c.getColumnIndex("amountTax")));
-//            entityDanhSachThu.setMultiple(c.getString(c.getColumnIndex("multiple")));
-//            entityDanhSachThu.setBillType(c.getString(c.getColumnIndex("billType")));
-//            entityDanhSachThu.setTypeIndex(c.getString(c.getColumnIndex("typeIndex")));
-//            entityDanhSachThu.setGroupTypeIndex(c.getString(c.getColumnIndex("groupTypeIndex")));
-//            entityDanhSachThu.setCreatedDate(c.getString(c.getColumnIndex("createdDate")));
-//            entityDanhSachThu.setIdChanged(c.getInt(c.getColumnIndex("idChanged")));
-//            entityDanhSachThu.setDateChanged(c.getString(c.getColumnIndex("dateChanged")));
-//            entityDanhSachThu.setPcCodeExt(c.getString(c.getColumnIndex("pcCodeExt")));
-//            entityDanhSachThu.setCode(c.getString(c.getColumnIndex("code")));
-//            entityDanhSachThu.setName(c.getString(c.getColumnIndex("name")));
-//            entityDanhSachThu.setNameNosign(c.getString(c.getColumnIndex("nameNosign")));
-//            entityDanhSachThu.setPhoneByevn(c.getString(c.getColumnIndex("phoneByevn")));
-//            entityDanhSachThu.setPhoneByecp(c.getString(c.getColumnIndex("phoneByecp")));
-//            entityDanhSachThu.setElectricityMeter(c.getString(c.getColumnIndex("electricityMeter")));
-//            entityDanhSachThu.setInning(c.getString(c.getColumnIndex("inning")));
-//            entityDanhSachThu.setRoad(c.getString(c.getColumnIndex("road")));
-//            entityDanhSachThu.setStation(c.getString(c.getColumnIndex("station")));
-//            entityDanhSachThu.setTaxCode(c.getString(c.getColumnIndex("taxCode")));
-//            entityDanhSachThu.setTrade(c.getString(c.getColumnIndex("trade")));
-//            entityDanhSachThu.setCountPeriod(c.getString(c.getColumnIndex("countPeriod")));
-//            entityDanhSachThu.setTeam(c.getString(c.getColumnIndex("team")));
-//            entityDanhSachThu.setType(c.getInt(c.getColumnIndex("type")));
-//            entityDanhSachThu.setLastQuery(c.getString(c.getColumnIndex("lastQuery")));
-//            entityDanhSachThu.setGroupType(c.getInt(c.getColumnIndex("groupType")));
-//            entityDanhSachThu.setBillingChannel(c.getString(c.getColumnIndex("billingChannel")));
-//            entityDanhSachThu.setBillType(c.getString(c.getColumnIndex("billingType")));
-//            entityDanhSachThu.setVI_TTOAN(c.getString(c.getColumnIndex("billingBy")));
-//            entityDanhSachThu.setCashierPay(c.getString(c.getColumnIndex("cashierPay")));
-        }
-        return entityDanhSachThu;
-    }
-
-    public EntityLichSuThanhToan selectDebtColectionForLichSu(int billId) {
-        database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE billId = " + billId;
-        Cursor c = database.rawQuery(query, null);
-        EntityLichSuThanhToan entityLichSuThanhToan = new EntityLichSuThanhToan();
-        if (c.moveToFirst()) {
-//            entityLichSuThanhToan.setEdong(c.getString(c.getColumnIndex("edong")));
-//            entityLichSuThanhToan.setCustomerCode(c.getString(c.getColumnIndex("customerCode")));
-//            entityLichSuThanhToan.setCustomerPayCode(c.getString(c.getColumnIndex("customerPayCode")));
-//            entityLichSuThanhToan.setBillId(c.getInt(c.getColumnIndex("billId")));
-//            entityLichSuThanhToan.setTerm(c.getString(c.getColumnIndex("term")));
-//            entityLichSuThanhToan.setAmount(c.getInt(c.getColumnIndex("amount")));
-//            entityLichSuThanhToan.setPeriod(c.getString(c.getColumnIndex("period")));
-//            entityLichSuThanhToan.setIssueDate(c.getString(c.getColumnIndex("issueDate")));
-//            entityLichSuThanhToan.setStrIssueDate(c.getString(c.getColumnIndex("strIssueDate")));
-//            entityLichSuThanhToan.setTRANG_THAI_TT(c.getInt(c.getColumnIndex("status")));
-//            entityLichSuThanhToan.setSeri(c.getString(c.getColumnIndex("seri")));
-//            entityLichSuThanhToan.setPcCode(c.getString(c.getColumnIndex("pcCode")));
-//            entityLichSuThanhToan.setHandoverCode(c.getString(c.getColumnIndex("handoverCode")));
-//            entityLichSuThanhToan.setCashierCode(c.getString(c.getColumnIndex("cashierCode")));
-//            entityLichSuThanhToan.setBookCmis(c.getString(c.getColumnIndex("bookCmis")));
-//            entityLichSuThanhToan.setFromDate(c.getString(c.getColumnIndex("fromDate")));
-//            entityLichSuThanhToan.setToDate(c.getString(c.getColumnIndex("toDate")));
-//            entityLichSuThanhToan.setStrFromDate(c.getString(c.getColumnIndex("strFromDate")));
-//            entityLichSuThanhToan.setStrToDate(c.getString(c.getColumnIndex("strToDate")));
-//            entityLichSuThanhToan.setHome(c.getString(c.getColumnIndex("home")));
-//            entityLichSuThanhToan.setTax(c.getFloat(c.getColumnIndex("tax")));
-//            entityLichSuThanhToan.setBillNum(c.getString(c.getColumnIndex("billNum")));
-//            entityLichSuThanhToan.setCurrency(c.getString(c.getColumnIndex("currency")));
-//            entityLichSuThanhToan.setPriceDetails(c.getString(c.getColumnIndex("priceDetails")));
-//            entityLichSuThanhToan.setNumeDetails(c.getString(c.getColumnIndex("numeDetails")));
-//            entityLichSuThanhToan.setAmountDetails(c.getString(c.getColumnIndex("amountDetails")));
-//            entityLichSuThanhToan.setOldIndex(c.getString(c.getColumnIndex("oldIndex")));
-//            entityLichSuThanhToan.setNewIndex(c.getString(c.getColumnIndex("newIndex")));
-//            entityLichSuThanhToan.setNume(c.getString(c.getColumnIndex("nume")));
-//            entityLichSuThanhToan.setAmountNotTax(c.getInt(c.getColumnIndex("amountNotTax")));
-//            entityLichSuThanhToan.setAmountTax(c.getString(c.getColumnIndex("amountTax")));
-//            entityLichSuThanhToan.setMultiple(c.getString(c.getColumnIndex("multiple")));
-//            entityLichSuThanhToan.setBillType(c.getString(c.getColumnIndex("billType")));
-//            entityLichSuThanhToan.setTypeIndex(c.getString(c.getColumnIndex("typeIndex")));
-//            entityLichSuThanhToan.setGroupTypeIndex(c.getString(c.getColumnIndex("groupTypeIndex")));
-//            entityLichSuThanhToan.setCreatedDate(c.getString(c.getColumnIndex("createdDate")));
-//            entityLichSuThanhToan.setIdChanged(c.getInt(c.getColumnIndex("idChanged")));
-//            entityLichSuThanhToan.setDateChanged(c.getString(c.getColumnIndex("dateChanged")));
-//            entityLichSuThanhToan.setPcCodeExt(c.getString(c.getColumnIndex("pcCodeExt")));
-//            entityLichSuThanhToan.setCode(c.getString(c.getColumnIndex("code")));
-//            entityLichSuThanhToan.setName(c.getString(c.getColumnIndex("name")));
-//            entityLichSuThanhToan.setNameNosign(c.getString(c.getColumnIndex("nameNosign")));
-//            entityLichSuThanhToan.setPhoneByevn(c.getString(c.getColumnIndex("phoneByevn")));
-//            entityLichSuThanhToan.setPhoneByecp(c.getString(c.getColumnIndex("phoneByecp")));
-//            entityLichSuThanhToan.setElectricityMeter(c.getString(c.getColumnIndex("electricityMeter")));
-//            entityLichSuThanhToan.setInning(c.getString(c.getColumnIndex("inning")));
-//            entityLichSuThanhToan.setRoad(c.getString(c.getColumnIndex("road")));
-//            entityLichSuThanhToan.setStation(c.getString(c.getColumnIndex("station")));
-//            entityLichSuThanhToan.setTaxCode(c.getString(c.getColumnIndex("taxCode")));
-//            entityLichSuThanhToan.setTrade(c.getString(c.getColumnIndex("trade")));
-//            entityLichSuThanhToan.setCountPeriod(c.getString(c.getColumnIndex("countPeriod")));
-//            entityLichSuThanhToan.setTeam(c.getString(c.getColumnIndex("team")));
-//            entityLichSuThanhToan.setType(c.getInt(c.getColumnIndex("type")));
-//            entityLichSuThanhToan.setLastQuery(c.getString(c.getColumnIndex("lastQuery")));
-//            entityLichSuThanhToan.setGroupType(c.getInt(c.getColumnIndex("groupType")));
-//            entityLichSuThanhToan.setBillingChannel(c.getString(c.getColumnIndex("billingChannel")));
-//            entityLichSuThanhToan.setBillType(c.getString(c.getColumnIndex("billingType")));
-//            entityLichSuThanhToan.setVI_TTOAN(c.getString(c.getColumnIndex("billingBy")));
-//            entityLichSuThanhToan.setCashierPay(c.getString(c.getColumnIndex("cashierPay")));
-        }
-        return entityLichSuThanhToan;
-    }
-
-    //endregion
 
     //region EVN
     public void insertOrUpdateEvnPcFromLoginReponse(EvnPC evnPC) {
@@ -2303,16 +1976,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return rowAffect;
     }
 
-    public int updateBillWith(String edongKey, int billId, int status, String edong) {
-        ContentValues initialValues = new ContentValues();
-
-        initialValues.put("status", status);
-        initialValues.put("edong", edong);
-
-        database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_DEBT_COLLECTION, initialValues, " edongKey = ? and billId = ? ", new String[]{edongKey, String.valueOf(billId)});
-        return rowAffect;
-    }
 
     public long checkBillExist(String billId) {
         database = this.getReadableDatabase();
@@ -2321,426 +1984,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (mCursor.moveToFirst())
             return mCursor.getInt(0);
         return 0;
-    }
-
-    public long getMaxIdChanged() {
-        database = this.getReadableDatabase();
-        String query = "SELECT MAX(idChanged) FROM " + TABLE_NAME_BILL;
-        Cursor c = database.rawQuery(query, null);
-        if (c.moveToFirst()) {
-            return c.getLong(0);
-        }
-        return 0l;
-    }
-
-    public String getMaxDateChanged() {
-        database = this.getReadableDatabase();
-        String query = "SELECT MAX(dateChanged) FROM " + TABLE_NAME_BILL;
-        Cursor c = database.rawQuery(query, null);
-        if (c.moveToFirst()) {
-            return c.getString(0);
-        }
-        return "";
-    }
-
-    public boolean checkIsHasBillNotPayTermBefore(String edong, String code, String term) {
-        database = this.getReadableDatabase();
-
-        String query = "SELECT billId FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode = '" + code + "' and status = " + Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode() + " and term < " + term;
-        Cursor mCursor = database.rawQuery(query, null);
-
-        if (mCursor.getCount() > 0)
-            return true;
-
-        return false;
-    }
-
-    public String getTermBillOfCustomer(String edong, String code, int billId) {
-        database = this.getReadableDatabase();
-
-        String query = "SELECT term FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode = '" + code + "' and billID = " + billId;
-        Cursor mCursor = database.rawQuery(query, null);
-
-        if (mCursor.getCount() == 0)
-            return null;
-
-        if (mCursor.moveToFirst())
-            return stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
-
-        return null;
-    }
-    //endregion
-
-    //region DEBT Danh sách hóa đơn thu
-    public int insertDebtCollection(EntityDanhSachThu entityDanhSachThu) {
-
-//        if (entityDanhSachThu.getEdong() == null || entityDanhSachThu.getEdong().trim().isEmpty())
-//            return SQLiteConnection.ERROR_OCCUR;
-//
-//        ContentValues initialValues = new ContentValues();
-//        initialValues.put("customerCode", entityDanhSachThu.getCustomerCode());
-//        initialValues.put("customerPayCode", entityDanhSachThu.getCustomerPayCode());
-//        initialValues.put("billId", entityDanhSachThu.getBillId());
-//
-//        //20170414011107000 != 2015-01-01
-//        String term = "";
-//        if (entityDanhSachThu.getTerm().length() == yyyyMMdd.toString().length()) {
-//            term = Common.convertDateToDate(entityDanhSachThu.getTerm(), yyyyMMdd, yyyyMMddHHmmssSSS);
-//        }
-//        initialValues.put("term", term);
-//        initialValues.put("amount", entityDanhSachThu.getAmount());
-//        initialValues.put("period", entityDanhSachThu.getPeriod());
-//        initialValues.put("issueDate", entityDanhSachThu.getIssueDate());
-//        initialValues.put("strIssueDate", entityDanhSachThu.getStrIssueDate());
-//        initialValues.put("status", entityDanhSachThu.getTRANG_THAI_TT());
-//        initialValues.put("seri", entityDanhSachThu.getSeri());
-//        initialValues.put("pcCode", entityDanhSachThu.getPcCode());
-//        initialValues.put("handoverCode", entityDanhSachThu.getHandoverCode());
-//        initialValues.put("cashierCode", entityDanhSachThu.getCashierCode());
-//        initialValues.put("bookCmis", entityDanhSachThu.getBookCmis());
-//        initialValues.put("fromDate", entityDanhSachThu.getFromDate());
-//        initialValues.put("toDate", entityDanhSachThu.getToDate());
-//        initialValues.put("strFromDate", entityDanhSachThu.getStrFromDate());
-//        initialValues.put("strToDate", entityDanhSachThu.getStrToDate());
-//        initialValues.put("home", entityDanhSachThu.getHome());
-//        initialValues.put("tax", entityDanhSachThu.getTax());
-//        initialValues.put("billNum", entityDanhSachThu.getBillNum());
-//        initialValues.put("currency", entityDanhSachThu.getCurrency());
-//        initialValues.put("priceDetails", entityDanhSachThu.getPriceDetails());
-//        initialValues.put("numeDetails", entityDanhSachThu.getNumeDetails());
-//        initialValues.put("amountDetails", entityDanhSachThu.getAmountDetails());
-//        initialValues.put("oldIndex", entityDanhSachThu.getOldIndex());
-//        initialValues.put("newIndex", entityDanhSachThu.getNewIndex());
-//        initialValues.put("nume", entityDanhSachThu.getNume());
-//        initialValues.put("amountNotTax", entityDanhSachThu.getAmountNotTax());
-//        initialValues.put("amountTax", entityDanhSachThu.getAmountTax());
-//        initialValues.put("multiple", entityDanhSachThu.getMultiple());
-//        initialValues.put("billType", entityDanhSachThu.getBillType());
-//        initialValues.put("typeIndex", entityDanhSachThu.getTypeIndex());
-//        initialValues.put("groupTypeIndex", entityDanhSachThu.getGroupTypeIndex());
-//        initialValues.put("createdDate", entityDanhSachThu.getCreatedDate());
-//        initialValues.put("idChanged", entityDanhSachThu.getIdChanged());
-//        initialValues.put("dateChanged", entityDanhSachThu.getDateChanged());
-//        initialValues.put("edong", entityDanhSachThu.getEdong());
-//        initialValues.put("pcCodeExt", entityDanhSachThu.getPcCodeExt());
-//        initialValues.put("code", entityDanhSachThu.getCode());
-//        initialValues.put("name", entityDanhSachThu.getName());
-//        initialValues.put("nameNosign", entityDanhSachThu.getNameNosign());
-//        initialValues.put("phoneByevn", entityDanhSachThu.getPhoneByevn());
-//        initialValues.put("phoneByecp", entityDanhSachThu.getPhoneByecp());
-//        initialValues.put("electricityMeter", entityDanhSachThu.getElectricityMeter());
-//        initialValues.put("inning", entityDanhSachThu.getInning());
-//        initialValues.put("road", entityDanhSachThu.getRoad());
-//        initialValues.put("station", entityDanhSachThu.getStation());
-//        initialValues.put("taxCode", entityDanhSachThu.getTaxCode());
-//        initialValues.put("trade", entityDanhSachThu.getTrade());
-//        initialValues.put("countPeriod", entityDanhSachThu.getCountPeriod());
-//        initialValues.put("team", entityDanhSachThu.getTeam());
-//        initialValues.put("type", entityDanhSachThu.getType());
-//        initialValues.put("lastQuery", entityDanhSachThu.getLastQuery());
-//        initialValues.put("groupType", entityDanhSachThu.getGroupType());
-//        initialValues.put("billingChannel", entityDanhSachThu.getBillingChannel());
-//        initialValues.put("billingType", entityDanhSachThu.getBillingType());
-//        initialValues.put("billingBy", entityDanhSachThu.getBillingBy());
-//        initialValues.put("cashierPay", entityDanhSachThu.getCashierPay());
-//        initialValues.put("edongKey", entityDanhSachThu.getEdong());
-//        initialValues.put("payments", entityDanhSachThu.getPayments());
-//        initialValues.put("payStatus", entityDanhSachThu.getPayStatus());
-//        initialValues.put("stateOfDebt", entityDanhSachThu.getStateOfDebt());
-//        initialValues.put("stateOfCancel", entityDanhSachThu.getStateOfCancel());
-//        initialValues.put("stateOfReturn", entityDanhSachThu.getStateOfReturn());
-//        initialValues.put("suspectedProcessingStatus", entityDanhSachThu.getSuspectedProcessingStatus());
-//        initialValues.put("stateOfPush", entityDanhSachThu.getStateOfPush());
-//        initialValues.put("dateOfPush", entityDanhSachThu.getDateOfPush());
-//        initialValues.put("countPrintReceipt", entityDanhSachThu.getCountPrintReceipt());
-//        initialValues.put("printInfo", entityDanhSachThu.getPrintInfo());
-//        database = getWritableDatabase();
-//        int rowAffect = (int) database.insert(TABLE_NAME_DEBT_COLLECTION, null, initialValues);
-//
-//        return rowAffect;
-        return  -1;
-    }
-
-    public int updateBillDebtWith(
-            String edongKey, int billId, //where
-            String edong, Integer paymentMode, int payStatus, Integer stateOfDebt, Integer stateOfCancel,
-            Integer stateOfReturn, Integer suspectedProcessingStatus, Integer stateOfPush, String dateOfPush,
-            int countPrintReceipt, Integer statusOfPrintInfo) {
-        ContentValues initialValues = new ContentValues();
-
-        initialValues.put("edong", edong);
-        initialValues.put("payments", paymentMode);
-
-        initialValues.put("payStatus", payStatus);
-        initialValues.put("stateOfDebt", stateOfDebt);
-        initialValues.put("stateOfCancel", stateOfCancel);
-        initialValues.put("stateOfReturn", stateOfReturn);
-        initialValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
-        initialValues.put("stateOfPush", stateOfPush);
-        initialValues.put("dateOfPush", dateOfPush);
-        initialValues.put("countPrintReceipt", countPrintReceipt);
-        initialValues.put("printInfo", statusOfPrintInfo);
-
-        database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_DEBT_COLLECTION, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
-        return rowAffect;
-    }
-
-    public int updateBillDebtWithThanhToanBoiNguonKhac(String edongKey, int billId, String edong, Integer paymentMode, int payStatus, Integer stateOfDebt, Integer stateOfCancel, Integer stateOfReturn, Integer suspectedProcessingStatus, String dateOfPush, int countPrintReceipt, Integer statusOfPrintInfo, Integer tradeCode) {
-        ContentValues initialValues = new ContentValues();
-
-        initialValues.put("edong", edong);
-        initialValues.put("payments", paymentMode);
-
-        initialValues.put("payStatus", payStatus);
-        initialValues.put("stateOfDebt", stateOfDebt);
-        initialValues.put("stateOfCancel", stateOfCancel);
-        initialValues.put("stateOfReturn", stateOfReturn);
-        initialValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
-        initialValues.put("dateOfPush", dateOfPush);
-        initialValues.put("countPrintReceipt", countPrintReceipt);
-        initialValues.put("printInfo", statusOfPrintInfo);
-        initialValues.put("tradeCode", tradeCode);
-
-        database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_DEBT_COLLECTION, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
-        return rowAffect;
-    }
-
-
-    public int selectPayStatusDebt(String edong, String code, int billId) {
-        database = this.getReadableDatabase();
-//        String query = "SELECT payStatus FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE edongKey = '" + edong + "' and customerCode = '" + code + "' and billId = '" + billId + "'";
-        String query = "SELECT status FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and customerCode = '" + code + "' and billId = '" + billId + "'";
-        Cursor mCursor = database.rawQuery(query, null);
-        if (mCursor.moveToFirst())
-            return mCursor.getInt(0);
-        return ERROR_OCCUR;
-    }
-
-    public int updateBillDebtWithThanhToanErrorOrSuccess(
-            String edongKey, int billId, //where
-            String edong, Integer paymentMode, int payStatus, Integer stateOfDebt, Integer stateOfCancel,
-            Integer stateOfReturn, Integer suspectedProcessingStatus, int countPrintReceipt, Integer statusOfPrintInfo) {
-        ContentValues initialValues = new ContentValues();
-
-        initialValues.put("edong", edong);
-        initialValues.put("payments", paymentMode);
-
-        initialValues.put("payStatus", payStatus);
-        initialValues.put("stateOfDebt", stateOfDebt);
-        initialValues.put("stateOfCancel", stateOfCancel);
-        initialValues.put("stateOfReturn", stateOfReturn);
-        initialValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
-        initialValues.put("countPrintReceipt", countPrintReceipt);
-        initialValues.put("printInfo", statusOfPrintInfo);
-
-        database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_DEBT_COLLECTION, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
-        return rowAffect;
-    }
-
-    public int updateBillDebtWithSuspectedProcessingStatus(String edong, int billId, Integer suspectedProcessingStatus) {
-        database = getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
-        return database.update(TABLE_NAME_DEBT_COLLECTION, contentValues, "edongKey = ? and billId = ? ", new String[]{edong, String.valueOf(billId)});
-    }
-
-    //endregion
-
-    //region HISTORY Lịch sử
-    public int insertPayLib(EntityLichSuThanhToan entityLichSuThanhToan) {
-
-        database = getWritableDatabase();
-
-//        if (entityLichSuThanhToan.getEdong() == null || entityLichSuThanhToan.getEdong().trim().isEmpty())
-//            return SQLiteConnection.ERROR_OCCUR;
-//
-//        ContentValues initialValues = new ContentValues();
-//        initialValues.put("customerCode", entityLichSuThanhToan.getCustomerCode());
-//        initialValues.put("customerPayCode", entityLichSuThanhToan.getCustomerPayCode());
-//        initialValues.put("billId", entityLichSuThanhToan.getBillId());
-//
-//        //20170414011107000 != 2015-01-01
-//        String term = "";
-//        if (entityLichSuThanhToan.getTerm().length() == yyyyMMdd.toString().length()) {
-//            term = Common.convertDateToDate(entityLichSuThanhToan.getTerm(), yyyyMMdd, yyyyMMddHHmmssSSS);
-//        }
-//        initialValues.put("term", term);
-//        initialValues.put("amount", entityLichSuThanhToan.getAmount());
-//        initialValues.put("period", entityLichSuThanhToan.getPeriod());
-//        initialValues.put("issueDate", entityLichSuThanhToan.getIssueDate());
-//        initialValues.put("strIssueDate", entityLichSuThanhToan.getStrIssueDate());
-//        initialValues.put("status", entityLichSuThanhToan.getTRANG_THAI_TT());
-//        initialValues.put("seri", entityLichSuThanhToan.getSeri());
-//        initialValues.put("pcCode", entityLichSuThanhToan.getPcCode());
-//        initialValues.put("handoverCode", entityLichSuThanhToan.getHandoverCode());
-//        initialValues.put("cashierCode", entityLichSuThanhToan.getCashierCode());
-//        initialValues.put("bookCmis", entityLichSuThanhToan.getBookCmis());
-//        initialValues.put("fromDate", entityLichSuThanhToan.getFromDate());
-//        initialValues.put("toDate", entityLichSuThanhToan.getToDate());
-//        initialValues.put("strFromDate", entityLichSuThanhToan.getStrFromDate());
-//        initialValues.put("strToDate", entityLichSuThanhToan.getStrToDate());
-//        initialValues.put("home", entityLichSuThanhToan.getHome());
-//        initialValues.put("tax", entityLichSuThanhToan.getTax());
-//        initialValues.put("billNum", entityLichSuThanhToan.getBillNum());
-//        initialValues.put("currency", entityLichSuThanhToan.getCurrency());
-//        initialValues.put("priceDetails", entityLichSuThanhToan.getPriceDetails());
-//        initialValues.put("numeDetails", entityLichSuThanhToan.getNumeDetails());
-//        initialValues.put("amountDetails", entityLichSuThanhToan.getAmountDetails());
-//        initialValues.put("oldIndex", entityLichSuThanhToan.getOldIndex());
-//        initialValues.put("newIndex", entityLichSuThanhToan.getNewIndex());
-//        initialValues.put("nume", entityLichSuThanhToan.getNume());
-//        initialValues.put("amountNotTax", entityLichSuThanhToan.getAmountNotTax());
-//        initialValues.put("amountTax", entityLichSuThanhToan.getAmountTax());
-//        initialValues.put("multiple", entityLichSuThanhToan.getMultiple());
-//        initialValues.put("billType", entityLichSuThanhToan.getBillType());
-//        initialValues.put("typeIndex", entityLichSuThanhToan.getTypeIndex());
-//        initialValues.put("groupTypeIndex", entityLichSuThanhToan.getGroupTypeIndex());
-//        initialValues.put("createdDate", entityLichSuThanhToan.getCreatedDate());
-//        initialValues.put("idChanged", entityLichSuThanhToan.getIdChanged());
-//        initialValues.put("dateChanged", entityLichSuThanhToan.getDateChanged());
-//        initialValues.put("edong", entityLichSuThanhToan.getEdong());
-//        initialValues.put("pcCodeExt", entityLichSuThanhToan.getPcCodeExt());
-//        initialValues.put("code", entityLichSuThanhToan.getCode());
-//        initialValues.put("name", entityLichSuThanhToan.getName());
-//        initialValues.put("nameNosign", entityLichSuThanhToan.getNameNosign());
-//        initialValues.put("phoneByevn", entityLichSuThanhToan.getPhoneByevn());
-//        initialValues.put("phoneByecp", entityLichSuThanhToan.getPhoneByecp());
-//        initialValues.put("electricityMeter", entityLichSuThanhToan.getElectricityMeter());
-//        initialValues.put("inning", entityLichSuThanhToan.getInning());
-//        initialValues.put("road", entityLichSuThanhToan.getRoad());
-//        initialValues.put("station", entityLichSuThanhToan.getStation());
-//        initialValues.put("taxCode", entityLichSuThanhToan.getTaxCode());
-//        initialValues.put("trade", entityLichSuThanhToan.getTrade());
-//        initialValues.put("countPeriod", entityLichSuThanhToan.getCountPeriod());
-//        initialValues.put("team", entityLichSuThanhToan.getTeam());
-//        initialValues.put("type", entityLichSuThanhToan.getType());
-//        initialValues.put("lastQuery", entityLichSuThanhToan.getLastQuery());
-//        initialValues.put("groupType", entityLichSuThanhToan.getGroupType());
-//        initialValues.put("billingChannel", entityLichSuThanhToan.getBillingChannel());
-//        initialValues.put("billingType", entityLichSuThanhToan.getBillingType());
-//        initialValues.put("billingBy", entityLichSuThanhToan.getBillingBy());
-//        initialValues.put("cashierPay", entityLichSuThanhToan.getCashierPay());
-//        initialValues.put("edongKey", entityLichSuThanhToan.getEdong());
-//        initialValues.put("payments", entityLichSuThanhToan.getPayments());
-//        initialValues.put("payStatus", entityLichSuThanhToan.getPayStatus());
-//        initialValues.put("stateOfDebt", entityLichSuThanhToan.getStateOfDebt());
-//        initialValues.put("stateOfCancel", entityLichSuThanhToan.getStateOfCancel());
-//        initialValues.put("stateOfReturn", entityLichSuThanhToan.getStateOfReturn());
-//        initialValues.put("suspectedProcessingStatus", entityLichSuThanhToan.getSuspectedProcessingStatus());
-//        initialValues.put("stateOfPush", entityLichSuThanhToan.getStateOfPush());
-//        initialValues.put("dateOfPush", entityLichSuThanhToan.getDateOfPush());
-//        initialValues.put("countPrintReceipt", entityLichSuThanhToan.getCountPrintReceipt());
-//        initialValues.put("printInfo", entityLichSuThanhToan.getPrintInfo());
-//        initialValues.put("dateIncurred", entityLichSuThanhToan.getDateIncurred());
-//        initialValues.put("tradingCode", entityLichSuThanhToan.getTradingCode());
-//        int rowAffect = (int) database.insert(TABLE_NAME_HISTORY_PAY, null, initialValues);
-//
-//        return rowAffect;
-        return  -1;
-    }
-
-    public String getCustomerNameByBillId(String edong, long billId) {
-        database = this.getReadableDatabase();
-        String query = "SELECT name FROM (SELECT customerCode FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and billId = " + billId + " ) AS A JOIN " + TABLE_NAME_CUSTOMER + " AS B ON A.customerCode = B.code";
-        Cursor c = database.rawQuery(query, null);
-
-        c.moveToFirst();
-        if (c.getCount() == 0) {
-            return null;
-        } else return stringConvertNull(c.getString(c.getColumnIndex("name")));
-    }
-
-    public String getCustomerCodeByBillId(String edong, long billId) {
-        database = this.getReadableDatabase();
-        String query = "SELECT customerCode FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and billId = " + billId;
-        Cursor c = database.rawQuery(query, null);
-
-        c.moveToFirst();
-        if (c.getCount() == 0) {
-            return null;
-        } else return stringConvertNull(c.getString(c.getColumnIndex("customerCode")));
-    }
-
-    public int updateBillHistoryWith(String edongKey, int billId, String dateIncurred, Integer tradingCode) {
-        ContentValues initialValues = new ContentValues();
-
-        initialValues.put("dateIncurred", dateIncurred);
-        initialValues.put("tradingCode", tradingCode);
-
-        database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_HISTORY_PAY, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
-        return rowAffect;
-    }
-
-    public int updateBillWithWithThanhToanError(String edongKey, int billId, String edong) {
-        ContentValues initialValues = new ContentValues();
-
-        initialValues.put("edong", edong);
-
-        database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_HISTORY_PAY, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
-        return rowAffect;
-    }
-
-    public int updateBillHistoryWithThanhToanErrorOrSuccess(String edongKey, int billId, String edong, Integer paymentMode, int payStatus, Integer stateOfDebt, Integer stateOfCancel, Integer stateOfReturn, Integer suspectedProcessingStatus, int countPrintReceipt, Integer statusOfPrintInfo, String dateIncurred, Integer tradingCode) {
-        ContentValues initialValues = new ContentValues();
-
-        initialValues.put("edong", edong);
-        initialValues.put("payments", paymentMode);
-        initialValues.put("payStatus", payStatus);
-        initialValues.put("stateOfDebt", stateOfDebt);
-        initialValues.put("stateOfCancel", stateOfCancel);
-        initialValues.put("stateOfReturn", stateOfReturn);
-        initialValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
-        initialValues.put("countPrintReceipt", countPrintReceipt);
-        initialValues.put("printInfo", statusOfPrintInfo);
-
-        initialValues.put("dateIncurred", dateIncurred);
-        initialValues.put("tradingCode", tradingCode);
-
-        database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_HISTORY_PAY, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
-        return rowAffect;
-    }
-
-    public int updateBillHistoryWithPrintInfo(String edongKey, int billId, Integer statusOfPrintInfo) {
-        ContentValues initialValues = new ContentValues();
-
-        initialValues.put("printInfo", statusOfPrintInfo);
-
-        database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_HISTORY_PAY, initialValues, " edongKey = ? and billId = ?", new String[]{edongKey, String.valueOf(billId)});
-        return rowAffect;
-    }
-
-    public int updateBillHistoryWithSuspectedProcessingStatus(String edong, int billId, Integer suspectedProcessingStatus) {
-        database = getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("suspectedProcessingStatus", suspectedProcessingStatus);
-        return database.update(TABLE_NAME_HISTORY_PAY, contentValues, "edongKey = ? and billId = ? ", new String[]{edong, String.valueOf(billId)});
-    }
-
-    //endregion
-
-    //region Account Tài khoản
-    public int selectNotYetPushMoney(String edongKey) {
-        database = getReadableDatabase();
-        String query = "SELECT notYetPushMoney FROM " + TABLE_NAME_ACCOUNT + " where edong = '" + edongKey + "'";
-        Cursor c = database.rawQuery(query, null);
-        if (c.moveToFirst()) {
-            return intConvertNull(c.getInt(0));
-        }
-        return 0;
-    }
-
-    public int updateAccountWith(String edong, int notYetPushMoney) {
-        database = getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("notYetPushMoney", notYetPushMoney);
-        return database.update(TABLE_NAME_ACCOUNT, contentValues, "edong = ?", new String[]{String.valueOf(edong)});
     }
 
 

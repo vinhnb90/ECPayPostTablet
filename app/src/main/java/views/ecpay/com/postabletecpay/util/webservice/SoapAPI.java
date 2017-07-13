@@ -925,8 +925,8 @@ public class SoapAPI {
     }
 
     public static String getJsonRequestAccount(String agent, String agentEncypted, String commandId, long auditNumber,
-                                                  String macAdressHexValue, String diskDriver, String signatureEncrypted,
-                                                  String phone, String accountId) {
+                                               String macAdressHexValue, String diskDriver, String signatureEncrypted,
+                                               String phone, String accountId) {
         boolean hasNull =
                 TextUtils.isEmpty(agent) ||
                         TextUtils.isEmpty(agentEncypted) ||
@@ -1283,7 +1283,7 @@ public class SoapAPI {
         protected ChangePassResponse doInBackground(String... jsons) {
             String json = jsons[0];
             try {
-                Common.writeLog(json, Common.COMMAND_ID.CHANGE_PIN.toString(),true);
+                Common.writeLog(json, Common.COMMAND_ID.CHANGE_PIN.toString(), true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -1315,7 +1315,7 @@ public class SoapAPI {
 
             String data = response.toString();
             try {
-                Common.writeLog(data, Common.COMMAND_ID.CHANGE_PIN.toString(),false);
+                Common.writeLog(data, Common.COMMAND_ID.CHANGE_PIN.toString(), false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -1401,7 +1401,7 @@ public class SoapAPI {
         protected CashTranferRespone doInBackground(String... jsons) {
             String json = jsons[0];
             try {
-                Common.writeLog(json, Common.COMMAND_ID.CASH_TRANSFER.toString(),true);
+                Common.writeLog(json, Common.COMMAND_ID.CASH_TRANSFER.toString(), true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -1434,7 +1434,7 @@ public class SoapAPI {
             String data = response.toString();
 
             try {
-                Common.writeLog(data, Common.COMMAND_ID.CASH_TRANSFER.toString(),false);
+                Common.writeLog(data, Common.COMMAND_ID.CASH_TRANSFER.toString(), false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -1523,7 +1523,7 @@ public class SoapAPI {
             String json = jsons[0];
 
             try {
-                Common.writeLog(json, Common.COMMAND_ID.GET_PC_INFO.toString(),true);
+                Common.writeLog(json, Common.COMMAND_ID.GET_PC_INFO.toString(), true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -1556,7 +1556,7 @@ public class SoapAPI {
             String data = response.toString();
 
             try {
-                Common.writeLog(data, Common.COMMAND_ID.GET_PC_INFO.toString(),false);
+                Common.writeLog(data, Common.COMMAND_ID.GET_PC_INFO.toString(), false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -1862,7 +1862,7 @@ public class SoapAPI {
         protected T doInBackground(String... jsons) {
             String json = jsons[0];
             try {
-                Common.writeLog(json, "Chưa rõ---Xem thông số header",true);
+                Common.writeLog(json, "Chưa rõ---Xem thông số header", true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -1895,7 +1895,7 @@ public class SoapAPI {
             String data = response.toString();
 
             try {
-                Common.writeLog(data, "Chưa rõ---Xem thông số header",false);
+                Common.writeLog(data, "Chưa rõ---Xem thông số header", false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -1957,7 +1957,7 @@ public class SoapAPI {
         }
     }
 
-    public static class AsyncSoapIncludeTimout<T extends Respone> extends AsyncTask<String, String,  T> {
+    public static class AsyncSoapIncludeTimout<T extends Respone> extends AsyncTask<String, String, T> {
 
         Class<T> classType;
 
@@ -1969,13 +1969,13 @@ public class SoapAPI {
         private static final String METHOD_PARAM = "message";
         private AsyncSoapCallBack callBack;
         private boolean isEndCallSoap = false;
-        private  Handler mHandler;
-        private  Runnable handerTimeOut;
+        private Handler mHandler;
+        private Runnable handerTimeOut;
 
 
         private Object userData;
 
-        public AsyncSoapIncludeTimout( Handler handler,Class<T> type, AsyncSoapCallBack callBack) throws Exception {
+        public AsyncSoapIncludeTimout(Handler handler, Class<T> type, AsyncSoapCallBack callBack) throws Exception {
             this.callBack = callBack;
             this.classType = type;
             mHandler = handler;
@@ -2083,7 +2083,7 @@ public class SoapAPI {
             super.onCancelled();
         }
 
-        public static abstract class AsyncSoapCallBack<T extends  Respone> {
+        public static abstract class AsyncSoapCallBack<T extends Respone> {
             public abstract void onPre(final AsyncSoapIncludeTimout soap);
 
             public abstract void onUpdate(String message);
@@ -2143,7 +2143,7 @@ public class SoapAPI {
             String json = jsons[0];
 
             try {
-                Common.writeLog(json, Common.COMMAND_ID.CUSTOMER_BILL.toString(),true);
+                Common.writeLog(json, Common.COMMAND_ID.CUSTOMER_BILL.toString(), true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -2175,7 +2175,7 @@ public class SoapAPI {
             String data = response.toString();
 
             try {
-                Common.writeLog(data, Common.COMMAND_ID.CUSTOMER_BILL.toString(),false);
+                Common.writeLog(data, Common.COMMAND_ID.CUSTOMER_BILL.toString(), false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -2285,7 +2285,7 @@ public class SoapAPI {
             String json = jsons[0];
 
             try {
-                Common.writeLog(json, Common.COMMAND_ID.LOGOUT.toString(),true);
+                Common.writeLog(json, Common.COMMAND_ID.LOGOUT.toString(), true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -2316,7 +2316,7 @@ public class SoapAPI {
             String data = response.toString();
 
             try {
-                Common.writeLog(data, Common.COMMAND_ID.LOGOUT.toString(),false);
+                Common.writeLog(data, Common.COMMAND_ID.LOGOUT.toString(), false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -2407,7 +2407,7 @@ public class SoapAPI {
         private Handler handlerDelay;
         int positionIndexListAsyncBillOnline;
 
-        public AsyncSoapBillOnline(String edong, AsyncSoapBillOnlineCallBack callBack, Handler handler, int positionIndexListAsyncBillOnline, PayAdapter.BillEntityAdapter  entity) throws Exception {
+        public AsyncSoapBillOnline(String edong, AsyncSoapBillOnlineCallBack callBack, Handler handler, int positionIndexListAsyncBillOnline, PayAdapter.BillEntityAdapter entity) throws Exception {
             this.callBack = callBack;
             this.edong = edong;
             this.handlerDelay = handler;
@@ -2427,7 +2427,7 @@ public class SoapAPI {
             String json = jsons[0];
 
             try {
-                Common.writeLog(json, Common.COMMAND_ID.BILLING.toString(),true);
+                Common.writeLog(json, Common.COMMAND_ID.BILLING.toString(), true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -2460,7 +2460,7 @@ public class SoapAPI {
             String data = response.toString();
 
             try {
-                Common.writeLog(data, Common.COMMAND_ID.BILLING.toString(),false);
+                Common.writeLog(data, Common.COMMAND_ID.BILLING.toString(), false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -2568,7 +2568,7 @@ public class SoapAPI {
             String json = jsons[0];
 
             try {
-                Common.writeLog(json, Common.COMMAND_ID.CHECK_TRANS.toString(),true);
+                Common.writeLog(json, Common.COMMAND_ID.CHECK_TRANS.toString(), true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -2599,7 +2599,7 @@ public class SoapAPI {
             String data = response.toString();
 
             try {
-                Common.writeLog(data, Common.COMMAND_ID.CHECK_TRANS.toString(),false);
+                Common.writeLog(data, Common.COMMAND_ID.CHECK_TRANS.toString(), false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -2699,7 +2699,7 @@ public class SoapAPI {
             Log.d("here", "doInBackground: " + json);
 
             try {
-                Common.writeLog(json, Common.COMMAND_ID.CHECK_TRANS.toString(),true);
+                Common.writeLog(json, Common.COMMAND_ID.CHECK_TRANS.toString(), true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -2731,7 +2731,7 @@ public class SoapAPI {
             String data = response.toString();
 
             try {
-                Common.writeLog(data, Common.COMMAND_ID.CHECK_TRANS.toString(),false);
+                Common.writeLog(data, Common.COMMAND_ID.CHECK_TRANS.toString(), false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -2835,7 +2835,7 @@ public class SoapAPI {
             String json = jsons[0];
 
             try {
-                Common.writeLog(json, Common.COMMAND_ID.TRANSACTION_CANCELLATION.toString(),true);
+                Common.writeLog(json, Common.COMMAND_ID.TRANSACTION_CANCELLATION.toString(), true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -2866,7 +2866,7 @@ public class SoapAPI {
             String data = response.toString();
 
             try {
-                Common.writeLog(data, Common.COMMAND_ID.TRANSACTION_CANCELLATION.toString(),false);
+                Common.writeLog(data, Common.COMMAND_ID.TRANSACTION_CANCELLATION.toString(), false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -2969,7 +2969,7 @@ public class SoapAPI {
             String json = jsons[0];
 
             try {
-                Common.writeLog(json, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER.toString(),true);
+                Common.writeLog(json, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER.toString(), true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -3000,7 +3000,7 @@ public class SoapAPI {
             String data = response.toString();
 
             try {
-                Common.writeLog(data, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER.toString(),false);
+                Common.writeLog(data, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER.toString(), false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -3095,7 +3095,7 @@ public class SoapAPI {
             String json = jsons[0];
 
             try {
-                Common.writeLog(json, Common.COMMAND_ID.SYNC_DATA.toString(),true);
+                Common.writeLog(json, Common.COMMAND_ID.SYNC_DATA.toString(), true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -3126,7 +3126,7 @@ public class SoapAPI {
             String data = response.toString();
 
             try {
-                Common.writeLog(data, Common.COMMAND_ID.SYNC_DATA.toString(),false);
+                Common.writeLog(data, Common.COMMAND_ID.SYNC_DATA.toString(), false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -3222,7 +3222,7 @@ public class SoapAPI {
             String json = jsons[0];
 
             try {
-                Common.writeLog(json, Common.COMMAND_ID.GET_FILE_GEN.toString(),true);
+                Common.writeLog(json, Common.COMMAND_ID.GET_FILE_GEN.toString(), true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -3253,7 +3253,7 @@ public class SoapAPI {
             String data = response.toString();
 
             try {
-                Common.writeLog(data, Common.COMMAND_ID.GET_FILE_GEN.toString(),false);
+                Common.writeLog(data, Common.COMMAND_ID.GET_FILE_GEN.toString(), false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -3351,7 +3351,7 @@ public class SoapAPI {
             String json = jsons[0];
 
             try {
-                Common.writeLog(json, Common.COMMAND_ID.PUT_TRANSACTION_OFF.toString(),true);
+                Common.writeLog(json, Common.COMMAND_ID.PUT_TRANSACTION_OFF.toString(), true);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
@@ -3382,7 +3382,7 @@ public class SoapAPI {
             String data = response.toString();
 
             try {
-                Common.writeLog(data, Common.COMMAND_ID.PUT_TRANSACTION_OFF.toString(),false);
+                Common.writeLog(data, Common.COMMAND_ID.PUT_TRANSACTION_OFF.toString(), false);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }

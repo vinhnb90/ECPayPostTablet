@@ -119,7 +119,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         boolean isShowBill = false;
         for (int i = 0, n = data.get(position).getBillKH().size(); i < n; i ++)
         {
-            if(payPresenter.getPayModel().getListBillSelected().contains(data.get(position).getBillKH().get(i)))
+            if(payPresenter.getPayModel().containBillInSelected(data.get(position).getBillKH().get(i).getBillId()))
             {
                 isShowBill = true;
                 break;
@@ -427,6 +427,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                 holder.ibtnDelete.setVisibility(View.INVISIBLE);
             } else {
                 holder.cb.setEnabled(false);
+                holder.cb.setChecked(true);
                 holder.ibtnDelete.setVisibility(View.VISIBLE);
             }
             holder.tvDate.setText(entity.getTHANG_THANH_TOAN());

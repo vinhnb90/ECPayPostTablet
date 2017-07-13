@@ -217,7 +217,7 @@ public class Common {
     }
 
     public enum PROVIDER_CODE {
-        NCCNONE("000", "Chọn Điện Lực"),
+        NCCNONE("", "Chọn Điện Lực"),
         NCC0498("NCC0498", "Tổng Công Ty Điện Lực Miền Nam"),
         NCC0499("NCC0499", "Tổng Công Ty Điện Lực Miền Trung"),
         NCC0483("NCC0483", "Tổng Công ty điện lực miền Bắc"),
@@ -1236,8 +1236,8 @@ public class Common {
     //endregion
 
     //region info communication server
-    //unit: seconds
-    public static long TIME_OUT_CONNECT = 50000;
+    //unit: milli seconds
+    public static long TIME_OUT_CONNECT = 30000;
 
     public static long TIME_OUT_CHECK_CONNECTION = 10000;
 
@@ -1328,7 +1328,7 @@ public class Common {
     //endregion
 
     //region info connect API SOAP
-    public static String ENDPOINT_URL = "http://kiosktest.edong.vn:8989/eStoreCashier/EStoreCashierImpl?wsdl";
+    public static String ENDPOINT_URL = "http://192.168.130.7:8080/eStoreCashier/EStoreCashierImpl?wsdl";
     //endregion
 
     //region config file and system

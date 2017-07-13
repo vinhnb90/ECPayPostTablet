@@ -101,13 +101,7 @@ public class PayPresenter implements IPayPresenter {
     @Override
     public void addSelectBillToPay(PayAdapter.BillEntityAdapter bill, boolean isSelect)
     {
-        if(isSelect)
-        {
-            mPayModel.getListBillSelected().add(bill);
-        }else
-        {
-            mPayModel.getListBillSelected().remove(bill);
-        }
+        mPayModel.selectBill(bill, isSelect);
 
         mIPayView.updateBillSelectToPay(mPayModel.getListBillSelected());
     }
@@ -207,12 +201,6 @@ public class PayPresenter implements IPayPresenter {
     @Override
     public void callSearchOnline(String mEdong, String infoSearch, boolean isReseach) {
         this.cancelSeachOnline();
-        if(mIPayView.getProviderCodeSelected().getCode().equalsIgnoreCase(Common.PROVIDER_CODE.NCCNONE.getCode()))
-        {
-            //Loi Chua Chon Dien Luc
-            mIPayView.showMessageNotifySearchOnline("Bạn chưa chọn khu vực điện lực để search!", Common.TYPE_DIALOG.LOI);
-            return;
-        }
 
         String textMessage = "";
         Context context = mIPayView.getContextView();
@@ -267,7 +255,6 @@ public class PayPresenter implements IPayPresenter {
 
         if (jsonRequestSearchOnline == null)
             return;
-
 
         try {
             currentAsyncSearchOnline = new SoapAPI.AsyncSoapIncludeTimout<SearchOnlineResponse>(handlerDelay, SearchOnlineResponse.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
@@ -485,13 +472,14 @@ public class PayPresenter implements IPayPresenter {
             countBillPayedSuccess = 0;
             for (int i = 0, n = bills.size(); i < n; i ++)
             {
-                if(bills.get(i).getMessageError().length() == 0)
+                if(bills.get(i).isChecked() && bills.get(i).getMessageError().length() == 0)
                 {
                     try
                     {
                         payOffline(bills.get(i));
                         countBillPayedSuccess ++;
 
+                        mPayModel.removeBillSelect(bills.get(i).getBillId());
                         this.refreshTextCountBillPayedSuccess();
 
                     }catch (Exception e)
@@ -620,6 +608,8 @@ public class PayPresenter implements IPayPresenter {
                             bill.setMessageError(Common.CODE_REPONSE_BILL_ONLINE.ex10006.getMessage());
 
                             countBillPayedSuccess ++;
+
+                            mPayModel.removeBillSelect(bill.getBillId());
                         }else if (codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e814.getCode())) {
                             /**
                              * Trường hợp hóa đơn đã được thanh toán bởi ví khác: Không thực hiện thanh toán hóa đơn
@@ -628,7 +618,7 @@ public class PayPresenter implements IPayPresenter {
                             bill.setTRANG_THAI_TT(Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC.getCode());
                             bill.setVI_TTOAN(body.getPaymentEdong());
                             bill.setMessageError(Common.CODE_REPONSE_BILL_ONLINE.ex10007.getMessage());
-
+                            mPayModel.removeBillSelect(bill.getBillId());
                             countBillPayedSuccess ++;
                         }else if (!codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e000.getCode())
                                 &&
@@ -648,6 +638,7 @@ public class PayPresenter implements IPayPresenter {
                             {//Thanh Toan Thanh Cong Trong Gio Dong Ket Noi ECPay -> EVN
                                 hoaDonThanhCongTrongGioDongKetNoi(body);
                             }
+                            mPayModel.removeBillSelect(bill.getBillId());
 
                             bill.setTRANG_THAI_TT(Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
                             bill.setVI_TTOAN(MainActivity.mEdong);

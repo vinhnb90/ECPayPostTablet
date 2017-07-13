@@ -49,6 +49,54 @@ public class PayModel extends CommonModel {
 //        this.mDataCustomerBill = mDataCustomerBill;
 //    }
 
+
+    public void removeBillSelect(long billId)
+    {
+        for (int i = 0, n = mListBillSelected.size(); i < n; i ++)
+        {
+            if(mListBillSelected.get(i).getBillId() == billId)
+            {
+                mListBillSelected.remove(i);
+                return;
+            }
+        }
+    }
+
+    public boolean containBillInSelected(long billId) {
+        for (int i = 0, n = mListBillSelected.size(); i < n; i++) {
+            if (mListBillSelected.get(i).getBillId() == billId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void selectBill(PayAdapter.BillEntityAdapter bill, boolean isSelect)
+    {
+        if(isSelect)
+        {
+            for (int i = 0, n = mListBillSelected.size(); i < n; i ++)
+            {
+                if(mListBillSelected.get(i).getBillId() == bill.getBillId())
+                {
+                    return;
+                }
+            }
+            mListBillSelected.add(bill);
+        }else
+        {
+            for (int i = 0, n = mListBillSelected.size(); i < n; i ++)
+            {
+                if(mListBillSelected.get(i).getBillId() == bill.getBillId())
+                {
+                    mListBillSelected.remove(i);
+                    return;
+                }
+            }
+        }
+    }
+
+
     public List<PayAdapter.BillEntityAdapter> getListBillSelected() {
         return mListBillSelected;
     }
@@ -168,37 +216,7 @@ public class PayModel extends CommonModel {
         }
     }
 
-    public void updateBillIsChecked(String edong, String code, int billId, boolean checked) {
 
-        sqLiteConnection.updateBillOfCustomerIsChecked(edong, code, billId, checked);
-
-    }
-
-    public int countMoneyAllBillsIsChecked(String edong) {
-        if (edong == null || edong.trim().isEmpty())
-            return ERROR_OCCUR;
-
-        return 0;//sqLiteConnection.countMoneyAllBillIsChecked(edong);
-    }
-
-    public int countAllBillsIsChecked(String edong) {
-        if (edong == null || edong.trim().isEmpty())
-            return ERROR_OCCUR;
-
-        return 0;//sqLiteConnection.countAllBillsIsChecked(edong);
-    }
-
-    public int countAllBillsIsCheckedWithStatusPay(String edong, Common.STATUS_BILLING statusBilling) {
-        if (edong == null || edong.trim().isEmpty())
-            return ERROR_OCCUR;
-
-        return 0;//sqLiteConnection.countAllBillsIsCheckedWithStatusPay(edong, statusBilling);
-
-    }
-
-    public void updateCustomerIsShowBill(String edong, String code, boolean checked) {
-        sqLiteConnection.updateCustomerIsShowBill(edong, code, checked);
-    }
 
     public String getSession(String edong) {
         if (TextUtils.isEmpty(edong))
@@ -207,60 +225,9 @@ public class PayModel extends CommonModel {
         return sqLiteConnection.selectSessionAccount(edong);
     }
 
-    public int updateBillStatus(String edong, String customerCode, Long billId, Common.STATUS_BILLING status) {
-        boolean failInput =
-                TextUtils.isEmpty(edong) ||
-                        TextUtils.isEmpty(customerCode);
-        if (failInput)
-            return ERROR_OCCUR;
-
-        return sqLiteConnection.updateBillStatusPay(edong, customerCode, billId, status);
-    }
-
-    public long countMoneyAllBillsIsCheckedWithStatusPay(String edong, Common.STATUS_BILLING statusBilling) {
-        if (edong == null || edong.trim().isEmpty())
-            return ERROR_OCCUR;
-
-        return sqLiteConnection.countMoneyAllBillIsCheckedWithStatusPay(edong, statusBilling);
-    }
-
-    public void updateBillRequestDateBill(String edong, String customerCode, Long billId, String dateNow, Long traceNumber) {
-        boolean failInput =
-                TextUtils.isEmpty(edong) ||
-                        TextUtils.isEmpty(customerCode) ||
-                        TextUtils.isEmpty(dateNow);
-        if (failInput)
-            return;
-
-        sqLiteConnection.countMoneyAllBillIsCheckedWithStatusPay(edong, customerCode, billId, dateNow, traceNumber);
-    }
-
-    public Long getTraceNumberBill(String edong, String code, Long billId) {
-        boolean failInput =
-                TextUtils.isEmpty(edong) ||
-                        TextUtils.isEmpty(code);
-
-        if (failInput)
-            return null;
-
-        return sqLiteConnection.selectTraceNumberBill(edong, code, billId);
-    }
 
     public List<String> getPcCodes() {
         return sqLiteConnection.getPcCodes();
-    }
-
-    public void updateBillReasonDelete(String edong, String code, Long billId, String reasonDeleteBill, Common.STATUS_BILLING statusBilling) {
-        boolean failInput =
-                TextUtils.isEmpty(edong) ||
-                        TextUtils.isEmpty(code) ||
-                        TextUtils.isEmpty(reasonDeleteBill) ||
-                        statusBilling == null;
-
-        if (failInput)
-            return;
-
-        sqLiteConnection.updateBillReasonDelete(edong, code, billId, reasonDeleteBill, statusBilling);
     }
 
     public long updateHoaDonNo(long billID, String status, String edong) {
@@ -285,132 +252,12 @@ public class PayModel extends CommonModel {
     }
 
 
-    public int insertDebtCollection(EntityDanhSachThu entityDanhSachThu) {
-        return sqLiteConnection.insertDebtCollection(entityDanhSachThu);
-    }
-
-    public EntityDanhSachThu selectDebtColectionForDanhSachThu(int billId) {
-        return sqLiteConnection.selectDebtColectionForDanhSachThu(billId);
-    }
-
-    public EntityLichSuThanhToan selectDebtColectionForLichSu(int billId) {
-        return sqLiteConnection.selectDebtColectionForLichSu(billId);
-    }
-
-    public int insertPayLib(EntityLichSuThanhToan entityLichSuThanhToan) {
-        return sqLiteConnection.insertPayLib(entityLichSuThanhToan);
-    }
-
-    public boolean checkIsHasBillNotPayTermBefore(String edong, String code, int billId) {
-        boolean failInput =
-                TextUtils.isEmpty(edong) ||
-                        TextUtils.isEmpty(code);
-
-        if (failInput)
-            return false;
-
-        //lấy term của hóa đơn
-        String term = sqLiteConnection.getTermBillOfCustomer(edong, code, billId);
-        if (term == null)
-            return false;
-
-        return sqLiteConnection.checkIsHasBillNotPayTermBefore(edong, code, term);
-    }
-
-    public String getCustomerNameByBillId(String edong, long billId) {
-        return sqLiteConnection.getCustomerNameByBillId(edong, billId);
-    }
-
-    public String getCustomerCodeByBillId(String edong, long billId) {
-        return sqLiteConnection.getCustomerCodeByBillId(edong, billId);
-    }
-
-    public int updateBillWith(String edongKey, int billId, int status, String edong) {
-        return sqLiteConnection.updateBillWith(edongKey, billId, status, edong);
-    }
-
-    public int updateBillDebtWith(
-            String edongKey, int billId, String edong, Integer paymentMode, int payStatus, Integer stateOfDebt,
-            Integer stateIfCancel, Integer stateOfReturn, Integer suspectedProcessingStatus,
-            Integer stateOfPush, String dateOfPush, int countPrintReceipt, Integer statusOfPrintInfo) {
-
-        return sqLiteConnection.updateBillDebtWith(
-                edongKey, billId, //where
-                edong, paymentMode, payStatus,
-                stateOfDebt, stateIfCancel, stateOfReturn,
-                suspectedProcessingStatus, stateOfPush, dateOfPush,
-                countPrintReceipt, statusOfPrintInfo);
-    }
-
-    public int updateBillDebtWithThanhToanBoiNguonKhacOrViKhac(
-            String edongKey, int billId, String edong, Integer paymentMode, int payStatus, Integer stateOfDebt,
-            Integer stateOfCancel, Integer stateOfReturn, Integer suspectedProcessingStatus,
-            String dateOfPush, int countPrintReceipt, Integer statusOfPrintInfo, Integer tradeCode) {
-
-        return sqLiteConnection.updateBillDebtWithThanhToanBoiNguonKhac(
-                edongKey, billId, //where
-                edong, paymentMode, payStatus,
-                stateOfDebt, stateOfCancel, stateOfReturn,
-                suspectedProcessingStatus, dateOfPush,
-                countPrintReceipt, statusOfPrintInfo, tradeCode);
-    }
-
-    public int updateBillHistoryWith(String edongKey, int billId, String dateIncurred, Integer tradingCode) {
-        return sqLiteConnection.updateBillHistoryWith(edongKey, billId, dateIncurred, tradingCode);
-    }
-
-    public int checkPayStatusDebt(String edong, String code, int billId) {
-        return sqLiteConnection.selectPayStatusDebt(edong, code, billId);
-    }
-
-    public int updateBillWithWithThanhToanError(String edongKey, int billId, String edong) {
-        return sqLiteConnection.updateBillWithWithThanhToanError(edongKey, billId, edong);
-    }
-
-    public int updateBillDebtWithThanhToanErrorOrSuccess(
-            String edongKey, int billId, //where
-            String edong, Integer paymentMode, int payStatus, Integer stateOfDebt, Integer stateOfCancel,
-            Integer stateOfReturn, Integer suspectedProcessingStatus, int countPrintReceipt, Integer statusOfPrintInfo) {
-        return sqLiteConnection.updateBillDebtWithThanhToanErrorOrSuccess(edongKey, billId,
-                edong, paymentMode, payStatus, stateOfDebt, stateOfCancel,
-                stateOfReturn, suspectedProcessingStatus, countPrintReceipt, statusOfPrintInfo);
-    }
-
-    public int updateBillHistoryWithThanhToanErrorOrSuccess(
-            String edongKey, int billId, //where
-            String edong, Integer paymentMode, int payStatus, Integer stateOfDebt, Integer stateOfCancel,
-            Integer stateOfReturn, Integer suspectedProcessingStatus, int countPrintReceipt, Integer statusOfPrintInfo,
-            String dateIncurred, Integer tradingCode) {
-        return sqLiteConnection.updateBillHistoryWithThanhToanErrorOrSuccess(edongKey, billId,
-                edong, paymentMode, payStatus, stateOfDebt, stateOfCancel,
-                stateOfReturn, suspectedProcessingStatus, countPrintReceipt, statusOfPrintInfo, dateIncurred, tradingCode);
-    }
-
-    public int updateBillHistoryWithPrintInfo(String edongKey, int billId, Integer code) {
-        return sqLiteConnection.updateBillHistoryWithPrintInfo(edongKey, billId, code);
-    }
-
-    public int getNotYetPushMoney(String edongKey) {
-        return sqLiteConnection.selectNotYetPushMoney(edongKey);
-    }
 
     public void updateSoDuKhaDung(String edong, long balance, long lockMoney)
     {
         sqLiteConnection.updateBalance(edong, balance, lockMoney);
     }
 
-
-    public int updateAccountWith(String edong, int notYetPushMoney) {
-        return sqLiteConnection.updateAccountWith(edong, notYetPushMoney);
-    }
-
-    public int updateBillDebtWithSuspectedProcessingStatus(String edong, int billId, Integer suspectedProcessingStatus) {
-        return sqLiteConnection.updateBillDebtWithSuspectedProcessingStatus(edong, billId, suspectedProcessingStatus);
-    }
-
-    public int updateBillHistoryWithSuspectedProcessingStatus(String edong, int billId, Integer suspectedProcessingStatus) {
-        return sqLiteConnection.updateBillHistoryWithSuspectedProcessingStatus(edong, billId, suspectedProcessingStatus);
-    }
 
 
     public static class AsyncSearchOffline extends AsyncTask<Pair<Common.TYPE_SEARCH, String>, String, Void> {
