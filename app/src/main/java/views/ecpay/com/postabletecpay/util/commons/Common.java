@@ -894,6 +894,17 @@ public class Common {
             this.message = message;
         }
 
+        public static TRANG_THAI_TTOAN findCodeMessage(String code) {
+            for (TRANG_THAI_TTOAN v : values()) {
+                if (v.getCode().equalsIgnoreCase(code)) {
+                    return v;
+                }
+            }
+            return NULL;
+        }
+
+
+
         public String getCode() {
             return code;
         }

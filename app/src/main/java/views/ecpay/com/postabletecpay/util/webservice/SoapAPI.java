@@ -779,7 +779,6 @@ public class SoapAPI {
                         TextUtils.isEmpty(mac) ||
                         TextUtils.isEmpty(diskDriver) ||
                         TextUtils.isEmpty(signatureEncrypted) ||
-                        TextUtils.isEmpty(providerCode) ||
                         TextUtils.isEmpty(customerCode) ||
                         TextUtils.isEmpty(accountId);
 
