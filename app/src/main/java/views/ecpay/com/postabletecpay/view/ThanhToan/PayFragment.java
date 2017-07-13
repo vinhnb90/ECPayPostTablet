@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.CardView;
@@ -52,6 +54,8 @@ import views.ecpay.com.postabletecpay.presenter.PayPresenter;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
+import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
+import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
@@ -425,6 +429,25 @@ public class PayFragment extends Fragment implements
     @Optional
     @OnClick(R.id.ibtn_frag_thanhtoan_back)
     public void clickBack(View view) {
+        Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Fragment fragment = MainPageFragment.newInstance(mEdong);
+                    if (fragment != null) {
+                        FragmentTransaction fragmentTransaction = PayFragment.this.getActivity().getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.replace(R.id.frameLayout, fragment);
+                        fragmentTransaction.commit();
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }, Common.TIME_DELAY_ANIM);
     }
 
     //endregion

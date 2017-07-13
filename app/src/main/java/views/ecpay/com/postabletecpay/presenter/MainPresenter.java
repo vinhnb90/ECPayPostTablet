@@ -454,8 +454,8 @@ public class MainPresenter implements IMainPresenter {
     @Override
     public void checkAndPostBill() {
 
-        ArrayList<TransactionOffItem> lstTransactionOff = (ArrayList<TransactionOffItem>)mainModel.selectOfflineBill();
-        if(lstTransactionOff.size() == 0)
+        ArrayList<TransactionOffItem> lstTransactionOff = (ArrayList<TransactionOffItem>) mainModel.selectOfflineBill();
+        if (lstTransactionOff.size() == 0)
             return;
 
         Context context = mIMainView.getContextView();
@@ -483,8 +483,7 @@ public class MainPresenter implements IMainPresenter {
 //        }
 //        configInfo.setSignatureEncrypted(signatureEncrypted);
 
-        for (int i = 0, n = lstTransactionOff.size(); i < n; i ++)
-        {
+        for (int i = 0, n = lstTransactionOff.size(); i < n; i++) {
             lstTransactionOff.get(i).setProvide_code(Common.PROVIDER_DEFAULT);
             lstTransactionOff.get(i).setAudit_number(String.valueOf(configInfo.getAuditNumber()));
         }
@@ -662,6 +661,8 @@ public class MainPresenter implements IMainPresenter {
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onPost(ListDataResponse response) {
+            if (response == null)
+                return;
             String sDataCustomer = response.getBodyListDataResponse().getCustomer();
             if (sDataCustomer != null && !sDataCustomer.isEmpty()) {
                 byte[] zipByteCustomer = org.apache.commons.codec.binary.Base64.decodeBase64(sDataCustomer.getBytes());
@@ -736,8 +737,9 @@ public class MainPresenter implements IMainPresenter {
     //endregion
 
 
-    public interface InteractorMainPresenter{
+    public interface InteractorMainPresenter {
         List<PayAdapter.DataAdapter> getData();
+
         void refreshData();
     }
 }

@@ -25,15 +25,21 @@ public class ReportTongHopPresenter extends ReportPresenter implements IReportTo
     @Override
     public void fill() {
 
-        ReportModel.BillInfo billDuocGiao = reportModel.getConnecttion().countBillDuocGiao(MainActivity.mEdong);
-        ReportModel.BillInfo billDaThu = reportModel.getConnecttion().countBillDaThu(MainActivity.mEdong);
-        ReportModel.BillInfo billVangLai = reportModel.getConnecttion().countBillVangLai(MainActivity.mEdong);
-        ReportModel.BillInfo billHoanTra = reportModel.getConnecttion().countBillHoanTra(MainActivity.mEdong);
+        try {
+            ReportModel.BillInfo billDuocGiao = reportModel.getConnecttion().countBillDuocGiao(MainActivity.mEdong);
+            ReportModel.BillInfo billDaThu = reportModel.getConnecttion().countBillDaThu(MainActivity.mEdong);
+            ReportModel.BillInfo billVangLai = reportModel.getConnecttion().countBillVangLai(MainActivity.mEdong);
+            ReportModel.BillInfo billHoanTra = reportModel.getConnecttion().countBillHoanTra(MainActivity.mEdong);
 
-        reportTongHopView.fill(reportModel.getAccountInfo(MainActivity.mEdong),
-                billDuocGiao.getCount(), billDuocGiao.getAmount(),
-                billDaThu.getCount(), billDaThu.getAmount(),
-                billVangLai.getCount(), billVangLai.getAmount(),
-                billHoanTra.getCount(), billHoanTra.getAmount());
+            reportTongHopView.fill(reportModel.getAccountInfo(MainActivity.mEdong),
+                    billDuocGiao.getCount(), billDuocGiao.getAmount(),
+                    billDaThu.getCount(), billDaThu.getAmount(),
+                    billVangLai.getCount(), billVangLai.getAmount(),
+                    billHoanTra.getCount(), billHoanTra.getAmount());
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }

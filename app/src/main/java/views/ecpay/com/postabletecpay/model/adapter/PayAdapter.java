@@ -108,7 +108,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
         holder.btnTrangThaiNo.setText(!isPayed ? NOT_DEBT : IS_DEBT);
 
-        Common.runAnimationClickViewScale(holder.cardView, R.anim.twinking_view, Common.TIME_DELAY_ANIM);
+//        Common.runAnimationClickViewScale(holder.cardView, R.anim.twinking_view, Common.TIME_DELAY_ANIM);
 
         DataAdapter dataAdapter = getObjectDataAdapter(code);
 

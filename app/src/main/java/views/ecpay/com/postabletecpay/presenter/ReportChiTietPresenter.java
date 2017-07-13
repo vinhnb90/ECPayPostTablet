@@ -27,7 +27,7 @@ public class ReportChiTietPresenter extends ReportPresenter implements IReportCh
 
     @Override
     public void search(boolean isMaKH, String code, Calendar from, Calendar to) {
-        List<Bill> lst = reportModel.getConnecttion().getBillThuByCodeAndDate(MainActivity.mEdong, isMaKH, code, from, to);
-        reportChiTietView.fill(lst);
+            List<Bill> lst = reportModel.getConnecttion().getBillThuByCodeAndDate(MainActivity.mEdong, isMaKH, code, from, to);
+            reportChiTietView.fill(lst);
     }
 }
