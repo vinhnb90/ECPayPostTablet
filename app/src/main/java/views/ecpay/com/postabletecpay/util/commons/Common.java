@@ -276,6 +276,11 @@ public class Common {
             return message;
         }
 
+        @Override
+        public String toString() {
+            return getCode();
+        }
+
         private final String code;
         private String message;
 
@@ -1019,10 +1024,37 @@ public class Common {
         CAP_NHAT_TTHAI_NO("02", "Cap Nhat Trang Thai No"),
         TT_ONLINE_CHAM_NO_ONLINE("03", "Thanh Toan Online Cham No Online"),
         TT_ONLINE_CHAM_NO_OFFLINE("04", "Thanh Toan Online Cham No Offline"),
+        CHAM_NO("07", "Cham No"),
         TT_ONLINE_CHAM_NO_LOI("05", "Thanh Toan Online Cham No Loi"),
+        XU_LY_GIAO_DICH_NGHI_NGO("09", "Xu Ly Giao Dich Nghi Ngo"),
+        GUI_YEU_CAU_HUY("11", "Gui Yeu Cau Huy"),
+        HUY_HOA_DON("08", "Huy Hoa Don"),
         DAY_CHAM_NO("10", "Day Cham No");
 
         MA_GIAO_DICH(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+
+        private final String code;
+        private String message;
+    }
+
+
+    public enum TRANG_THAI_HUY
+    {
+        DA_HUY("01", "Da Huy"),
+        CHO_HUY("02", "Cho Huy");
+        TRANG_THAI_HUY(String code, String message) {
             this.code = code;
             this.message = message;
         }

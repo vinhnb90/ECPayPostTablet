@@ -47,14 +47,13 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
     private List<DataAdapter> data = new ArrayList<>();
 //    private List<PayEntityAdapter BillEntityAdapter> billList = new ArrayList<>();
-    @BindDrawable(R.drawable.bg_button_orange)
-    Drawable green;
     @BindDrawable(R.drawable.bg_button)
+    Drawable green;
+    @BindDrawable(R.drawable.bg_button_orange)
     Drawable violet;
     @BindView(R.id.btn_row_thanhtoan_recycler_print)
     Button btnPrintBill;
 
-    private static int positionCustomer;
     private boolean onBind;
 
     public PayAdapter(Context sContext, IPayPresenter presenter, List<DataAdapter> data, int indexBegin, int indexEnd) {
@@ -88,7 +87,8 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         onBind = true;
 
-        positionCustomer = position;
+        holder.setDataAdapter(data.get(position));
+
         EntityKhachHang entityAdapter = data.get(position).getInfoKH();
         final String code = entityAdapter.getMA_KHANG();
         final String edong = entityAdapter.getE_DONG();
@@ -100,19 +100,20 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         holder.tvMaKH.setText(code);
 
         boolean isPayed = data.get(position).isPayed();
-
+        holder.setPayed(isPayed);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             holder.btnTrangThaiNo.setBackground(isPayed ? green : violet);
         } else {
             holder.btnTrangThaiNo.setBackgroundDrawable(isPayed ? green : violet);
         }
-        holder.btnTrangThaiNo.setText(!isPayed ? NOT_DEBT : IS_DEBT);
+        holder.btnTrangThaiNo.setText(isPayed ? NOT_DEBT : IS_DEBT);
 
-//        Common.runAnimationClickViewScale(holder.cardView, R.anim.twinking_view, Common.TIME_DELAY_ANIM);
+        Common.runAnimationClickViewScale(holder.cardView, R.anim.twinking_view, Common.TIME_DELAY_ANIM);
 
         DataAdapter dataAdapter = getObjectDataAdapter(code);
 
-        holder.billsInsideAdapter.setBillList(edong, code, dataAdapter.getBillKH(), positionCustomer);
+
+        holder.billsInsideAdapter.setBillList(edong, code, dataAdapter.getBillKH(), position);
         holder.rvBill.invalidate();
 
 
@@ -128,21 +129,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         data.get(position).setShowBill(isShowBill);
 
-        holder.rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
-
-        /*((MainActivity) sContext).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                List<PayAdapter.BillEntityAdapter> listBill = new ArrayList<>();
-                listBill = payModel.getAllBillOfCustomer(edong, code);
-                holder.billsInsideAdapter.setBillList(edong, code, listBill, positionCustomer);
-                holder.rvBill.invalidate();
-
-                boolean isShowBill = billList.get(positionCustomer).isShowBill();
-                holder.rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
-            }
-        });*/
-
+        holder.showBills(isShowBill);
         onBind = false;
 
     }
@@ -180,12 +167,22 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         TextView tvTongTien;
         @BindView(R.id.btn_row_pay_recycler_trangThaiNo)
         Button btnTrangThaiNo;
+        @BindView(R.id.btn_row_thanhtoan_recycler_print)
+        Button btn_row_thanhtoan_recycler_print;
         @BindView(R.id.card_row_thanh_toan_recycler)
         LinearLayout cardView;
         @BindView(R.id.rvHoaDon)
         RecyclerView rvBill;
         //        CardView cardView;
+        @BindView(R.id.ll_row_thanhtoan_recycler_print)
+        LinearLayout ll_row_thanhtoan_recycler_print;
         public View itemView;
+
+
+        boolean isPayed;
+
+
+        DataAdapter dataAdapter;
 
         public PayViewHolder(View itemView) {
             super(itemView);
@@ -200,17 +197,56 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                 @Override
                 public void onClick(View v) {
                     if (!onBind) {
-                        boolean isShowBill = !data.get(positionCustomer).isShowBill();
+                        boolean isShowBill = !dataAdapter.isShowBill();
 
-                        data.get(positionCustomer).setShowBill(isShowBill);
-
-                        int index = 0;
-                        rvBill.setVisibility(isShowBill ? View.VISIBLE : View.GONE);
+                        dataAdapter.setShowBill(isShowBill);
+                        showBills(isShowBill);
                     }
                 }
             });
+
+            btn_row_thanhtoan_recycler_print.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    payPresenter.PrintThongBaoDien(dataAdapter);
+                }
+            });
+
             //set 10 rows and a page
 //            cardView.getLayoutParams().height = (int) (height / PayFragment.ROWS_ON_PAGE);
+        }
+
+
+        public DataAdapter getDataAdapter() {
+            return dataAdapter;
+        }
+
+        public void setDataAdapter(DataAdapter dataAdapter) {
+            this.dataAdapter = dataAdapter;
+        }
+
+        public void showBills(boolean show)
+        {
+
+            rvBill.setVisibility(show ? View.VISIBLE : View.GONE);
+
+            if(isPayed)
+            {
+                ll_row_thanhtoan_recycler_print.setVisibility(View.GONE);
+            }else
+            {
+                ll_row_thanhtoan_recycler_print.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+
+        }
+
+
+        public boolean isPayed() {
+            return isPayed;
+        }
+
+        public void setPayed(boolean payed) {
+            isPayed = payed;
         }
 
         private BillInsidePayAdapter billsInsideAdapter;
@@ -420,21 +456,25 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             holder.setData(entity);
             holder.setPosition(position);
 
+            holder.setAdapterParent(this);
 
             holder.cb.setChecked(entity.isChecked());
             if (entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())) {
                 holder.cb.setEnabled(true);
                 holder.ibtnDelete.setVisibility(View.INVISIBLE);
+
+                holder.tvStatusBill.setText(Common.STATUS_BILLING.CHUA_THANH_TOAN.getMessage());
             } else {
                 holder.cb.setEnabled(false);
                 holder.cb.setChecked(true);
                 holder.ibtnDelete.setVisibility(View.VISIBLE);
+                holder.tvStatusBill.setText(Common.STATUS_BILLING.DA_THANH_TOAN.getMessage());
+                entity.setPrint(entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()));
             }
             holder.tvDate.setText(entity.getTHANG_THANH_TOAN());
             holder.tvMoneyBill.setText(Common.convertLongToMoney(entity.getTIEN_THANH_TOAN()));
-            holder.tvStatusBill.setText(Common.STATUS_BILLING.findCodeMessage(entity.getTRANG_THAI_TT()).getMessage());
 
-            if (Common.STATUS_BILLING.findCodeMessage(entity.getTRANG_THAI_TT()).getCode().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())){
+            if (entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())){
                 holder.tvStatusBill.setTextColor(ContextCompat.getColor(sContext, R.color.colorRed));
             } else {
                 holder.tvStatusBill.setTextColor(ContextCompat.getColor(sContext, R.color.colorTextGreen));
@@ -462,6 +502,9 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             @BindView(R.id.btn_row_bill_inside_pay_delete)
             ImageButton ibtnDelete;
 
+            BillInsidePayAdapter adapterParent;
+
+
             BillEntityAdapter data;
             int position;
 
@@ -469,8 +512,23 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             public BillInsidePayViewHolder(View itemView) {
                 super(itemView);
                 ButterKnife.bind(this, itemView);
+
+                ibtnPrintInside.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        payPresenter.PrintHoaDon(data);
+                    }
+                });
+
             }
 
+            public BillInsidePayAdapter getAdapterParent() {
+                return adapterParent;
+            }
+
+            public void setAdapterParent(BillInsidePayAdapter adapterParent) {
+                this.adapterParent = adapterParent;
+            }
 
             public void setPosition(int position) {
                 this.position = position;
@@ -549,7 +607,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                 int position = getAdapterPosition();
                 BillEntityAdapter bill = billList.get(position);
 
-                payPresenter.getIPayView().processDialogDeleteBillOnline(edong, code, bill, posCustomerInside);
+                payPresenter.getIPayView().processDialogDeleteBillOnline(edong, bill, adapterParent);
             }
 
             public CheckBox getCb() {
@@ -628,7 +686,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         {
             for (int i = 0; i < billKH.size(); i ++)
             {
-                if(billKH.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.toString()))
+                if(billKH.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()))
                     return false;
             }
             return true;

@@ -21,9 +21,9 @@ public class BodyDeleteBillOnlineRequest extends BodyRequest{
     @SerializedName("billing-date")
     @Expose
     private String billingDate;
-    @SerializedName("trace-number")
-    @Expose
-    private Long traceNumber;
+//    @SerializedName("trace-number")
+//    @Expose
+//    private Long traceNumber;
     @SerializedName("reason")
     @Expose
     private String reason;
@@ -61,13 +61,13 @@ public class BodyDeleteBillOnlineRequest extends BodyRequest{
         this.billingDate = billingDate;
     }
 
-    public Long getTraceNumber() {
-        return traceNumber;
-    }
-
-    public void setTraceNumber(Long traceNumber) {
-        this.traceNumber = traceNumber;
-    }
+//    public Long getTraceNumber() {
+//        return traceNumber;
+//    }
+//
+//    public void setTraceNumber(Long traceNumber) {
+//        this.traceNumber = traceNumber;
+//    }
 
     public String getReason() {
         return reason;

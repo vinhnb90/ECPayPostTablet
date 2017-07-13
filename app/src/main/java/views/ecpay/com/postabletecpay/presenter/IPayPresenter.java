@@ -31,9 +31,9 @@ public interface IPayPresenter {
 
     void callShowDialogPay();
 
-    void callProcessDeleteBillOnline(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside);
+    void callProcessDeleteBillOnline(String edong, PayAdapter.BillEntityAdapter bill, PayAdapter.BillInsidePayAdapter adapter);
 
-    void callFillInfoBillDeleteDialog(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside);
+    void callFillInfoBillDeleteDialog(String edong, PayAdapter.BillEntityAdapter bill);
 
     void callDeleteOnlineSoap(String edong, String reasonDeleteBill);
 
@@ -44,4 +44,9 @@ public interface IPayPresenter {
     IPayView getIPayView();
 
     void addSelectBillToPay(PayAdapter.BillEntityAdapter bill, boolean isSelect);
+
+
+    void PrintThongBaoDien(PayAdapter.DataAdapter data);
+    void PrintHoaDon(PayAdapter.BillEntityAdapter bill);
+
 }

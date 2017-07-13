@@ -19,6 +19,7 @@ import views.ecpay.com.postabletecpay.util.entities.EntityLichSuThanhToan;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBillOnline.BillingOnlineRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 import static views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection.ERROR_OCCUR;
@@ -163,6 +164,12 @@ public class PayModel extends CommonModel {
             EntityKhachHang customer = listCustomer.get(index);
             String code = customer.getMA_KHANG();
             Pair<List<PayAdapter.BillEntityAdapter>, Long> listBill = selectInfoBillOfCustomerToRecycler(MainActivity.mEdong, code);
+
+            for(int i = 0, n = listBill.first.size(); i < n; i ++)
+            {
+                listBill.first.get(i).setTEN_KHACH_HANG(customer.getTEN_KHANG());
+            }
+
             Collections.sort(listBill.first, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
             PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(customer, listBill.first, listBill.second);
             mDataPayAdapter.add(dataAdapter);
@@ -258,7 +265,20 @@ public class PayModel extends CommonModel {
         sqLiteConnection.updateBalance(edong, balance, lockMoney);
     }
 
+    public void truTienTrongVi(String edong, long amount)
+    {
+        Account account = getAccountInfo(edong);
+        if(account != null)
+        {
+            sqLiteConnection.updateBalance(edong, account.getBalance() - amount, account.getLockMoney());
+        }
+    }
 
+    public void updateBillHuy(Long billId, Common.TRANG_THAI_HUY TRANG_THAI_HUY, String lyDo)
+    {
+        sqLiteConnection.updateHoaDonThu(String.valueOf(billId), TRANG_THAI_HUY, lyDo);
+        sqLiteConnection.insertLichSuThanhToan(String.valueOf(billId), TRANG_THAI_HUY, Common.MA_GIAO_DICH.GUI_YEU_CAU_HUY.getCode(), lyDo);
+    }
 
     public static class AsyncSearchOffline extends AsyncTask<Pair<Common.TYPE_SEARCH, String>, String, Void> {
 

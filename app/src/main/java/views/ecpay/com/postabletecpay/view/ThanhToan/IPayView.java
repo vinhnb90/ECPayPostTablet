@@ -31,7 +31,7 @@ public interface IPayView extends ICommonView {
 
     void showPayRecyclerListBills(List<PayAdapter.BillEntityAdapter> listBillChecked);
 
-    void refreshAdapterPayRecyclerListBills();
+    void refreshAdapterPayRecyclerListBills(boolean disableCheckBoxAll);
 
     void showCountBillsAndTotalMoneyInDialog(int totalBillsInList, long totalMoneyInList);
 
@@ -51,7 +51,7 @@ public interface IPayView extends ICommonView {
 
     void showDialogPayingOnline();
 
-    void showDialogDeleteBillOnline(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside);
+    void showDialogDeleteBillOnline(String edong, PayAdapter.BillEntityAdapter bill, PayAdapter.BillInsidePayAdapter adapter);
 
     void showInfoBillDeleteDialog(String customerPayCode, String tenKH, String monthBill, long moneyBill);
 
@@ -75,7 +75,7 @@ public interface IPayView extends ICommonView {
 
     void showMessageNotifyPayfrag(String message);
 
-    void processDialogDeleteBillOnline(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside);
+    void processDialogDeleteBillOnline(String edong, PayAdapter.BillEntityAdapter bill, PayAdapter.BillInsidePayAdapter adapter);
 
     void updateBillSelectToPay(List<PayAdapter.BillEntityAdapter> lst);
 

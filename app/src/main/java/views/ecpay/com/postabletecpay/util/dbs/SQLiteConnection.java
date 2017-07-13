@@ -736,7 +736,17 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         contentValues.put("TRANG_THAI_DAY_CHAM_NO", TRANG_THAI_DAY_CHAM_NO);
         contentValues.put("NGAY_DAY", NGAY_DAY);
         contentValues.put("TRANG_THAI_HOAN_TRA", TRANG_THAI_HOAN_TRA);
-        database.update(TABLE_NAME_BILL, contentValues, "MA_HOA_DON = ?", new String[]{MA_HOA_DON});
+        database.update(TABLE_NAME_DEBT_COLLECTION, contentValues, "MA_HOA_DON = ?", new String[]{MA_HOA_DON});
+    }
+
+
+
+    public  void updateHoaDonThu(String MA_HOA_DON, Common.TRANG_THAI_HUY TRANG_THAI_HUY, String LyDo)
+    {
+        database = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("TRANG_THAI_HUY", TRANG_THAI_HUY.getCode());
+        database.update(TABLE_NAME_DEBT_COLLECTION, contentValues, "MA_HOA_DON = ?", new String[]{MA_HOA_DON});
     }
 
 
@@ -1650,6 +1660,63 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("SO_IN_BIEN_NHAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_IN_BIEN_NHAN")));
         initialValues.put("IN_THONG_BAO_DIEN", hoaDonThu.getString(hoaDonThu.getColumnIndex("IN_THONG_BAO_DIEN")));
         initialValues.put("NGAY_PHAT_SINH", NGAY_PHAT_SINH);
+        initialValues.put("MA_GIAO_DICH", MA_GIAO_DICH);
+
+        database.insert(TABLE_NAME_HISTORY_PAY, null, initialValues);
+
+
+        if (hoaDonThu != null && !hoaDonThu.isClosed()) {
+            hoaDonThu.close();
+        }
+    }
+
+    public void insertLichSuThanhToan(String  MA_HOA_DON, Common.TRANG_THAI_HUY TRANG_THAI_THUY, String MA_GIAO_DICH, String LyDo)
+    {
+        database = getWritableDatabase();
+
+        String query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE MA_HOA_DON = " + MA_HOA_DON;
+        Cursor hoaDonThu = database.rawQuery(query, null);
+        if(hoaDonThu == null || !hoaDonThu.moveToFirst())
+            return;
+
+        ContentValues initialValues = new ContentValues();
+
+        initialValues.put("MA_KHANG", hoaDonThu.getString(hoaDonThu.getColumnIndex("MA_KHANG")));
+        initialValues.put("E_DONG", hoaDonThu.getString(hoaDonThu.getColumnIndex("E_DONG")));
+        initialValues.put("MA_HOA_DON",hoaDonThu.getString(hoaDonThu.getColumnIndex("MA_HOA_DON")));
+        initialValues.put("SERI_HDON", hoaDonThu.getString(hoaDonThu.getColumnIndex("SERI_HDON")));
+
+
+        initialValues.put("MA_THE", hoaDonThu.getString(hoaDonThu.getColumnIndex("MA_THE")));
+        initialValues.put("TEN_KHANG", hoaDonThu.getString(hoaDonThu.getColumnIndex("TEN_KHANG")));
+        initialValues.put("DIA_CHI", hoaDonThu.getString(hoaDonThu.getColumnIndex("DIA_CHI")));
+
+        initialValues.put("THANG_TTOAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("THANG_TTOAN")));
+        initialValues.put("PHIEN_TTOAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("PHIEN_TTOAN")));
+        initialValues.put("SO_TIEN_TTOAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_TIEN_TTOAN")));
+        initialValues.put("SO_GCS", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_GCS")));
+        initialValues.put("DIEN_LUC", hoaDonThu.getString(hoaDonThu.getColumnIndex("DIEN_LUC")));
+        initialValues.put("SO_HO", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_HO")));
+
+        initialValues.put("SO_DAU_KY", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_DAU_KY")));
+        initialValues.put("SO_CUOI_KY", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_CUOI_KY")));
+        initialValues.put("SO_CTO", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_CTO")));
+        initialValues.put("SDT_ECPAY", hoaDonThu.getString(hoaDonThu.getColumnIndex("SDT_ECPAY")));
+        initialValues.put("SDT_EVN", hoaDonThu.getString(hoaDonThu.getColumnIndex("SDT_EVN")));
+        initialValues.put("GIAO_THU", hoaDonThu.getString(hoaDonThu.getColumnIndex("GIAO_THU")));
+        initialValues.put("NGAY_GIAO_THU", hoaDonThu.getString(hoaDonThu.getColumnIndex("NGAY_GIAO_THU")));
+        initialValues.put("VI_TTOAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("VI_TTOAN")));
+
+
+
+        initialValues.put("HINH_THUC_TT", hoaDonThu.getString(hoaDonThu.getColumnIndex("HINH_THUC_TT")));
+        initialValues.put("TRANG_THAI_TTOAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("TRANG_THAI_TTOAN")));
+        initialValues.put("TRANG_THAI_CHAM_NO", hoaDonThu.getString(hoaDonThu.getColumnIndex("TRANG_THAI_CHAM_NO")));
+        initialValues.put("TRANG_THAI_HUY", TRANG_THAI_THUY.getCode());
+        initialValues.put("TRANG_THAI_NGHI_NGO", hoaDonThu.getString(hoaDonThu.getColumnIndex("TRANG_THAI_NGHI_NGO")));
+        initialValues.put("SO_IN_BIEN_NHAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_IN_BIEN_NHAN")));
+        initialValues.put("IN_THONG_BAO_DIEN", hoaDonThu.getString(hoaDonThu.getColumnIndex("IN_THONG_BAO_DIEN")));
+        initialValues.put("NGAY_PHAT_SINH", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
         initialValues.put("MA_GIAO_DICH", MA_GIAO_DICH);
 
         database.insert(TABLE_NAME_HISTORY_PAY, null, initialValues);

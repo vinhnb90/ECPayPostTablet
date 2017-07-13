@@ -14,13 +14,13 @@ public class CheckTrainOnlineResponse extends Respone {
 
     @SerializedName("header")
     @Expose
-    private HeaderCheckTrainOnlineResponse header;
+    private HeaderRespone header;
     @SerializedName("body")
     @Expose
     private BodyCheckTrainOnlineResponse body;
     @SerializedName("footer")
     @Expose
-    private FooterCheckTrainOnlineResponse footer;
+    private FooterRespone footer;
     private final static long serialVersionUID = 6743274675011955698L;
 
     @Override
@@ -30,7 +30,7 @@ public class CheckTrainOnlineResponse extends Respone {
 
     @Override
     public void setHeader(HeaderRespone header) {
-        this.header = (HeaderCheckTrainOnlineResponse)header;
+        this.header = header;
     }
 
     @Override
@@ -50,6 +50,6 @@ public class CheckTrainOnlineResponse extends Respone {
 
     @Override
     public void setFooter(FooterRespone footer) {
-        this.footer = (FooterCheckTrainOnlineResponse)footer;
+        this.footer = (FooterRespone)footer;
     }
 }

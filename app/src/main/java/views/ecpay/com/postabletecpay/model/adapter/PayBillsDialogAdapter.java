@@ -45,6 +45,15 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
 
     }
 
+
+    public boolean isDisableCheckbox() {
+        return isDisableCheckbox;
+    }
+
+    public void setDisableCheckbox(boolean disableCheckbox) {
+        isDisableCheckbox = disableCheckbox;
+    }
+
     @Override
     public BillDialogViewHorder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = View.inflate(parent.getContext(), R.layout.row_thanhtoan_list_bills, null);
@@ -74,13 +83,17 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
         {
             status = message;
         }
+        if(isDisableCheckbox)
+        {
+            holder.getCbChoose().setEnabled(false);
+        }else
+        {
+            if (billChecked.getTRANG_THAI_TT().equalsIgnoreCase(CHUA_THANH_TOAN.getCode()))
+                holder.getCbChoose().setEnabled(true);
+            else
+                holder.getCbChoose().setEnabled(false);
+        }
 
-        if (billChecked.getTRANG_THAI_TT().equalsIgnoreCase(CHUA_THANH_TOAN.getCode()))
-            holder.getCbChoose().setVisibility(View.VISIBLE);
-        else
-            holder.getCbChoose().setVisibility(View.INVISIBLE);
-
-        holder.getCbChoose().setEnabled(!isDisableCheckbox);
 
         holder.getTvPayStatus().setText(status);
 

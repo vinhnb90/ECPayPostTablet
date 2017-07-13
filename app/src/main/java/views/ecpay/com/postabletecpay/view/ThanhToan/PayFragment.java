@@ -37,6 +37,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -60,6 +61,7 @@ import views.ecpay.com.postabletecpay.view.Util.BarcodeScannerDialog;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
+import static views.ecpay.com.postabletecpay.util.commons.Common.NEGATIVE_ONE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
 
@@ -753,14 +755,27 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void showCountBillsAndTotalMoneyFragment(int size, long totalMoneyAllBills) {
-        tvTotalBills.setText(String.valueOf(size));
-        tvTotalBillsMoney.setText(Common.convertLongToMoney(totalMoneyAllBills));
+       try
+       {
+           tvTotalBills.setText(String.valueOf(size));
+           tvTotalBillsMoney.setText(Common.convertLongToMoney(totalMoneyAllBills));
+       }catch (Exception e)
+       {
+           e.printStackTrace();
+       }
     }
 
     @Override
-    public void refreshAdapterPayRecyclerListBills() {
-        payBillsDialogAdapter.notifyDataSetChanged();
-        rvListBillDialog.invalidate();
+    public void refreshAdapterPayRecyclerListBills(boolean disableCheckBoxAll) {
+        try
+        {
+            payBillsDialogAdapter.setDisableCheckbox(disableCheckBoxAll);
+            payBillsDialogAdapter.notifyDataSetChanged();
+            rvListBillDialog.invalidate();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -768,15 +783,18 @@ public class PayFragment extends Fragment implements
         if (listBillChecked == null)
             return;
 
-        setUpRecyclerDialog();
+        try
+        {
+            setUpRecyclerDialog();
 
-//        if (payBillsDialogAdapter == null) {
-        payBillsDialogAdapter = new PayBillsDialogAdapter(this, listBillChecked, false);
-        rvListBillDialog.setAdapter(payBillsDialogAdapter);
-//        } else
-//            payBillsDialogAdapter.refreshData(listBillChecked);
+            payBillsDialogAdapter = new PayBillsDialogAdapter(this, listBillChecked, false);
+            rvListBillDialog.setAdapter(payBillsDialogAdapter);
 
-        rvListBillDialog.invalidate();
+            rvListBillDialog.invalidate();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private void setUpRecyclerDialog() {
@@ -921,23 +939,36 @@ public class PayFragment extends Fragment implements
 
                     for (int i = 0, n = mIPayPresenter.getPayModel().getListBillSelected().size(); i < n; i ++)
                     {
-                        mIPayPresenter.getPayModel().getListBillSelected().get(i).setChecked(true);
+                        PayAdapter.BillEntityAdapter bill = mIPayPresenter.getPayModel().getListBillSelected().get(i);
+                        if(!bill.isChecked() || !bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()))
+                        {
+                            mIPayPresenter.getPayModel().removeBillSelect(bill.getBillId());
+                        }
                     }
 
-                    bindViewAgain();
+                    try
+                    {
+
+                        bindViewAgain();
+                        payAdapter.notifyDataSetChanged();
+                        rvKH.invalidate();
+
+                        updateBillSelectToPay(mIPayPresenter.getPayModel().getListBillSelected());
+                    }catch (Exception e)
+                    {
+
+                    }
                 }
             });
             dialogPayingOnline.show();
     }
 
     @Override
-    public void showDialogDeleteBillOnline(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside) {
-        boolean fail = TextUtils.isEmpty(edong) || TextUtils.isEmpty(code) || bill == null;
+    public void showDialogDeleteBillOnline(String edong, PayAdapter.BillEntityAdapter bill, final PayAdapter.BillInsidePayAdapter adapter) {
+        boolean fail = TextUtils.isEmpty(edong) ||  bill == null;
         if (fail)
             return;
 
-        if (this.getActivity() instanceof CallbackDeleteBillOnlineDialog) {
-            final CallbackDeleteBillOnlineDialog callbackDeleteBillOnlineDialog = (CallbackDeleteBillOnlineDialog) getContextView();
 
             dialogDeleteBillOnline = new Dialog(this.getActivity());
             dialogDeleteBillOnline.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -955,18 +986,26 @@ public class PayFragment extends Fragment implements
             unbinder = ButterKnife.bind(this, dialogDeleteBillOnline);
 
             hideAllProcessDeleteBillOnline();
-            mIPayPresenter.callFillInfoBillDeleteDialog(edong, code, bill, posCustomerInside);
+            mIPayPresenter.callFillInfoBillDeleteDialog(edong, bill);
 
             dialogDeleteBillOnline.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    callbackDeleteBillOnlineDialog.processOnDismissDeleteBillOnlineDialog();
+                    try
+                    {
+                        bindViewAgain();
+                        if(adapter != null)
+                        {
+                            adapter.notifyDataSetChanged();
+                        }
+                    }catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             });
 
             dialogDeleteBillOnline.show();
-        } else
-            Log.e(TAG, "showdialogDeleteBillOnline: fragment cannot implement callbackDeleteBillOnlineDialog");
     }
 
     @Override
@@ -992,16 +1031,26 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void showPbarDeleteBillOnline() {
-        cardMessage.setVisibility(View.VISIBLE);
-        tvMessageBillDeleteDialog.setVisibility(View.GONE);
-        pbarBillDeleteDialog.setVisibility(View.VISIBLE);
+        try {
+            cardMessage.setVisibility(View.VISIBLE);
+            tvMessageBillDeleteDialog.setVisibility(View.GONE);
+            pbarBillDeleteDialog.setVisibility(View.VISIBLE);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void hideAllProcessDeleteBillOnline() {
-        cardMessage.setVisibility(View.INVISIBLE);
-        tvMessageBillDeleteDialog.setVisibility(View.INVISIBLE);
-        pbarBillDeleteDialog.setVisibility(View.GONE);
+        try {
+            cardMessage.setVisibility(View.INVISIBLE);
+            tvMessageBillDeleteDialog.setVisibility(View.INVISIBLE);
+            pbarBillDeleteDialog.setVisibility(View.GONE);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1127,8 +1176,8 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
-    public void processDialogDeleteBillOnline(String edong, String code, PayAdapter.BillEntityAdapter bill, int posCustomerInside) {
-        mIPayPresenter.callProcessDeleteBillOnline(edong, code, bill, posCustomerInside);
+    public void processDialogDeleteBillOnline(String edong, PayAdapter.BillEntityAdapter bill, PayAdapter.BillInsidePayAdapter adapter) {
+        mIPayPresenter.callProcessDeleteBillOnline(edong,  bill, adapter);
     }
 
     @Override
@@ -1178,7 +1227,7 @@ public class PayFragment extends Fragment implements
             tvMessageDialog.setVisibility(View.GONE);
 
             btnPayDialog.setEnabled(false);
-            btnCancelDialog.setEnabled(true);
+            btnCancelDialog.setEnabled(false);
         }
 
         //show pbar && finish payed
@@ -1220,8 +1269,4 @@ public class PayFragment extends Fragment implements
         etSearch.setText(textBarcode);
     }
 
-
-    public interface CallbackDeleteBillOnlineDialog {
-        void processOnDismissDeleteBillOnlineDialog();
-    }
 }

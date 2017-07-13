@@ -33,7 +33,6 @@ import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.RESPONSE
 public class MainActivity extends AppCompatActivity implements
         IMainView,
         MainPageFragment.OnFragmentInteractionListener,
-        PayFragment.CallbackDeleteBillOnlineDialog,
         BaoCaoFragment.OnFragmentInteractionListener,
         UserInfoFragment.OnFragmentInteractionListener {
 
@@ -336,17 +335,6 @@ public class MainActivity extends AppCompatActivity implements
 
     //endregion
 
-    //region PayFragment.CallbackDeleteBillOnlineDialog,
-    @Override
-    public void processOnDismissDeleteBillOnlineDialog() {
-        //check fragment
-        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
-            return;
-        }
-
-    }
-    //endregion
 
     //region OnFragmentInteractionListener
     @Override

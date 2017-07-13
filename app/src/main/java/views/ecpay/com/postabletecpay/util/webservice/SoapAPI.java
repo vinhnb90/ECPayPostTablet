@@ -47,8 +47,6 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.Foo
 import views.ecpay.com.postabletecpay.util.entities.request.EntityChangePass.HeaderChangePassRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityCheckTrainOnline.BodyCheckTrainOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityCheckTrainOnline.CheckTrainOnlineRequest;
-import views.ecpay.com.postabletecpay.util.entities.request.EntityCheckTrainOnline.FooterCheckTrainOnlineRequest;
-import views.ecpay.com.postabletecpay.util.entities.request.EntityCheckTrainOnline.HeaderCheckTrainOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityData.BodyListDataRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityData.FooterListDataRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityData.HeaderListDataRequest;
@@ -1042,31 +1040,31 @@ public class SoapAPI {
         if (hasNull)
             return null;
 
-        HeaderCheckTrainOnlineRequest headerCheckTrainOnlineRequest = new HeaderCheckTrainOnlineRequest();
-        headerCheckTrainOnlineRequest.setAgent(agent);
-        headerCheckTrainOnlineRequest.setPassword(agentEncypted);
-        headerCheckTrainOnlineRequest.setCommandId(commandId);
+        HeaderRequest header = new HeaderRequest();
+        header.setAgent(agent);
+        header.setPassword(agentEncypted);
+        header.setCommandId(commandId);
 
-        BodyCheckTrainOnlineRequest bodyCheckTrainOnlineRequest = new BodyCheckTrainOnlineRequest();
-        bodyCheckTrainOnlineRequest.setAuditNumber(auditNumber);
-        bodyCheckTrainOnlineRequest.setMac(macAdressHexValue);
-        bodyCheckTrainOnlineRequest.setDiskDrive(diskDriver);
-        bodyCheckTrainOnlineRequest.setSignature(signatureEncrypted);
+        BodyCheckTrainOnlineRequest body = new BodyCheckTrainOnlineRequest();
+        body.setAuditNumber(auditNumber);
+        body.setMac(macAdressHexValue);
+        body.setDiskDrive(diskDriver);
+        body.setSignature(signatureEncrypted);
 
         long moneyBill = Double.valueOf(amount).longValue();
-        bodyCheckTrainOnlineRequest.setAmount(moneyBill);
+        body.setAmount(moneyBill);
 
-        bodyCheckTrainOnlineRequest.setCustomerCode(customerCode);
-        bodyCheckTrainOnlineRequest.setBillId(billId);
-        bodyCheckTrainOnlineRequest.setRequestDate(requestDate);
+        body.setCustomerCode(customerCode);
+        body.setBillId(billId);
+        body.setRequestDate(requestDate);
 
-        FooterCheckTrainOnlineRequest footerCheckTrainOnlineRequest = new FooterCheckTrainOnlineRequest();
-        footerCheckTrainOnlineRequest.setAccountIdt(accountId);
+        FooterRequest footer = new FooterRequest();
+        footer.setAccountIdt(accountId);
 
         final CheckTrainOnlineRequest checkTrainOnlineRequest = new CheckTrainOnlineRequest();
-        checkTrainOnlineRequest.setHeader(headerCheckTrainOnlineRequest);
-        checkTrainOnlineRequest.setBody(bodyCheckTrainOnlineRequest);
-        checkTrainOnlineRequest.setFooter(footerCheckTrainOnlineRequest);
+        checkTrainOnlineRequest.setHeader(header);
+        checkTrainOnlineRequest.setBody(body);
+        checkTrainOnlineRequest.setFooter(footer);
 
 
         final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -1084,7 +1082,7 @@ public class SoapAPI {
                                                               long auditNumber, String macAdressHexValue, String diskDriver,
                                                               String signatureEncrypted, Long amount, String code, Long billId,
                                                               @Nullable String requestDate,
-                                                              Long traceNumber, String reasonDeleteBill, String accountId) {
+                                                               String reasonDeleteBill, String accountId) {
         boolean hasNull =
                 TextUtils.isEmpty(agent) ||
                         TextUtils.isEmpty(agentEncypted) ||
@@ -1115,7 +1113,6 @@ public class SoapAPI {
         bodyDeleteBillOnlineRequest.setCustomerCode(code);
         bodyDeleteBillOnlineRequest.setBillId(billId);
         bodyDeleteBillOnlineRequest.setBillingDate(requestDate);
-        bodyDeleteBillOnlineRequest.setTraceNumber(traceNumber);
         bodyDeleteBillOnlineRequest.setReason(reasonDeleteBill);
 
         FooterRequest footer = new FooterRequest();
