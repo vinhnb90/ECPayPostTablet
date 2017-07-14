@@ -72,9 +72,9 @@ public class LoginPresenter implements ILoginPresenter {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void validateInput(String userName, String pass) {
-        mILoginView.showMainScreen("01214500702");
-        if(true)
-            return;
+//        mILoginView.showMainScreen("01214500702");
+//        if(true)
+//            return;
 
         String textMessage = "";
         Context context = mILoginView.getContextView();
