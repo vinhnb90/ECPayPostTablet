@@ -46,7 +46,7 @@ public interface IPayPresenter {
     void addSelectBillToPay(PayAdapter.BillEntityAdapter bill, boolean isSelect);
 
 
-    void PrintThongBaoDien(PayAdapter.DataAdapter data);
-    void PrintHoaDon(PayAdapter.BillEntityAdapter bill);
+    /*void PrintThongBaoDien(PayAdapter.DataAdapter data);
+    void PrintHoaDon(PayAdapter.BillEntityAdapter bill);*/
 
 }

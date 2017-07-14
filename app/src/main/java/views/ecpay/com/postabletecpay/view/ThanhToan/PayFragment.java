@@ -2,10 +2,18 @@ package views.ecpay.com.postabletecpay.view.ThanhToan;
 
 import android.app.ActionBar;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -29,14 +37,26 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sewoo.jpos.command.ESCPOSConst;
+import com.sewoo.port.android.BluetoothPort;
+import com.sewoo.request.android.RequestHandler;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
@@ -54,7 +74,9 @@ import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
 import views.ecpay.com.postabletecpay.presenter.PayPresenter;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
+import views.ecpay.com.postabletecpay.view.Printer.ESCPOSSample;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 import views.ecpay.com.postabletecpay.view.Util.BarcodeScannerDialog;
@@ -215,7 +237,20 @@ public class PayFragment extends Fragment implements
     private Dialog dialogPayingOnline, dialogDeleteBillOnline;
     public static final int REQUEST_BARCODE = 999;
     public static final int RESPONSE_BARCODE = 1000;
-
+    //region Bluetooth
+    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothPort bluetoothPort;
+    ArrayAdapter<String> adapter;
+    private Vector<BluetoothDevice> remoteDevices;
+    private static final int REQUEST_ENABLE_BT = 2;
+    private ListView listBluetooth;
+    private Thread hThread;
+    private BroadcastReceiver discoveryResult;
+    private BroadcastReceiver searchFinish;
+    private BroadcastReceiver searchStart;
+    private static ProgressDialog pDialog;
+    private boolean isThongbao;
+    //endregion
 
     private Common.PROVIDER_CODE ProviderSelect = Common.PROVIDER_CODE.NCCNONE ;
 
@@ -277,6 +312,54 @@ public class PayFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        loadSettingFile();
+        bluetoothSetup();
+        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
+        addPairedDevices();
+        discoveryResult = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                String key;
+                BluetoothDevice remoteDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if(remoteDevice != null)
+                {
+                    if(remoteDevice.getBondState() != BluetoothDevice.BOND_BONDED)
+                    {
+                        key = remoteDevice.getName() +"\n["+remoteDevice.getAddress()+"]";
+                    }
+                    else
+                    {
+                        key = remoteDevice.getName() +"\n["+remoteDevice.getAddress()+"] [Paired]";
+                    }
+                    if(bluetoothPort.isValidAddress(remoteDevice.getAddress()))
+                    {
+                        remoteDevices.add(remoteDevice);
+                        adapter.add(key);
+                    }
+                }
+            }
+        };
+        getContext().registerReceiver(discoveryResult, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+        searchStart = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+
+            }
+        };
+        searchFinish = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                showDialogListBlueTooth();
+                pDialog.dismiss();
+            }
+        };
+        getContext().registerReceiver(searchFinish, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
     }
 
 
@@ -538,6 +621,27 @@ public class PayFragment extends Fragment implements
     @Override
     public void onDestroyView() {
         mIPayPresenter.cancelSeachOnline();
+        try
+        {
+            saveSettingFile();
+            bluetoothPort.disconnect();
+        }
+        catch (IOException e)
+        {
+            Log.e(TAG, e.getMessage(), e);
+        }
+        catch (InterruptedException e)
+        {
+            Log.e(TAG, e.getMessage(), e);
+        }
+        if((hThread != null) && (hThread.isAlive()))
+        {
+            hThread.interrupt();
+            hThread = null;
+        }
+        getContext().unregisterReceiver(searchFinish);
+        getContext().unregisterReceiver(searchStart);
+        getContext().unregisterReceiver(discoveryResult);
         super.onDestroyView();
     }
 
@@ -828,6 +932,52 @@ public class PayFragment extends Fragment implements
             }
         };
         Common.showDialog(getContext(), yesNoDialog, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), message, false, typeDialog);
+    }
+
+    @Override
+    public void PrintThongBaoDien(PayAdapter.DataAdapter data) {
+        isThongbao = true;
+        if (!bluetoothPort.isConnected()) {
+            if (!mBluetoothAdapter.isDiscovering()) {
+                clearBtDevData();
+                adapter.clear();
+                mBluetoothAdapter.startDiscovery();
+                pDialog = new ProgressDialog(getActivity());
+                pDialog.setMessage("Đang tìm kiếm thiết bị");
+                pDialog.setTitle("Đang tìm kiếm thiết bị");
+                pDialog.show();
+                pDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                pDialog.setContentView(R.layout.progress_dialog);
+                pDialog.setCancelable(false);
+            } else {
+                mBluetoothAdapter.cancelDiscovery();
+            }
+        }else {
+            printer(true);
+        }
+    }
+
+    @Override
+    public void PrintHoaDon(PayAdapter.BillEntityAdapter bill) {
+        isThongbao = false;
+        if (!bluetoothPort.isConnected()) {
+            if (!mBluetoothAdapter.isDiscovering()) {
+                clearBtDevData();
+                adapter.clear();
+                mBluetoothAdapter.startDiscovery();
+                pDialog = new ProgressDialog(getActivity());
+                pDialog.setMessage("Đang tìm kiếm thiết bị");
+                pDialog.setTitle("Đang tìm kiếm thiết bị");
+                pDialog.show();
+                pDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                pDialog.setContentView(R.layout.progress_dialog);
+                pDialog.setCancelable(false);
+            } else {
+                mBluetoothAdapter.cancelDiscovery();
+            }
+        }else {
+            printer(false);
+        }
     }
 
     @Override
@@ -1267,5 +1417,205 @@ public class PayFragment extends Fragment implements
             return;
         etSearch.setText(textBarcode);
     }
+
+    //region Bluetooth
+    // Set up Bluetooth.
+    private void bluetoothSetup() {
+        // Initialize
+        clearBtDevData();
+        bluetoothPort = BluetoothPort.getInstance();
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth
+            return;
+        }
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+    }
+
+    private static final String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "//temp";
+    private static final String fileName = dir + "//BTPrinter";
+    private String lastConnAddr;
+
+    private void loadSettingFile() {
+        int rin = 0;
+        char[] buf = new char[128];
+        try {
+            FileReader fReader = new FileReader(fileName);
+            rin = fReader.read(buf);
+            if (rin > 0) {
+                lastConnAddr = new String(buf, 0, rin);
+            }
+            fReader.close();
+        } catch (FileNotFoundException e) {
+            Log.i(TAG, "Connection history not exists.");
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+    }
+
+    private void saveSettingFile() {
+        try {
+            File tempDir = new File(dir);
+            if (!tempDir.exists()) {
+                tempDir.mkdir();
+            }
+            FileWriter fWriter = new FileWriter(fileName);
+            if (lastConnAddr != null)
+                fWriter.write(lastConnAddr);
+            fWriter.close();
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+    }
+
+    // clear device data used list.
+    private void clearBtDevData() {
+        remoteDevices = new Vector<BluetoothDevice>();
+    }
+
+    // add paired device to list
+    private void addPairedDevices() {
+        BluetoothDevice pairedDevice;
+        Iterator<BluetoothDevice> iter = (mBluetoothAdapter.getBondedDevices()).iterator();
+        while (iter.hasNext()) {
+            pairedDevice = iter.next();
+            if (bluetoothPort.isValidAddress(pairedDevice.getAddress())) {
+                remoteDevices.add(pairedDevice);
+                adapter.add(pairedDevice.getName() + "\n[" + pairedDevice.getAddress() + "] [Paired]");
+            }
+        }
+    }
+
+    private void showDialogListBlueTooth() {
+        final Dialog dialog = new Dialog(this.getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_listbluetooth);
+        dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        listBluetooth = (ListView) dialog.findViewById(R.id.dl_list_bluetooth);
+        listBluetooth.setAdapter(adapter);
+        // Connect - click the List item.
+        listBluetooth.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                BluetoothDevice btDev = remoteDevices.elementAt(arg2);
+                try {
+                    if (mBluetoothAdapter.isDiscovering()) {
+                        mBluetoothAdapter.cancelDiscovery();
+                    }
+                    btConn(btDev);
+                    dialog.dismiss();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        });
+        dialog.show();
+    }
+
+    // Bluetooth Connection method.
+    private void btConn(final BluetoothDevice btDev) throws IOException {
+        new connTask().execute(btDev);
+    }
+
+    // Bluetooth Disconnection method.
+    private void btDisconn() {
+        try {
+            bluetoothPort.disconnect();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+        if ((hThread != null) && (hThread.isAlive()))
+            hThread.interrupt();
+        // UI
+        listBluetooth.setEnabled(true);
+    }
+
+    // Bluetooth Connection Task.
+    class connTask extends AsyncTask<BluetoothDevice, Void, Integer> {
+        private final ProgressDialog dialog = new ProgressDialog(getContext());
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Integer doInBackground(BluetoothDevice... params) {
+            Integer retVal = null;
+            try {
+                bluetoothPort.connect(params[0]);
+                lastConnAddr = params[0].getAddress();
+                retVal = new Integer(0);
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+                retVal = new Integer(-1);
+            }
+            return retVal;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            if(result.intValue() == 0)	// Connection success.
+            {
+                RequestHandler rh = new RequestHandler();
+                hThread = new Thread(rh);
+                hThread.start();
+                // UI
+                listBluetooth.setEnabled(false);
+                if(dialog.isShowing())
+                    dialog.dismiss();
+                Toast toast = Toast.makeText(getContext(), "Đã kết nối bluetooth", Toast.LENGTH_SHORT);
+                toast.show();
+                if (isThongbao)
+                    printer(true);
+                else
+                    printer(false);
+            }
+            else	// Connection failed.
+            {
+                if(dialog.isShowing())
+                    dialog.dismiss();
+            }
+            super.onPostExecute(result);
+        }
+    }
+
+    private void printer(boolean isThongBao){
+        int results = 0;
+        ESCPOSSample sample = new ESCPOSSample();
+        try {
+            if (!isThongBao)
+                results = sample.sample1(getContext());
+            else
+                results = sample.Thongbao(getContext());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (results != 0) {
+            switch (results) {
+                case ESCPOSConst.STS_PAPEREMPTY:
+                    Log.e(getClass().getName(),"Paper empty");
+                    break;
+                case ESCPOSConst.STS_COVEROPEN:
+                    Log.e(getClass().getName(),"cover open");
+                    break;
+                case ESCPOSConst.STS_PAPERNEAREMPTY:
+                    Log.e(getClass().getName(),"page near empty");
+                    break;
+            }
+        }
+    }
+    //end region
 
 }

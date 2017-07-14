@@ -1,23 +1,33 @@
 package views.ecpay.com.postabletecpay.presenter;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.sewoo.port.android.BluetoothPort;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Vector;
 
+import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
@@ -404,17 +414,6 @@ public class PayPresenter implements IPayPresenter {
         }
 
         mIPayView.hideSearchOnlineProcess();
-    }
-
-
-    @Override
-    public void PrintThongBaoDien(PayAdapter.DataAdapter data) {
-        Log.d("TAG", "PrintThongBaoDien MA_KHACH_HANG = " + data.getInfoKH().getMA_KHANG());
-    }
-
-    @Override
-    public void PrintHoaDon(PayAdapter.BillEntityAdapter bill) {
-        Log.d("TAG", "PrintHoaDon MA_HOA_DON = " + bill.getBillId());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
