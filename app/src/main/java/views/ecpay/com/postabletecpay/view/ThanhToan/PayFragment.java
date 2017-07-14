@@ -948,7 +948,6 @@ public class PayFragment extends Fragment implements
 
                     try
                     {
-
                         bindViewAgain();
                         payAdapter.notifyDataSetChanged();
                         rvKH.invalidate();
