@@ -128,7 +128,7 @@ public class ESCPOSSample
 				posPtr.printText(demtext(14, (DNTT - 200)* dongia4 + "")+ (DNTT - 200)* dongia4 +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			}
 			posPtr.printNormal("--------------------------------");
-			posPtr.printNormal("|  "+ demtext(12,DNTT + "")+ DNTT +"kwh|");
+			posPtr.printNormal("|  "+ DNTT+"kwh"+demtext(12,DNTT + "") +"|");
 			posPtr.printText(demtext(14,"466211")+ 466211 +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
             posPtr.printNormal("| Thue GTGT      |");
 			posPtr.printText(demtext(14,"46621")+ 46621 +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);

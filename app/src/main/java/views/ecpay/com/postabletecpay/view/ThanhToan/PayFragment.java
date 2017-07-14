@@ -44,6 +44,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bbpos.simplyprint.SimplyPrintController;
 import com.sewoo.jpos.command.ESCPOSConst;
 import com.sewoo.port.android.BluetoothPort;
 import com.sewoo.request.android.RequestHandler;
@@ -77,6 +78,7 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.Printer.ESCPOSSample;
+import views.ecpay.com.postabletecpay.view.Printer.SimplyConnection;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 import views.ecpay.com.postabletecpay.view.Util.BarcodeScannerDialog;
@@ -237,6 +239,8 @@ public class PayFragment extends Fragment implements
     private Dialog dialogPayingOnline, dialogDeleteBillOnline;
     public static final int REQUEST_BARCODE = 999;
     public static final int RESPONSE_BARCODE = 1000;
+
+
     //region Bluetooth
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothPort bluetoothPort;
@@ -250,6 +254,9 @@ public class PayFragment extends Fragment implements
     private BroadcastReceiver searchStart;
     private static ProgressDialog pDialog;
     private boolean isThongbao;
+    private SimplyPrintController controller;
+    protected static ArrayAdapter<String> arrayAdapter;
+    protected static List<BluetoothDevice> foundDevices;
     //endregion
 
     private Common.PROVIDER_CODE ProviderSelect = Common.PROVIDER_CODE.NCCNONE ;
@@ -360,6 +367,7 @@ public class PayFragment extends Fragment implements
             }
         };
         getContext().registerReceiver(searchFinish, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+        controller = new SimplyPrintController(getContext(), new SimplyConnection());
     }
 
 
@@ -937,47 +945,12 @@ public class PayFragment extends Fragment implements
     @Override
     public void PrintThongBaoDien(PayAdapter.DataAdapter data) {
         isThongbao = true;
-        if (!bluetoothPort.isConnected()) {
-            if (!mBluetoothAdapter.isDiscovering()) {
-                clearBtDevData();
-                adapter.clear();
-                mBluetoothAdapter.startDiscovery();
-                pDialog = new ProgressDialog(getActivity());
-                pDialog.setMessage("Đang tìm kiếm thiết bị");
-                pDialog.setTitle("Đang tìm kiếm thiết bị");
-                pDialog.show();
-                pDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                pDialog.setContentView(R.layout.progress_dialog);
-                pDialog.setCancelable(false);
-            } else {
-                mBluetoothAdapter.cancelDiscovery();
-            }
-        }else {
-            printer(true);
-        }
+
     }
 
     @Override
     public void PrintHoaDon(PayAdapter.BillEntityAdapter bill) {
         isThongbao = false;
-        if (!bluetoothPort.isConnected()) {
-            if (!mBluetoothAdapter.isDiscovering()) {
-                clearBtDevData();
-                adapter.clear();
-                mBluetoothAdapter.startDiscovery();
-                pDialog = new ProgressDialog(getActivity());
-                pDialog.setMessage("Đang tìm kiếm thiết bị");
-                pDialog.setTitle("Đang tìm kiếm thiết bị");
-                pDialog.show();
-                pDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                pDialog.setContentView(R.layout.progress_dialog);
-                pDialog.setCancelable(false);
-            } else {
-                mBluetoothAdapter.cancelDiscovery();
-            }
-        }else {
-            printer(false);
-        }
     }
 
     @Override
@@ -1616,6 +1589,82 @@ public class PayFragment extends Fragment implements
             }
         }
     }
-    //end region
+    //endregion
+
+    //region Chon May In
+    public void dialogChonMayIn() {
+        Dialog dialog = new Dialog(getContext());
+        dialog.setContentView(R.layout.dialog_listbluetooth);
+
+        String[] connections = new String[2];
+        connections[0] = "Simply";
+        connections[1] = "Sewoo";
+
+        ListView listView = (ListView)dialog.findViewById(R.id.dl_list_bluetooth);
+        listView.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, connections));
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(position == 0) {
+                    Object[] pairedObjects = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray();
+                    final BluetoothDevice[] pairedDevices = new BluetoothDevice[pairedObjects.length];
+                    for(int i = 0; i < pairedObjects.length; ++i) {
+                        pairedDevices[i] = (BluetoothDevice)pairedObjects[i];
+                    }
+
+                    final ArrayAdapter<String> mArrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1);
+                    for (int i = 0; i < pairedDevices.length; ++i) {
+                        mArrayAdapter.add(pairedDevices[i].getName());
+                    }
+                    Dialog dialog = new Dialog(getContext());
+                    dialog.setContentView(R.layout.dialog_listbluetooth);
+
+                    ListView listView = (ListView)dialog.findViewById(R.id.dl_list_bluetooth);
+                    listView.setAdapter(mArrayAdapter);
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            controller.startBTv2(pairedDevices[position]);
+                        }
+
+                    });
+
+                    dialog.show();
+
+                    controller.scanBTv2(DEVICE_NAMES, 120);
+                } else if(position == 1) {
+                    if (!bluetoothPort.isConnected()) {
+                        if (!mBluetoothAdapter.isDiscovering()) {
+                            clearBtDevData();
+                            adapter.clear();
+                            mBluetoothAdapter.startDiscovery();
+                            pDialog = new ProgressDialog(getActivity());
+                            pDialog.setMessage("Đang tìm kiếm thiết bị");
+                            pDialog.setTitle("Đang tìm kiếm thiết bị");
+                            pDialog.show();
+                            pDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                            pDialog.setContentView(R.layout.progress_dialog);
+                            pDialog.setCancelable(false);
+                        } else {
+                            mBluetoothAdapter.cancelDiscovery();
+                        }
+                    }else {
+                        if (isThongbao)
+                            printer(true);
+                        else
+                            printer(false);
+                    }
+                }
+            }
+
+        });
+
+
+        dialog.show();
+    }
+
+    //endregion
 
 }
