@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_row_thanh_toan_recycler"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:textSize="@dimen/_12sdp"
+    android:padding="@dimen/_2sdp"
+    style="?android:attr/spinnerDropDownItemStyle"
+    android:gravity="center_vertical|center_horizontal"
+    android:ellipsize="marquee"
+    android:maxLines="1"
+    android:orientation="vertical">
+
+    </TextView>

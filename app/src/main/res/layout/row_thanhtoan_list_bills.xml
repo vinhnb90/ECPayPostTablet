@@ -2,10 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
-        android:layout_margin="@dimen/_8sdp"
+        android:layout_margin="@dimen/_3sdp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal|center_vertical"
@@ -39,7 +39,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@+id/cb_row_thanhtoan_list_bills_choose"
                     android:lines="1"
-                    android:textSize="@dimen/_12sdp"
+                    android:textSize="@dimen/_9sdp"
                     android:scrollHorizontally="true"
                     android:text="PD384728938" />
 
@@ -52,7 +52,7 @@
                     android:layout_toRightOf="@+id/cb_row_thanhtoan_list_bills_choose"
                     android:lines="1"
                     android:scrollHorizontally="true"
-                    android:textSize="@dimen/_12sdp"
+                    android:textSize="@dimen/_9sdp"
                     android:text="Kỳ 03/2017" />
             </LinearLayout>
 
@@ -71,21 +71,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:lines="1"
-                android:textSize="@dimen/_12sdp"
+                android:textSize="@dimen/_9sdp"
                 android:scrollHorizontally="true"
-                android:text="Ten"
+                tools:text="TenTenTen"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_row_thanhtoan_list_bills_amount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_marginTop="@dimen/_2sdp"
                 android:gravity="center_horizontal"
                 android:lines="1"
                 android:scrollHorizontally="true"
-                android:textSize="@dimen/_12sdp"
+                android:textSize="@dimen/_9sdp"
                 android:text="100.000 đ100100.000 đ.000 đ100100.000 đ.000 đ100.000 đ100.000 đ" />
 
         </LinearLayout>
@@ -93,13 +92,13 @@
         <RelativeLayout
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="@dimen/_5sdp"
             android:layout_weight="1"
             android:layout_width="0dp"
+            android:gravity="center_vertical|center_horizontal"
             android:layout_height="match_parent">
 
             <ImageButton
-                android:visibility="invisible"
+                android:visibility="gone"
                 android:id="@+id/ibtn_dialog_thanhtoan_message"
                 android:background="@drawable/ic_message"
                 android:layout_alignParentRight="true"
@@ -107,16 +106,13 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:layout_marginRight="@dimen/_5sdp"
                 android:id="@+id/tv_row_thanhtoan_list_bills_status_pay"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/ibtn_dialog_thanhtoan_message"
                 android:gravity="center_horizontal|center_vertical"
-                android:lines="1"
-                android:scrollHorizontally="true"
                 android:text="Chưa thanh toán"
-                android:textSize="@dimen/_12sdp"
+                android:textSize="@dimen/_9sdp"
                 android:textColor="@color/colorDarkOrange" />
 
         </RelativeLayout>

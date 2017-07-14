@@ -284,7 +284,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:paddingTop="@dimen/_10sdp">
+            android:paddingTop="@dimen/_2sdp">
 
 
             <LinearLayout
@@ -378,7 +378,7 @@
             <Button
                 android:id="@+id/btn_frag_thanh_toan_paying"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_24sdp"
+                android:layout_height="@dimen/_30sdp"
                 android:layout_below="@+id/ll_frag_thanh_toan_count"
                 android:layout_margin="@dimen/_5sdp"
                 android:textSize="@dimen/_10sdp"

@@ -132,19 +132,19 @@
                 android:id="@+id/ll_row_thanhtoan_recycler_print"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/_8sdp"
-                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginBottom="@dimen/_2sdp"
+                android:layout_marginTop="@dimen/_2sdp"
                 android:gravity="center_horizontal"
                 android:visibility="gone">
 
                 <Button
                     android:id="@+id/btn_row_thanhtoan_recycler_print"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/_15sdp"
+                    android:layout_height="@dimen/_24sdp"
+                    android:padding="@dimen/_2sdp"
                     android:text="In thông báo"
                     android:textAllCaps="false"
-                    android:textSize="@dimen/_13sdp">
+                    android:textSize="@dimen/_10sdp">
 
                 </Button>
             </LinearLayout>
