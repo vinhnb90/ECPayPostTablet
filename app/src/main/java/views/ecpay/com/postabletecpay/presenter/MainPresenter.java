@@ -676,6 +676,13 @@ public class MainPresenter implements IMainPresenter {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                }finally {
+                    ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mIMainView.refreshInfoMain();
+                        }
+                    });
                 }
             }
         }
@@ -702,68 +709,80 @@ public class MainPresenter implements IMainPresenter {
         public void onPost(ListDataResponse response) {
             if (response == null)
                 return;
-            String sDataCustomer = response.getBodyListDataResponse().getCustomer();
-            if (sDataCustomer != null && !sDataCustomer.isEmpty()) {
-                byte[] zipByteCustomer = org.apache.commons.codec.binary.Base64.decodeBase64(sDataCustomer.getBytes());
 
-                try {
-                    String sCustomer = Common.decompress(zipByteCustomer);
+            try {
+                String sDataCustomer = response.getBodyListDataResponse().getCustomer();
+                if (sDataCustomer != null && !sDataCustomer.isEmpty()) {
+                    byte[] zipByteCustomer = org.apache.commons.codec.binary.Base64.decodeBase64(sDataCustomer.getBytes());
 
-                    JSONArray jsonArray = new JSONArray(sCustomer);
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject ja = jsonArray.getJSONObject(i);
-                        GsonBuilder gsonBuilder = new GsonBuilder();
-                        Gson gson = gsonBuilder.create();
-                        CustomerResponse customerResponse = gson.fromJson(ja.toString(), CustomerResponse.class);
-                        if (mainModel.checkCustomerExist(customerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
-                            if (mainModel.insertCustomer(customerResponse) != -1) {
-                                Log.i("INFO", "SUCCESS");
-                            }
-                        } else {
-                            if (mainModel.updateCustomer(customerResponse) != -1) {
-                                Log.i("INFO", "SUCCESS");
-                            }
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            String sDataBill = response.getBodyListDataResponse().getBill();
-            if (sDataBill != null && !sDataBill.isEmpty()) {
-                byte[] zipByteBill = org.apache.commons.codec.binary.Base64.decodeBase64(sDataBill.getBytes());
+                    try {
+                        String sCustomer = Common.decompress(zipByteCustomer);
 
-                try {
-                    String sCustomer = Common.decompress(zipByteBill);
-
-                    JSONArray jsonArray = new JSONArray(sCustomer);
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject ja = jsonArray.getJSONObject(i);
-                        GsonBuilder gsonBuilder = new GsonBuilder();
-                        Gson gson = gsonBuilder.create();
-                        BillResponse billResponse = gson.fromJson(ja.toString(), BillResponse.class);
-                        billResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
-                        if (mainModel.checkBillExist(billResponse.getBodyBillResponse().getBillId()) == 0) {
-                            if (mainModel.insertBill(billResponse) != -1) {
-                                Log.i("INFO", "SUCCESS");
-                            }
-                        } else {
-                            if (mainModel.updateBill(billResponse) != -1) {
-                                Log.i("INFO", "SUCCESS");
+                        JSONArray jsonArray = new JSONArray(sCustomer);
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject ja = jsonArray.getJSONObject(i);
+                            GsonBuilder gsonBuilder = new GsonBuilder();
+                            Gson gson = gsonBuilder.create();
+                            CustomerResponse customerResponse = gson.fromJson(ja.toString(), CustomerResponse.class);
+                            if (mainModel.checkCustomerExist(customerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
+                                if (mainModel.insertCustomer(customerResponse) != -1) {
+                                    Log.i("INFO", "SUCCESS");
+                                }
+                            } else {
+                                if (mainModel.updateCustomer(customerResponse) != -1) {
+                                    Log.i("INFO", "SUCCESS");
+                                }
                             }
                         }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-
-                    //update data
-                    MainPresenter.this.refreshDataPayAdapter();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
+                String sDataBill = response.getBodyListDataResponse().getBill();
+                if (sDataBill != null && !sDataBill.isEmpty()) {
+                    byte[] zipByteBill = org.apache.commons.codec.binary.Base64.decodeBase64(sDataBill.getBytes());
+
+                    try {
+                        String sCustomer = Common.decompress(zipByteBill);
+
+                        JSONArray jsonArray = new JSONArray(sCustomer);
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject ja = jsonArray.getJSONObject(i);
+                            GsonBuilder gsonBuilder = new GsonBuilder();
+                            Gson gson = gsonBuilder.create();
+                            BillResponse billResponse = gson.fromJson(ja.toString(), BillResponse.class);
+                            billResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
+                            if (mainModel.checkBillExist(billResponse.getBodyBillResponse().getBillId()) == 0) {
+                                if (mainModel.insertBill(billResponse) != -1) {
+                                    Log.i("INFO", "SUCCESS");
+                                }
+                            } else {
+                                if (mainModel.updateBill(billResponse) != -1) {
+                                    Log.i("INFO", "SUCCESS");
+                                }
+                            }
+                        }
+
+                        //update data
+                        MainPresenter.this.refreshDataPayAdapter();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mIMainView.refreshInfoMain();
+                    }
+                });
             }
         }
 

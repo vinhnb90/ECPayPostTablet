@@ -85,10 +85,9 @@
                     android:id="@+id/tv_dialog_delete_bill_online_name_customer"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/_10sdp"
+                    android:layout_marginLeft="@dimen/_20sdp"
                     android:layout_toRightOf="@+id/tv_dialog_delete_bill_online_2"
                     android:layout_weight="1"
-                    android:lines="1"
                     android:scrollHorizontally="true"
                     android:textSize="@dimen/_12sdp"
                     tools:text="Tên khách hàng:" />
@@ -147,7 +146,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/_20sdp"
                     android:layout_weight="1"
-                    android:lines="1"
                     android:scrollHorizontally="true"
                     android:textSize="@dimen/_12sdp"
                     tools:text="Số tiền:" />

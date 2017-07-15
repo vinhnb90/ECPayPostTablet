@@ -1299,6 +1299,7 @@ public class Common {
         CASH_TRANSFER,
         GET_PC_INFO,
         SEARCH_CUSTOMER,
+        SEARCH_CUSTOMER_BILL,
         MAP_CUSTOMER_CARD,
         BALANCE,
         ACCOUNT;
@@ -1333,6 +1334,8 @@ public class Common {
                 return "GET-PC-INFO";
             if (this == SEARCH_CUSTOMER)
                 return "CUSTOMER";
+            if (this == SEARCH_CUSTOMER_BILL)
+                return "CUSTOMER-BILL";
             if (this == MAP_CUSTOMER_CARD)
                 return "MAP-CUSTOMER-CARD";
             if(this == BALANCE)
@@ -1368,7 +1371,7 @@ public class Common {
     //endregion
 
     //region info connect API SOAP
-    public static String ENDPOINT_URL = "http://kiosktest.edong.vn:8989/eStoreCashier/EStoreCashierImpl?wsdl";
+    public static String ENDPOINT_URL = "http://kiosktest.edong.vn:8989/eStoreCashier/EStoreCashierImpl";
     //endregion
 
     //region config file and system

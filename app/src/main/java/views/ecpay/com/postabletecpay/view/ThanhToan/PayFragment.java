@@ -323,13 +323,11 @@ public class PayFragment extends Fragment implements
                 if(ProviderSelect.getCode().equalsIgnoreCase(Common.PROVIDER_CODE.NCCNONE.getCode()))
                     return;
 
-
                 if(checkUserNeedSearchOnline(etSearch.getText().toString()))
                 {
                     showSearchOnlineProcess();
                     mIPayPresenter.reseachOnline(mEdong);
                 }
-
             }
 
             @Override
@@ -813,6 +811,10 @@ public class PayFragment extends Fragment implements
     }
 
     @Override
+    public void processClickPrinteBillDialog(PayAdapter.BillEntityAdapter billEntityAdapter) {
+    }
+
+    @Override
     public void processUnCheckedBillDialog(String message, Common.TYPE_DIALOG typeDialog) {
         if (message == null)
             return;
@@ -948,7 +950,6 @@ public class PayFragment extends Fragment implements
 
                     try
                     {
-
                         bindViewAgain();
                         payAdapter.notifyDataSetChanged();
                         rvKH.invalidate();

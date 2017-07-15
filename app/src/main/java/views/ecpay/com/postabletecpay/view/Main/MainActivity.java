@@ -202,10 +202,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling instanceof MainPageFragment) {
-            ((MainPageFragment) fragmentVisibling).refreshInfoMain();
-        }
     }
 
 

@@ -168,7 +168,6 @@ public class PayPresenter implements IPayPresenter {
                                 @Override
                                 public void run() {
 //                                    refreshTotalBillsAndTotalMoneyInFragment(edong, Common.STATUS_BILLING.CHUA_THANH_TOAN);
-
                                     try
                                     {
                                         mIPayView.showPayRecyclerPage(finalFitter, finalIndexBegin, finalIndexEnd, pageIndex, totalPage, infoSearch, isSeachOnline);
@@ -329,7 +328,6 @@ public class PayPresenter implements IPayPresenter {
 
     void finishSearchOnline(BodySearchOnlineResponse response)
     {
-
         if(response != null)
         {
             CustomerInsideBody customerResponse = null;
