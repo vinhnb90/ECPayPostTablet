@@ -207,21 +207,28 @@ public class MainPresenter implements IMainPresenter {
                     }
                 }
                 //Insert BOOK CMIS
+                List<ListBookCmisResponse> listBookCmis = new ArrayList<>();
+                List<ListBookCmisResponse> listBookCmisNeedDownload = new ArrayList<>();
                 ListBookCmisResponse listBookCmisResponse;
                 String dataBookCmis = response.getBodyListEVNResponse().getListBookCmissResponse();
                 JSONArray jaBookCmis = new JSONArray(dataBookCmis);
                 for (int i = 0; i < jaBookCmis.length(); i++) {
                     listBookCmisResponse = gson.fromJson(jaBookCmis.getString(i), ListBookCmisResponse.class);
+                    listBookCmis.add(listBookCmisResponse);
+
                     if (mainModel.checkBookCmisExist(listBookCmisResponse.getBookCmis()) == 0) {
                         mainModel.insertBookCmis(listBookCmisResponse);
                     }
+
+                    File fileDownload = new File(Common.PATH_FOLDER_DOWNLOAD + listBookCmis.get(i).getBookCmis() + "_" + edong + ".zip");
+
+                    if (!fileDownload.exists()) {
+                        listBookCmisNeedDownload.add(listBookCmisResponse);
+                    }
                 }
 
-                String path = Common.PATH_FOLDER_DOWNLOAD;
-                File directory = new File(path);
-                File[] allFiles = directory.listFiles();
-                if (allFiles.length < 2) {
-                    synchronizeFileGen();
+                if (listBookCmisNeedDownload.size() > 0) {
+                    synchronizeFileGen(listBookCmisNeedDownload);
                 } else {
                     synchronizeData();
                 }
@@ -238,7 +245,7 @@ public class MainPresenter implements IMainPresenter {
 
     //region đồng bộ hoá đơn
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public void synchronizeFileGen() {
+    public void synchronizeFileGen(List<ListBookCmisResponse> listBookCmisNeedDownload) {
         String textMessage = "";
         Context context = mIMainView.getContextView();
         Boolean isErr = false;
@@ -256,95 +263,92 @@ public class MainPresenter implements IMainPresenter {
             return;
         }
 
-
-        Cursor c = mainModel.getAllBookCmis();
-        if (c.moveToFirst()) {
-            do {
-                bookCmis = c.getString(0);
-                String pcCodeExt = c.getString(1);
+        for (int i =0; i<listBookCmisNeedDownload.size();i++)
+        {
+            bookCmis = listBookCmisNeedDownload.get(i).getBookCmis();
+            String pcCodeExt = listBookCmisNeedDownload.get(i).getPcCodeExt();
 //                if(bookCmis.equals("TL022")) {
 
-                ConfigInfo configInfo;
-                String versionApp = "";
-                try {
-                    versionApp = mIMainView.getContextView().getPackageManager()
-                            .getPackageInfo(context.getPackageName(), 0).versionName;
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                }
+            ConfigInfo configInfo;
+            String versionApp = "";
+            try {
+                versionApp = mIMainView.getContextView().getPackageManager()
+                        .getPackageInfo(context.getPackageName(), 0).versionName;
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
 
+            try {
+                configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp, pcCodeExt);
+            } catch (Exception e) {
+                mIMainView.showTextMessage(e.getMessage());
+                return;
+            }
+
+
+            String signatureEncrypted = "";
+            try {
+                String dataSign = Common.getDataSignRSA(
+                        configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
+                        configInfo.getDiskDriver(), pcCodeExt, configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
+                Log.d(TAG, "setupInfoRequest: " + dataSign);
+                signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
+                Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
+            } catch (Exception e) {
+            }
+            configInfo.setSignatureEncrypted(signatureEncrypted);
+
+            String jsonRequestZipData = SoapAPI.getJsonRequestSynDataZip(
+                    configInfo.getAGENT(),
+                    configInfo.getAgentEncypted(),
+                    configInfo.getCommandId(),
+                    configInfo.getAuditNumber(),
+                    configInfo.getMacAdressHexValue(),
+                    configInfo.getDiskDriver(),
+                    configInfo.getSignatureEncrypted(),
+                    bookCmis,
+                    pcCodeExt,
+                    configInfo.getAccountId());
+
+            if (jsonRequestZipData != null) {
                 try {
-                    configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp, pcCodeExt);
+                    final SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeDataZip;
+
+                    soapSynchronizeDataZip = new SoapAPI.AsyncSoapSynchronizeDataZip(callBackFileGen, mIMainView.getContextView());
+
+                    if (soapSynchronizeDataZip.getStatus() != AsyncTask.Status.RUNNING) {
+                        soapSynchronizeDataZip.execute(jsonRequestZipData);
+
+                        //thread time out
+                        Thread soapDataThread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ListDataZipResponse listDataZipResponse = null;
+
+                                //call time out
+                                try {
+                                    Thread.sleep(TIME_OUT_CONNECT);
+                                } catch (InterruptedException e) {
+                                    mIMainView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                                } finally {
+                                    if (listDataZipResponse == null) {
+                                        soapSynchronizeDataZip.callCountdown(soapSynchronizeDataZip);
+                                    }
+                                }
+                            }
+                        });
+
+                        soapDataThread.start();
+                    }
                 } catch (Exception e) {
                     mIMainView.showTextMessage(e.getMessage());
                     return;
                 }
 
-
-                String signatureEncrypted = "";
-                try {
-                    String dataSign = Common.getDataSignRSA(
-                            configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
-                            configInfo.getDiskDriver(), pcCodeExt, configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
-                    Log.d(TAG, "setupInfoRequest: " + dataSign);
-                    signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
-                    Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
-                } catch (Exception e) {
-                }
-                configInfo.setSignatureEncrypted(signatureEncrypted);
-
-                String jsonRequestZipData = SoapAPI.getJsonRequestSynDataZip(
-                        configInfo.getAGENT(),
-                        configInfo.getAgentEncypted(),
-                        configInfo.getCommandId(),
-                        configInfo.getAuditNumber(),
-                        configInfo.getMacAdressHexValue(),
-                        configInfo.getDiskDriver(),
-                        configInfo.getSignatureEncrypted(),
-                        c.getString(1),
-                        c.getString(0),
-                        configInfo.getAccountId());
-
-                if (jsonRequestZipData != null) {
-                    try {
-                        final SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeDataZip;
-
-                        soapSynchronizeDataZip = new SoapAPI.AsyncSoapSynchronizeDataZip(callBackFileGen, mIMainView.getContextView());
-
-                        if (soapSynchronizeDataZip.getStatus() != AsyncTask.Status.RUNNING) {
-                            soapSynchronizeDataZip.execute(jsonRequestZipData);
-
-                            //thread time out
-                            Thread soapDataThread = new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ListDataZipResponse listDataZipResponse = null;
-
-                                    //call time out
-                                    try {
-                                        Thread.sleep(TIME_OUT_CONNECT);
-                                    } catch (InterruptedException e) {
-                                        mIMainView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
-                                    } finally {
-                                        if (listDataZipResponse == null) {
-                                            soapSynchronizeDataZip.callCountdown(soapSynchronizeDataZip);
-                                        }
-                                    }
-                                }
-                            });
-
-                            soapDataThread.start();
-                        }
-                    } catch (Exception e) {
-                        mIMainView.showTextMessage(e.getMessage());
-                        return;
-                    }
-
-                }
+            }
 //                }
-            } while (c.moveToNext());
         }
-    }
+}
 
     public void synchronizeData() {
         String textMessage = "";
