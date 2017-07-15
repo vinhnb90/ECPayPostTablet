@@ -33,6 +33,8 @@ public class EntityHoaDonThu {
     private String VI_TTOAN;
 
 
+    private Date NGAY_THU;
+
     private String HINH_THUC_TT;
     private String TRANG_THAI_CHAM_NO;
     private String TRANG_THAI_HUY;
@@ -299,6 +301,13 @@ public class EntityHoaDonThu {
         E_DONG = e_DONG;
     }
 
+    public Date getNGAY_THU() {
+        return NGAY_THU;
+    }
+
+    public void setNGAY_THU(Date NGAY_THU) {
+        this.NGAY_THU = NGAY_THU;
+    }
 
     public static EntityHoaDonThu copy(EntityHoaDonNo entityHoaDonNo)
     {

@@ -11,6 +11,7 @@ import java.util.List;
 
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.EntityHoaDonThu;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 
 /**
@@ -19,7 +20,7 @@ import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 
 public class ReportHoanTraAdapter  extends RecyclerView.Adapter<ReportHoanTraAdapter.RowHoanTraHolder> {
 
-    List<Bill> mBills;
+    List<EntityHoaDonThu> mBills;
 
 
     public ReportHoanTraAdapter()
@@ -27,11 +28,11 @@ public class ReportHoanTraAdapter  extends RecyclerView.Adapter<ReportHoanTraAda
         mBills = new ArrayList<>();
     }
 
-    public List<Bill> getmBills() {
+    public List<EntityHoaDonThu> getmBills() {
         return mBills;
     }
 
-    public void setmBills(List<Bill> mBills) {
+    public void setmBills(List<EntityHoaDonThu> mBills) {
         this.mBills = mBills;
     }
 
@@ -44,18 +45,12 @@ public class ReportHoanTraAdapter  extends RecyclerView.Adapter<ReportHoanTraAda
 
     @Override
     public void onBindViewHolder(RowHoanTraHolder holder, int position) {
-        Bill bill = mBills.get(position);
-        holder.tvTenKH.setText(bill.getName());
-        holder.tvMaKH.setText(bill.getCustomerCode());
-        holder.tv_fragment_thanh_toan_total_bills_money.setText(Common.convertLongToMoney(bill.getAmount()));
-        holder.tvTinhTrang.setText("Chua set");
-        if(bill.getTerm().length() != 0)
-        {
-            holder.tvKy.setText(bill.getTerm().substring(4, 6) + "/" + bill.getTerm().substring(0, 4));
-        }else
-        {
-            holder.tvKy.setText("");
-        }
+        EntityHoaDonThu bill = mBills.get(position);
+        holder.tvTenKH.setText(bill.getTEN_KHANG());
+        holder.tvMaKH.setText(bill.getMA_KHANG());
+        holder.tv_fragment_thanh_toan_total_bills_money.setText(Common.convertLongToMoney(bill.getSO_TIEN_TTOAN()));
+        holder.tvTinhTrang.setText(Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getMessage());
+        holder.tvKy.setText(Common.parse(bill.getTHANG_TTOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString()));
 
 
     }

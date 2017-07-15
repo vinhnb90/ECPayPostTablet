@@ -939,7 +939,7 @@ public class PayFragment extends Fragment implements
                 @Override
                 public void onDismiss(DialogInterface dialog) {
 
-                    for (int i = 0, n = mIPayPresenter.getPayModel().getListBillSelected().size(); i < n; i ++)
+                    for (int i = mIPayPresenter.getPayModel().getListBillSelected().size() - 1; i >= 0; i --)
                     {
                         PayAdapter.BillEntityAdapter bill = mIPayPresenter.getPayModel().getListBillSelected().get(i);
                         if(!bill.isChecked() || !bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()))

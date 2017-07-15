@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.view.BaoCao;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,12 +18,16 @@ import org.w3c.dom.Text;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import views.ecpay.com.postabletecpay.R;
+import views.ecpay.com.postabletecpay.presenter.IReportLichSuThanhToanPresenter;
+import views.ecpay.com.postabletecpay.presenter.ReportLichSuThanhToanPresenter;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 /**
  * Created by macbook on 4/30/17.
  */
 
-public class BaoCaoLichSuFragment extends Fragment implements View.OnClickListener {
+public class BaoCaoLichSuFragment extends Fragment implements View.OnClickListener, IReportLichSuThanhToanView {
 
     @BindView(R.id.rbMaKH) RadioButton rbMaKH;
     @BindView(R.id.rbTenKH) RadioButton rbTenKH;
@@ -32,6 +37,9 @@ public class BaoCaoLichSuFragment extends Fragment implements View.OnClickListen
     @BindView(R.id.tvUsername) TextView tvUsername;
     @BindView(R.id.tvMaKH) TextView tvMaKH;
 
+
+    IReportLichSuThanhToanPresenter reportLichSuThanhToanPresenter;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -39,11 +47,31 @@ public class BaoCaoLichSuFragment extends Fragment implements View.OnClickListen
         ButterKnife.bind(this, view);
 
         btTimKiem.setOnClickListener(this);
+
+        reportLichSuThanhToanPresenter = new ReportLichSuThanhToanPresenter(this);
+
+
+        tvUsername.setText("");
+        tvMaKH.setText("");
+
         return view;
     }
 
     @Override
     public void onClick(View v) {
+        if(v.getId() == R.id.btTimKiem)
+        {
+
+        }
+    }
+
+    @Override
+    public Context getContextView() {
+        return this.getContext();
+    }
+
+    @Override
+    public void fill(Account account, int hdGiao, long tienGiao, int dhThu, long tienThu, int hdVangLai, long tienVangLai, int hdTraKH, long tienTraKHH) {
 
     }
 }

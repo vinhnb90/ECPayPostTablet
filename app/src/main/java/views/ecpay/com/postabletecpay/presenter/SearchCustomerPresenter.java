@@ -156,7 +156,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
                         }
                         return;
                     }
-                    BodySearchCustomerBillRespone body = (BodySearchCustomerBillRespone) response.getBody();
+                    BodySearchOnlineResponse body = (BodySearchOnlineResponse) response.getBody();
 
                     if (body.getCustomer() == null || body.getCustomer().length() == 0) {
                         searchCustomerView.showMessage(response.getFooter().getDescription());
@@ -196,7 +196,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
 
 
                     if (customerResponse.getCardNo() == null || customerResponse.getCardNo().length() == 0) {
-                        if (customerResponse.getListBill().size() != 0) {
+                        if (customerResponse.getListBill() != null && customerResponse.getListBill().size() != 0) {
                             BillInsideCustomer billInsideCustomer = customerResponse.getListBill().get(0);
                             if (billInsideCustomer.getCardNo() == null || billInsideCustomer.getCardNo().length() == 0) {
                                 khachHang.setMA_THE(billInsideCustomer.getCardNo());

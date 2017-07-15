@@ -371,7 +371,7 @@ public class PayPresenter implements IPayPresenter {
                     bill.setBillId(billInsideCustomer.getBillId());
                     bill.setVI_TTOAN("");
                     bill.setTIEN_THANH_TOAN(billInsideCustomer.getAmount());
-                    bill.setTHANG_THANH_TOAN(Common.convertDateToDate(billInsideCustomer.getTerm(), yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.MMyyyy));
+                    bill.setTHANG_THANH_TOAN(Common.parseDate(Common.convertDateToDate(Common.convertToDate(billInsideCustomer.getTerm()), yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.FULL), Common.DATE_TIME_TYPE.FULL.toString()));
                     bill.setTRANG_THAI_TT(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
                     bill.setMA_DIEN_LUC(billInsideCustomer.getPcCode());
                     bill.setChecked(false);
@@ -381,7 +381,7 @@ public class PayPresenter implements IPayPresenter {
 
                     bill.setPrintEnable(true);
 
-                    bill.setRequestDate(Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+                    bill.setRequestDate(Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
 
                     dataAdapter.getBillKH().add(bill);
 
@@ -846,7 +846,7 @@ public class PayPresenter implements IPayPresenter {
 
         this.billDeleteOnline = bill;
 
-        mIPayView.showInfoBillDeleteDialog(bill.getMA_KHACH_HANG(), bill.getTEN_KHACH_HANG(), bill.getTHANG_THANH_TOAN(), bill.getTIEN_THANH_TOAN());
+        mIPayView.showInfoBillDeleteDialog(bill.getMA_KHACH_HANG(), bill.getTEN_KHACH_HANG(), Common.parse(bill.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString()), bill.getTIEN_THANH_TOAN());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)

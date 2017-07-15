@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindDrawable;
@@ -257,7 +258,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
     public static class BillEntityAdapter implements Comparable<BillEntityAdapter>{
 
-        private String THANG_THANH_TOAN;
+        private Date THANG_THANH_TOAN;
         private long TIEN_THANH_TOAN;
         private boolean isPrint;
         private String TRANG_THAI_TT;
@@ -318,11 +319,11 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             isPrintEnable = printEnable;
         }
 
-        public String getTHANG_THANH_TOAN() {
+        public Date getTHANG_THANH_TOAN() {
             return THANG_THANH_TOAN;
         }
 
-        public void setTHANG_THANH_TOAN(String THANG_THANH_TOAN) {
+        public void setTHANG_THANH_TOAN(Date THANG_THANH_TOAN) {
             this.THANG_THANH_TOAN = THANG_THANH_TOAN;
         }
 
@@ -393,8 +394,8 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         @Override
         public int compareTo(@NonNull BillEntityAdapter billEntityAdapter) {
-            long termThis = Common.convertDateToLong(this.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy);
-            long termThat = Common.convertDateToLong(billEntityAdapter.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy);
+            long termThis = this.getTHANG_THANH_TOAN().getTime();
+            long termThat = billEntityAdapter.getTHANG_THANH_TOAN().getTime();
 
             //giảm dần
             return (int) (termThat - termThis);
@@ -456,6 +457,10 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
             holder.setAdapterParent(this);
 
+
+            entity.setChecked(payPresenter.getPayModel().containBillInSelected(entity.getBillId()));
+
+
             holder.cb.setChecked(entity.isChecked());
             if (entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())) {
                 holder.cb.setEnabled(true);
@@ -469,7 +474,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                 holder.tvStatusBill.setText(Common.STATUS_BILLING.DA_THANH_TOAN.getMessage());
                 entity.setPrint(entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()));
             }
-            holder.tvDate.setText(entity.getTHANG_THANH_TOAN());
+            holder.tvDate.setText(Common.parse(entity.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString()));
             holder.tvMoneyBill.setText(Common.convertLongToMoney(entity.getTIEN_THANH_TOAN()));
 
             if (entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())){
