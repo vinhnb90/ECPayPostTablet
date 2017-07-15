@@ -90,7 +90,7 @@
 
             <ImageButton
                 android:layout_marginRight="@dimen/_15sdp"
-                android:id="@+id/btb_dialog_version_content_update"
+                android:id="@+id/btn_dialog_version_content_update"
                 android:layout_width="@dimen/_24sdp"
                 android:layout_height="@dimen/_24sdp"
                 android:layout_alignParentRight="true"

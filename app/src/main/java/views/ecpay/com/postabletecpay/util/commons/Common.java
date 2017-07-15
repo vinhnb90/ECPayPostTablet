@@ -1371,8 +1371,7 @@ public class Common {
     //endregion
 
     //region info connect API SOAP
-//    public static String ENDPOINT_URL = "http://kiosktest.edong.vn:8989/eStoreCashier/EStoreCashierImpl";
-    public static String ENDPOINT_URL = "http://192.168.130.7:8080/eStoreCashier/EStoreCashierImpl?wsdl";
+    public static String ENDPOINT_URL = "http://kiosktest.edong.vn:8989/eStoreCashier/EStoreCashierImpl";
     //endregion
 
     //region config file and system
@@ -1452,11 +1451,13 @@ public class Common {
             File folderDB = new File(PATH_FOLDER_DB);
             if (!folderDB.exists()) {
                 folderDB.mkdir();
+                folderDB.mkdirs();
             }
 
             File folderDownload = new File(PATH_FOLDER_DOWNLOAD);
             if (!folderDownload.exists()) {
                 folderDownload.mkdir();
+                folderDownload.mkdirs();
             }
 
 //            File folderData = new File(PATH_FOLDER_DATA);

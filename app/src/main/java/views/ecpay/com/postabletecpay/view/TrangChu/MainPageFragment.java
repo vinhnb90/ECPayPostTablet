@@ -509,6 +509,8 @@ public class MainPageFragment extends Fragment implements
 
         Button btOK = (Button) dialog.findViewById(R.id.btn_dialog_version_button_ok);
         TextView tvHelp = (TextView) dialog.findViewById(R.id.tv_dialog_version_content);
+//        ImageButton imgVersion = (ImageButton) dialog.findViewById(R.id.)
+
         ibClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

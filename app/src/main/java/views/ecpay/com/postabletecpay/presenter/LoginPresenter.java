@@ -72,7 +72,6 @@ public class LoginPresenter implements ILoginPresenter {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void validateInput(String userName, String pass) {
-
         String textMessage = "";
         Context context = mILoginView.getContextView();
         Boolean isErr = false;
@@ -376,7 +375,7 @@ public class LoginPresenter implements ILoginPresenter {
                     evnPC.setLevel(pc.getLevel());
 
                     //write database
-                    mLoginModel.writeSqliteEvnPcTable(evnPC);
+                    mLoginModel.writeSqliteEvnPcTable(evnPC, account.getEdong());
                 }
             }
             //show main

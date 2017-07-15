@@ -51,6 +51,7 @@
         android:visibility="invisible" />
 
     <EditText
+        android:maxLength="20"
         android:id="@+id/etTaiKhoan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,6 +76,7 @@
         android:layout_below="@+id/etTaiKhoan"
         android:drawableLeft="@mipmap/ic_matkhau"
         android:hint="Mật khẩu"
+        android:maxLength="8"
         android:inputType="textPassword"
         android:padding="@dimen/_5sdp" />
 

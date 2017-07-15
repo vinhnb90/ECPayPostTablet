@@ -38,16 +38,16 @@
                     android:orientation="vertical">
 
 
-                        <TextView
-                            android:id="@+id/tv_row_pay_recycler_customer"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:scrollHorizontally="true"
-                            android:text="Công ty TNHH ABC"
-                            android:textColor="@color/colorTextBlack"
-                            android:textSize="@dimen/_9sdp"
-                            android:textStyle="bold" />
-
+                    <TextView
+                        android:id="@+id/tv_row_pay_recycler_customer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:scrollHorizontally="true"
+                        android:text="Công ty TNHH ABC"
+                        android:textColor="@color/colorTextBlack"
+                        android:textSize="@dimen/_8sdp"
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -65,7 +65,7 @@
                             android:maxLines="1"
                             android:scrollHorizontally="true"
                             android:text="PD00011"
-                            android:textSize="@dimen/_9sdp" />
+                            android:textSize="@dimen/_8sdp" />
 
                         <TextView
                             android:id="@+id/tv_row_pay_recycler_loTrinh"
@@ -76,7 +76,7 @@
                             android:maxLines="1"
                             android:scrollHorizontally="true"
                             android:text="D04059"
-                            android:textSize="@dimen/_9sdp" />
+                            android:textSize="@dimen/_8sdp" />
 
                         <TextView
                             android:id="@+id/tv_row_pay_recycler_tongTien"
@@ -89,7 +89,7 @@
                             android:scrollHorizontally="true"
                             android:text="20.989.909"
                             android:textColor="@color/colorRed"
-                            android:textSize="@dimen/_9sdp"
+                            android:textSize="@dimen/_8sdp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -99,7 +99,7 @@
                         android:layout_height="wrap_content"
                         android:scrollHorizontally="true"
                         android:text="Công ty TNHH ABC"
-                        android:textSize="@dimen/_9sdp" />
+                        android:textSize="@dimen/_8sdp" />
 
                 </LinearLayout>
 
@@ -114,13 +114,13 @@
                     <Button
                         android:id="@+id/btn_row_pay_recycler_trangThaiNo"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="@dimen/_24sdp"
                         android:background="@drawable/bg_button_orange"
                         android:clickable="false"
                         android:padding="@dimen/_2sdp"
                         android:text="Còn nợ"
                         android:textColor="@android:color/white"
-                        android:textSize="@dimen/_10sdp" />
+                        android:textSize="@dimen/_8sdp" />
                 </LinearLayout>
 
 
