@@ -135,6 +135,9 @@ public class BodyBillResponse {
     @SerializedName("address")
     @Expose
     private String address;
+    @SerializedName("requestDate")
+    @Expose
+    private String requestDate;
 
 
     public String getBillingBy() {
@@ -471,5 +474,13 @@ public class BodyBillResponse {
 
     public void setBillingType(String billingType) {
         this.billingType = billingType;
+    }
+
+    public String getRequestDate() {
+        return requestDate;
+    }
+
+    public void setRequestDate(String requestDate) {
+        this.requestDate = requestDate;
     }
 }

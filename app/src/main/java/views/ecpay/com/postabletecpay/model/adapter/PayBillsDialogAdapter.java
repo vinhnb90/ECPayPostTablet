@@ -69,7 +69,7 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
         holder.getCbChoose().setChecked(billChecked.isChecked());
         holder.getTvCode().setText(String.valueOf(billChecked.getMA_KHACH_HANG()));
 
-        holder.getTvTerm().setText(billChecked.getTHANG_THANH_TOAN());
+        holder.getTvTerm().setText(Common.parse(billChecked.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString()));
         holder.getTvName().setText(billChecked.getTEN_KHACH_HANG());
         holder.getTvAmount().setText(Common.convertLongToMoney(billChecked.getTIEN_THANH_TOAN()));
 

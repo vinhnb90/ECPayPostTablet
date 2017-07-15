@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
@@ -27,6 +28,9 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 
     ICustomerInfoView customerInfoView;
     CustomerInfoModel customerInfoModel;
+
+    Handler mHander = new Handler();
+
     public CustomerInfoPresenter(ICustomerInfoView view)
     {
         customerInfoView = view;
@@ -75,28 +79,52 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 
 
         if (json == null)
+        {
+            try
+            {
+                customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString());
+            }catch (Exception e)
+            {
+
+            }
             return;
+        }
 
 
 
 
         try {
-            final SoapAPI.AsyncSoap<MapCustomerCardRespone> soapChangePass = new SoapAPI.AsyncSoap<MapCustomerCardRespone>(MapCustomerCardRespone.class, new SoapAPI.AsyncSoap.AsyncSoapCallBack() {
+            final SoapAPI.AsyncSoapIncludeTimout<MapCustomerCardRespone> soapChangePass = new SoapAPI.AsyncSoapIncludeTimout<MapCustomerCardRespone>(mHander, MapCustomerCardRespone.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
                 @Override
-                public void onPre(SoapAPI.AsyncSoap soap) {
+                public void onPre(SoapAPI.AsyncSoapIncludeTimout soap) {
 
                 }
 
                 @Override
                 public void onUpdate(String message) {
+                    if (message == null || message.isEmpty() || message.trim().equals(""))
+                        return;
+                    try
+                    {
+                        customerInfoView.showMessageText(message);
+                    }catch (Exception e)
+                    {
 
+                    }
                 }
 
                 @Override
-                public void onPost(Respone response) {
+                public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
                     customerInfoView.setLoading(false);
                     if(response == null)
                     {
+                        try
+                        {
+                            customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                        }catch (Exception e)
+                        {
+
+                        }
                         return;
                     }
 
@@ -108,42 +136,21 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 //                        customer.setBankName(bankName);
 //                        customer.setBankAccount(bankAcc);
                         UpdateDataBase(customer);
-                    }else
-                    {
-
                     }
                 }
 
                 @Override
-                public void onTimeOut(SoapAPI.AsyncSoap soap) {
+                public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
+                    try
+                    {
+                        customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                    }catch (Exception e)
+                    {
 
+                    }
                 }
             });
-
-            if (soapChangePass.getStatus() != AsyncTask.Status.RUNNING) {
-                soapChangePass.execute(json);
-
-                //thread time out
-                final Thread soapChangePassThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        MapCustomerCardRespone changePassResponse = null;
-
-                        //call time out
-                        try {
-                            Thread.sleep(Common.TIME_OUT_CONNECT);
-                        } catch (InterruptedException e) {
-                            //iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
-                        } finally {
-                            if (changePassResponse == null) {
-                                soapChangePass.callCountdown(soapChangePass);
-                            }
-                        }
-                    }
-                });
-
-                soapChangePassThread.start();
-            }
+            soapChangePass.execute(json);
         } catch (Exception e) {
             //iCashTranferView.showText(e.getMessage());
             return;
@@ -166,6 +173,13 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
             configInfo = Common.setupInfoRequest(context, mEDong, Common.COMMAND_ID.MAP_CUSTOMER_CARD.toString(), versionApp);
         } catch (Exception e) {
 
+            try
+            {
+                customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString());
+            }catch (Exception e1)
+            {
+
+            }
             return;
         }
 
@@ -191,28 +205,52 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 
 
         if (json == null)
+        {
+            try
+            {
+                customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString());
+            }catch (Exception e)
+            {
+
+            }
             return;
+        }
 
 
 
 
         try {
-            final SoapAPI.AsyncSoap<MapCustomerCardRespone> soapChangePass = new SoapAPI.AsyncSoap<MapCustomerCardRespone>(MapCustomerCardRespone.class, new SoapAPI.AsyncSoap.AsyncSoapCallBack() {
+            final SoapAPI.AsyncSoapIncludeTimout<MapCustomerCardRespone> soapChangePass = new SoapAPI.AsyncSoapIncludeTimout<MapCustomerCardRespone>(mHander, MapCustomerCardRespone.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
                 @Override
-                public void onPre(SoapAPI.AsyncSoap soap) {
+                public void onPre(SoapAPI.AsyncSoapIncludeTimout soap) {
 
                 }
 
                 @Override
                 public void onUpdate(String message) {
+                    if (message == null || message.isEmpty() || message.trim().equals(""))
+                        return;
+                    try
+                    {
+                        customerInfoView.showMessageText(message);
+                    }catch (Exception e)
+                    {
 
+                    }
                 }
 
                 @Override
-                public void onPost(Respone response) {
+                public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
                     customerInfoView.setLoading(false);
                     if(response == null)
                     {
+                        try
+                        {
+                            customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                        }catch (Exception e)
+                        {
+
+                        }
                         return;
                     }
 
@@ -231,35 +269,17 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                 }
 
                 @Override
-                public void onTimeOut(SoapAPI.AsyncSoap soap) {
+                public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
+                    try
+                    {
+                        customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                    }catch (Exception e)
+                    {
 
+                    }
                 }
             });
-
-            if (soapChangePass.getStatus() != AsyncTask.Status.RUNNING) {
-                soapChangePass.execute(json);
-
-                //thread time out
-                final Thread soapChangePassThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        MapCustomerCardRespone changePassResponse = null;
-
-                        //call time out
-                        try {
-                            Thread.sleep(Common.TIME_OUT_CONNECT);
-                        } catch (InterruptedException e) {
-                            //iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
-                        } finally {
-                            if (changePassResponse == null) {
-                                soapChangePass.callCountdown(soapChangePass);
-                            }
-                        }
-                    }
-                });
-
-                soapChangePassThread.start();
-            }
+            soapChangePass.execute(json);
         } catch (Exception e) {
             //iCashTranferView.showText(e.getMessage());
             return;

@@ -999,7 +999,7 @@ public class Common {
     }
     public enum TRANG_THAI_HOAN_TRA
     {
-        CHUA_TRA ("01", "Chua Tra");
+        CHUA_TRA ("01", "Chưa Trả");
 
         TRANG_THAI_HOAN_TRA(String code, String message) {
             this.code = code;
@@ -2364,7 +2364,7 @@ public class Common {
             if (this == ddMMyyyy)
                 return "dd/MM/yyyy";
             if (this == FULL)
-                return "yyyy-MM-dd'T'HH:mm:ss";
+                return "yyyy-MM-dd HH:mm:ss";
             return super.toString();
         }
     }
@@ -2441,6 +2441,11 @@ public class Common {
 
     public static Date parseDate(String value, String format)
     {
+        if(value == null)
+        {
+            return  null;
+        }
+
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         Date d=new Date();
         try {
@@ -2457,7 +2462,7 @@ public class Common {
         try {
             return dateFormat.format(value);
         } catch (Exception e) {
-            return getDateTimeNow(DATE_TIME_TYPE.valueOf(format));
+            return null;
         }
     }
 
@@ -2533,14 +2538,32 @@ public class Common {
         return screenWidth;
     }
 
-    public static String convertDateToDate(String time, DATE_TIME_TYPE typeDefault, DATE_TIME_TYPE typeConvert) {
-        if (time == null || time.trim().isEmpty())
-            return "";
-
+    public static String convertToDate(String time)
+    {
+        if(time == null || time.length() == 0)
+        {
+            return getDateTimeNow(DATE_TIME_TYPE.yyyyMMddHHmmssSSS);
+        }
         time = time.replaceAll("-", "");
         for (int i = time.length(); i <= 17; i ++)
         {
             time += "0";
+        }
+
+        return time;
+    }
+
+    public static String convertDateToDate(String time, DATE_TIME_TYPE typeDefault, DATE_TIME_TYPE typeConvert) {
+        if (time == null || time.trim().isEmpty())
+            return "";
+
+        if(typeDefault != DATE_TIME_TYPE.FULL)
+        {
+            time = time.replaceAll("-", "");
+            for (int i = time.length(); i <= 17; i ++)
+            {
+                time += "0";
+            }
         }
 
 

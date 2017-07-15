@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
@@ -57,12 +58,14 @@ public class MainPresenter implements IMainPresenter {
     private IMainView mIMainView;
     private MainModel mainModel;
 
+    private Handler mHandler = new Handler();
+
     private String edong;
     private String bookCmis;
     private static List<PayAdapter.DataAdapter> mDataPayAdapter = new ArrayList<>();
 
 
-    private SoapAPI.AsyncSoap<PostBillResponse> CurrentPostBillAsync = null;
+    private SoapAPI.AsyncSoapIncludeTimout<PostBillResponse> CurrentPostBillAsync = null;
 
     public MainPresenter(IMainView mIMainView, String edong) {
         this.mIMainView = mIMainView;
@@ -207,31 +210,29 @@ public class MainPresenter implements IMainPresenter {
                     }
                 }
                 //Insert BOOK CMIS
-                List<ListBookCmisResponse> listBookCmis = new ArrayList<>();
+                List<ListBookCmisResponse> listBookCmisExist = new ArrayList<>();
                 List<ListBookCmisResponse> listBookCmisNeedDownload = new ArrayList<>();
-                ListBookCmisResponse listBookCmisResponse;
+
                 String dataBookCmis = response.getBodyListEVNResponse().getListBookCmissResponse();
                 JSONArray jaBookCmis = new JSONArray(dataBookCmis);
                 for (int i = 0; i < jaBookCmis.length(); i++) {
-                    listBookCmisResponse = gson.fromJson(jaBookCmis.getString(i), ListBookCmisResponse.class);
-                    listBookCmis.add(listBookCmisResponse);
+                    ListBookCmisResponse listBookCmisResponse = gson.fromJson(jaBookCmis.getString(i), ListBookCmisResponse.class);
 
                     if (mainModel.checkBookCmisExist(listBookCmisResponse.getBookCmis()) == 0) {
                         mainModel.insertBookCmis(listBookCmisResponse);
                     }
 
-                    File fileDownload = new File(Common.PATH_FOLDER_DOWNLOAD + listBookCmis.get(i).getBookCmis() + "_" + edong + ".zip");
+                    File fileDownload = new File(Common.PATH_FOLDER_DOWNLOAD + listBookCmisExist.get(i).getBookCmis() + "_" + edong + ".zip");
 
                     if (!fileDownload.exists()) {
                         listBookCmisNeedDownload.add(listBookCmisResponse);
+                    } else {
+                        listBookCmisExist.add(listBookCmisResponse);
                     }
                 }
 
-                if (listBookCmisNeedDownload.size() > 0) {
-                    synchronizeFileGen(listBookCmisNeedDownload);
-                } else {
-                    synchronizeData();
-                }
+                synchronizeFileGen(listBookCmisNeedDownload);
+                synchronizeData(listBookCmisExist);
             } catch (Exception ex) {
                 mIMainView.showTextMessage(ex.getMessage());
             }
@@ -263,8 +264,7 @@ public class MainPresenter implements IMainPresenter {
             return;
         }
 
-        for (int i =0; i<listBookCmisNeedDownload.size();i++)
-        {
+        for (int i = 0; i < listBookCmisNeedDownload.size(); i++) {
             bookCmis = listBookCmisNeedDownload.get(i).getBookCmis();
             String pcCodeExt = listBookCmisNeedDownload.get(i).getPcCodeExt();
 //                if(bookCmis.equals("TL022")) {
@@ -348,9 +348,9 @@ public class MainPresenter implements IMainPresenter {
             }
 //                }
         }
-}
+    }
 
-    public void synchronizeData() {
+    public void synchronizeData(List<ListBookCmisResponse> listBookCmisExist) {
         String textMessage = "";
         Context context = mIMainView.getContextView();
         Boolean isErr = false;
@@ -368,111 +368,112 @@ public class MainPresenter implements IMainPresenter {
             return;
         }
 
-        ConfigInfo configInfo;
-        String versionApp = "";
-        try {
-            versionApp = mIMainView.getContextView().getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
 
-        try {
-            configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.SYNC_DATA.toString(), versionApp, mainModel.getPcCode(edong));
-        } catch (Exception e) {
-            mIMainView.showTextMessage(e.getMessage());
-            return;
-        }
-
-        String signatureEncrypted = "";
-        try {
-            String dataSign = Common.getDataSignRSA(
-                    configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
-                    configInfo.getDiskDriver(), mainModel.getPcCode(edong), configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
-            Log.d(TAG, "setupInfoRequest: " + dataSign);
-            signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
-            Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
-        } catch (Exception e) {
-        }
-        configInfo.setSignatureEncrypted(signatureEncrypted);
-
-        Cursor c = mainModel.getAllBookCmis();
-        if (c.moveToFirst()) {
-            do {
-
-                bookCmis = c.getString(0);
-                File fileBookCmis = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + "_" + edong + ".zip");
-                if (fileBookCmis.exists()) {
-                    long maxIdChanged = mainModel.getMaxIdChanged(bookCmis);
-                    String maxDateChanged = mainModel.getMaxDateChanged(bookCmis);
-                    String jsonRequestData = SoapAPI.getJsonRequestSynData(
-                            configInfo.getAGENT(),
-                            configInfo.getAgentEncypted(),
-                            configInfo.getCommandId(),
-                            configInfo.getAuditNumber(),
-                            configInfo.getMacAdressHexValue(),
-                            configInfo.getDiskDriver(),
-                            configInfo.getSignatureEncrypted(),
-                            mainModel.getPcCode(edong),
-                            c.getString(0),
-                            maxIdChanged,
-                            maxDateChanged,
-                            configInfo.getAccountId());
+        for (int i = 0; i < listBookCmisExist.size(); i++) {
+            bookCmis = listBookCmisExist.get(i).getBookCmis();
+            String pcCodeExt = listBookCmisExist.get(i).getPcCodeExt();
 
 
-                    if (jsonRequestData != null) {
-                        try {
-                            final SoapAPI.AsyncSoapSynchronizeData soapSynchronizeData;
+            ConfigInfo configInfo;
+            String versionApp = "";
+            try {
+                versionApp = mIMainView.getContextView().getPackageManager()
+                        .getPackageInfo(context.getPackageName(), 0).versionName;
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
 
-                            soapSynchronizeData = new SoapAPI.AsyncSoapSynchronizeData(callBackData, mIMainView.getContextView());
+            try {
+                configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.SYNC_DATA.toString(), versionApp, pcCodeExt);
+            } catch (Exception e) {
+                mIMainView.showTextMessage(e.getMessage());
+                return;
+            }
 
-                            if (soapSynchronizeData.getStatus() != AsyncTask.Status.RUNNING) {
-                                soapSynchronizeData.execute(jsonRequestData);
+            String signatureEncrypted = "";
+            try {
+                String dataSign = Common.getDataSignRSA(
+                        configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
+                        configInfo.getDiskDriver(), pcCodeExt, configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
+                Log.d(TAG, "setupInfoRequest: " + dataSign);
+                signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
+                Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
+            } catch (Exception e) {
+            }
+            configInfo.setSignatureEncrypted(signatureEncrypted);
 
-                                //thread time out
-                                Thread soapDataThread = new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        ListDataResponse listDataResponse = null;
 
-                                        //call time out
-                                        try {
-                                            Thread.sleep(TIME_OUT_CONNECT);
-                                        } catch (InterruptedException e) {
-                                            mIMainView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
-                                        } finally {
-                                            if (listDataResponse == null) {
-                                                soapSynchronizeData.callCountdown(soapSynchronizeData);
-                                            }
+            File fileBookCmis = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + "_" + edong + ".zip");
+            if (fileBookCmis.exists()) {
+                long maxIdChanged = mainModel.getMaxIdChanged(edong, bookCmis);
+                String maxDateChanged = mainModel.getMaxDateChanged(edong, bookCmis);
+                String jsonRequestData = SoapAPI.getJsonRequestSynData(
+                        configInfo.getAGENT(),
+                        configInfo.getAgentEncypted(),
+                        configInfo.getCommandId(),
+                        configInfo.getAuditNumber(),
+                        configInfo.getMacAdressHexValue(),
+                        configInfo.getDiskDriver(),
+                        configInfo.getSignatureEncrypted(),
+                        pcCodeExt,
+                        bookCmis,
+                        maxIdChanged,
+                        maxDateChanged,
+                        configInfo.getAccountId());
+
+
+                if (jsonRequestData != null) {
+                    try {
+                        final SoapAPI.AsyncSoapSynchronizeData soapSynchronizeData;
+
+                        soapSynchronizeData = new SoapAPI.AsyncSoapSynchronizeData(callBackData, mIMainView.getContextView());
+
+                        if (soapSynchronizeData.getStatus() != AsyncTask.Status.RUNNING) {
+                            soapSynchronizeData.execute(jsonRequestData);
+
+                            //thread time out
+                            Thread soapDataThread = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ListDataResponse listDataResponse = null;
+
+                                    //call time out
+                                    try {
+                                        Thread.sleep(TIME_OUT_CONNECT);
+                                    } catch (InterruptedException e) {
+                                        mIMainView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                                    } finally {
+                                        if (listDataResponse == null) {
+                                            soapSynchronizeData.callCountdown(soapSynchronizeData);
                                         }
                                     }
-                                });
+                                }
+                            });
 
-                                soapDataThread.start();
-                            }
-                        } catch (Exception e) {
-                            mIMainView.showTextMessage(e.getMessage());
-                            return;
+                            soapDataThread.start();
                         }
-
+                    } catch (Exception e) {
+                        mIMainView.showTextMessage(e.getMessage());
+                        return;
                     }
+
                 }
-            } while (c.moveToNext());
+            }
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void checkAndPostBill() {
+    public boolean checkAndPostBill() {
+
+        if (CurrentPostBillAsync != null && !CurrentPostBillAsync.isEndCallSoap()) {
+            return false;
+        }
 
         ArrayList<TransactionOffItem> lstTransactionOff = (ArrayList<TransactionOffItem>) mainModel.selectOfflineBill();
         if (lstTransactionOff.size() == 0)
-            return;
+            return true;
 
-
-        if (CurrentPostBillAsync != null && !CurrentPostBillAsync.isEndCallSoap()) {
-            CurrentPostBillAsync.cancel(true);
-        }
 
         Context context = mIMainView.getContextView();
 
@@ -483,7 +484,7 @@ public class MainPresenter implements IMainPresenter {
             configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.PUT_TRANSACTION_OFF.toString(), Common.getVersionApp(mIMainView.getContextView()));////TO-DO:NEED CHECK HERE AGAIN, mainModel.getPcCode());
         } catch (Exception e) {
             mIMainView.showTextMessage(e.getMessage());
-            return;
+            return false;
         }
 
 
@@ -518,9 +519,9 @@ public class MainPresenter implements IMainPresenter {
 
         if (jsonRequestPushBill != null) {
             try {
-                CurrentPostBillAsync = new SoapAPI.AsyncSoap<PostBillResponse>(PostBillResponse.class, new SoapAPI.AsyncSoap.AsyncSoapCallBack() {
+                CurrentPostBillAsync = new SoapAPI.AsyncSoapIncludeTimout<PostBillResponse>(mHandler, PostBillResponse.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
                     @Override
-                    public void onPre(SoapAPI.AsyncSoap soap) {
+                    public void onPre(SoapAPI.AsyncSoapIncludeTimout soap) {
 
                     }
 
@@ -530,25 +531,27 @@ public class MainPresenter implements IMainPresenter {
                     }
 
                     @Override
-                    public void onPost(Respone response) {
+                    public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
                         if (response != null) {
 
                         }
                     }
 
                     @Override
-                    public void onTimeOut(SoapAPI.AsyncSoap soap) {
+                    public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
 
                     }
                 });
                 CurrentPostBillAsync.execute(jsonRequestPushBill);
+                return true;
             } catch (Exception e) {
                 CurrentPostBillAsync = null;
                 mIMainView.showTextMessage(e.getMessage());
-                return;
+                return false;
             }
 
         }
+        return false;
     }
 
     @Override
@@ -645,7 +648,7 @@ public class MainPresenter implements IMainPresenter {
                                     Gson gson = gsonBuilder.create();
                                     FileGenResponse fileGenResponse = gson.fromJson(ja.toString(), FileGenResponse.class);
 
-                                    mainModel.setChangedGenFile(bookCmis, fileGenResponse.getId_changed(), fileGenResponse.getDate_changed());
+                                    mainModel.setChangedGenFile(edong, bookCmis, fileGenResponse.getId_changed(), fileGenResponse.getDate_changed());
 
                                     for (ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
                                         if (mainModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
@@ -685,6 +688,13 @@ public class MainPresenter implements IMainPresenter {
                         }
                     });
                 }
+
+                ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mIMainView.refreshInfoMain();
+                    }
+                });
             }
         }
 
@@ -785,6 +795,13 @@ public class MainPresenter implements IMainPresenter {
                     }
                 });
             }
+
+            ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mIMainView.refreshInfoMain();
+                }
+            });
         }
 
         @Override
@@ -793,7 +810,7 @@ public class MainPresenter implements IMainPresenter {
         }
     };
 
-    //endregion
+//endregion
 
 
     public interface InteractorMainPresenter {

@@ -3,6 +3,7 @@ package views.ecpay.com.postabletecpay.presenter;
 import java.util.Calendar;
 import java.util.List;
 
+import views.ecpay.com.postabletecpay.util.entities.EntityHoaDonThu;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 import views.ecpay.com.postabletecpay.view.BaoCao.IReportHoanTraView;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
@@ -25,7 +26,7 @@ public class ReportHoanTraPresenter extends ReportPresenter implements IReportCh
 
     @Override
     public void search(boolean isMaKH, String code, Calendar from, Calendar to) {
-        List<Bill> lst = reportModel.getConnecttion().getBillHoanTraByCodeAndDate(MainActivity.mEdong, isMaKH, code, from, to);
+        List<EntityHoaDonThu> lst = reportModel.getConnecttion().getBillHoanTraByCodeAndDate(MainActivity.mEdong, isMaKH, code, from, to);
         reportHoanTraView.fill(lst);
     }
 }
