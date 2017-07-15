@@ -329,30 +329,30 @@ public class LoginActivity extends BaseActivity implements ILoginView {
     //region onClick
     @OnClick(R.id.btLogin)
     public void clickLogin(View view) {
-//        Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
-//
-//        final String userName = etUsername.getText().toString();
-//        final String pass = etPass.getText().toString();
-//
-//        if (cbRememberLogin.isChecked()) {
-//            mILoginPresenter.writeSharedPrefLogin(userName, pass);
-//        } else
-//            mILoginPresenter.clearSharedPrefLogin();
-//
-//        final Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                showPbarLogin();
-//                mILoginPresenter.validateInput(userName, pass);
-//            }
-//        }, TIME_DELAY_ANIM);
+        Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
 
-        ///Cheat
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        intent.putExtra(KEY_EDONG, "01666564963");
-        startActivity(intent);
-        this.finish();
+        final String userName = etUsername.getText().toString();
+        final String pass = etPass.getText().toString();
+
+        if (cbRememberLogin.isChecked()) {
+            mILoginPresenter.writeSharedPrefLogin(userName, pass);
+        } else
+            mILoginPresenter.clearSharedPrefLogin();
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                showPbarLogin();
+                mILoginPresenter.validateInput(userName, pass);
+            }
+        }, TIME_DELAY_ANIM);
+
+//        ///Cheat
+//        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//        intent.putExtra(KEY_EDONG, "01666564963");
+//        startActivity(intent);
+//        this.finish();
     }
     //endregion
 
