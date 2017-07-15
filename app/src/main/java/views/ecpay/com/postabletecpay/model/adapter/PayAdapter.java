@@ -153,7 +153,6 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         return data.size();
     }
 
-
     public class PayViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.tv_row_pay_recycler_customer)
         TextView tvTenKH;
@@ -255,7 +254,6 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             return itemView;
         }
     }
-
 
     public static class BillEntityAdapter implements Comparable<BillEntityAdapter>{
 

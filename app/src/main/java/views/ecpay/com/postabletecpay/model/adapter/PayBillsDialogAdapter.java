@@ -67,7 +67,7 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
         PayAdapter.BillEntityAdapter billChecked = listBillChecked.get(position);
 
         holder.getCbChoose().setChecked(billChecked.isChecked());
-        holder.getTvCode().setText(String.valueOf(billChecked.getBillId()));
+        holder.getTvCode().setText(String.valueOf(billChecked.getMA_KHACH_HANG()));
 
         holder.getTvTerm().setText(billChecked.getTHANG_THANH_TOAN());
         holder.getTvName().setText(billChecked.getTEN_KHACH_HANG());
@@ -93,10 +93,7 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
             else
                 holder.getCbChoose().setEnabled(false);
         }
-
-
         holder.getTvPayStatus().setText(status);
-
     }
 
     @Override
@@ -206,11 +203,12 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
 
         }
 
-        @OnClick(R.id.ibtn_dialog_thanhtoan_message)
-        public void onClickMessage(View view) {
+        @OnClick(R.id.ibtn_row_thanhtoan_list_bills_print)
+        public void onClickPrint(View view) {
             Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
             int pos = getAdapterPosition();
-            iPayView.processClickMessageErrorBillDialog(listBillChecked.get(pos).getMessageError());
+            iPayView.processClickPrinteBillDialog(listBillChecked.get(pos));
+//            iPayView.processClickMessageErrorBillDialog(listBillChecked.get(pos).getMessageError());
         }
     }
 
@@ -222,5 +220,7 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
         void processUnCheckedBillDialog(String message, Common.TYPE_DIALOG typeDialog);
 
         void showCountBillsAndTotalMoneyInDialog(int totalBillsInList, long totalMoneyInList);
+
+        void processClickPrinteBillDialog(PayAdapter.BillEntityAdapter billEntityAdapter);
     }
 }
