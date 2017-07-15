@@ -87,4 +87,7 @@ public interface IPayView extends ICommonView {
     void processUnCheckedBillDialog(String message, Common.TYPE_DIALOG typeDialog);
 
 //    void disableAllBillCheckboxWhenBillingOnline(boolean isDisableCheckbox);
+
+    void PrintThongBaoDien(PayAdapter.DataAdapter data);
+    void PrintHoaDon(PayAdapter.BillEntityAdapter bill);
 }

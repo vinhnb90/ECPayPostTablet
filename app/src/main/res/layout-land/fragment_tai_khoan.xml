@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_190sdp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/bg_taikhoan" />
+    </LinearLayout>
+    <ImageButton
+        android:id="@+id/ibtn_frag_user_info_back"
+        android:layout_width="@dimen/_25sdp"
+        android:layout_height="@dimen/_25sdp"
+        android:layout_margin="@dimen/_5sdp"
+        android:background="@null"
+        android:src="@mipmap/ic_back" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:text="THÔNG TIN TÀI KHOẢN"
+        android:textColor="@color/colorTextWhite"
+        android:textSize="@dimen/_14sdp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="6">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="4">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/_10sdp"
+                android:layout_marginRight="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_25sdp">
+
+                <RelativeLayout
+                    android:id="@+id/rlMain"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/tvTitle"
+                    android:background="@android:drawable/dialog_holo_light_frame"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:padding="@dimen/_10sdp">
+
+                    <ImageView
+                        android:id="@+id/iv_frag_main_avatar"
+                        android:layout_width="@dimen/_90sdp"
+                        android:layout_height="@dimen/_90sdp"
+                        android:padding="@dimen/_10sdp"
+                        android:src="@drawable/avatar" />
+
+                    <LinearLayout
+                        android:id="@+id/llText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/iv_frag_main_avatar"
+                        android:layout_alignTop="@+id/iv_frag_main_avatar"
+                        android:layout_marginLeft="@dimen/_10sdp"
+                        android:layout_toRightOf="@+id/iv_frag_main_avatar"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvTaiKhoan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="3"
+                            android:scrollbars="vertical"
+                            android:text="Chủ tài khoản: usernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusernameusername"
+                            android:textSize="@dimen/_13sdp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvNgayDangKy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_8sdp"
+                            android:maxLines="1"
+                            android:text="Ngày đăng ký: 10/03/2017"
+                            android:textSize="@dimen/_10sdp" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvTitleTenTaiKhoan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/llText"
+                        android:layout_marginLeft="@dimen/_5sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:text="Tên tài khoản:"
+                        android:textSize="@dimen/_10sdp" />
+
+                    <TextView
+                        android:id="@+id/tvTenTaiKhoan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/llText"
+                        android:layout_marginRight="@dimen/_5sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:layout_toRightOf="@+id/tvTitleTenTaiKhoan"
+                        android:gravity="right"
+                        android:maxLines="1"
+                        android:scrollbars="vertical"
+                        android:text="Username"
+                        android:textSize="@dimen/_10sdp" />
+
+                    <View
+                        android:id="@+id/view1"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@+id/tvTenTaiKhoan"
+                        android:layout_marginTop="@dimen/_3sdp"
+                        android:background="@color/colorLightGray" />
+
+                    <TextView
+                        android:id="@+id/tvTitleCMND"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/view1"
+                        android:layout_marginLeft="@dimen/_5sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:text="CMND:"
+                        android:textSize="@dimen/_10sdp" />
+
+                    <TextView
+                        android:id="@+id/tvCMND"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/view1"
+                        android:layout_marginRight="@dimen/_5sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:layout_toRightOf="@+id/tvTitleCMND"
+                        android:gravity="right"
+                        android:maxLines="1"
+                        android:scrollbars="vertical"
+                        android:text="031731743"
+                        android:textSize="@dimen/_10sdp" />
+
+                    <View
+                        android:id="@+id/view2"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@+id/tvCMND"
+                        android:layout_marginTop="@dimen/_3sdp"
+                        android:background="@color/colorLightGray" />
+
+                    <TextView
+                        android:id="@+id/tvTitleDienThoai"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/view2"
+                        android:layout_marginLeft="@dimen/_5sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:text="Điện thoại:"
+                        android:textSize="@dimen/_10sdp" />
+
+                    <TextView
+                        android:id="@+id/tvDienThoai"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/view2"
+                        android:layout_marginRight="@dimen/_5sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:layout_toRightOf="@+id/tvTitleDienThoai"
+                        android:gravity="right"
+                        android:maxLines="1"
+                        android:scrollbars="vertical"
+                        android:text="01656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372016562483720165624837201656248372"
+                        android:textSize="@dimen/_10sdp" />
+
+                    <View
+                        android:id="@+id/view3"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@+id/tvDienThoai"
+                        android:layout_marginTop="@dimen/_3sdp"
+                        android:background="@color/colorLightGray" />
+
+                    <TextView
+                        android:id="@+id/tvTitleEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/view3"
+                        android:layout_marginLeft="@dimen/_5sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:text="Email:"
+                        android:textSize="@dimen/_10sdp" />
+
+                    <TextView
+                        android:id="@+id/tvEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/view3"
+                        android:layout_marginRight="@dimen/_5sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:layout_toRightOf="@+id/tvTitleEmail"
+                        android:gravity="right"
+                        android:maxLines="2"
+                        android:scrollbars="vertical"
+                        android:text="email@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.comemail@gmail.com"
+                        android:textSize="@dimen/_10sdp" />
+
+                    <View
+                        android:id="@+id/view4"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@+id/tvEmail"
+                        android:layout_marginTop="@dimen/_3sdp"
+                        android:background="@color/colorLightGray" />
+
+                    <TextView
+                        android:id="@+id/tvTitleDiaChi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/view4"
+                        android:layout_marginLeft="@dimen/_5sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:text="Địa chỉ:"
+                        android:textSize="@dimen/_10sdp" />
+
+                    <TextView
+                        android:id="@+id/tvDiaChi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/view4"
+                        android:layout_marginRight="@dimen/_5sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:layout_toRightOf="@+id/tvTitleDiaChi"
+                        android:gravity="right"
+                        android:maxLines="3"
+                        android:scrollbars="vertical"
+                        android:text="25 Vũ Phạm Hàm, Yên Hoà, Cầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà NộiCầu Giấy, Hà Nội"
+                        android:textSize="@dimen/_10sdp" />
+
+                </RelativeLayout>
+            </ScrollView>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+
+            android:id="@+id/llInfo"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@+id/rlMain"
+            android:layout_marginLeft="@dimen/_15sdp"
+            android:layout_marginRight="@dimen/_15sdp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+
+            <LinearLayout
+                android:id="@+id/llInfo1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:text="SỐ TÀI KHOẢN"
+                    android:textSize="@dimen/_9sdp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSoTaiKhoan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_8sdp"
+                    android:layout_marginRight="@dimen/_8sdp"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:maxLines="4"
+                    android:scrollbars="vertical"
+                    android:text="2345"
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/_11sdp"
+                    android:textStyle="normal" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:background="@color/colorDisable" />
+
+            <LinearLayout
+                android:id="@+id/llInfo2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:text="SỐ DƯ KHẢ DỤNG"
+                    android:textSize="@dimen/_9sdp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_frag_taikhoan_sodu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_8sdp"
+                    android:layout_marginRight="@dimen/_8sdp"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:maxLines="4"
+                    android:scrollbars="vertical"
+                    android:text="2.000.0002.000.0002.000.0002.000.0002.000.0002.000.0002.000.0002.000.000"
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/_11sdp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:background="@color/colorDisable" />
+
+            <LinearLayout
+                android:id="@+id/llInfo3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:text="LOẠI TÀI KHOẢN"
+                    android:textSize="@dimen/_9sdp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvLoaiTaiKhoan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_8sdp"
+                    android:layout_marginRight="@dimen/_8sdp"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:maxLines="4"
+                    android:scrollbars="vertical"
+                    android:text="12"
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/_11sdp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llButton"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="@dimen/_15sdp"
+            android:layout_marginRight="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_18sdp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <Button
+                android:id="@+id/btn_frag_tai_khoan_change_pass"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_orange"
+                android:text="Đổi mật khẩu"
+                android:textColor="@color/colorTextWhite"
+                android:textSize="@dimen/_10sdp" />
+
+            <Button
+                android:id="@+id/btn_frag_user_info_logout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_20sdp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button"
+                android:text="Đăng xuất"
+                android:textColor="@color/colorTextWhite"
+                android:textSize="@dimen/_10sdp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+</FrameLayout>

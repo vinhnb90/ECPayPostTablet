@@ -31,6 +31,7 @@ import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
+import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
 
 import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.BillInsidePayAdapter.IS_DEBT;
 import static views.ecpay.com.postabletecpay.model.adapter.PayAdapter.BillInsidePayAdapter.NOT_DEBT;
@@ -208,7 +209,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             btn_row_thanhtoan_recycler_print.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    payPresenter.PrintThongBaoDien(dataAdapter);
+                    payPresenter.getIPayView().PrintThongBaoDien(dataAdapter);
                 }
             });
 
@@ -519,7 +520,8 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                 ibtnPrintInside.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        payPresenter.PrintHoaDon(data);
+
+                        payPresenter.getIPayView().PrintHoaDon(data);
                     }
                 });
 
