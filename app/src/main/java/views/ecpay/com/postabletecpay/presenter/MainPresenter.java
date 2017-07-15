@@ -380,7 +380,6 @@ public class MainPresenter implements IMainPresenter {
             return;
         }
 
-
         String signatureEncrypted = "";
         try {
             String dataSign = Common.getDataSignRSA(
@@ -398,7 +397,7 @@ public class MainPresenter implements IMainPresenter {
             do {
 
                 bookCmis = c.getString(0);
-                File fileBookCmis = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + ".zip");
+                File fileBookCmis = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + "_" + edong + ".zip");
                 if (fileBookCmis.exists()) {
                     long maxIdChanged = mainModel.getMaxIdChanged(bookCmis);
                     String maxDateChanged = mainModel.getMaxDateChanged(bookCmis);
