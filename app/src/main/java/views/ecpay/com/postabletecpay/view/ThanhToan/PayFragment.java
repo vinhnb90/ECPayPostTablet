@@ -55,10 +55,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -75,17 +75,14 @@ import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
 import views.ecpay.com.postabletecpay.presenter.PayPresenter;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
 import views.ecpay.com.postabletecpay.util.commons.Common;
-import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.Printer.ESCPOSSample;
-import views.ecpay.com.postabletecpay.view.Printer.SimplyConnection;
-import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
+import views.ecpay.com.postabletecpay.view.Printer.ReceiptUtility;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 import views.ecpay.com.postabletecpay.view.Util.BarcodeScannerDialog;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
-import static views.ecpay.com.postabletecpay.util.commons.Common.NEGATIVE_ONE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
 
@@ -98,6 +95,7 @@ public class PayFragment extends Fragment implements
     public static final int FIRST_PAGE_INDEX = 1;
     public static final int PAGE_INCREMENT = 1;
     public static final int ROWS_ON_PAGE = 10;
+    protected static final String[] DEVICE_NAMES = new String[] { "BTPTR", "SIMPLY" };
     @Nullable
     @BindView(R.id.et_frag_thanh_toan_search)
     EditText etSearch;
@@ -254,9 +252,12 @@ public class PayFragment extends Fragment implements
     private BroadcastReceiver searchStart;
     private static ProgressDialog pDialog;
     private boolean isThongbao;
+    private boolean isSimply;
+    private boolean isBluetoothConnected;
     private SimplyPrintController controller;
     protected static ArrayAdapter<String> arrayAdapter;
-    protected static List<BluetoothDevice> foundDevices;
+    protected List<BluetoothDevice> foundDevice;
+    private List<byte[]> receipts = null;
     //endregion
 
     private Common.PROVIDER_CODE ProviderSelect = Common.PROVIDER_CODE.NCCNONE ;
@@ -319,55 +320,7 @@ public class PayFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loadSettingFile();
-        bluetoothSetup();
-        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
-        addPairedDevices();
-        discoveryResult = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                String key;
-                BluetoothDevice remoteDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if(remoteDevice != null)
-                {
-                    if(remoteDevice.getBondState() != BluetoothDevice.BOND_BONDED)
-                    {
-                        key = remoteDevice.getName() +"\n["+remoteDevice.getAddress()+"]";
-                    }
-                    else
-                    {
-                        key = remoteDevice.getName() +"\n["+remoteDevice.getAddress()+"] [Paired]";
-                    }
-                    if(bluetoothPort.isValidAddress(remoteDevice.getAddress()))
-                    {
-                        remoteDevices.add(remoteDevice);
-                        adapter.add(key);
-                    }
-                }
-            }
-        };
-        getContext().registerReceiver(discoveryResult, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-        searchStart = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
 
-            }
-        };
-        searchFinish = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                showDialogListBlueTooth();
-                pDialog.dismiss();
-            }
-        };
-        getContext().registerReceiver(searchFinish, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
-        controller = new SimplyPrintController(getContext(), new SimplyConnection());
     }
 
 
@@ -389,6 +342,7 @@ public class PayFragment extends Fragment implements
         mEdong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
         setUpRecyclerFragment(rootView);
         //first page
+        isBluetoothConnected = false;
         typeSearch = Common.TYPE_SEARCH.ALL;
         mPageIndex = FIRST_PAGE_INDEX;
         try {
@@ -629,27 +583,25 @@ public class PayFragment extends Fragment implements
     @Override
     public void onDestroyView() {
         mIPayPresenter.cancelSeachOnline();
-        try
-        {
-            saveSettingFile();
-            bluetoothPort.disconnect();
+        if (isBluetoothConnected) {
+            if (!isSimply) {
+                try {
+                    saveSettingFile();
+                    bluetoothPort.disconnect();
+                } catch (IOException e) {
+                    Log.e(TAG, e.getMessage(), e);
+                } catch (InterruptedException e) {
+                    Log.e(TAG, e.getMessage(), e);
+                }
+                if ((hThread != null) && (hThread.isAlive())) {
+                    hThread.interrupt();
+                    hThread = null;
+                }
+                isBluetoothConnected = false;
+            }else {
+                stopConnection();
+            }
         }
-        catch (IOException e)
-        {
-            Log.e(TAG, e.getMessage(), e);
-        }
-        catch (InterruptedException e)
-        {
-            Log.e(TAG, e.getMessage(), e);
-        }
-        if((hThread != null) && (hThread.isAlive()))
-        {
-            hThread.interrupt();
-            hThread = null;
-        }
-        getContext().unregisterReceiver(searchFinish);
-        getContext().unregisterReceiver(searchStart);
-        getContext().unregisterReceiver(discoveryResult);
         super.onDestroyView();
     }
 
@@ -720,8 +672,6 @@ public class PayFragment extends Fragment implements
             btnPre.setEnabled(true);
             btnNext.setEnabled(true);
             tvPage.setText(String.valueOf(pageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
-
-
 
             //enable disable button pre next
             if (pageIndex == FIRST_PAGE_INDEX) {
@@ -945,12 +895,31 @@ public class PayFragment extends Fragment implements
     @Override
     public void PrintThongBaoDien(PayAdapter.DataAdapter data) {
         isThongbao = true;
-
+        if (!isBluetoothConnected) {
+            dialogChonMayIn();
+        }else
+            if (!isSimply) {
+                printer(true);
+            }else {
+                receipts = new ArrayList<byte[]>();
+                receipts.add(ReceiptUtility.genReceiptTest(getContext()));
+                controller.startPrinting(receipts.size(), 120, 120);
+            }
     }
 
     @Override
     public void PrintHoaDon(PayAdapter.BillEntityAdapter bill) {
         isThongbao = false;
+        if (!isBluetoothConnected) {
+            dialogChonMayIn();
+        }else
+            if (!isSimply) {
+                printer(false);
+            } else {
+                receipts = new ArrayList<byte[]>();
+                receipts.add(ReceiptUtility.genReceiptTest(getContext()));
+                controller.startPrinting(receipts.size(), 120, 120);
+            }
     }
 
     @Override
@@ -1090,8 +1059,6 @@ public class PayFragment extends Fragment implements
         boolean fail = TextUtils.isEmpty(edong) ||  bill == null;
         if (fail)
             return;
-
-
             dialogDeleteBillOnline = new Dialog(this.getActivity());
             dialogDeleteBillOnline.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialogDeleteBillOnline.setContentView(R.layout.dialog_delete_bill_online);
@@ -1390,12 +1357,61 @@ public class PayFragment extends Fragment implements
             return;
         etSearch.setText(textBarcode);
     }
+// region Setup Bluetooth
+    private void openBluetooth(){
+        loadSettingFile();
+        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
+        addPairedDevices();
+        discoveryResult = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                String key;
+                BluetoothDevice remoteDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if(remoteDevice != null)
+                {
+                    if(remoteDevice.getBondState() != BluetoothDevice.BOND_BONDED)
+                    {
+                        key = remoteDevice.getName() +"\n["+remoteDevice.getAddress()+"]";
+                    }
+                    else
+                    {
+                        key = remoteDevice.getName() +"\n["+remoteDevice.getAddress()+"] [Paired]";
+                    }
+                    if(bluetoothPort.isValidAddress(remoteDevice.getAddress()))
+                    {
+                        remoteDevices.add(remoteDevice);
+                        adapter.add(key);
+                    }
+                }
+            }
+        };
+        getContext().registerReceiver(discoveryResult, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+        searchStart = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
 
+            }
+        };
+        searchFinish = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                showDialogListBlueTooth();
+                pDialog.dismiss();
+            }
+        };
+        getContext().registerReceiver(searchFinish, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+
+    }
+    //endregion
     //region Bluetooth
-    // Set up Bluetooth.
     private void bluetoothSetup() {
         // Initialize
-        clearBtDevData();
         bluetoothPort = BluetoothPort.getInstance();
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -1404,8 +1420,10 @@ public class PayFragment extends Fragment implements
         }
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            openBluetooth();
+        }else {
+            openBluetooth();
         }
     }
 
@@ -1471,7 +1489,6 @@ public class PayFragment extends Fragment implements
         dialog.setContentView(R.layout.dialog_listbluetooth);
         dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
         listBluetooth = (ListView) dialog.findViewById(R.id.dl_list_bluetooth);
         listBluetooth.setAdapter(adapter);
@@ -1515,7 +1532,7 @@ public class PayFragment extends Fragment implements
     }
 
     // Bluetooth Connection Task.
-    class connTask extends AsyncTask<BluetoothDevice, Void, Integer> {
+    private class connTask extends AsyncTask<BluetoothDevice, Void, Integer> {
         private final ProgressDialog dialog = new ProgressDialog(getContext());
 
         @Override
@@ -1550,6 +1567,7 @@ public class PayFragment extends Fragment implements
                     dialog.dismiss();
                 Toast toast = Toast.makeText(getContext(), "Đã kết nối bluetooth", Toast.LENGTH_SHORT);
                 toast.show();
+                isBluetoothConnected =true;
                 if (isThongbao)
                     printer(true);
                 else
@@ -1589,11 +1607,20 @@ public class PayFragment extends Fragment implements
             }
         }
     }
+
+    public void stopConnection() {
+        SimplyPrintController.ConnectionMode connectionMode = controller.getConnectionMode();
+        if(connectionMode == SimplyPrintController.ConnectionMode.BLUETOOTH_2) {
+            controller.stopBTv2();
+        } else if(connectionMode == SimplyPrintController.ConnectionMode.BLUETOOTH_4) {
+            controller.disconnectBTv4();
+        }
+    }
     //endregion
 
     //region Chon May In
     public void dialogChonMayIn() {
-        Dialog dialog = new Dialog(getContext());
+        final Dialog dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.dialog_listbluetooth);
 
         String[] connections = new String[2];
@@ -1607,17 +1634,20 @@ public class PayFragment extends Fragment implements
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(position == 0) {
+                    isSimply = true;
+                    controller = new SimplyPrintController(getContext(), new SimplyConnection());
                     Object[] pairedObjects = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray();
                     final BluetoothDevice[] pairedDevices = new BluetoothDevice[pairedObjects.length];
                     for(int i = 0; i < pairedObjects.length; ++i) {
                         pairedDevices[i] = (BluetoothDevice)pairedObjects[i];
                     }
-
-                    final ArrayAdapter<String> mArrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1);
+                    controller.scanBTv2(DEVICE_NAMES, 120);
+                    final ArrayAdapter<String> mArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
                     for (int i = 0; i < pairedDevices.length; ++i) {
                         mArrayAdapter.add(pairedDevices[i].getName());
                     }
-                    Dialog dialog = new Dialog(getContext());
+                    dialog.dismiss();
+                    final Dialog dialog = new Dialog(getContext());
                     dialog.setContentView(R.layout.dialog_listbluetooth);
 
                     ListView listView = (ListView)dialog.findViewById(R.id.dl_list_bluetooth);
@@ -1627,26 +1657,24 @@ public class PayFragment extends Fragment implements
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             controller.startBTv2(pairedDevices[position]);
+                            dialog.dismiss();
                         }
 
                     });
-
                     dialog.show();
-
-                    controller.scanBTv2(DEVICE_NAMES, 120);
                 } else if(position == 1) {
+                    bluetoothSetup();
+                    isSimply = false;
+                    dialog.dismiss();
                     if (!bluetoothPort.isConnected()) {
                         if (!mBluetoothAdapter.isDiscovering()) {
                             clearBtDevData();
                             adapter.clear();
                             mBluetoothAdapter.startDiscovery();
                             pDialog = new ProgressDialog(getActivity());
-                            pDialog.setMessage("Đang tìm kiếm thiết bị");
-                            pDialog.setTitle("Đang tìm kiếm thiết bị");
                             pDialog.show();
                             pDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
                             pDialog.setContentView(R.layout.progress_dialog);
-                            pDialog.setCancelable(false);
                         } else {
                             mBluetoothAdapter.cancelDiscovery();
                         }
@@ -1660,11 +1688,151 @@ public class PayFragment extends Fragment implements
             }
 
         });
-
-
         dialog.show();
     }
 
     //endregion
+    private class SimplyConnection implements SimplyPrintController.SimplyPrintControllerListener{
+        @Override
+        public void onBTv2Detected() {
+        }
 
+        @Override
+        public void onBTv2DeviceListRefresh(List<BluetoothDevice> foundDevices) {
+            foundDevice = foundDevices;
+            if(arrayAdapter != null) {
+                arrayAdapter.clear();
+                for(int i = 0; i < foundDevices.size(); ++i) {
+                    arrayAdapter.add(foundDevices.get(i).getName());
+                }
+                arrayAdapter.notifyDataSetChanged();
+            }
+        }
+
+        @Override
+        public void onBTv2Connected(BluetoothDevice bluetoothDevice) {
+            isBluetoothConnected = true;
+            receipts = new ArrayList<byte[]>();
+//                receipts.add(ReceiptUtility.genReceipt(MainActivity.this));
+            receipts.add(ReceiptUtility.genReceiptTest(getContext()));
+            controller.startPrinting(receipts.size(), 120, 120);
+        }
+
+        @Override
+        public void onBTv2Disconnected() {
+            Log.e(getClass().getName(),"Disconnected");
+        }
+
+        @Override
+        public void onBTv2ScanStopped() {
+            Toast.makeText(getContext(),"error",Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onBTv2ScanTimeout() {
+            Log.e(getClass().getName(),"Scan Timeout");
+        }
+
+        @Override
+        public void onBTv4DeviceListRefresh(List<BluetoothDevice> foundDevices) {
+            foundDevice = foundDevices;
+            if(arrayAdapter != null) {
+                arrayAdapter.clear();
+                for(int i = 0; i < foundDevices.size(); ++i) {
+                    arrayAdapter.add(foundDevices.get(i).getName());
+                }
+                arrayAdapter.notifyDataSetChanged();
+            }
+        }
+
+        @Override
+        public void onBTv4Connected() {
+        }
+
+        @Override
+        public void onBTv4Disconnected() {
+        }
+
+        @Override
+        public void onBTv4ScanStopped() {
+        }
+
+        @Override
+        public void onBTv4ScanTimeout() {
+        }
+
+        @Override
+        public void onReturnDeviceInfo(Hashtable<String, String> deviceInfoTable) {
+            String productId = deviceInfoTable.get("productId");
+            String firmwareVersion = deviceInfoTable.get("firmwareVersion");
+            String bootloaderVersion = deviceInfoTable.get("bootloaderVersion");
+            String hardwareVersion = deviceInfoTable.get("hardwareVersion");
+            String isUsbConnected = deviceInfoTable.get("isUsbConnected");
+            String isCharging = deviceInfoTable.get("isCharging");
+            String batteryLevel = deviceInfoTable.get("batteryLevel");
+
+        }
+
+        @Override
+        public void onReturnPrinterResult(SimplyPrintController.PrinterResult printerResult) {
+            if(printerResult == SimplyPrintController.PrinterResult.SUCCESS) {
+            } else if(printerResult == SimplyPrintController.PrinterResult.NO_PAPER) {
+            } else if(printerResult == SimplyPrintController.PrinterResult.WRONG_CMD) {
+            } else if(printerResult == SimplyPrintController.PrinterResult.OVERHEAT) {
+
+            }
+        }
+
+        @Override
+        public void onReturnGetDarknessResult(int value) {
+        }
+
+        @Override
+        public void onReturnSetDarknessResult(boolean isSuccess) {
+            if(isSuccess) {
+            } else {
+            }
+        }
+
+        @Override
+        public void onRequestPrinterData(int index, boolean isReprint) {
+            controller.sendPrinterData(receipts.get(index));
+            if(isReprint) {
+
+            } else {
+            }
+        }
+
+        @Override
+        public void onPrinterOperationEnd() {
+
+        }
+
+        @Override
+        public void onBatteryLow(SimplyPrintController.BatteryStatus batteryStatus) {
+            if(batteryStatus == SimplyPrintController.BatteryStatus.LOW) {
+            } else if(batteryStatus == SimplyPrintController.BatteryStatus.CRITICALLY_LOW) {
+            }
+        }
+
+        @Override
+        public void onBTv2DeviceNotFound() {
+        }
+
+
+        @Override
+        public void onError(SimplyPrintController.Error errorState) {
+            if(errorState == SimplyPrintController.Error.UNKNOWN) {
+            } else if(errorState == SimplyPrintController.Error.CMD_NOT_AVAILABLE) {
+            } else if(errorState == SimplyPrintController.Error.TIMEOUT) {
+            } else if(errorState == SimplyPrintController.Error.DEVICE_BUSY) {
+            } else if(errorState == SimplyPrintController.Error.INPUT_OUT_OF_RANGE) {
+            } else if(errorState == SimplyPrintController.Error.INPUT_INVALID) {
+            } else if(errorState == SimplyPrintController.Error.CRC_ERROR) {
+            } else if(errorState == SimplyPrintController.Error.FAIL_TO_START_BTV2) {
+            } else if(errorState == SimplyPrintController.Error.COMM_LINK_UNINITIALIZED) {
+            } else if(errorState == SimplyPrintController.Error.BTV2_ALREADY_STARTED) {
+            }
+        }
+    }
 }

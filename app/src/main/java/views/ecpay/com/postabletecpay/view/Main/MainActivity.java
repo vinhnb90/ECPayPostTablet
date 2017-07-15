@@ -2,9 +2,11 @@ package views.ecpay.com.postabletecpay.view.Main;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -235,6 +237,27 @@ public class MainActivity extends AppCompatActivity implements
 
     public IOnPauseScannerBarcodeListner getPauseScannerBarcodeListner() {
         return pauseScannerBarcodeListner;
+    }
+    Toast toast;
+    long lastTimePressed = 0;
+    @Override
+    public void onBackPressed() {
+        Fragment currentFragment = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (currentFragment instanceof MainPageFragment) {
+            if (System.currentTimeMillis() - lastTimePressed > 2500) {
+                toast = Toast.makeText(getApplicationContext(),
+                        "Nhấn lại lần nữa để thoát", Toast.LENGTH_SHORT);
+                toast.show();
+                lastTimePressed = System.currentTimeMillis();
+            } else {
+                if (toast != null) {
+                    toast.cancel();
+                }
+                System.exit(0);
+            }
+        } else {
+            this.getSupportFragmentManager().popBackStack();
+        }
     }
 
     public void setPauseScannerBarcodeListner(IOnPauseScannerBarcodeListner pauseScannerBarcodeListner) {
