@@ -222,7 +222,7 @@ public class MainPresenter implements IMainPresenter {
                         mainModel.insertBookCmis(listBookCmisResponse);
                     }
 
-                    File fileDownload = new File(Common.PATH_FOLDER_DOWNLOAD + listBookCmisExist.get(i).getBookCmis() + "_" + edong + ".zip");
+                    File fileDownload = new File(Common.PATH_FOLDER_DOWNLOAD + listBookCmisResponse.getBookCmis() + "_" + edong + ".zip");
 
                     if (!fileDownload.exists()) {
                         listBookCmisNeedDownload.add(listBookCmisResponse);
@@ -306,8 +306,8 @@ public class MainPresenter implements IMainPresenter {
                     configInfo.getMacAdressHexValue(),
                     configInfo.getDiskDriver(),
                     configInfo.getSignatureEncrypted(),
-                    bookCmis,
                     pcCodeExt,
+                    bookCmis,
                     configInfo.getAccountId());
 
             if (jsonRequestZipData != null) {
