@@ -202,8 +202,8 @@ public class MainPresenter implements IMainPresenter {
                 JSONArray jaEvnPC = new JSONArray(dataEvnPC);
                 for (int i = 0; i < jaEvnPC.length(); i++) {
                     listEvnPCResponse = gson.fromJson(jaEvnPC.getString(i), ListEvnPCResponse.class);
-                    if (mainModel.checkEvnPCExist(listEvnPCResponse.getPcId()) == 0) {
-                        mainModel.insertEvnPC(listEvnPCResponse);
+                    if (mainModel.checkEvnPCExist(listEvnPCResponse.getPcId(), edong) == 0) {
+                        mainModel.insertEvnPC(listEvnPCResponse, edong);
                     }
                 }
                 //Insert BOOK CMIS
@@ -257,39 +257,41 @@ public class MainPresenter implements IMainPresenter {
         }
 
 
-        ConfigInfo configInfo;
-        String versionApp = "";
-        try {
-            versionApp = mIMainView.getContextView().getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp, mainModel.getPcCode());
-        } catch (Exception e) {
-            mIMainView.showTextMessage(e.getMessage());
-            return;
-        }
-
-
-        String signatureEncrypted = "";
-        try {
-            String dataSign = Common.getDataSignRSA(
-                    configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
-                    configInfo.getDiskDriver(), mainModel.getPcCode(), configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
-            Log.d(TAG, "setupInfoRequest: " + dataSign);
-            signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
-            Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
-        } catch (Exception e) {
-        }
-        configInfo.setSignatureEncrypted(signatureEncrypted);
-
         Cursor c = mainModel.getAllBookCmis();
         if (c.moveToFirst()) {
             do {
                 bookCmis = c.getString(0);
+                String pcCodeExt = c.getString(1);
+//                if(bookCmis.equals("TL022")) {
+
+                ConfigInfo configInfo;
+                String versionApp = "";
+                try {
+                    versionApp = mIMainView.getContextView().getPackageManager()
+                            .getPackageInfo(context.getPackageName(), 0).versionName;
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.GET_FILE_GEN.toString(), versionApp, pcCodeExt);
+                } catch (Exception e) {
+                    mIMainView.showTextMessage(e.getMessage());
+                    return;
+                }
+
+
+                String signatureEncrypted = "";
+                try {
+                    String dataSign = Common.getDataSignRSA(
+                            configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
+                            configInfo.getDiskDriver(), pcCodeExt, configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
+                    Log.d(TAG, "setupInfoRequest: " + dataSign);
+                    signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
+                    Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
+                } catch (Exception e) {
+                }
+                configInfo.setSignatureEncrypted(signatureEncrypted);
 
                 String jsonRequestZipData = SoapAPI.getJsonRequestSynDataZip(
                         configInfo.getAGENT(),
@@ -339,6 +341,7 @@ public class MainPresenter implements IMainPresenter {
                     }
 
                 }
+//                }
             } while (c.moveToNext());
         }
     }
@@ -371,7 +374,7 @@ public class MainPresenter implements IMainPresenter {
         }
 
         try {
-            configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.SYNC_DATA.toString(), versionApp, mainModel.getPcCode());
+            configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.SYNC_DATA.toString(), versionApp, mainModel.getPcCode(edong));
         } catch (Exception e) {
             mIMainView.showTextMessage(e.getMessage());
             return;
@@ -382,7 +385,7 @@ public class MainPresenter implements IMainPresenter {
         try {
             String dataSign = Common.getDataSignRSA(
                     configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
-                    configInfo.getDiskDriver(), mainModel.getPcCode(), configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
+                    configInfo.getDiskDriver(), mainModel.getPcCode(edong), configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
             Log.d(TAG, "setupInfoRequest: " + dataSign);
             signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
             Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
@@ -407,7 +410,7 @@ public class MainPresenter implements IMainPresenter {
                             configInfo.getMacAdressHexValue(),
                             configInfo.getDiskDriver(),
                             configInfo.getSignatureEncrypted(),
-                            mainModel.getPcCode(),
+                            mainModel.getPcCode(edong),
                             c.getString(0),
                             maxIdChanged,
                             maxDateChanged,
@@ -615,14 +618,14 @@ public class MainPresenter implements IMainPresenter {
                 byte[] zipByte = org.apache.commons.codec.binary.Base64.decodeBase64(sData.getBytes());
 
                 try {
-                    File file = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + ".zip");
+                    File file = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + "_" + edong + ".zip");
                     if (!file.exists()) {
                         Common.writeBytesToFile(file, zipByte);
                         if (file.exists()) {
                             File fileText = new File(Common.PATH_FOLDER_DOWNLOAD, "full.txt");
                             if (fileText.exists())
                                 fileText.delete();
-                            if (Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + ".zip")) {
+                            if (Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + "_" + edong + ".zip")) {
                                 StringBuilder text = new StringBuilder();
                                 try {
                                     BufferedReader br = new BufferedReader(new FileReader(fileText));
@@ -671,7 +674,7 @@ public class MainPresenter implements IMainPresenter {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                }finally {
+                } finally {
                     ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

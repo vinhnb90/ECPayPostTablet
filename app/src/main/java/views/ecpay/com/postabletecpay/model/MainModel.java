@@ -41,24 +41,24 @@ public class MainModel extends CommonModel {
         return sqLiteConnection.countMoneyAllBill(edong);
     }
 
-    public long insertEvnPC(ListEvnPCResponse listEvnPCResponse) {
-        return sqLiteConnection.insertEvnPC(listEvnPCResponse);
+    public long insertEvnPC(ListEvnPCResponse listEvnPCResponse, String edong) {
+        return sqLiteConnection.insertEvnPC(listEvnPCResponse,  edong);
     }
 
-    public long deleteAllPC() {
-        return sqLiteConnection.deleteAllPC();
+    public long deleteAllPC(String edong) {
+        return sqLiteConnection.deleteAllPC(edong);
     }
 
-    public long checkEvnPCExist(int pcId) {
-        return sqLiteConnection.checkEvnPCExist(pcId);
+    public long checkEvnPCExist(int pcId, String edong) {
+        return sqLiteConnection.checkEvnPCExist(pcId, edong);
     }
 
     public long insertBookCmis(ListBookCmisResponse listBookCmisResponse) {
         return sqLiteConnection.insertBookCmis(listBookCmisResponse);
     }
 
-    public String getPcCode() {
-        return sqLiteConnection.getPcCode();
+    public String getPcCode(String edong) {
+        return sqLiteConnection.getPcCode(edong);
     }
 
     public long deleteAllBookCmis() {

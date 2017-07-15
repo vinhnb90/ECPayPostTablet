@@ -79,7 +79,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             "`status` TEXT, `idNumber` TEXT, `idNumberDate` TEXT, `idNumberPlace` TEXT, `parentEdong` TEXT, `notYetPushMoney` INTEGER DEFAULT 0)";
 
 
-    private String CREATE_TABLE_EVN_PC = "CREATE TABLE " + TABLE_NAME_EVN_PC + " ( pcId NOT NULL PRIMARY KEY, strPcId TEXT, parentId INTEGER, " +
+    private String CREATE_TABLE_EVN_PC = "CREATE TABLE " + TABLE_NAME_EVN_PC + " ( pcId NOT NULL PRIMARY KEY, edong TEXT NOT NULL, strPcId TEXT, parentId INTEGER, " +
             "strParentId TEXT, " +
             "code TEXT, ext TEXT, fullName TEXT, shortName TEXT, address TEXT, taxCode TEXT, phone1 TEXT, phone2 TEXT, " +
             "fax TEXT, level INTEGER, " +
@@ -1136,7 +1136,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
 
     //region EVN
-    public void insertOrUpdateEvnPcFromLoginReponse(EvnPC evnPC) {
+    public void insertOrUpdateEvnPcFromLoginReponse(EvnPC evnPC, String edong) {
         if (evnPC == null)
             return;
 
@@ -1153,15 +1153,16 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("phone2", evnPC.getPhone2());
         initialValues.put("fax", evnPC.getFax());
         initialValues.put("level", evnPC.getLevel());
+        initialValues.put("edong", edong);
 
         database = getWritableDatabase();
         int id = (int) database.insertWithOnConflict(TABLE_NAME_EVN_PC, null, initialValues, SQLiteDatabase.CONFLICT_IGNORE);
         if (id == -1) {
-            database.update(TABLE_NAME_EVN_PC, initialValues, "pcId=?", new String[]{String.valueOf(evnPC.getPcId())});
+            database.update(TABLE_NAME_EVN_PC, initialValues, "pcId=? and edong=?", new String[]{String.valueOf(evnPC.getPcId()), edong});
         }
     }
 
-    public long insertEvnPC(ListEvnPCResponse listEvnPCResponse) {
+    public long insertEvnPC(ListEvnPCResponse listEvnPCResponse, String edong) {
         ContentValues initialValues = new ContentValues();
 
         initialValues.put("parentId", listEvnPCResponse.getParentId());
@@ -1191,13 +1192,14 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("regionId", listEvnPCResponse.getRegionId());
         initialValues.put("parentPcCode", listEvnPCResponse.getParentPcCode());
         initialValues.put("cardPrefix", listEvnPCResponse.getCardPrefix());
+        initialValues.put("edong", edong);
 
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_EVN_PC, null, initialValues);
         return rowAffect;
     }
 
-    public long updateEvnPC(ListEvnPCResponse listEvnPCResponse) {
+    public long updateEvnPC(ListEvnPCResponse listEvnPCResponse, String edong) {
         ContentValues initialValues = new ContentValues();
 
         initialValues.put("parentId", listEvnPCResponse.getParentId());
@@ -1227,29 +1229,29 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("regionId", listEvnPCResponse.getRegionId());
         initialValues.put("parentPcCode", listEvnPCResponse.getParentPcCode());
         initialValues.put("cardPrefix", listEvnPCResponse.getCardPrefix());
-
+        initialValues.put("edong", edong);
         database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_EVN_PC, initialValues, "pcId=?", new String[]{String.valueOf(listEvnPCResponse.getPcId())});
+        int rowAffect = (int) database.update(TABLE_NAME_EVN_PC, initialValues, "pcId=? and edong=?", new String[]{String.valueOf(listEvnPCResponse.getPcId()), edong});
         return rowAffect;
     }
 
-    public long deleteAllPC() {
+    public long deleteAllPC(String edong) {
         database = this.getWritableDatabase();
-        return database.delete(TABLE_NAME_EVN_PC, null, null);
+        return database.delete(TABLE_NAME_EVN_PC,  "edong=?", new String[]{edong});
     }
 
-    public long checkEvnPCExist(int pcId) {
+    public long checkEvnPCExist(int pcId, String edong) {
         database = this.getReadableDatabase();
-        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_EVN_PC + " WHERE pcId = " + pcId;
+        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_EVN_PC + " WHERE pcId = " + pcId + " and edong = " + edong;
         Cursor mCursor = database.rawQuery(query, null);
         if (mCursor.moveToFirst())
             return mCursor.getInt(0);
         return 0;
     }
 
-    public String getPcCode() {
+    public String getPcCode(String edong) {
         database = this.getReadableDatabase();
-        String query = "SELECT ext FROM " + TABLE_NAME_EVN_PC;
+        String query = "SELECT ext FROM " + TABLE_NAME_EVN_PC + " Where edong = " + edong;
         Cursor c = database.rawQuery(query, null);
         if (c.moveToFirst()) {
             return c.getString(0);
@@ -1257,12 +1259,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return "";
     }
 
-    public List<String> getPcCodes() {
+    public List<String> getPcCodes(String edong) {
 
         List<String> result = new ArrayList<>();
 
         database = this.getReadableDatabase();
-        String query = "SELECT ext FROM " + TABLE_NAME_EVN_PC;
+        String query = "SELECT ext FROM " + TABLE_NAME_EVN_PC + " where edong =" + edong;
         Cursor c = database.rawQuery(query, null);
         if (c.moveToFirst()) {
             do {

@@ -233,8 +233,8 @@ public class PayModel extends CommonModel {
     }
 
 
-    public List<String> getPcCodes() {
-        return sqLiteConnection.getPcCodes();
+    public List<String> getPcCodes(String edong) {
+        return sqLiteConnection.getPcCodes( edong);
     }
 
     public long updateHoaDonNo(long billID, String status, String edong) {
