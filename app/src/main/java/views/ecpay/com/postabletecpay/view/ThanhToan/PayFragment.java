@@ -368,13 +368,11 @@ public class PayFragment extends Fragment implements
                 if(ProviderSelect.getCode().equalsIgnoreCase(Common.PROVIDER_CODE.NCCNONE.getCode()))
                     return;
 
-
                 if(checkUserNeedSearchOnline(etSearch.getText().toString()))
                 {
                     showSearchOnlineProcess();
                     mIPayPresenter.reseachOnline(mEdong);
                 }
-
             }
 
             @Override
@@ -872,6 +870,10 @@ public class PayFragment extends Fragment implements
 
         tvTotalBillsDialog.setText(String.valueOf(totalBillsInDialog));
         tvTotalBillsMoneyDialog.setText(Common.convertLongToMoney(totalMoneyInDialog));
+    }
+
+    @Override
+    public void processClickPrinteBillDialog(PayAdapter.BillEntityAdapter billEntityAdapter) {
     }
 
     @Override

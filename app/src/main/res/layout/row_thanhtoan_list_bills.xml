@@ -94,22 +94,24 @@
             android:layout_centerVertical="true"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:gravity="center_vertical|center_horizontal"
+            android:layout_gravity="center_vertical|center_horizontal"
             android:layout_height="match_parent">
 
             <ImageButton
-                android:visibility="gone"
-                android:id="@+id/ibtn_dialog_thanhtoan_message"
-                android:background="@drawable/ic_message"
+                android:visibility="visible"
+                android:id="@+id/ibtn_row_thanhtoan_list_bills_print"
+                android:background="@drawable/ic_print"
                 android:layout_alignParentRight="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_marginLeft="@dimen/_8sdp"
+                android:layout_width="@dimen/_18sdp"
+                android:layout_height="@dimen/_18sdp" />
+
 
             <TextView
                 android:id="@+id/tv_row_thanhtoan_list_bills_status_pay"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@+id/ibtn_dialog_thanhtoan_message"
+                android:layout_height="@dimen/_24sdp"
+                android:layout_toLeftOf="@+id/ibtn_row_thanhtoan_list_bills_print"
                 android:gravity="center_horizontal|center_vertical"
                 android:text="Chưa thanh toán"
                 android:textSize="@dimen/_9sdp"

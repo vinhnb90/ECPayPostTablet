@@ -1,6 +1,7 @@
 package views.ecpay.com.postabletecpay.model;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
@@ -22,10 +23,12 @@ public class LoginModel extends CommonModel {
         sqLiteConnection.insertOrUpdateAccount(account);
     }
 
-    public void writeSqliteEvnPcTable(EvnPC evnPC) {
+    public void writeSqliteEvnPcTable(EvnPC evnPC, String edong) {
         if (evnPC == null)
             return;
-        sqLiteConnection.insertOrUpdateEvnPcFromLoginReponse(evnPC);
+        if(TextUtils.isEmpty(edong))
+            return;
+        sqLiteConnection.insertOrUpdateEvnPcFromLoginReponse(evnPC, edong);
     }
     //endregion
 }

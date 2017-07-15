@@ -1451,11 +1451,13 @@ public class Common {
             File folderDB = new File(PATH_FOLDER_DB);
             if (!folderDB.exists()) {
                 folderDB.mkdir();
+                folderDB.mkdirs();
             }
 
             File folderDownload = new File(PATH_FOLDER_DOWNLOAD);
             if (!folderDownload.exists()) {
                 folderDownload.mkdir();
+                folderDownload.mkdirs();
             }
 
 //            File folderData = new File(PATH_FOLDER_DATA);

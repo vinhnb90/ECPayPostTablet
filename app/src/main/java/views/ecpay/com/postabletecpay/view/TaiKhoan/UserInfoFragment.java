@@ -113,6 +113,7 @@ public class UserInfoFragment extends Fragment implements IUserInfoView, ILogout
     private OnFragmentInteractionListener listener;
     private Dialog dialogLogout;
     private Unbinder unbinder;
+    View viewfragment;
 
     public static UserInfoFragment newInstance(String edong) {
         Bundle bundle = new Bundle();
@@ -133,12 +134,12 @@ public class UserInfoFragment extends Fragment implements IUserInfoView, ILogout
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_tai_khoan, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        viewfragment = inflater.inflate(R.layout.fragment_tai_khoan, container, false);
+        unbinder = ButterKnife.bind(this, viewfragment);
 
         mEdong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
         mIUserInfoPresenter.getInfoUser(mEdong);
-        return view;
+        return viewfragment;
     }
 
     @Override
@@ -237,6 +238,7 @@ public class UserInfoFragment extends Fragment implements IUserInfoView, ILogout
     public void clickLogoutCancel(View view) {
         if (dialogLogout != null)
             dialogLogout.dismiss();
+            unbinder = ButterKnife.bind(this, viewfragment);
     }
     //endregion
 

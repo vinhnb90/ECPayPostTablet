@@ -133,6 +133,7 @@ public class MainPageFragment extends Fragment implements
     private ILogoutPresenter mILogoutPresenter;
     private Unbinder unbinder;
     private Dialog dialogLogout;
+    View curentFragment;
 
     public static MainPageFragment newInstance(String edong) {
         Bundle bundle = new Bundle();
@@ -153,8 +154,8 @@ public class MainPageFragment extends Fragment implements
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_trang_chu, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        curentFragment = inflater.inflate(R.layout.fragment_trang_chu, container, false);
+        unbinder = ButterKnife.bind(this, curentFragment);
 
         mEdong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
 
@@ -165,7 +166,7 @@ public class MainPageFragment extends Fragment implements
         btnChuyenViTong.setOnClickListener(this);
         btnDinhDanhThe.setOnClickListener(this);
         this.refreshInfoMain();
-        return view;
+        return curentFragment;
     }
 
     @Override
@@ -308,6 +309,7 @@ public class MainPageFragment extends Fragment implements
     public void clickLogoutCancel(View view) {
         if (dialogLogout != null)
             dialogLogout.dismiss();
+            unbinder = ButterKnife.bind(this, curentFragment);
     }
     //endregion
 
@@ -509,6 +511,8 @@ public class MainPageFragment extends Fragment implements
 
         Button btOK = (Button) dialog.findViewById(R.id.btn_dialog_version_button_ok);
         TextView tvHelp = (TextView) dialog.findViewById(R.id.tv_dialog_version_content);
+//        ImageButton imgVersion = (ImageButton) dialog.findViewById(R.id.)
+
         ibClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

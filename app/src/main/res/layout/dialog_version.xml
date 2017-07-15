@@ -90,7 +90,7 @@
 
             <ImageButton
                 android:layout_marginRight="@dimen/_15sdp"
-                android:id="@+id/btb_dialog_version_content_update"
+                android:id="@+id/btn_dialog_version_content_update"
                 android:layout_width="@dimen/_24sdp"
                 android:layout_height="@dimen/_24sdp"
                 android:layout_alignParentRight="true"
@@ -102,9 +102,7 @@
                 android:id="@+id/tv_dialog_version_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/btb_dialog_version_content_update"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:layout_toLeftOf="@+id/btb_dialog_version_content_update"
                 android:gravity="center_horizontal"
                 android:maxLines="30"
                 android:orientation="horizontal"
