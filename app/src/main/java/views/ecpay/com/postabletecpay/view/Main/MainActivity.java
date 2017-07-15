@@ -48,12 +48,14 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         public void run() {
             boolean currentConnect = Common.isNetworkConnected(MainActivity.this);
-            if (!hasNetworkLast && currentConnect) {
+            boolean posted= true;
+//            if (!hasNetworkLast && currentConnect) {
                 if (iMainPresenter != null) {
-                    iMainPresenter.checkAndPostBill();
+                    posted = iMainPresenter.checkAndPostBill();
                 }
-            }
-            hasNetworkLast = currentConnect;
+//            }
+            if(posted)
+                hasNetworkLast = currentConnect;
             if (mHander != null && mRunableCheckPostBill != null)
                 mHander.postDelayed(mRunableCheckPostBill, Common.TIME_OUT_CHECK_CONNECTION);
         }

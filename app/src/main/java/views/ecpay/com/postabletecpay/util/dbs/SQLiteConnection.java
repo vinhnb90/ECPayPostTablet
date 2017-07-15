@@ -677,26 +677,26 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     continue;
                 ;
 
-                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC)) {
-
-                    this.updateHoaDonThu(MA_HOA_DON, Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC, "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(),
-                            currentDate, Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
-
-
-                    this.insertLichSuThanhToan(MA_HOA_DON, currentDate, Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
-                    continue;
-                }
-                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC)) {
-
-                    this.updateHoaDonThu(MA_HOA_DON, Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC, "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(),
-                            currentDate, Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
-
-
-                    this.insertLichSuThanhToan(MA_HOA_DON, currentDate, Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
-                    continue;
-                }
-
-                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.CHUA_TTOAN)) {
+//                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC)) {
+//
+//                    this.updateHoaDonThu(MA_HOA_DON, Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC, "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(),
+//                            currentDate, Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
+//
+//
+//                    this.insertLichSuThanhToan(MA_HOA_DON, currentDate, Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
+//                    continue;
+//                }
+//                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC)) {
+//
+//                    this.updateHoaDonThu(MA_HOA_DON, Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC, "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(),
+//                            currentDate, Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
+//
+//
+//                    this.insertLichSuThanhToan(MA_HOA_DON, currentDate, Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
+//                    continue;
+//                }
+//
+//                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.CHUA_TTOAN)) {
 
                     TransactionOffItem item = new TransactionOffItem();
                     item.setCustomer_code(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
@@ -704,7 +704,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     item.setBill_id(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON"))));
                     item.setEdong(mCursor.getString(mCursor.getColumnIndex("E_DONG")));
                     lst.add(item);
-                }
+//                }
 
 
             } while (mCursor.moveToNext());
@@ -896,31 +896,33 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
 
         String query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE ";
+
+        boolean hasWhere = false;
+
         if (_maKH.length() != 0) {
-            query += "MA_KHANG like '%" + _maKH + "%' or ";
-            query += "MA_THE like '%" + _maKH + "%' ";
-        } else {
-            boolean hasWhere = false;
+            hasWhere = true;
+            query += "(MA_KHANG like '%" + _maKH + "%' or ";
+            query += "MA_THE like '%" + _maKH + "%') ";
+        }
 
-            if (_name.length() > 0) {
-                query += (hasWhere ? "and " : "") + "TEN_KHANG like '%" + _name + "%' ";
-                hasWhere = true;
-            }
+        if (_name.length() > 0) {
+            query += (hasWhere ? "and " : "") + "TEN_KHANG like '%" + _name + "%' ";
+            hasWhere = true;
+        }
 
-            if (_address.length() > 0) {
-                query += (hasWhere ? "and " : "") + "DIA_CHI like '%" + _address + "%' ";
-                hasWhere = true;
-            }
+        if (_address.length() > 0) {
+            query += (hasWhere ? "and " : "") + "DIA_CHI like '%" + _address + "%' ";
+            hasWhere = true;
+        }
 
-            if (_phone.length() > 0) {
-                query += (hasWhere ? "and " : "") + "SDT_ECPAY like '%" + _phone + "%' ";
-                hasWhere = true;
-            }
+        if (_phone.length() > 0) {
+            query += (hasWhere ? "and " : "") + "SDT_ECPAY like '%" + _phone + "%' ";
+            hasWhere = true;
+        }
 
-            if (_bookCmis.length() > 0) {
-                query += (hasWhere ? "and " : "") + "SO_GCS like '%" + _bookCmis + "%' ";
-                hasWhere = true;
-            }
+        if (_bookCmis.length() > 0) {
+            query += (hasWhere ? "and " : "") + "SO_GCS like '%" + _bookCmis + "%' ";
+            hasWhere = true;
         }
 
         database = this.getWritableDatabase();
@@ -1397,29 +1399,25 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return rowAffect;
     }
 
-    public long updateCustomer(Customer customer) {
+    public long updateCustomer(EntityKhachHang customer) {
         ContentValues initialValues = new ContentValues();
 
-        initialValues.put("name", customer.getName());
-        initialValues.put("address", customer.getAddress());
-        initialValues.put("pcCode", customer.getPcCode());
-        initialValues.put("cardNo", customer.getCardNo());
-        initialValues.put("pcCodeExt", customer.getPcCodeExt());
-        initialValues.put("phoneByevn", customer.getPhoneByevn());
-        initialValues.put("phoneByecp", customer.getPhoneByecp());
-        initialValues.put("bookCmis", customer.getBookCmis());
-        initialValues.put("electricityMeter", customer.getElectricityMeter());
-        initialValues.put("inning", customer.getInning());
-        initialValues.put("status", customer.getStatus());
-        initialValues.put("bankAccount", "");
-        initialValues.put("idNumber", customer.getIdNumber());
-        initialValues.put("bankName", "");
-        initialValues.put("isShowBill", 0);
-        initialValues.put("idChanged", customer.getIdChanged());
-        initialValues.put("dateChanged", customer.getDateChanged());
+        initialValues.put("MA_KHANG", customer.getMA_KHANG());
+        initialValues.put("TEN_KHANG", customer.getTEN_KHANG());
+        initialValues.put("MA_THE", customer.getMA_THE());
+        initialValues.put("DIA_CHI", customer.getDIA_CHI());
+        initialValues.put("PHIEN_TTOAN", customer.getPHIEN_TTOAN());
+        initialValues.put("LO_TRINH", customer.getLO_TRINH());
+        initialValues.put("SO_GCS", customer.getSO_GCS());
+        initialValues.put("DIEN_LUC", customer.getDIEN_LUC());
+        initialValues.put("SO_HO", "");
+        initialValues.put("E_DONG", customer.getE_DONG());
+        initialValues.put("SDT_ECPAY", customer.getSDT_ECPAY());
+        initialValues.put("SDT_EVN", customer.getSDT_EVN());
+
 
         database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_CUSTOMER, initialValues, "code = ?", new String[]{customer.getCode()});
+        int rowAffect = (int) database.update(TABLE_NAME_CUSTOMER, initialValues, "MA_KHANG = ?", new String[]{customer.getMA_KHANG()});
         return rowAffect;
     }
 

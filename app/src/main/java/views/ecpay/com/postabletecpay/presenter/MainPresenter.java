@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
@@ -57,12 +58,14 @@ public class MainPresenter implements IMainPresenter {
     private IMainView mIMainView;
     private MainModel mainModel;
 
+    private Handler mHandler = new Handler();
+
     private String edong;
     private String bookCmis;
     private static List<PayAdapter.DataAdapter> mDataPayAdapter = new ArrayList<>();
 
 
-    private SoapAPI.AsyncSoap<PostBillResponse> CurrentPostBillAsync = null;
+    private SoapAPI.AsyncSoapIncludeTimout<PostBillResponse> CurrentPostBillAsync = null;
 
     public MainPresenter(IMainView mIMainView, String edong) {
         this.mIMainView = mIMainView;
@@ -457,16 +460,16 @@ public class MainPresenter implements IMainPresenter {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void checkAndPostBill() {
+    public boolean checkAndPostBill() {
+
+        if (CurrentPostBillAsync != null && !CurrentPostBillAsync.isEndCallSoap()) {
+            return false;
+        }
 
         ArrayList<TransactionOffItem> lstTransactionOff = (ArrayList<TransactionOffItem>) mainModel.selectOfflineBill();
         if (lstTransactionOff.size() == 0)
-            return;
+            return true;
 
-
-        if (CurrentPostBillAsync != null && !CurrentPostBillAsync.isEndCallSoap()) {
-            CurrentPostBillAsync.cancel(true);
-        }
 
         Context context = mIMainView.getContextView();
 
@@ -477,7 +480,7 @@ public class MainPresenter implements IMainPresenter {
             configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.PUT_TRANSACTION_OFF.toString(), Common.getVersionApp(mIMainView.getContextView()));////TO-DO:NEED CHECK HERE AGAIN, mainModel.getPcCode());
         } catch (Exception e) {
             mIMainView.showTextMessage(e.getMessage());
-            return;
+            return false;
         }
 
 
@@ -512,9 +515,9 @@ public class MainPresenter implements IMainPresenter {
 
         if (jsonRequestPushBill != null) {
             try {
-                CurrentPostBillAsync = new SoapAPI.AsyncSoap<PostBillResponse>(PostBillResponse.class, new SoapAPI.AsyncSoap.AsyncSoapCallBack() {
+                CurrentPostBillAsync = new SoapAPI.AsyncSoapIncludeTimout<PostBillResponse>(mHandler, PostBillResponse.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
                     @Override
-                    public void onPre(SoapAPI.AsyncSoap soap) {
+                    public void onPre(SoapAPI.AsyncSoapIncludeTimout soap) {
 
                     }
 
@@ -524,25 +527,27 @@ public class MainPresenter implements IMainPresenter {
                     }
 
                     @Override
-                    public void onPost(Respone response) {
+                    public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
                         if (response != null) {
 
                         }
                     }
 
                     @Override
-                    public void onTimeOut(SoapAPI.AsyncSoap soap) {
+                    public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
 
                     }
                 });
                 CurrentPostBillAsync.execute(jsonRequestPushBill);
+                return true;
             } catch (Exception e) {
                 CurrentPostBillAsync = null;
                 mIMainView.showTextMessage(e.getMessage());
-                return;
+                return false;
             }
 
         }
+        return false;
     }
 
     @Override
