@@ -2050,6 +2050,7 @@ public class SoapAPI {
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             String message = values[0];
+            mHandler.removeCallbacks(handerTimeOut);
             isEndCallSoap = true;
             callBack.onUpdate(message);
         }

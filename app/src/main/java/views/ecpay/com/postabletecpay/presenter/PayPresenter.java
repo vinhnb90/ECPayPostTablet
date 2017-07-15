@@ -585,7 +585,7 @@ public class PayPresenter implements IPayPresenter {
         }
 
 
-        SoapAPI.AsyncSoapIncludeTimout<BillingOnlineRespone> billingOnlineResponeAsyncSoap = new SoapAPI.AsyncSoapIncludeTimout<BillingOnlineRespone>(handlerDelay, BillingOnlineRespone.class,
+        final SoapAPI.AsyncSoapIncludeTimout<BillingOnlineRespone> billingOnlineResponeAsyncSoap = new SoapAPI.AsyncSoapIncludeTimout<BillingOnlineRespone>(handlerDelay, BillingOnlineRespone.class,
                 new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
                     @Override
                     public void onPre(SoapAPI.AsyncSoapIncludeTimout soap) {
@@ -593,14 +593,33 @@ public class PayPresenter implements IPayPresenter {
                     }
 
                     @Override
-                    public void onUpdate(String message) {
-
+                    public void onUpdate(final String message) {
+                        billOnlineAsyncList.remove(this);
+                        try
+                        {
+                            mIPayView.showMessageNotifyBillOnlineDialog(message, false, Common.TYPE_DIALOG.LOI, true);
+                            mIPayView.showPayingRviewDialogFinish();
+                            mIPayView.refreshAdapterPayRecyclerListBills(true);
+                        }catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
                     public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
 
                         if (response == null) {
+                            billOnlineAsyncList.remove(soap);
+                            try
+                            {
+                                mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                                mIPayView.showPayingRviewDialogFinish();
+                                mIPayView.refreshAdapterPayRecyclerListBills(true);
+                            }catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                             return;
                         }
 
@@ -727,8 +746,16 @@ public class PayPresenter implements IPayPresenter {
                         }
 
                         @Override
-                        public void onUpdate(String message) {
+                        public void onUpdate(final String message) {
+                            ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
 
+                                    mIPayView.showMessageNotifyBillOnlineDialog(message, false, Common.TYPE_DIALOG.LOI, true);
+                                    mIPayView.showPayingRviewDialogFinish();
+                                    mIPayView.refreshAdapterPayRecyclerListBills(true);
+                                }
+                            });
                         }
 
                         @Override

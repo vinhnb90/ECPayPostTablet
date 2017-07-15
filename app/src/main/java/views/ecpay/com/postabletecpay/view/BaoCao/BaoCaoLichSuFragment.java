@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +16,12 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import views.ecpay.com.postabletecpay.R;
+import views.ecpay.com.postabletecpay.model.adapter.ReportLichSuThanhToanAdapter;
 import views.ecpay.com.postabletecpay.presenter.IReportLichSuThanhToanPresenter;
 import views.ecpay.com.postabletecpay.presenter.ReportLichSuThanhToanPresenter;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
@@ -34,8 +38,6 @@ public class BaoCaoLichSuFragment extends Fragment implements View.OnClickListen
     @BindView(R.id.etSearch) EditText etSearch;
     @BindView(R.id.btTimKiem) Button btTimKiem;
     @BindView(R.id.rvDanhSach) RecyclerView rvDanhSach;
-    @BindView(R.id.tvUsername) TextView tvUsername;
-    @BindView(R.id.tvMaKH) TextView tvMaKH;
 
 
     IReportLichSuThanhToanPresenter reportLichSuThanhToanPresenter;
@@ -50,10 +52,6 @@ public class BaoCaoLichSuFragment extends Fragment implements View.OnClickListen
 
         reportLichSuThanhToanPresenter = new ReportLichSuThanhToanPresenter(this);
 
-
-        tvUsername.setText("");
-        tvMaKH.setText("");
-
         return view;
     }
 
@@ -61,7 +59,7 @@ public class BaoCaoLichSuFragment extends Fragment implements View.OnClickListen
     public void onClick(View v) {
         if(v.getId() == R.id.btTimKiem)
         {
-
+            reportLichSuThanhToanPresenter.search(rbMaKH.isChecked() , etSearch.getText().toString());
         }
     }
 
@@ -73,5 +71,14 @@ public class BaoCaoLichSuFragment extends Fragment implements View.OnClickListen
     @Override
     public void fill(Account account, int hdGiao, long tienGiao, int dhThu, long tienThu, int hdVangLai, long tienVangLai, int hdTraKH, long tienTraKHH) {
 
+    }
+
+    @Override
+    public void fill(List<ReportLichSuThanhToanAdapter.LichSuThanhToanData> lst) {
+        ReportLichSuThanhToanAdapter adapter = new ReportLichSuThanhToanAdapter(lst, this);
+        rvDanhSach.setAdapter(adapter);
+        rvDanhSach.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvDanhSach.setHasFixedSize(true);
+        rvDanhSach.invalidate();
     }
 }

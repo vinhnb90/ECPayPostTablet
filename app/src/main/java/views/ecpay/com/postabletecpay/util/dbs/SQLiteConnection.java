@@ -20,6 +20,7 @@ import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.ReportModel;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
+import views.ecpay.com.postabletecpay.model.adapter.ReportLichSuThanhToanAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.EntityDanhSachThu;
 import views.ecpay.com.postabletecpay.util.entities.EntityHoaDonNo;
@@ -474,6 +475,127 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
 
+    private ReportLichSuThanhToanAdapter.LichSuThanhToanData find(String maKH, List<ReportLichSuThanhToanAdapter.LichSuThanhToanData> lst)
+    {
+        for(int i = 0, n = lst.size(); i < n; i ++)
+        {
+            if(lst.get(i).getMA_KHACH_HANG().equalsIgnoreCase(maKH))
+            {
+                return lst.get(i);
+            }
+        }
+
+        return null;
+    }
+
+    String getTenKhachHangByMaKhachHang(String edong, String MA_KHACH_HANG)
+    {
+        Cursor mCursor = database.rawQuery("SELECT TEN_KHANG FROM "  + TABLE_NAME_CUSTOMER + " WHERE MA_KHANG = '" + MA_KHACH_HANG + "' and E_DONG = '" + edong + "'", null);
+        if(mCursor != null)
+        {
+            if(mCursor.moveToFirst())
+            {
+                return  mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"));
+            }
+            mCursor.close();
+        }
+        return "";
+    }
+
+
+    public List<ReportLichSuThanhToanAdapter.LichSuThanhToanData> getLichSuThanhToan(String edong, boolean isMaKH, String customerCode)
+    {
+        List<ReportLichSuThanhToanAdapter.LichSuThanhToanData> lst = new ArrayList<>();
+
+
+        String query;
+        if(isMaKH)
+        {
+            query = "SELECT * FROM " + TABLE_NAME_HISTORY_PAY + " WHERE E_DONG = '" + edong +
+                    "' and MA_KHANG like '%" + customerCode + "%' " + " ORDER BY date(NGAY_PHAT_SINH) DESC";
+        }else
+        {
+            query = "SELECT * FROM " + TABLE_NAME_HISTORY_PAY + " WHERE E_DONG = '" + edong +
+                    "' and TEN_KHANG like '%" + customerCode + "%' " + " ORDER BY date(NGAY_PHAT_SINH) DESC";
+        }
+
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor != null && mCursor.moveToFirst()) {
+            do {
+
+                ReportLichSuThanhToanAdapter.LichSuThanhToanData data = this.find(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")), lst);
+
+                String name, code ;
+
+                if(data == null)
+                {
+
+                    name = mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"));
+                    code = mCursor.getString(mCursor.getColumnIndex("MA_KHANG"));
+
+                    if(name == null || name.length() == 0)
+                    {
+                        name = getTenKhachHangByMaKhachHang(MainActivity.mEdong, code);
+                    }
+
+                    data = new ReportLichSuThanhToanAdapter.LichSuThanhToanData(code, name);
+                    lst.add(data);
+                }else
+                {
+                    name = data.getTEN_KHACH_HANG();
+                    code = data.getMA_KHACH_HANG();
+                }
+
+                EntityLichSuThanhToan lichsu = new EntityLichSuThanhToan();
+
+
+                lichsu.setE_DONG(mCursor.getString(mCursor.getColumnIndex("E_DONG")));
+                lichsu.setSERI_HDON(mCursor.getString(mCursor.getColumnIndex("SERI_HDON")));
+                lichsu.setMA_HOA_DON(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON")));
+                lichsu.setMA_KHANG(code);
+                lichsu.setMA_THE(mCursor.getString(mCursor.getColumnIndex("MA_THE")));
+                lichsu.setTEN_KHANG(name);
+                lichsu.setDIA_CHI(mCursor.getString(mCursor.getColumnIndex("DIA_CHI")));
+                lichsu.setTHANG_TTOAN(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
+                lichsu.setPHIEN_TTOAN(mCursor.getInt(mCursor.getColumnIndex("PHIEN_TTOAN")));
+                lichsu.setSO_TIEN_TTOAN(mCursor.getInt(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
+                lichsu.setSO_GCS(mCursor.getString(mCursor.getColumnIndex("SO_GCS")));
+                lichsu.setDIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
+                lichsu.setSO_HO(mCursor.getString(mCursor.getColumnIndex("SO_HO")));
+                lichsu.setSO_DAU_KY(mCursor.getString(mCursor.getColumnIndex("SO_DAU_KY")));
+                lichsu.setSO_CUOI_KY(mCursor.getString(mCursor.getColumnIndex("SO_CUOI_KY")));
+                lichsu.setSO_CTO(mCursor.getString(mCursor.getColumnIndex("SO_CTO")));
+                lichsu.setSDT_ECPAY(mCursor.getString(mCursor.getColumnIndex("SDT_ECPAY")));
+                lichsu.setSDT_EVN(mCursor.getString(mCursor.getColumnIndex("SDT_EVN")));
+                lichsu.setGIAO_THU(mCursor.getString(mCursor.getColumnIndex("GIAO_THU")));
+                lichsu.setNGAY_GIAO_THU(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
+                lichsu.setTRANG_THAI_TTOAN(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN")));
+                lichsu.setVI_TTOAN(mCursor.getString(mCursor.getColumnIndex("VI_TTOAN")));
+
+
+                lichsu.setHINH_THUC_TT(mCursor.getString(mCursor.getColumnIndex("HINH_THUC_TT")));
+                lichsu.setTRANG_THAI_CHAM_NO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_CHAM_NO")));
+                lichsu.setTRANG_THAI_HUY(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_HUY")));
+                lichsu.setTRANG_THAI_NGHI_NGO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_NGHI_NGO")));
+                lichsu.setSO_IN_BIEN_NHAN(mCursor.getInt(mCursor.getColumnIndex("SO_IN_BIEN_NHAN")));
+                lichsu.setIN_THONG_BAO_DIEN(mCursor.getString(mCursor.getColumnIndex("IN_THONG_BAO_DIEN")));
+                lichsu.setNGAY_PHAT_SINH(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("NGAY_PHAT_SINH")), Common.DATE_TIME_TYPE.FULL.toString()));
+                lichsu.setMA_GIAO_DICH(mCursor.getString(mCursor.getColumnIndex("MA_GIAO_DICH")));
+
+                data.getLichSu().add(lichsu);
+            }
+            while (mCursor.moveToNext());
+
+            mCursor.close();
+        }
+
+
+
+        return lst;
+    }
+
+
     public List<EntityHoaDonThu> getBillHoanTraByCodeAndDate(String edong, boolean isMaKH, String customerCode, Calendar dateFrom, Calendar dateTo) {
         List<EntityHoaDonThu> lst = new ArrayList<>();
 
@@ -483,12 +605,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         String queryDateTo = "";
         if(dateFrom != null)
         {
-            queryDateFrom = " and NGAY_THU >= Datetime(" + Common.parse(dateFrom.getTime(), Common.DATE_TIME_TYPE.FULL.toString()) + ")";
+            queryDateFrom = " and date(NGAY_THU) >= date('" + Common.parse(dateFrom.getTime(), Common.DATE_TIME_TYPE.FULL.toString()) + "')";
         }
 
         if(dateTo != null)
         {
-            queryDateTo = " and NGAY_THU <= Datetime(" + Common.parse(dateTo.getTime(), Common.DATE_TIME_TYPE.FULL.toString()) + ")";
+            queryDateTo = " and date(NGAY_THU) <= date('" + Common.parse(dateTo.getTime(), Common.DATE_TIME_TYPE.FULL.toString()) + "')";
         }
 
         if(isMaKH)

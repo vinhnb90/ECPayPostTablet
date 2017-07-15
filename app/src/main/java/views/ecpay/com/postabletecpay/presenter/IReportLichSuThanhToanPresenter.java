@@ -7,7 +7,7 @@ import java.util.Calendar;
  */
 
 public interface IReportLichSuThanhToanPresenter extends IReportPrensenter {
-    public void search(boolean isMaKH, String code, Calendar from, Calendar to);
+    public void search(boolean isMaKH, String code);
 
 
 
