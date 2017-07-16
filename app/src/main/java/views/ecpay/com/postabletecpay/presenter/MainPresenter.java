@@ -49,6 +49,7 @@ import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import static android.content.Context.MODE_PRIVATE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT;
+import static views.ecpay.com.postabletecpay.util.commons.Common.ZERO;
 
 /**
  * Created by VinhNB_PC on 6/12/2017.
@@ -61,10 +62,10 @@ public class MainPresenter implements IMainPresenter {
     private Handler mHandler = new Handler();
 
     private String edong;
-    private String bookCmis;
+    //    private String bookCmis;
     private static List<PayAdapter.DataAdapter> mDataPayAdapter = new ArrayList<>();
 
-
+    private int allProcessDownload;
     private SoapAPI.AsyncSoapIncludeTimout<PostBillResponse> CurrentPostBillAsync = null;
 
     public MainPresenter(IMainView mIMainView, String edong) {
@@ -231,6 +232,9 @@ public class MainPresenter implements IMainPresenter {
                     }
                 }
 
+                //start UI prgressbar
+                mIMainView.startShowPbarDownload();
+                allProcessDownload = listBookCmisNeedDownload.size() + listBookCmisExist.size();
                 synchronizeFileGen(listBookCmisNeedDownload);
                 synchronizeData(listBookCmisExist);
             } catch (Exception ex) {
@@ -244,6 +248,7 @@ public class MainPresenter implements IMainPresenter {
         }
     };
 
+
     //region đồng bộ hoá đơn
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void synchronizeFileGen(List<ListBookCmisResponse> listBookCmisNeedDownload) {
@@ -251,10 +256,6 @@ public class MainPresenter implements IMainPresenter {
         Context context = mIMainView.getContextView();
         Boolean isErr = false;
 
-//        if (!Common.isConnectingWifi(context) && !isErr) {
-//            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
-//            isErr = true;
-//        }
         if (!Common.isNetworkConnected(context) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
             isErr = true;
@@ -265,9 +266,8 @@ public class MainPresenter implements IMainPresenter {
         }
 
         for (int i = 0; i < listBookCmisNeedDownload.size(); i++) {
-            bookCmis = listBookCmisNeedDownload.get(i).getBookCmis();
+            final String bookCmis = listBookCmisNeedDownload.get(i).getBookCmis();
             String pcCodeExt = listBookCmisNeedDownload.get(i).getPcCodeExt();
-//                if(bookCmis.equals("TL022")) {
 
             ConfigInfo configInfo;
             String versionApp = "";
@@ -312,10 +312,117 @@ public class MainPresenter implements IMainPresenter {
 
             if (jsonRequestZipData != null) {
                 try {
+                    SoapAPI.AsyncSoapSynchronizeDataZip.AsyncSoapSynchronizeDataZipCallBack callBackFileGen = new SoapAPI.AsyncSoapSynchronizeDataZip.AsyncSoapSynchronizeDataZipCallBack() {
+                        @Override
+                        public void onPre(SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeInvoices) {
+
+                        }
+
+                        @Override
+                        public void onUpdate(String message) {
+
+                        }
+
+                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @Override
+                        public void onPost(ListDataZipResponse response) {
+                            //nếu kết thúc thì giảm đi 1 thread và kiểm tra nếu là thread cuối thì tắt progress dialog
+                            allProcessDownload--;
+                            if (allProcessDownload == ZERO)
+                                mIMainView.finishHidePbarDownload();
+
+                            if (response == null)
+                                return;
+
+                            String sData = response.getBodyListDataResponse().getFile_data();
+                            if (sData != null && !sData.isEmpty()) {
+                                byte[] zipByte = org.apache.commons.codec.binary.Base64.decodeBase64(sData.getBytes());
+
+                                try {
+                                    File file = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + "_" + edong + ".zip");
+                                    if (!file.exists()) {
+                                        Common.writeBytesToFile(file, zipByte);
+                                        if (file.exists()) {
+                                            File fileText = new File(Common.PATH_FOLDER_DOWNLOAD, "full.txt");
+                                            if (fileText.exists())
+                                                fileText.delete();
+                                            if (Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + "_" + edong + ".zip")) {
+                                                StringBuilder text = new StringBuilder();
+                                                try {
+                                                    BufferedReader br = new BufferedReader(new FileReader(fileText));
+                                                    String line;
+
+                                                    while ((line = br.readLine()) != null) {
+                                                        text.append(line);//chỗ tạo file đây
+                                                        text.append('\n');
+                                                    }
+                                                    br.close();
+
+                                                    JSONObject ja = new JSONObject(text.toString());
+                                                    GsonBuilder gsonBuilder = new GsonBuilder();
+                                                    Gson gson = gsonBuilder.create();
+                                                    FileGenResponse fileGenResponse = gson.fromJson(ja.toString(), FileGenResponse.class);
+
+                                                    mainModel.setChangedGenFile(edong, bookCmis, fileGenResponse.getId_changed(), fileGenResponse.getDate_changed());
+
+                                                    for (ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
+                                                        if (mainModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
+                                                            if (mainModel.insertCustomer(listCustomerResponse) != -1) {
+                                                                Log.i("INFO", "TEST");
+                                                            }
+                                                        }
+                                                    }
+
+                                                    for (ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
+                                                        listBillResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
+                                                        if (mainModel.checkBillExist(listBillResponse.getBodyBillResponse().getBillId()) == 0) {
+                                                            if (mainModel.insertBill(listBillResponse) != -1) {
+                                                                Log.i("INFO", "TEST");
+                                                            }
+                                                        }
+                                                    }
+
+                                                    //update mDataPayAdapter
+                                                    MainPresenter.this.refreshDataPayAdapter();
+
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        }
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } finally {
+                                    ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mIMainView.refreshInfoMain();
+                                        }
+                                    });
+                                }
+
+                                ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mIMainView.refreshInfoMain();
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onTimeOut(final SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeInvoices) {
+                            // time out thì tắt tiến trình
+                            soapSynchronizeInvoices.setEndCallSoap(true);
+                            soapSynchronizeInvoices.cancel(true);
+                        }
+                    };
+
                     final SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeDataZip;
-
                     soapSynchronizeDataZip = new SoapAPI.AsyncSoapSynchronizeDataZip(callBackFileGen, mIMainView.getContextView());
-
                     if (soapSynchronizeDataZip.getStatus() != AsyncTask.Status.RUNNING) {
                         soapSynchronizeDataZip.execute(jsonRequestZipData);
 
@@ -324,13 +431,13 @@ public class MainPresenter implements IMainPresenter {
                             @Override
                             public void run() {
                                 ListDataZipResponse listDataZipResponse = null;
-
                                 //call time out
                                 try {
                                     Thread.sleep(TIME_OUT_CONNECT);
                                 } catch (InterruptedException e) {
-                                    mIMainView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                                    Log.e(TAG, "run: " + e.getMessage());
                                 } finally {
+                                    // kết thúc time timeout mà vẫn không có dữ liệu trả về thì gọi callCountdown
                                     if (listDataZipResponse == null) {
                                         soapSynchronizeDataZip.callCountdown(soapSynchronizeDataZip);
                                     }
@@ -341,10 +448,13 @@ public class MainPresenter implements IMainPresenter {
                         soapDataThread.start();
                     }
                 } catch (Exception e) {
-                    mIMainView.showTextMessage(e.getMessage());
+                    Log.e(TAG, "synchronizeFileGen: " + e.getMessage());
                     return;
                 }
 
+            } else {
+                //nếu lỗi thì giảm allProcessDownload xuống 1;
+                allProcessDownload--;
             }
 //                }
         }
@@ -355,10 +465,6 @@ public class MainPresenter implements IMainPresenter {
         Context context = mIMainView.getContextView();
         Boolean isErr = false;
 
-//        if (!Common.isConnectingWifi(context) && !isErr) {
-//            textMessage = Common.MESSAGE_NOTIFY.ERR_WIFI.toString();
-//            isErr = true;
-//        }
         if (!Common.isNetworkConnected(context) && !isErr) {
             textMessage = Common.MESSAGE_NOTIFY.ERR_NETWORK.toString();
             isErr = true;
@@ -370,9 +476,8 @@ public class MainPresenter implements IMainPresenter {
 
 
         for (int i = 0; i < listBookCmisExist.size(); i++) {
-            bookCmis = listBookCmisExist.get(i).getBookCmis();
+            String bookCmis = listBookCmisExist.get(i).getBookCmis();
             String pcCodeExt = listBookCmisExist.get(i).getPcCodeExt();
-
 
             ConfigInfo configInfo;
             String versionApp = "";
@@ -424,8 +529,120 @@ public class MainPresenter implements IMainPresenter {
 
                 if (jsonRequestData != null) {
                     try {
-                        final SoapAPI.AsyncSoapSynchronizeData soapSynchronizeData;
+                        SoapAPI.AsyncSoapSynchronizeData.AsyncSoapSynchronizeDataCallBack callBackData = new SoapAPI.AsyncSoapSynchronizeData.AsyncSoapSynchronizeDataCallBack() {
+                            @Override
+                            public void onPre(SoapAPI.AsyncSoapSynchronizeData soapSynchronizeInvoices) {
 
+                            }
+
+                            @Override
+                            public void onUpdate(String message) {
+
+                            }
+
+                            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                            @Override
+                            public void onPost(ListDataResponse response) {
+                                //nếu kết thúc thì giảm đi 1 thread và kiểm tra nếu là thread cuối thì tắt progress dialog
+                                allProcessDownload--;
+                                if (allProcessDownload == ZERO)
+                                    mIMainView.finishHidePbarDownload();
+
+                                if (response == null)
+                                    return;
+
+                                try {
+                                    String sDataCustomer = response.getBodyListDataResponse().getCustomer();
+                                    if (sDataCustomer != null && !sDataCustomer.isEmpty()) {
+                                        byte[] zipByteCustomer = org.apache.commons.codec.binary.Base64.decodeBase64(sDataCustomer.getBytes());
+
+                                        try {
+                                            String sCustomer = Common.decompress(zipByteCustomer);
+
+                                            JSONArray jsonArray = new JSONArray(sCustomer);
+                                            for (int i = 0; i < jsonArray.length(); i++) {
+                                                JSONObject ja = jsonArray.getJSONObject(i);
+                                                GsonBuilder gsonBuilder = new GsonBuilder();
+                                                Gson gson = gsonBuilder.create();
+                                                CustomerResponse customerResponse = gson.fromJson(ja.toString(), CustomerResponse.class);
+                                                if (mainModel.checkCustomerExist(customerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
+                                                    if (mainModel.insertCustomer(customerResponse) != -1) {
+                                                        Log.i("INFO", "SUCCESS");
+                                                    }
+                                                } else {
+                                                    if (mainModel.updateCustomer(customerResponse) != -1) {
+                                                        Log.i("INFO", "SUCCESS");
+                                                    }
+                                                }
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    String sDataBill = response.getBodyListDataResponse().getBill();
+                                    if (sDataBill != null && !sDataBill.isEmpty()) {
+                                        byte[] zipByteBill = org.apache.commons.codec.binary.Base64.decodeBase64(sDataBill.getBytes());
+
+                                        try {
+                                            String sCustomer = Common.decompress(zipByteBill);
+
+                                            JSONArray jsonArray = new JSONArray(sCustomer);
+                                            for (int i = 0; i < jsonArray.length(); i++) {
+                                                JSONObject ja = jsonArray.getJSONObject(i);
+                                                GsonBuilder gsonBuilder = new GsonBuilder();
+                                                Gson gson = gsonBuilder.create();
+                                                BillResponse billResponse = gson.fromJson(ja.toString(), BillResponse.class);
+                                                billResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
+                                                if (mainModel.checkBillExist(billResponse.getBodyBillResponse().getBillId()) == 0) {
+                                                    if (mainModel.insertBill(billResponse) != -1) {
+                                                        Log.i("INFO", "SUCCESS");
+                                                    }
+                                                } else {
+                                                    if (mainModel.updateBill(billResponse) != -1) {
+                                                        Log.i("INFO", "SUCCESS");
+                                                    }
+                                                }
+                                            }
+
+                                            //update data
+                                            MainPresenter.this.refreshDataPayAdapter();
+
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                } finally {
+                                    ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mIMainView.refreshInfoMain();
+                                        }
+                                    });
+                                }
+
+                                ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mIMainView.refreshInfoMain();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onTimeOut(final SoapAPI.AsyncSoapSynchronizeData soapSynchronizeInvoices) {
+                                // time out thì tắt tiến trình
+                                soapSynchronizeInvoices.setEndCallSoap(true);
+                                soapSynchronizeInvoices.cancel(true);
+                            }
+                        };
+
+                        final SoapAPI.AsyncSoapSynchronizeData soapSynchronizeData;
                         soapSynchronizeData = new SoapAPI.AsyncSoapSynchronizeData(callBackData, mIMainView.getContextView());
 
                         if (soapSynchronizeData.getStatus() != AsyncTask.Status.RUNNING) {
@@ -453,10 +670,12 @@ public class MainPresenter implements IMainPresenter {
                             soapDataThread.start();
                         }
                     } catch (Exception e) {
-                        mIMainView.showTextMessage(e.getMessage());
+                        Log.e(TAG, "synchronizeData: " + e.getMessage());
                         return;
                     }
-
+                } else {
+                    // nếu lỗi tạo thread thì giảm
+                    allProcessDownload--;
                 }
             }
         }
@@ -601,110 +820,110 @@ public class MainPresenter implements IMainPresenter {
         return mDataPayAdapter;
     }
 
-    private SoapAPI.AsyncSoapSynchronizeDataZip.AsyncSoapSynchronizeDataZipCallBack callBackFileGen = new SoapAPI.AsyncSoapSynchronizeDataZip.AsyncSoapSynchronizeDataZipCallBack() {
-        @Override
-        public void onPre(SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeInvoices) {
+    /* private SoapAPI.AsyncSoapSynchronizeDataZip.AsyncSoapSynchronizeDataZipCallBack callBackFileGen = new SoapAPI.AsyncSoapSynchronizeDataZip.AsyncSoapSynchronizeDataZipCallBack() {
+         @Override
+         public void onPre(SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeInvoices) {
 
-        }
+         }
 
-        @Override
-        public void onUpdate(String message) {
+         @Override
+         public void onUpdate(String message) {
 
-        }
+         }
 
-        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-        @Override
-        public void onPost(ListDataZipResponse response) {
-            if (response == null)
-                return;
+         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+         @Override
+         public void onPost(ListDataZipResponse response) {
+             if (response == null)
+                 return;
 
 
-            String sData = response.getBodyListDataResponse().getFile_data();
-            if (sData != null && !sData.isEmpty()) {
-                byte[] zipByte = org.apache.commons.codec.binary.Base64.decodeBase64(sData.getBytes());
+             String sData = response.getBodyListDataResponse().getFile_data();
+             if (sData != null && !sData.isEmpty()) {
+                 byte[] zipByte = org.apache.commons.codec.binary.Base64.decodeBase64(sData.getBytes());
 
-                try {
-                    File file = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + "_" + edong + ".zip");
-                    if (!file.exists()) {
-                        Common.writeBytesToFile(file, zipByte);
-                        if (file.exists()) {
-                            File fileText = new File(Common.PATH_FOLDER_DOWNLOAD, "full.txt");
-                            if (fileText.exists())
-                                fileText.delete();
-                            if (Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + "_" + edong + ".zip")) {
-                                StringBuilder text = new StringBuilder();
-                                try {
-                                    BufferedReader br = new BufferedReader(new FileReader(fileText));
-                                    String line;
+                 try {
+                     File file = new File(Common.PATH_FOLDER_DOWNLOAD + bookCmis + "_" + edong + ".zip");
+                     if (!file.exists()) {
+                         Common.writeBytesToFile(file, zipByte);
+                         if (file.exists()) {
+                             File fileText = new File(Common.PATH_FOLDER_DOWNLOAD, "full.txt");
+                             if (fileText.exists())
+                                 fileText.delete();
+                             if (Common.unpackZip(Common.PATH_FOLDER_DOWNLOAD, bookCmis + "_" + edong + ".zip")) {
+                                 StringBuilder text = new StringBuilder();
+                                 try {
+                                     BufferedReader br = new BufferedReader(new FileReader(fileText));
+                                     String line;
 
-                                    while ((line = br.readLine()) != null) {
-                                        text.append(line);//chỗ tạo file đây
-                                        text.append('\n');
-                                    }
-                                    br.close();
+                                     while ((line = br.readLine()) != null) {
+                                         text.append(line);//chỗ tạo file đây
+                                         text.append('\n');
+                                     }
+                                     br.close();
 
-                                    JSONObject ja = new JSONObject(text.toString());
-                                    GsonBuilder gsonBuilder = new GsonBuilder();
-                                    Gson gson = gsonBuilder.create();
-                                    FileGenResponse fileGenResponse = gson.fromJson(ja.toString(), FileGenResponse.class);
+                                     JSONObject ja = new JSONObject(text.toString());
+                                     GsonBuilder gsonBuilder = new GsonBuilder();
+                                     Gson gson = gsonBuilder.create();
+                                     FileGenResponse fileGenResponse = gson.fromJson(ja.toString(), FileGenResponse.class);
 
-                                    mainModel.setChangedGenFile(edong, bookCmis, fileGenResponse.getId_changed(), fileGenResponse.getDate_changed());
+                                     mainModel.setChangedGenFile(edong, bookCmis, fileGenResponse.getId_changed(), fileGenResponse.getDate_changed());
 
-                                    for (ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
-                                        if (mainModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
-                                            if (mainModel.insertCustomer(listCustomerResponse) != -1) {
-                                                Log.i("INFO", "TEST");
-                                            }
-                                        }
-                                    }
+                                     for (ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
+                                         if (mainModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
+                                             if (mainModel.insertCustomer(listCustomerResponse) != -1) {
+                                                 Log.i("INFO", "TEST");
+                                             }
+                                         }
+                                     }
 
-                                    for (ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
-                                        listBillResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
-                                        if (mainModel.checkBillExist(listBillResponse.getBodyBillResponse().getBillId()) == 0) {
-                                            if (mainModel.insertBill(listBillResponse) != -1) {
-                                                Log.i("INFO", "TEST");
-                                            }
-                                        }
-                                    }
+                                     for (ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
+                                         listBillResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
+                                         if (mainModel.checkBillExist(listBillResponse.getBodyBillResponse().getBillId()) == 0) {
+                                             if (mainModel.insertBill(listBillResponse) != -1) {
+                                                 Log.i("INFO", "TEST");
+                                             }
+                                         }
+                                     }
 
-                                    //update mDataPayAdapter
-                                    MainPresenter.this.refreshDataPayAdapter();
+                                     //update mDataPayAdapter
+                                     MainPresenter.this.refreshDataPayAdapter();
 
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mIMainView.refreshInfoMain();
-                        }
-                    });
-                }
+                                 } catch (IOException e) {
+                                     e.printStackTrace();
+                                 } catch (JSONException e) {
+                                     e.printStackTrace();
+                                 }
+                             }
+                         }
+                     }
+                 } catch (IOException e) {
+                     e.printStackTrace();
+                 } finally {
+                     ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
+                         @Override
+                         public void run() {
+                             mIMainView.refreshInfoMain();
+                         }
+                     });
+                 }
 
-                ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mIMainView.refreshInfoMain();
-                    }
-                });
-            }
-        }
+                 ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
+                     @Override
+                     public void run() {
+                         mIMainView.refreshInfoMain();
+                     }
+                 });
+             }
+         }
 
-        @Override
-        public void onTimeOut(SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeInvoices) {
+         @Override
+         public void onTimeOut(SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeInvoices) {
 
-        }
-    };
-
-    private SoapAPI.AsyncSoapSynchronizeData.AsyncSoapSynchronizeDataCallBack callBackData = new SoapAPI.AsyncSoapSynchronizeData.AsyncSoapSynchronizeDataCallBack() {
+         }
+     };
+ */
+    /*private SoapAPI.AsyncSoapSynchronizeData.AsyncSoapSynchronizeDataCallBack callBackData = new SoapAPI.AsyncSoapSynchronizeData.AsyncSoapSynchronizeDataCallBack() {
         @Override
         public void onPre(SoapAPI.AsyncSoapSynchronizeData soapSynchronizeInvoices) {
 
@@ -809,7 +1028,7 @@ public class MainPresenter implements IMainPresenter {
 
         }
     };
-
+*/
 //endregion
 
 

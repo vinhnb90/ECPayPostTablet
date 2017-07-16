@@ -3070,7 +3070,6 @@ public class SoapAPI {
         private AsyncSoapSynchronizeDataCallBack callBack;
         private boolean isEndCallSoap = false;
         private Context context;
-        private ProgressDialog progressDialog;
 
         public AsyncSoapSynchronizeData(AsyncSoapSynchronizeDataCallBack callBack, Context contextView) throws Exception {
             this.callBack = callBack;
@@ -3080,10 +3079,6 @@ public class SoapAPI {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Downloading file ...");
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressDialog.show();
             callBack.onPre(this);
         }
 
@@ -3155,7 +3150,6 @@ public class SoapAPI {
             super.onPostExecute(listDataResponse);
             isEndCallSoap = true;
             callBack.onPost(listDataResponse);
-            progressDialog.dismiss();
         }
 
         public static abstract class AsyncSoapSynchronizeDataCallBack {
@@ -3197,9 +3191,8 @@ public class SoapAPI {
         private AsyncSoapSynchronizeDataZipCallBack callBack;
         private boolean isEndCallSoap = false;
         private Context context;
-        private ProgressDialog progressDialog;
 
-        public AsyncSoapSynchronizeDataZip(AsyncSoapSynchronizeDataZipCallBack callBack, Context context) throws Exception {
+        public AsyncSoapSynchronizeDataZip(final AsyncSoapSynchronizeDataZipCallBack callBack, Context context) throws Exception {
             this.callBack = callBack;
             this.context = context;
         }
@@ -3207,10 +3200,6 @@ public class SoapAPI {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Downloading file ...");
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressDialog.show();
             callBack.onPre(this);
         }
 
@@ -3284,7 +3273,6 @@ public class SoapAPI {
             super.onPostExecute(listDataZipResponse);
             isEndCallSoap = true;
             callBack.onPost(listDataZipResponse);
-            progressDialog.dismiss();
         }
 
         public static abstract class AsyncSoapSynchronizeDataZipCallBack {
