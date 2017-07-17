@@ -168,6 +168,7 @@ public class PayModel extends CommonModel {
             for(int i = 0, n = listBill.first.size(); i < n; i ++)
             {
                 listBill.first.get(i).setTEN_KHACH_HANG(customer.getTEN_KHANG());
+                listBill.first.get(i).setDIA_CHI(customer.getDIA_CHI());
             }
 
             Collections.sort(listBill.first, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
@@ -192,6 +193,7 @@ public class PayModel extends CommonModel {
             for(int i = 0, n = listBill.first.size(); i < n; i ++)
             {
                 listBill.first.get(i).setTEN_KHACH_HANG(customer.getTEN_KHANG());
+                listBill.first.get(i).setDIA_CHI(customer.getDIA_CHI());
             }
             Collections.sort(listBill.first, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
             PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(customer, listBill.first, listBill.second);

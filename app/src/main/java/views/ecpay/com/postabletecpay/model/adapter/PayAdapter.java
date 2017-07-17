@@ -268,7 +268,19 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         private boolean isCheckEnable;
         private String MA_KHACH_HANG;
         private String TEN_KHACH_HANG;
+        private String DIA_CHI;
         private String MA_DIEN_LUC;
+        private String SO_HO;
+        private String SO_CONG_TO;
+        private String CSDK;
+        private String CSCK;
+        private String MA_HOA_DON;
+        private String CHI_TIET_KG;
+        private String CHI_TIET_MCS;
+        private String CHI_TIET_TIEN_MCS;
+        private String DNTT;
+        private String TONG_TIEN_CHUA_THUE;
+        private String TONG_TIEN_THUE;
 
         private String messageError = "";
 
@@ -301,6 +313,14 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         public void setMA_KHACH_HANG(String MA_KHACH_HANG) {
             this.MA_KHACH_HANG = MA_KHACH_HANG;
+        }
+
+        public String getDIA_CHI() {
+            return DIA_CHI;
+        }
+
+        public void setDIA_CHI(String DIA_CHI) {
+            this.DIA_CHI = DIA_CHI;
         }
 
         public boolean isCheckEnable() {
@@ -390,6 +410,94 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         public void setVI_TTOAN(String billingBy) {
             this.billingBy = billingBy;
+        }
+
+        public String getSO_HO() {
+            return SO_HO;
+        }
+
+        public void setSO_HO(String SO_HO) {
+            this.SO_HO = SO_HO;
+        }
+
+        public String getSO_CONG_TO() {
+            return SO_CONG_TO;
+        }
+
+        public void setSO_CONG_TO(String SO_CONG_TO) {
+            this.SO_CONG_TO = SO_CONG_TO;
+        }
+
+        public String getCSDK() {
+            return CSDK;
+        }
+
+        public void setCSDK(String CSDK) {
+            this.CSDK = CSDK;
+        }
+
+        public String getCSCK() {
+            return CSCK;
+        }
+
+        public void setCSCK(String CSCK) {
+            this.CSCK = CSCK;
+        }
+
+        public String getMA_HOA_DON() {
+            return MA_HOA_DON;
+        }
+
+        public void setMA_HOA_DON(String MA_HOA_DON) {
+            this.MA_HOA_DON = MA_HOA_DON;
+        }
+
+        public String getCHI_TIET_KG() {
+            return CHI_TIET_KG;
+        }
+
+        public void setCHI_TIET_KG(String CHI_TIET_KG) {
+            this.CHI_TIET_KG = CHI_TIET_KG;
+        }
+
+        public String getCHI_TIET_MCS() {
+            return CHI_TIET_MCS;
+        }
+
+        public void setCHI_TIET_MCS(String CHI_TIET_MCS) {
+            this.CHI_TIET_MCS = CHI_TIET_MCS;
+        }
+
+        public String getCHI_TIET_TIEN_MCS() {
+            return CHI_TIET_TIEN_MCS;
+        }
+
+        public void setCHI_TIET_TIEN_MCS(String CHI_TIET_TIEN_MCS) {
+            this.CHI_TIET_TIEN_MCS = CHI_TIET_TIEN_MCS;
+        }
+
+        public String getDNTT() {
+            return DNTT;
+        }
+
+        public void setDNTT(String DNTT) {
+            this.DNTT = DNTT;
+        }
+
+        public String getTONG_TIEN_CHUA_THUE() {
+            return TONG_TIEN_CHUA_THUE;
+        }
+
+        public void setTONG_TIEN_CHUA_THUE(String TONG_TIEN_CHUA_THUE) {
+            this.TONG_TIEN_CHUA_THUE = TONG_TIEN_CHUA_THUE;
+        }
+
+        public String getTONG_TIEN_THUE() {
+            return TONG_TIEN_THUE;
+        }
+
+        public void setTONG_TIEN_THUE(String TONG_TIEN_THUE) {
+            this.TONG_TIEN_THUE = TONG_TIEN_THUE;
         }
 
         @Override

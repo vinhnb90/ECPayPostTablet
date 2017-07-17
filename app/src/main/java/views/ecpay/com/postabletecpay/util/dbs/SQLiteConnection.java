@@ -94,10 +94,19 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE)";
 
     //add new field requestDate: date bill paying online success from tablet
+    /* + Em Phuong
+        - Chi tiết khung giá (CHI_TIET_KG)
+        - Chi tiết từng mức chỉ số (CHI_TIET_MCS)
+        - Chi tiết số tiền từng mức chỉ sô (CHI_TIET_TIEN_MCS)
+        - Số điện năng tiêu thụ (DNTT)
+        - Tổng tiền chưa thuế (TONG_TIEN_CHUA_THUE)
+        - Tổng tiền thuế (TIEN_THUE)
+ */
     private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, `SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
             "`MA_THE` TEXT, `TEN_KHANG` TEXT, `DIA_CHI` TEXT, `THANG_TTOAN` DATE, `PHIEN_TTOAN` TEXT, `SO_TIEN_TTOAN` INTEGER, " +
             "`SO_GCS` TEXT, `DIEN_LUC` TEXT, `SO_HO` TEXT, `SO_DAU_KY` TEXT, `SO_CUOI_KY` TEXT, `SO_CTO` TEXT, `SDT_ECPAY` TEXT, " +
-            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT)";
+            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT, `CHI_TIET_KG` TEXT, `CHI_TIET_MCS` TEXT, `CHI_TIET_TIEN_MCS` TEXT, `DNTT` TEXT)"+
+            "`TONG_TIEN_CHUA_THUE` INTEGER, `TIEN_THUE` INTEGER)";
 
     private String CREATE_TABLE_DEBT_COLLECTION = "CREATE TABLE `" + TABLE_NAME_DEBT_COLLECTION + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, `SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
             "`MA_THE` TEXT, `TEN_KHANG` TEXT, `DIA_CHI` TEXT, `THANG_TTOAN` DATE, `PHIEN_TTOAN` TEXT, `SO_TIEN_TTOAN` INTEGER, " +
@@ -967,10 +976,20 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (mCursor.getCount() == 0)
             return new Pair<>(billList, total);
         if (mCursor.moveToFirst()) {
-            do {
+            do {;
                 String viThanhToan = mCursor.getString(mCursor.getColumnIndex("VI_TTOAN"));
+                String chiTietKhungGia = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_KG"));
+                String chiTietMucChiSo = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_MCS"));
+                String chiTietTienTheoChiSo = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_TIEN_MCS"));
+                String dienNangTieuThu = mCursor.getString(mCursor.getColumnIndex("DNTT"));
+                String soHo = mCursor.getString(mCursor.getColumnIndex("SO_HO"));
+                String soDauKy = mCursor.getString(mCursor.getColumnIndex("SO_DAU_KY"));
+                String soCuoiKy = mCursor.getString(mCursor.getColumnIndex("SO_CUOI_KY"));
+                String soCto = mCursor.getString(mCursor.getColumnIndex("SO_CTO"));
                 int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("MA_HOA_DON")));
                 int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
+                int tienChuaThue = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("TONG_TIEN_CHUA_THUE")));
+                int tienThue = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("TIEN_THUE")));
                 String status = mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN"));
 
                 total += amount;
@@ -986,6 +1005,16 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 bill.setTIEN_THANH_TOAN(amount);
                 bill.setTHANG_THANH_TOAN(term);
                 bill.setTRANG_THAI_TT(status);
+                bill.setCHI_TIET_KG(chiTietKhungGia);
+                bill.setCHI_TIET_MCS(chiTietMucChiSo);
+                bill.setCHI_TIET_TIEN_MCS(chiTietTienTheoChiSo);
+                bill.setDNTT(dienNangTieuThu);
+                bill.setTONG_TIEN_CHUA_THUE(tienChuaThue+"");
+                bill.setTONG_TIEN_THUE(tienThue+"");
+                bill.setCSDK(soDauKy);
+                bill.setCSCK(soCuoiKy);
+                bill.setSO_CONG_TO(soCto);
+                bill.setSO_HO(soHo);
                 bill.setMA_DIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
                 bill.setChecked(false);
                 bill.setMA_KHACH_HANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
@@ -1091,6 +1120,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
         initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
         initialValues.put("VI_TTOAN", "");
+        initialValues.put("CHI_TIET_KG", bodyBillResponse.getPriceDetails());
+        initialValues.put("CHI_TIET_MCS", bodyBillResponse.getNumeDetails());
+        initialValues.put("CHI_TIET_TIEN_MCS", bodyBillResponse.getAmountDetails());
+        initialValues.put("DNTT", bodyBillResponse.getNume());
+        initialValues.put("TONG_TIEN_CHUA_THUE", bodyBillResponse.getAmountNotTax());
+        initialValues.put("TIEN_THUE",bodyBillResponse.getAmountTax());
 
         database = getWritableDatabase();
 
@@ -1496,7 +1531,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
         initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
         initialValues.put("VI_TTOAN", "");
-        database = getWritableDatabase();
+        initialValues.put("CHI_TIET_KG", bodyBillResponse.getPriceDetail());
+        initialValues.put("CHI_TIET_MCS", bodyBillResponse.getNumeDetail());
+        initialValues.put("CHI_TIET_TIEN_MCS", bodyBillResponse.getAmountDetail());
+        initialValues.put("DNTT", bodyBillResponse.getNume());
+        initialValues.put("TONG_TIEN_CHUA_THUE", Common.parseInt(bodyBillResponse.getAmountNotTax()));
+        initialValues.put("TIEN_THUE",Common.parseInt(bodyBillResponse.getAmountTax()));
+                database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
         return rowAffect;
     }
@@ -1532,6 +1573,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
         initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
         initialValues.put("VI_TTOAN", "");
+        initialValues.put("CHI_TIET_KG", bodyBillResponse.getPriceDetail());
+        initialValues.put("CHI_TIET_MCS", bodyBillResponse.getNumeDetail());
+        initialValues.put("CHI_TIET_TIEN_MCS", bodyBillResponse.getAmountDetail());
+        initialValues.put("DNTT", bodyBillResponse.getNume());
+        initialValues.put("TONG_TIEN_CHUA_THUE", Common.parseInt(bodyBillResponse.getAmountNotTax()));
+        initialValues.put("TIEN_THUE",Common.parseInt(bodyBillResponse.getAmountTax()));
 
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
