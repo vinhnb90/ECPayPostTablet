@@ -211,6 +211,9 @@ public class PayPresenter implements IPayPresenter {
     public void callSearchOnline(String mEdong, String infoSearch, boolean isReseach) {
         this.cancelSeachOnline();
 
+
+        infoSearch = infoSearch.toUpperCase();
+
         String textMessage = "";
         Context context = mIPayView.getContextView();
         Boolean isErr = false;

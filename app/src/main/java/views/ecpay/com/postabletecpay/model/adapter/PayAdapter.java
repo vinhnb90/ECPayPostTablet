@@ -574,6 +574,16 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                                     checkBox.setChecked(false);
                                 }
                             });
+
+                            for (indexNotPayedTermOldest += 1; indexNotPayedTermOldest < billList.size(); indexNotPayedTermOldest++) {
+                                if (billList.get(index).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && billList.get(index).isChecked())
+                                {
+                                    payPresenter.getIPayView().showMessageNotifyPayfrag(Common.CODE_REPONSE_BILL_ONLINE.ex10005.getMessage() + Common.TEXT_MULTI_SPACE + bill.getMA_KHACH_HANG());
+                                    return;
+                                }
+                            }
+
+
                            payPresenter.getIPayView().showMessageNotifyPayfrag(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage() + Common.TEXT_MULTI_SPACE + bill.getMA_KHACH_HANG());
                             return;
                         }

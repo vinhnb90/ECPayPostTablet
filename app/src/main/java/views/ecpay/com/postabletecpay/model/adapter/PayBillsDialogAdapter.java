@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.STATUS_BILLING.CHUA_THANH_TOAN;
 
@@ -180,10 +181,63 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
 
                 int position = getAdapterPosition();
                 PayAdapter.BillEntityAdapter bill = listBillChecked.get(position);
-                bill.setChecked(checked);
-                long billId = bill.getBillId();
+                String MA_KHACH_HANG = bill.getMA_KHACH_HANG();
 
+                if(checked)
+                {
+                    int lastCHeck = -1;
+                    for(int i = position + 1, n = listBillChecked.size(); i < n; i ++)
+                    {
+                        if(listBillChecked.get(i).getMA_KHACH_HANG().equalsIgnoreCase(MA_KHACH_HANG) && listBillChecked.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()) &&
+                                !listBillChecked.get(i).isChecked())
+                        {
+                            lastCHeck = i;
+                            break;
+                        }
+                    }
 
+                    if(lastCHeck != -1)
+                    {
+                        boolean showDialog = false;
+                        checkBox.setChecked(false);
+                        for (lastCHeck += 1; lastCHeck < listBillChecked.size(); lastCHeck++) {
+                            if(listBillChecked.get(lastCHeck).getMA_KHACH_HANG().equalsIgnoreCase(MA_KHACH_HANG) && listBillChecked.get(lastCHeck).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && listBillChecked.get(lastCHeck).isChecked())
+                            {
+                                iPayView.processUnCheckedBillDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10005.getMessage() + Common.TEXT_MULTI_SPACE + bill.getMA_KHACH_HANG(), Common.TYPE_DIALOG.LOI);
+                                showDialog = true;
+
+                            }
+                        }
+
+                        if(!showDialog)
+                            iPayView.processUnCheckedBillDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage() + Common.TEXT_MULTI_SPACE + bill.getMA_KHACH_HANG(), Common.TYPE_DIALOG.LOI);
+                    }else
+                    {
+                        bill.setChecked(checked);
+                    }
+                }else
+                {
+                    bill.setChecked(checked);
+
+                    boolean hasChange = false;
+                    for (int i = 0; i <= position; i ++)
+                    {
+                        if(listBillChecked.get(i).getMA_KHACH_HANG().equalsIgnoreCase(MA_KHACH_HANG) && listBillChecked.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()))
+                        {
+                            if(i != position && listBillChecked.get(i).isChecked())
+                            {
+                                hasChange = true;
+                            }
+                            listBillChecked.get(i).setChecked(false);
+                        }
+                    }
+
+                    if (hasChange)
+                    {
+                        notifyDataSetChanged();
+                    }
+
+                }
 
 
 
