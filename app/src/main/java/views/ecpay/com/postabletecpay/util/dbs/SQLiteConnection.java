@@ -923,6 +923,10 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             }
             while (c.moveToNext());
 
+        }
+
+        if(c != null)
+        {
             c.close();
         }
         return customerList;
@@ -990,9 +994,77 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             }
             while (mCursor.moveToNext());
 
+        }
+
+        if(mCursor != null)
+        {
             mCursor.close();
         }
         return customerList;
+    }
+
+
+    public  List<PayAdapter.BillEntityAdapter> getBillSelectedToPay(String [] billids)
+    {
+        List<PayAdapter.BillEntityAdapter> billList = new ArrayList<>();
+
+        if(billids.length > 0)
+        {
+            database = this.getReadableDatabase();
+            String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + MainActivity.mEdong + "' and TRANG_THAI_TTOAN = '" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "' and (";
+
+            for (int i = 0, n = billids.length; i < n; i ++)
+            {
+                query += (i == 0 ? " MA_HOA_DON = '" : " or MA_HOA_DON = '") + billids[i] + "' ";
+            }
+
+            query += ")";
+            Cursor mCursor = database.rawQuery(query, null);
+            if (mCursor.getCount() == 0)
+            {
+                mCursor.close();
+                return billList;
+            }
+            if (mCursor.moveToFirst()) {
+                do {
+                    String viThanhToan = mCursor.getString(mCursor.getColumnIndex("VI_TTOAN"));
+                    int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("MA_HOA_DON")));
+                    int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
+                    String status = mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN"));
+
+                    String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")));
+
+                    PayAdapter.BillEntityAdapter bill = new PayAdapter.BillEntityAdapter();
+                    bill.setBillId(billId);
+                    bill.setVI_TTOAN(viThanhToan);
+                    bill.setTIEN_THANH_TOAN(amount);
+                    bill.setTHANG_THANH_TOAN(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
+                    bill.setTRANG_THAI_TT(status);
+                    bill.setMA_DIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
+                    bill.setChecked(false);
+                    bill.setMA_KHACH_HANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
+
+                    bill.setCheckEnable(!bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()));
+
+                    if (bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()) && MainActivity.mEdong.equalsIgnoreCase(viThanhToan))
+                        bill.setPrintEnable(true);
+                    else
+                        bill.setPrintEnable(false);
+
+                    bill.setRequestDate(dateRequest);
+
+                    billList.add(bill);
+                }
+                while (mCursor.moveToNext());
+            }
+
+
+            if (mCursor != null && !mCursor.isClosed()) {
+                mCursor.close();
+            }
+        }
+
+        return billList;
     }
 
     public Pair<List<PayAdapter.BillEntityAdapter>, Long> selectInfoBillOfCustomerToRecycler(String edong, String code) {
@@ -1005,7 +1077,10 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         long total = 0;
         if (mCursor.getCount() == 0)
+        {
+            mCursor.close();
             return new Pair<>(billList, total);
+        }
         if (mCursor.moveToFirst()) {
             do {
                 String viThanhToan = mCursor.getString(mCursor.getColumnIndex("VI_TTOAN"));
@@ -1786,6 +1861,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE MA_HOA_DON = '" + bodyBillResponse.getBillId() + "'";
         Cursor mCursor = database.rawQuery(query, null);
         if (mCursor.moveToFirst()) {
+            mCursor.close();
             ContentValues initialValues = new ContentValues();
 
 

@@ -418,6 +418,8 @@ public class PayFragment extends Fragment implements
             return;
 
         mPageIndex -= PAGE_INCREMENT;
+        if(mPageIndex < 0)
+            mPageIndex = 0;
         try {
             mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
         } catch (Exception e) {

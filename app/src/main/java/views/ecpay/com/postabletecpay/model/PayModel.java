@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Pair;
 
+import org.apache.log4j.chainsaw.Main;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +24,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
+import static android.content.Context.MODE_PRIVATE;
 import static views.ecpay.com.postabletecpay.util.dbs.SQLiteConnection.ERROR_OCCUR;
 
 /**
@@ -39,7 +42,19 @@ public class PayModel extends CommonModel {
 
 //        instance = this;
 //        mDataCustomerBill = this.refreshDataPayAdapter();
-        mListBillSelected = new ArrayList<>();
+        getManagerSharedPref().addSharePref(Common.SHARE_REF_BILL_SELECTED, MODE_PRIVATE);
+        String sSave = getManagerSharedPref().getSharePref(Common.SHARE_REF_BILL_SELECTED, MODE_PRIVATE).getString(Common.SHARE_REF_LST_BILL_SELECTED_ + MainActivity.mEdong, "");
+        if(sSave.length() == 0)
+        {
+            mListBillSelected = new ArrayList<>();
+        }else
+        {
+            String[] billIds = sSave.split(";");
+            mListBillSelected = sqLiteConnection.getBillSelectedToPay(billIds);
+        }
+
+
+
     }
 
 //    public List<PayAdapter.DataAdapter> getDataCustomerBill() {
@@ -61,6 +76,7 @@ public class PayModel extends CommonModel {
                 return;
             }
         }
+        this.saveBillSelect();
     }
 
     public boolean containBillInSelected(long billId) {
@@ -95,6 +111,25 @@ public class PayModel extends CommonModel {
                 }
             }
         }
+
+        this.saveBillSelect();
+    }
+
+
+    void saveBillSelect()
+    {
+        String sSave = "";
+        for (int i = 0, n = mListBillSelected.size(); i < n; i ++)
+        {
+            sSave +=  (i == 0 ? "" : ";")  + mListBillSelected.get(i).getBillId();
+        }
+
+        if(sSave.length() > 0)
+        {
+            getManagerSharedPref().getSharePref(Common.SHARE_REF_BILL_SELECTED, MODE_PRIVATE).edit().
+                    putString(Common.SHARE_REF_LST_BILL_SELECTED_ + MainActivity.mEdong, sSave).commit();
+        }
+
     }
 
 

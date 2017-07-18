@@ -348,6 +348,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
             }
         }, TIME_DELAY_ANIM);
 
+
 //        ///Cheat
 //        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
 //        intent.putExtra(KEY_EDONG, "01666564963");
