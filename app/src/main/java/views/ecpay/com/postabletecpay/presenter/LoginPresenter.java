@@ -356,7 +356,7 @@ public class LoginPresenter implements ILoginPresenter {
                 mLoginModel.writeSqliteAccountTable(account);
             }
 
-            //get List<ListEvnPCLoginResponse> from body response
+            /*//get List<ListEvnPCLoginResponse> from body response
             List<ListEvnPCLoginResponse> evnPCList = responseLoginResponse.getListEvnPCLoginResponse();
 //                    response.getBodyLoginResponse().getResponseLoginResponse().getListEvnPCLoginResponse();
 
@@ -381,7 +381,7 @@ public class LoginPresenter implements ILoginPresenter {
                     //write database
                     mLoginModel.writeSqliteEvnPcTable(evnPC, account.getEdong());
                 }
-            }
+            }*/
             //show main
             mILoginView.showMainScreen(account.getEdong());
         }
