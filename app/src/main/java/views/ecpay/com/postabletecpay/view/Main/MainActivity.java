@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements
                     fragment = PayFragment.newInstance(mEdong);
                     break;
                 case R.id.navigation_report:
-                    fragment = BaoCaoFragment.newInstance();
+                    fragment = BaoCaoFragment.newInstance(mEdong);
                     break;
                 case R.id.navigation_accout:
                     fragment = UserInfoFragment.newInstance(mEdong);

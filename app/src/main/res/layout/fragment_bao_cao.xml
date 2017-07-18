@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:background="@color/colorBlue">
         <ImageButton
-            android:id="@+id/ibtn_frag_user_info_back"
+            android:id="@+id/ibtn_frag_bao_cao_back"
             android:layout_width="@dimen/_25sdp"
             android:layout_height="@dimen/_25sdp"
             android:layout_alignParentLeft="true"
