@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs>
+    <tab
+        barColorWhenSelected="@color/colorTextWhite"
+        icon="@drawable/ic_home_black_24dp"
+        id="@+id/navigation_home"
+        title="Trang chủ" />
+    <tab
+        barColorWhenSelected="@color/colorTextWhite"
+        icon="@drawable/ic_thanhtoan_29"
+        id="@+id/navigation_pay"
+        title="Thanh toán" />
+    <tab
+        barColorWhenSelected="@color/colorTextWhite"
+        icon="@drawable/ic_baocao_29"
+        id="@+id/navigation_report"
+        title="Báo cáo" />
+    <tab
+        barColorWhenSelected="@color/colorTextWhite"
+        icon="@drawable/ic_taikhoan"
+        id="@+id/navigation_accout"
+        title="Tài khoản" />
+</tabs>

@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -19,6 +20,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
+
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnTabReselectListener;
+import com.roughike.bottombar.OnTabSelectListener;
+
+import org.apache.log4j.chainsaw.Main;
 
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.IMainPresenter;
@@ -41,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private IOnPauseScannerBarcodeListner pauseScannerBarcodeListner;
 
-    public static BottomNavigationView sNavigation;
+    public static BottomBar sNavigation;
     public static String mEdong;
     private IMainPresenter iMainPresenter;
     private static boolean isLoginCall;
@@ -93,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Downloading file ...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
     }
 
@@ -107,10 +116,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public enum ID_MENU_BOTTOM {
-        HOME(1),
-        PAY(2),
-        REPORT(3),
-        ACCOUNT(4);
+        HOME(0),
+        PAY(1),
+        REPORT(2),
+        ACCOUNT(3);
 
         private int index;
 
@@ -202,8 +211,39 @@ public class MainActivity extends AppCompatActivity implements
         fragmentTransaction.replace(R.id.frameLayout, MainPageFragment.newInstance(mEdong));
         fragmentTransaction.commit();
 
-        sNavigation = (BottomNavigationView) findViewById(R.id.navigation_ac_main);
-        sNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        sNavigation = (BottomBar) findViewById(R.id.navigation_ac_main);
+        sNavigation.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelected(@IdRes int tabId) {
+                Fragment fragment = null;
+                switch (tabId) {
+                    case R.id.navigation_home:
+                        fragment = MainPageFragment.newInstance(mEdong);
+                        break;
+                    case R.id.navigation_pay:
+                        fragment = PayFragment.newInstance(mEdong);
+                        break;
+                    case R.id.navigation_report:
+                        fragment = BaoCaoFragment.newInstance(mEdong);
+                        break;
+                    case R.id.navigation_accout:
+                        fragment = UserInfoFragment.newInstance(mEdong);
+                        break;
+                }
+                if (fragment != null) {
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.frameLayout, fragment);
+                    fragmentTransaction.commit();
+                }
+            }
+        });
+
+        sNavigation.setOnTabReselectListener(new OnTabReselectListener() {
+            @Override
+            public void onTabReSelected(@IdRes int tabId) {
+            }
+        });
+
 
     }
 
@@ -285,13 +325,6 @@ public class MainActivity extends AppCompatActivity implements
         isLoginCall = true;
     }
 
-    public static void updateNavigationBarState(int actionId) {
-        Menu menu = sNavigation.getMenu();
-        for (int i = 0, size = menu.size(); i < size; i++) {
-            MenuItem menuItem = menu.getItem(i);
-            menuItem.setChecked(menuItem.getItemId() == actionId);
-        }
-    }
 
     //region PayAdapter.BillInsidePayAdapter.BillInsidePayViewHolder.OnInterationBillInsidePayAdapter
 //    @Override
@@ -377,8 +410,16 @@ public class MainActivity extends AppCompatActivity implements
 
     //region OnFragmentInteractionListener
     @Override
-    public void switchNavigationBottomMenu(ID_MENU_BOTTOM typeMenu) {
-        sNavigation.getMenu().getItem(typeMenu.getIndex());
+    public void switchNavigationBottomMenu(final ID_MENU_BOTTOM typeMenu) {
+
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                sNavigation.selectTabAtPosition(typeMenu.getIndex());
+            }
+        });
+
+
     }
     //endregion
 

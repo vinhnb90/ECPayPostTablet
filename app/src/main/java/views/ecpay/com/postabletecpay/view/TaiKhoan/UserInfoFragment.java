@@ -38,6 +38,7 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
 import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
 import views.ecpay.com.postabletecpay.view.Logout.ILogoutView;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
@@ -138,6 +139,7 @@ public class UserInfoFragment extends Fragment implements IUserInfoView, ILogout
         unbinder = ButterKnife.bind(this, viewfragment);
 
         mEdong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
+        ((MainActivity)this.getContextView()).switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.ACCOUNT);
         mIUserInfoPresenter.getInfoUser(mEdong);
         return viewfragment;
     }

@@ -114,11 +114,11 @@ app:cardElevation="3dp">
         android:visibility="visible">
 
         <TextView
+            android:layout_marginLeft="@dimen/_10sdp"
             android:id="@+id/tv_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
             android:textSize="@dimen/_10sdp"
             android:text="Thanh toán..."
             android:textColor="@color/colorTextWhite" />
@@ -156,26 +156,25 @@ app:cardElevation="3dp">
                 android:visibility="visible" />
         </RelativeLayout>
 
-
-
         <TextView
             android:id="@+id/tv_diaglog_thanhtoan_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/ll_frag_thanh_toan_action_search"
-            android:layout_centerVertical="true"
             android:layout_marginLeft="@dimen/_10sdp"
             android:layout_marginRight="@dimen/_10sdp"
-            android:layout_toLeftOf="@+id/ll_frag_thanh_toan_action_search"
-            android:layout_toRightOf="@+id/tv_search"
-            android:gravity="right"
-            android:lines="1"
-            android:scrollHorizontally="true"
+            android:gravity="left"
+            android:layout_below="@+id/rv_diaglog_thanhtoan_process_bill"
             tools:text="Disconnect"
+            android:textSize="@dimen/_10sdp"
+            android:background="@color/colorTextGreen"
             android:textColor="@color/colorTextWhite"
-            android:visibility="gone" />
+            android:visibility="visible" />
+
+
 
     </RelativeLayout>
+
+
 
 
     <LinearLayout

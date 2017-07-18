@@ -20,9 +20,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -165,6 +167,7 @@ public class MainPageFragment extends Fragment implements
         btBaoCao.setOnClickListener(this);
         btnChuyenViTong.setOnClickListener(this);
         btnDinhDanhThe.setOnClickListener(this);
+        ((MainActivity) this.getContextView()).switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.HOME);
         this.refreshInfoMain();
         return curentFragment;
     }
@@ -198,6 +201,7 @@ public class MainPageFragment extends Fragment implements
             }
         }, TIME_DELAY_ANIM);
     }
+
     @Optional
     @OnClick(R.id.iv_frag_main_avatar)
     public void onClickAvatar(View view) {
@@ -245,6 +249,7 @@ public class MainPageFragment extends Fragment implements
 
         menu.show(view);
     }
+
     @Optional
     @Override
     public void onClick(View v) {
@@ -254,11 +259,9 @@ public class MainPageFragment extends Fragment implements
                 break;
             case R.id.btThanhToan:
                 fragment = PayFragment.newInstance(mEdong);
-                listener.switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.PAY);
                 break;
             case R.id.btBaoCao:
                 fragment = BaoCaoFragment.newInstance(mEdong);
-                listener.switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.REPORT);
                 break;
             case R.id.ibTroGiup:
                 showDialogHoTro();
@@ -294,10 +297,9 @@ public class MainPageFragment extends Fragment implements
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                try{
+                try {
                     mILogoutPresenter.callLogout(mEdong);
-                }catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -309,7 +311,7 @@ public class MainPageFragment extends Fragment implements
     public void clickLogoutCancel(View view) {
         if (dialogLogout != null)
             dialogLogout.dismiss();
-            unbinder = ButterKnife.bind(this, curentFragment);
+        unbinder = ButterKnife.bind(this, curentFragment);
     }
     //endregion
 
@@ -372,7 +374,7 @@ public class MainPageFragment extends Fragment implements
         }
 
         if (statusProgress == Common.STATUS_PROGRESS.FINISH) {
-            rvLogoutProcess.setVisibility(View.INVISIBLE);
+            rvLogoutProcess.setVisibility(View.GONE);
             btnLogoutOK.setEnabled(true);
         }
     }
@@ -514,9 +516,21 @@ public class MainPageFragment extends Fragment implements
         ImageButton ibClose = (ImageButton) dialog.findViewById(R.id.ibtn_dialog_version_close);
 
         Button btOK = (Button) dialog.findViewById(R.id.btn_dialog_version_button_ok);
-        TextView tvHelp = (TextView) dialog.findViewById(R.id.tv_dialog_version_content);
-//        ImageButton imgVersion = (ImageButton) dialog.findViewById(R.id.)
+        ImageButton btDetailVersion = (ImageButton) dialog.findViewById(R.id.btn_dialog_version_content_update);
+        final ListView list = (ListView) dialog.findViewById(R.id.tv_dialog_version_detail);
+        TextView tvVersion = (TextView) dialog.findViewById(R.id.tv_dialog_version);
 
+        tvVersion.setText("Phiên bản " + Common.getVersionApp(this.getActivity()));
+        list.setVisibility(View.GONE);
+        btDetailVersion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                list.setVisibility(View.VISIBLE);
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(MainPageFragment.this.getActivity(), R.layout.simple_spinner_dropdown_item_provider, Common.getDetailVersion());
+                dataAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item_provider);
+                list.setAdapter(dataAdapter);
+            }
+        });
         ibClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
