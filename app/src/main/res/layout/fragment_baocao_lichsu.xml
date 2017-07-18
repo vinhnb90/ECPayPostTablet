@@ -49,7 +49,7 @@
     <Button
         android:id="@+id/btTimKiem"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/_24sdp"
         android:text="TÌM KIẾM"
         android:background="@drawable/bg_button"
         android:textColor="@color/colorTextWhite"

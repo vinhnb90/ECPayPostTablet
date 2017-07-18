@@ -257,7 +257,7 @@ public class MainPageFragment extends Fragment implements
                 listener.switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.PAY);
                 break;
             case R.id.btBaoCao:
-                fragment = BaoCaoFragment.newInstance();
+                fragment = BaoCaoFragment.newInstance(mEdong);
                 listener.switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.REPORT);
                 break;
             case R.id.ibTroGiup:
