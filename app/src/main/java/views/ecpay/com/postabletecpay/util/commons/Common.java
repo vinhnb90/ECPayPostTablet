@@ -65,9 +65,11 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
@@ -2798,10 +2800,30 @@ public class Common {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-
         }
-
-
         return result.toString();
     }
+
+    public static List<String> getDetailVersion() {
+        List<String> result = new ArrayList<>();
+        result.add("Chức năng Đăng nhập");
+        result.add("Chức năng Đăng xuất");
+        result.add("Chức năng Đổi mật khẩu");
+        result.add("Chức năng Thông tin tài khoản");
+        result.add("Chức năng Trang Chủ");
+        result.add("Chức năng Hỗ trợ");
+        result.add("Chức năng Hướng dẫn");
+        result.add("Chức năng đồng bộ");
+        result.add("Chức năng Thanh toán hóa đơn");
+        result.add("Chức năng đẩy hóa đơn chấm nợ");
+        result.add("Chức năng Chuyển về ví tổng");
+        result.add("Chức năng Định danh thẻ khách hàng");
+        result.add("Chức năng Danh sách khách hàng");
+        result.add("Chức năng Đăng ký thẻ eCard");
+        result.add("Cập nhật thông tin khách hàng");
+        result.add("Chức năng Báo cáo");
+        result.add("Chức năng Xóa dữ liệu giao thu");
+        return result;
+    }
+
 }

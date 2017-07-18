@@ -16,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
@@ -58,7 +59,7 @@ public class BaoCaoFragment extends Fragment implements View.OnClickListener {
 
         ButterKnife.bind(this, view);
         mEdong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
-
+        ((MainActivity)this.getContext()).switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.REPORT);
         ibBack.setOnClickListener(this);
 
         viewPager.setAdapter(new BaoCaoAdapter(getChildFragmentManager()));

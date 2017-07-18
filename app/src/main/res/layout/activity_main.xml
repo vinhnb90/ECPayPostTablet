@@ -8,28 +8,26 @@
     android:orientation="vertical"
     tools:sContext="views.ecpay.com.postabletecpay.view.Main.MainActivity">
 
-    <LinearLayout
-        android:id="@+id/ll_navigation"
-        android:background="@color/colorTextWhite"
-        android:layout_alignParentBottom="true"
+    <com.roughike.bottombar.BottomBar
+        android:id="@+id/navigation_ac_main"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_40sdp">
-        <android.support.design.widget.BottomNavigationView
-            android:id="@+id/navigation_ac_main"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_40sdp"
-            app:itemBackground="@android:color/transparent"
-            app:menu="@menu/navigation"/>
-    </LinearLayout>
-
+        android:layout_height="@dimen/_40sdp"
+        android:layout_alignParentBottom="true"
+        android:backgroundTint="@color/colorPrimary"
+        app:bb_badgeBackgroundColor="@color/colorPrimary"
+        android:background="@color/colorTextWhite"
+        app:bb_behavior="shifting"
+        app:bb_activeTabColor="@color/colorPrimary"
+        app:bb_inActiveTabColor="@color/colorPrimary"
+        app:bb_tabXmlResource="@xml/bottombar_tabs_three"/>
 
     <RelativeLayout
-        android:layout_above="@+id/ll_navigation"
         android:id="@+id/rv_ac_main_request_pay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/_10sdp"
+        android:layout_above="@+id/navigation_ac_main"
         android:background="@color/colorTextGreen"
+        android:padding="@dimen/_10sdp"
         android:visibility="gone">
 
         <TextView
@@ -44,20 +42,20 @@
 
         <RelativeLayout
             android:id="@+id/rv_ac_main_process_bill"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/tv_ac_main_put_off_title"
-            android:layout_height="wrap_content">
+            android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/tv_ac_main_count_bill_payed"
-                android:textColor="@color/colorTextWhite"
-                android:layout_alignParentLeft="true"
-                tools:text="1/7 Hóa đơn"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:textColor="@color/colorTextWhite"
+                tools:text="1/7 Hóa đơn" />
 
             <ProgressBar
-                android:layout_toRightOf="@+id/tv_ac_main_count_bill_payed"
                 android:id="@+id/pbar_ac_main"
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
@@ -67,6 +65,7 @@
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginRight="@dimen/_10sdp"
                 android:layout_toLeftOf="@+id/ll_frag_thanh_toan_action_search"
+                android:layout_toRightOf="@+id/tv_ac_main_count_bill_payed"
 
                 android:indeterminate="true"
                 android:indeterminateTint="@color/colorTextWhite"
@@ -74,10 +73,10 @@
                 android:visibility="visible" />
 
             <TextView
-                android:layout_alignParentRight="true"
                 android:id="@+id/tv_ac_main_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginRight="@dimen/_10sdp"
@@ -86,9 +85,9 @@
 
                 android:lines="1"
                 android:scrollHorizontally="true"
-                tools:text="Disconnect"
                 android:textColor="@color/colorTextWhite"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:text="Disconnect" />
 
         </RelativeLayout>
 
@@ -96,16 +95,14 @@
     </RelativeLayout>
 
     <FrameLayout
-        android:layout_above="@+id/rv_ac_main_request_pay"
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/rv_ac_main_request_pay"
         android:layout_alignParentTop="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     </FrameLayout>
-
-
 
 
 </RelativeLayout>

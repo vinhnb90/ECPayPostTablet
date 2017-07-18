@@ -343,6 +343,7 @@ public class PayFragment extends Fragment implements
 
         mIPayPresenter = new PayPresenter(this);
         mEdong = getArguments().getString(KEY_EDONG, Common.TEXT_EMPTY);
+        ((MainActivity)this.getContextView()).switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.PAY);
         setUpRecyclerFragment(rootView);
         //first page
         isBluetoothConnected = false;
