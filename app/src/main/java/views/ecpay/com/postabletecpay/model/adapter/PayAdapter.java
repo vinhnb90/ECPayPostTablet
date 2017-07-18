@@ -124,6 +124,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             if(payPresenter.getPayModel().containBillInSelected(data.get(position).getBillKH().get(i).getBillId()))
             {
                 isShowBill = true;
+                data.get(position).setBill(data.get(position).getBillKH().get(i));
                 break;
             }
         }
@@ -755,6 +756,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     public static class DataAdapter {
         private EntityKhachHang infoKH;
         private List<BillEntityAdapter> billKH;
+        private BillEntityAdapter bill;
         private long totalMoney;
         private boolean isShowBill;
 
@@ -771,6 +773,14 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         public void setTotalMoney(long totalMoney) {
             this.totalMoney = totalMoney;
+        }
+
+        public BillEntityAdapter getBill() {
+            return bill;
+        }
+
+        public void setBill(BillEntityAdapter bill) {
+            this.bill = bill;
         }
 
         public boolean isShowBill() {

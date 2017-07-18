@@ -249,7 +249,6 @@ public class PayFragment extends Fragment implements
     private Thread hThread;
     private BroadcastReceiver discoveryResult;
     private BroadcastReceiver searchFinish;
-    private BroadcastReceiver searchStart;
     private static ProgressDialog pDialog;
     private boolean isThongbao;
     private boolean isSimply;
@@ -258,6 +257,8 @@ public class PayFragment extends Fragment implements
     protected static ArrayAdapter<String> arrayAdapter;
     protected List<BluetoothDevice> foundDevice;
     private List<byte[]> receipts = null;
+    private PayAdapter.BillEntityAdapter billEntityAdapter;
+    private PayAdapter.DataAdapter payDataBill;
     //endregion
 
     private Common.PROVIDER_CODE ProviderSelect = Common.PROVIDER_CODE.NCCNONE ;
@@ -896,12 +897,13 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void PrintThongBaoDien(PayAdapter.DataAdapter data) {
+        this.billEntityAdapter = data.getBillKH().get(0);
         isThongbao = true;
         if (!isBluetoothConnected) {
             dialogChonMayIn();
         }else
             if (!isSimply) {
-                printer(true);
+                printer(true,data.getBill());
             }else {
                 receipts = new ArrayList<byte[]>();
                 receipts.add(ReceiptUtility.genReceiptTest(getContext()));
@@ -911,12 +913,13 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void PrintHoaDon(PayAdapter.BillEntityAdapter bill) {
+        this.billEntityAdapter = bill;
         isThongbao = false;
         if (!isBluetoothConnected) {
             dialogChonMayIn();
         }else
             if (!isSimply) {
-                printer(false);
+                printer(false,bill);
             } else {
                 receipts = new ArrayList<byte[]>();
                 receipts.add(ReceiptUtility.genReceiptTest(getContext()));
@@ -1390,14 +1393,6 @@ public class PayFragment extends Fragment implements
             }
         };
         getContext().registerReceiver(discoveryResult, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-        searchStart = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-
-            }
-        };
         searchFinish = new BroadcastReceiver()
         {
             @Override
@@ -1571,9 +1566,9 @@ public class PayFragment extends Fragment implements
                 toast.show();
                 isBluetoothConnected =true;
                 if (isThongbao)
-                    printer(true);
+                    printer(true,billEntityAdapter);
                 else
-                    printer(false);
+                    printer(false,billEntityAdapter);
             }
             else	// Connection failed.
             {
@@ -1584,14 +1579,14 @@ public class PayFragment extends Fragment implements
         }
     }
 
-    private void printer(boolean isThongBao){
+    private void printer(boolean isThongBao,PayAdapter.BillEntityAdapter bill){
         int results = 0;
         ESCPOSSample sample = new ESCPOSSample();
         try {
             if (!isThongBao)
-                results = sample.sample1(getContext());
+                results = sample.sample2(getContext(),bill);
             else
-                results = sample.Thongbao(getContext());
+                results = sample.Thongbao(getContext(),bill);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -1682,9 +1677,9 @@ public class PayFragment extends Fragment implements
                         }
                     }else {
                         if (isThongbao)
-                            printer(true);
+                            printer(true,billEntityAdapter);
                         else
-                            printer(false);
+                            printer(false,billEntityAdapter);
                     }
                 }
             }

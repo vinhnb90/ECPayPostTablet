@@ -170,25 +170,8 @@ public class ESCPOSSample
 			e.printStackTrace();
 			return rtn;
 		}
-		int DNTT = 261;
 
-		int dongia1 = 1484;
-		int dongia2 = 1533;
-		int dongia3 = 1786;
-		int dongia4 = 2242;
-		int dongia5 = 2453;
-		int dongia6 = 2535;
-
-		int tinhlan1 = 50;
-		int tinhlan2 = 50;
-		int tinhlan3 = 100;
-		int tinhlan4 = 100;
-		int tinhlan5 = 100;
-		int tinhlan6  = DNTT - tinhlan1 - tinhlan2 - tinhlan3 - tinhlan4 - tinhlan5;
-
-		String nameCustom = "Vương Văn Phương", customId = "123456789", address = "Đồng Quang - Quốc Oai - Hà Nội",
-				soCongto = "123456",soHo = "987456", idHopDong = "0976956559", textHTTT= "tiền mặt",textCSDK ="phương",
-				textCSKH = "ECPay",textMoney = "100.000.000đ",textThue = "10.000đ",textSum = "100.010.000đ",nameNV = "Ngọc Linh";
+		String nameNV = "Ngọc Linh";
 
 
 		try {
@@ -203,7 +186,7 @@ public class ESCPOSSample
 			posPtr.printNormal("Mã KH: "+billObj.getMA_KHACH_HANG()+"\n");
 			posPtr.printNormal("Số công tơ: "+billObj.getSO_CONG_TO() +"   Số hộ: "+billObj.getSO_HO()+"\n");
 			posPtr.printNormal("Seri HĐĐT: "+billObj.getMA_HOA_DON()+"\n");
-			posPtr.printNormal("Hình thức thanh toán: "+textHTTT+"\n");
+			posPtr.printNormal("Hình thức thanh toán: tien mat\n");
 			posPtr.printNormal("Nội dung: thanh toán hóa đơn tiền điện: kỳ " + billObj.getTHANG_THANH_TOAN()+"\n");
 			posPtr.printNormal("Ngày: "+billObj.getRequestDate()+"\n");
 			posPtr.printNormal("CSDK: "+billObj.getCSDK()+"\n");
@@ -261,7 +244,7 @@ public class ESCPOSSample
 		return bitmap;
 	}
 
-	public int Thongbao(Context activity) throws InterruptedException {
+	public int Thongbao(Context activity, PayAdapter.BillEntityAdapter billEntityAdapter) throws InterruptedException {
 		try
 		{
 			rtn = posPtr.printerSts();
@@ -304,16 +287,16 @@ public class ESCPOSSample
 			posPtr.printText("Khong co gia tri thanh toan" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 
 //            posPtr.printNormal("Ten KH: "+billObj.getName()+"\n");
-			posPtr.printNormal("Ten KH: "+ nameCustom +"\n");
-			posPtr.printNormal("Đia chi: "+address +"\n");
-			posPtr.printNormal("Ma KH: "+customId+"\n");
-			posPtr.printNormal("So cong to: "+soCongto +"   Số hộ: "+soHo+"\n");
-			posPtr.printNormal("Seri HDDT: "+idHopDong+"\n");
+			posPtr.printNormal("Ten KH: "+ billEntityAdapter.getTEN_KHACH_HANG() +"\n");
+			posPtr.printNormal("Đia chi: "+billEntityAdapter.getDIA_CHI() +"\n");
+			posPtr.printNormal("Ma KH: "+billEntityAdapter.getMA_KHACH_HANG()+"\n");
+			posPtr.printNormal("So cong to: "+billEntityAdapter.getSO_CONG_TO() +"   Số hộ: "+billEntityAdapter.getSO_HO()+"\n");
+			posPtr.printNormal("Seri HDDT: "+billEntityAdapter.getMA_HOA_DON()+"\n");
 			posPtr.printNormal("Hinh thuc thanh toan: "+textHTTT+"\n");
-			posPtr.printNormal("Noi dung thanh toan tien dien: kỳ " + "thang 6"+"\n");
+			posPtr.printNormal("Noi dung thanh toan tien dien: kỳ " + billEntityAdapter.getTHANG_THANH_TOAN()+"\n");
 			posPtr.printNormal("Ngay: "+"14/07/2017"+"\n");
-			posPtr.printNormal("CSDK: "+textCSDK+"\n");
-			posPtr.printNormal("CSCK: "+textCSKH+"\n");
+			posPtr.printNormal("CSDK: "+billEntityAdapter.getCSDK()+"\n");
+			posPtr.printNormal("CSCK: "+billEntityAdapter.getCSCK()+"\n");
 			posPtr.printNormal("--------------------------------");
 			posPtr.printNormal("| ĐNTT | Đon gia |   Thanh tien|");
 			posPtr.printNormal("--------------------------------");
@@ -350,16 +333,16 @@ public class ESCPOSSample
 				posPtr.printText(demtext(14, (DNTT - 200)* dongia4 + "")+ (DNTT - 200)* dongia4 +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			}
 			posPtr.printNormal("--------------------------------");
-			posPtr.printNormal("|  "+ demtext(12,DNTT + "")+ DNTT +"kwh|");
-			posPtr.printText(demtext(14,"466211")+ 466211 +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printNormal("|  "+ demtext(12,billEntityAdapter.getDNTT() + "")+ billEntityAdapter.getDNTT() +"kwh|");
+			posPtr.printText(demtext(14,billEntityAdapter.getTONG_TIEN_CHUA_THUE())+ billEntityAdapter.getTONG_TIEN_CHUA_THUE() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printNormal("| Thue GTGT      |");
-			posPtr.printText(demtext(14,"46621")+ 46621 +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(demtext(14,billEntityAdapter.getTONG_TIEN_THUE())+ billEntityAdapter.getTONG_TIEN_THUE() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printNormal("--------------------------------");
 			posPtr.printNormal("| Tong cong      |");
-			posPtr.printText(demtext(14,"512833")+ 512833 +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(demtext(14,billEntityAdapter.getTIEN_THANH_TOAN()+"")+ billEntityAdapter.getTIEN_THANH_TOAN() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printNormal("--------------------------------");
 			posPtr.printNormal("\n\n");
-			posPtr.printNormal("Ngay thong bao:13/07/2017\n");
+			posPtr.printNormal("Ngay thong bao: "+billEntityAdapter.getRequestDate()+"\n");
 			posPtr.printText("Nhan vien" +"\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText(nameNV +"\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText("0976956559" +"\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);

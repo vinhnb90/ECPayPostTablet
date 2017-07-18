@@ -105,7 +105,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, `SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
             "`MA_THE` TEXT, `TEN_KHANG` TEXT, `DIA_CHI` TEXT, `THANG_TTOAN` DATE, `PHIEN_TTOAN` TEXT, `SO_TIEN_TTOAN` INTEGER, " +
             "`SO_GCS` TEXT, `DIEN_LUC` TEXT, `SO_HO` TEXT, `SO_DAU_KY` TEXT, `SO_CUOI_KY` TEXT, `SO_CTO` TEXT, `SDT_ECPAY` TEXT, " +
-            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT, `CHI_TIET_KG` TEXT, `CHI_TIET_MCS` TEXT, `CHI_TIET_TIEN_MCS` TEXT, `DNTT` TEXT)"+
+            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT, `CHI_TIET_KG` TEXT, `CHI_TIET_MCS` TEXT, `CHI_TIET_TIEN_MCS` TEXT, `DNTT` TEXT, "+
             "`TONG_TIEN_CHUA_THUE` INTEGER, `TIEN_THUE` INTEGER)";
 
     private String CREATE_TABLE_DEBT_COLLECTION = "CREATE TABLE `" + TABLE_NAME_DEBT_COLLECTION + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, `SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
@@ -976,7 +976,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (mCursor.getCount() == 0)
             return new Pair<>(billList, total);
         if (mCursor.moveToFirst()) {
-            do {;
+            do {
+                String tenKHang = mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"));
+                String diaChi = mCursor.getString(mCursor.getColumnIndex("DIA_CHI"));
                 String viThanhToan = mCursor.getString(mCursor.getColumnIndex("VI_TTOAN"));
                 String chiTietKhungGia = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_KG"));
                 String chiTietMucChiSo = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_MCS"));
@@ -1000,6 +1002,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")));
 
                 PayAdapter.BillEntityAdapter bill = new PayAdapter.BillEntityAdapter();
+                bill.setTEN_KHACH_HANG(tenKHang);
+                bill.setDIA_CHI(diaChi);
                 bill.setBillId(billId);
                 bill.setVI_TTOAN(viThanhToan);
                 bill.setTIEN_THANH_TOAN(amount);
@@ -1528,7 +1532,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
         initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
         initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
-        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy));
         initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
         initialValues.put("VI_TTOAN", "");
         initialValues.put("CHI_TIET_KG", bodyBillResponse.getPriceDetail());
@@ -1570,7 +1574,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
         initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
         initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
-        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy));
         initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
         initialValues.put("VI_TTOAN", "");
         initialValues.put("CHI_TIET_KG", bodyBillResponse.getPriceDetail());
