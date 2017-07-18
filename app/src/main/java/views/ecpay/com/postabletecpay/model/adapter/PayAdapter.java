@@ -30,6 +30,7 @@ import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
 
@@ -74,6 +75,24 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         this.indexEnd = indexEnd;
         this.notifyDataSetChanged();
 
+    }
+
+    public void UpdateBill(PayAdapter.BillEntityAdapter bill )
+    {
+        for(int i = 0, n = this.data.size(); i < n; i ++)
+        {
+            if(this.data.get(i).getInfoKH().getMA_KHANG().equalsIgnoreCase(bill.getMA_KHACH_HANG()))
+            {
+                for (int j = 0, n2 = this.data.get(i).getBillKH().size(); j < n2; j ++)
+                {
+                    if(this.data.get(i).getBillKH().get(j).getBillId() == bill.getBillId())
+                    {
+                        this.data.get(i).getBillKH().get(j).setTRANG_THAI_TT(bill.getTRANG_THAI_TT());
+                        this.data.get(i).getBillKH().get(j).setVI_TTOAN(bill.getVI_TTOAN());
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -385,7 +404,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
 
-        public String getBillingBy() {
+        public String getVI_TTOAN() {
             return billingBy;
         }
 
@@ -551,9 +570,6 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             public void onCheckedChanged(final CheckBox checkBox, boolean checked) {
                 if (checkBox.isPressed()) {
 
-                    boolean isNotBillPayedTermBefore = false;
-                    boolean isNotBillOldestPayedTermBefore = false;
-
                     int index = position + 1;
                     int indexNotPayedTermOldest = Common.NEGATIVE_ONE;
 
@@ -576,7 +592,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                             });
 
                             for (indexNotPayedTermOldest += 1; indexNotPayedTermOldest < billList.size(); indexNotPayedTermOldest++) {
-                                if (billList.get(index).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && billList.get(index).isChecked())
+                                if (billList.get(indexNotPayedTermOldest).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && billList.get(indexNotPayedTermOldest).isChecked())
                                 {
                                     payPresenter.getIPayView().showMessageNotifyPayfrag(Common.CODE_REPONSE_BILL_ONLINE.ex10005.getMessage() + Common.TEXT_MULTI_SPACE + bill.getMA_KHACH_HANG());
                                     return;

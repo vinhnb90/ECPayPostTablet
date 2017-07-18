@@ -68,7 +68,6 @@ import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.VISIBLE_
 public class PayPresenter implements IPayPresenter {
     private PayModel mPayModel;
     private IPayView mIPayView;
-    private int totalPage;
     private Common.TYPE_SEARCH mTypeSearch;
 
     SoapAPI.AsyncSoapIncludeTimout<SearchOnlineResponse> currentAsyncSearchOnline;
@@ -94,6 +93,9 @@ public class PayPresenter implements IPayPresenter {
         mPayModel = new PayModel(mIPayView.getContextView());
 
         mIPayView.showCountBillsAndTotalMoneyFragment(0, 0);
+
+
+        mIPayView.updateBillSelectToPay(mPayModel.getListBillSelected());
 
     }
 
@@ -135,9 +137,10 @@ public class PayPresenter implements IPayPresenter {
         {
 
             try {
-                PayModel.AsyncSearchOffline asyncSearchOffline = new PayModel.AsyncSearchOffline(mPayModel, new PayModel.AsyncSoapCallBack() {
+                PayModel.AsyncSearchOffline asyncSearchOffline = new PayModel.AsyncSearchOffline(pageIndex, mPayModel, new PayModel.AsyncSoapCallBack() {
                     @Override
-                    public void onPost(List<PayAdapter.DataAdapter> result) {
+                    public void onPost(final List<PayAdapter.DataAdapter> result) {
+                        /*
                         List<PayAdapter.DataAdapter> fitter = new ArrayList<>();
                         int indexBegin = 0;
                         int indexEnd = 0;
@@ -172,6 +175,7 @@ public class PayPresenter implements IPayPresenter {
                         final List<PayAdapter.DataAdapter> finalFitter = fitter;
                         final int finalIndexBegin = indexBegin;
                         final int finalIndexEnd = indexEnd;
+                        */
                         Activity activity = ((Activity)(mIPayView.getContextView()));
                         if(activity!= null)
                             activity.runOnUiThread(new Runnable() {
@@ -180,7 +184,7 @@ public class PayPresenter implements IPayPresenter {
 //                                    refreshTotalBillsAndTotalMoneyInFragment(edong, Common.STATUS_BILLING.CHUA_THANH_TOAN);
                                     try
                                     {
-                                        mIPayView.showPayRecyclerPage(finalFitter, finalIndexBegin, finalIndexEnd, pageIndex, totalPage, infoSearch, isSeachOnline);
+                                        mIPayView.showPayRecyclerPage(result, pageIndex, 10, pageIndex, 40, infoSearch, isSeachOnline);
                                     }catch (Exception e)
                                     {
 
@@ -505,6 +509,7 @@ public class PayPresenter implements IPayPresenter {
         }else //Thanh Toan Online
         {
             countBillPayedSuccess = 0;
+            mIPayView.refreshAdapterPayRecyclerListBills(true);
             for (int i = 0, n = bills.size(); i < n; i ++)
             {
                 if(bills.get(i).isChecked() && bills.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()))
@@ -712,7 +717,7 @@ public class PayPresenter implements IPayPresenter {
             if(billOnlineAsyncList.size() == 0) //call cap nhat vi
             {
                 //Update tien trong vi
-                long tienTT_THanhCong = this.refreshTotalBillsAndTotalMoneyInDialogWhenChecked(Common.STATUS_BILLING.DA_THANH_TOAN);
+                final long tienTT_THanhCong = this.refreshTotalBillsAndTotalMoneyInDialogWhenChecked(Common.STATUS_BILLING.DA_THANH_TOAN);
                 mPayModel.truTienTrongVi(MainActivity.mEdong, tienTT_THanhCong);
 
                 ConfigInfo configInfo = null;
@@ -755,7 +760,7 @@ public class PayPresenter implements IPayPresenter {
 
                                     mIPayView.showMessageNotifyBillOnlineDialog(message, false, Common.TYPE_DIALOG.LOI, true);
                                     mIPayView.showPayingRviewDialogFinish();
-                                    mIPayView.refreshAdapterPayRecyclerListBills(true);
+                                    mIPayView.refreshAdapterPayRecyclerListBills(false);
                                 }
                             });
                         }
@@ -772,9 +777,9 @@ public class PayPresenter implements IPayPresenter {
                                 mPayModel.updateSoDuKhaDung(resBalance.geteDong(), resBalance.getBalance(), resBalance.getLockMoney());
                             }
 
-                            mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                            showMessageSuccess(tienTT_THanhCong);
                             mIPayView.showPayingRviewDialogFinish();
-                            mIPayView.refreshAdapterPayRecyclerListBills(true);
+                            mIPayView.refreshAdapterPayRecyclerListBills(false);
                         }
 
                         @Override
@@ -783,9 +788,9 @@ public class PayPresenter implements IPayPresenter {
                                 @Override
                                 public void run() {
 
-                                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+                                    showMessageSuccess(tienTT_THanhCong);
                                     mIPayView.showPayingRviewDialogFinish();
-                                    mIPayView.refreshAdapterPayRecyclerListBills(true);
+                                    mIPayView.refreshAdapterPayRecyclerListBills(false);
                                 }
                             });
                         }
@@ -793,9 +798,10 @@ public class PayPresenter implements IPayPresenter {
                     accountResponeAsyncSoap.execute(jsonRequestAccount);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
+
+                    showMessageSuccess(tienTT_THanhCong);
                     mIPayView.showPayingRviewDialogFinish();
-                    mIPayView.refreshAdapterPayRecyclerListBills(true);
+                    mIPayView.refreshAdapterPayRecyclerListBills(false);
                 }
             }
         }else
@@ -806,13 +812,17 @@ public class PayPresenter implements IPayPresenter {
                 long tienTT_THanhCong = this.refreshTotalBillsAndTotalMoneyInDialogWhenChecked(Common.STATUS_BILLING.DA_THANH_TOAN);
                 mPayModel.truTienTrongVi(MainActivity.mEdong, tienTT_THanhCong);
 
-
-                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10001.getMessage(), false, Common.TYPE_DIALOG.THANH_CONG, true);
-                mIPayView.showPayingRviewDialogFinish();
-                mIPayView.refreshAdapterPayRecyclerListBills(true);
+                showMessageSuccess(tienTT_THanhCong);
+               mIPayView.showPayingRviewDialogFinish();
+                mIPayView.refreshAdapterPayRecyclerListBills(false);
             }
         }
 
+    }
+
+    void showMessageSuccess(long totalMoney)
+    {
+        mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.getMessageSuccess(countBillPayedSuccess, totalMoney), false, Common.TYPE_DIALOG.THANH_CONG, true);
     }
 
 
