@@ -329,11 +329,15 @@ public class MainPageFragment extends Fragment implements
     public void showMainPageInfo(String userName, long balance, int totalBills, int totalMoney) {
         if (userName == null)
             userName = TEXT_EMPTY;
+        try {
 
-        tvUsername.setText(userName);
-        tvSoDuKhaDung.setText(Common.convertLongToMoney(balance));
-        tvSoHoaDon.setText(String.valueOf(totalBills));
-        tvTongTien.setText(Common.convertLongToMoney(totalMoney));
+            tvUsername.setText(userName);
+            tvSoDuKhaDung.setText(Common.convertLongToMoney(balance));
+            tvSoHoaDon.setText(String.valueOf(totalBills));
+            tvTongTien.setText(Common.convertLongToMoney(totalMoney));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 

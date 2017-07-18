@@ -20,6 +20,7 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.STATUS_BILLING.CHUA_THANH_TOAN;
+import static views.ecpay.com.postabletecpay.util.commons.Common.STATUS_BILLING.DA_THANH_TOAN;
 
 /**
  * Created by VinhNB on 6/5/2017.
@@ -76,7 +77,7 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
 
         //TODO onBindViewHolder bill
         String message = billChecked.getMessageError();
-//        holder.getIbtnMessage().setVisibility(TextUtils.isEmpty(message) ? View.INVISIBLE : View.VISIBLE);
+       holder.ibtnPrint.setVisibility(billChecked.getTRANG_THAI_TT().equalsIgnoreCase(CHUA_THANH_TOAN.getCode()) ? View.INVISIBLE : View.VISIBLE);
 
         String status = Common.STATUS_BILLING.findCodeMessage(billChecked.getTRANG_THAI_TT()).getMessage();
 
@@ -87,12 +88,17 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
         if(isDisableCheckbox)
         {
             holder.getCbChoose().setEnabled(false);
+            if (!billChecked.getTRANG_THAI_TT().equalsIgnoreCase(CHUA_THANH_TOAN.getCode()))
+                holder.getCbChoose().setChecked(true);
         }else
         {
             if (billChecked.getTRANG_THAI_TT().equalsIgnoreCase(CHUA_THANH_TOAN.getCode()))
                 holder.getCbChoose().setEnabled(true);
             else
+            {
                 holder.getCbChoose().setEnabled(false);
+                holder.getCbChoose().setChecked(true);
+            }
         }
         holder.getTvPayStatus().setText(status);
     }
@@ -125,8 +131,8 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
         TextView tvAmount;
         @BindView(R.id.tv_row_thanhtoan_list_bills_status_pay)
         TextView tvPayStatus;
-//        @BindView(R.id.ibtn_dialog_thanhtoan_message)
-//        ImageButton ibtnMessage;
+        @BindView(R.id.ibtn_row_thanhtoan_list_bills_print)
+        ImageButton ibtnPrint;
 
         public BillDialogViewHorder(View itemView) {
             super(itemView);

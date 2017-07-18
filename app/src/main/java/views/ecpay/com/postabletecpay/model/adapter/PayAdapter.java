@@ -30,6 +30,7 @@ import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
 
@@ -74,6 +75,24 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         this.indexEnd = indexEnd;
         this.notifyDataSetChanged();
 
+    }
+
+    public void UpdateBill(PayAdapter.BillEntityAdapter bill )
+    {
+        for(int i = 0, n = this.data.size(); i < n; i ++)
+        {
+            if(this.data.get(i).getInfoKH().getMA_KHANG().equalsIgnoreCase(bill.getMA_KHACH_HANG()))
+            {
+                for (int j = 0, n2 = this.data.get(i).getBillKH().size(); j < n2; j ++)
+                {
+                    if(this.data.get(i).getBillKH().get(j).getBillId() == bill.getBillId())
+                    {
+                        this.data.get(i).getBillKH().get(j).setTRANG_THAI_TT(bill.getTRANG_THAI_TT());
+                        this.data.get(i).getBillKH().get(j).setVI_TTOAN(bill.getVI_TTOAN());
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -269,7 +288,19 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         private boolean isCheckEnable;
         private String MA_KHACH_HANG;
         private String TEN_KHACH_HANG;
+        private String DIA_CHI;
         private String MA_DIEN_LUC;
+        private String SO_HO;
+        private String SO_CONG_TO;
+        private String CSDK;
+        private String CSCK;
+        private String MA_HOA_DON;
+        private String CHI_TIET_KG;
+        private String CHI_TIET_MCS;
+        private String CHI_TIET_TIEN_MCS;
+        private String DNTT;
+        private String TONG_TIEN_CHUA_THUE;
+        private String TONG_TIEN_THUE;
 
         private String messageError = "";
 
@@ -302,6 +333,14 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         public void setMA_KHACH_HANG(String MA_KHACH_HANG) {
             this.MA_KHACH_HANG = MA_KHACH_HANG;
+        }
+
+        public String getDIA_CHI() {
+            return DIA_CHI;
+        }
+
+        public void setDIA_CHI(String DIA_CHI) {
+            this.DIA_CHI = DIA_CHI;
         }
 
         public boolean isCheckEnable() {
@@ -385,12 +424,100 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
 
-        public String getBillingBy() {
+        public String getVI_TTOAN() {
             return billingBy;
         }
 
         public void setVI_TTOAN(String billingBy) {
             this.billingBy = billingBy;
+        }
+
+        public String getSO_HO() {
+            return SO_HO;
+        }
+
+        public void setSO_HO(String SO_HO) {
+            this.SO_HO = SO_HO;
+        }
+
+        public String getSO_CONG_TO() {
+            return SO_CONG_TO;
+        }
+
+        public void setSO_CONG_TO(String SO_CONG_TO) {
+            this.SO_CONG_TO = SO_CONG_TO;
+        }
+
+        public String getCSDK() {
+            return CSDK;
+        }
+
+        public void setCSDK(String CSDK) {
+            this.CSDK = CSDK;
+        }
+
+        public String getCSCK() {
+            return CSCK;
+        }
+
+        public void setCSCK(String CSCK) {
+            this.CSCK = CSCK;
+        }
+
+        public String getMA_HOA_DON() {
+            return MA_HOA_DON;
+        }
+
+        public void setMA_HOA_DON(String MA_HOA_DON) {
+            this.MA_HOA_DON = MA_HOA_DON;
+        }
+
+        public String getCHI_TIET_KG() {
+            return CHI_TIET_KG;
+        }
+
+        public void setCHI_TIET_KG(String CHI_TIET_KG) {
+            this.CHI_TIET_KG = CHI_TIET_KG;
+        }
+
+        public String getCHI_TIET_MCS() {
+            return CHI_TIET_MCS;
+        }
+
+        public void setCHI_TIET_MCS(String CHI_TIET_MCS) {
+            this.CHI_TIET_MCS = CHI_TIET_MCS;
+        }
+
+        public String getCHI_TIET_TIEN_MCS() {
+            return CHI_TIET_TIEN_MCS;
+        }
+
+        public void setCHI_TIET_TIEN_MCS(String CHI_TIET_TIEN_MCS) {
+            this.CHI_TIET_TIEN_MCS = CHI_TIET_TIEN_MCS;
+        }
+
+        public String getDNTT() {
+            return DNTT;
+        }
+
+        public void setDNTT(String DNTT) {
+            this.DNTT = DNTT;
+        }
+
+        public String getTONG_TIEN_CHUA_THUE() {
+            return TONG_TIEN_CHUA_THUE;
+        }
+
+        public void setTONG_TIEN_CHUA_THUE(String TONG_TIEN_CHUA_THUE) {
+            this.TONG_TIEN_CHUA_THUE = TONG_TIEN_CHUA_THUE;
+        }
+
+        public String getTONG_TIEN_THUE() {
+            return TONG_TIEN_THUE;
+        }
+
+        public void setTONG_TIEN_THUE(String TONG_TIEN_THUE) {
+            this.TONG_TIEN_THUE = TONG_TIEN_THUE;
         }
 
         @Override
@@ -551,9 +678,6 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             public void onCheckedChanged(final CheckBox checkBox, boolean checked) {
                 if (checkBox.isPressed()) {
 
-                    boolean isNotBillPayedTermBefore = false;
-                    boolean isNotBillOldestPayedTermBefore = false;
-
                     int index = position + 1;
                     int indexNotPayedTermOldest = Common.NEGATIVE_ONE;
 
@@ -576,7 +700,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                             });
 
                             for (indexNotPayedTermOldest += 1; indexNotPayedTermOldest < billList.size(); indexNotPayedTermOldest++) {
-                                if (billList.get(index).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && billList.get(index).isChecked())
+                                if (billList.get(indexNotPayedTermOldest).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && billList.get(indexNotPayedTermOldest).isChecked())
                                 {
                                     payPresenter.getIPayView().showMessageNotifyPayfrag(Common.CODE_REPONSE_BILL_ONLINE.ex10005.getMessage() + Common.TEXT_MULTI_SPACE + bill.getMA_KHACH_HANG());
                                     return;

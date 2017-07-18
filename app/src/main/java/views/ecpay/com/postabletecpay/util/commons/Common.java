@@ -1622,6 +1622,7 @@ public class Common {
         if (activity == null)
             return;
 
+
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
@@ -1901,8 +1902,10 @@ public class Common {
     public static String SHARE_REF_FILE_LOGIN_PASS = "PASS";
     public static String SHARE_REF_FILE_LOGIN_IS_SAVE = "CHECKBOX";
     public static String SHARE_REF_CHANGED_GEN_FILE = "GEN_FILE_CHANGED";
+    public static String SHARE_REF_BILL_SELECTED = "BILL_SELECTED";
     public static String SHARE_REF_CHANGED_GEN_FILE_DATE = "GEN_FILE_CHANGED_DATE_";
     public static String SHARE_REF_CHANGED_GEN_FILE_ID_ = "GEN_FILE_CHANGED_ID_";
+    public static String SHARE_REF_LST_BILL_SELECTED_ = "BILL_SELECTED_";
 
     //endregion
 
