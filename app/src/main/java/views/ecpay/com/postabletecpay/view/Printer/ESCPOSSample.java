@@ -12,6 +12,7 @@ import com.sewoo.jpos.printer.LKPrint;
 import java.io.IOException;
 
 import views.ecpay.com.postabletecpay.R;
+import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 
 //import java.io.UnsupportedEncodingException;
@@ -155,7 +156,7 @@ public class ESCPOSSample
 		return 0;
     }
 
-	public int sample2(Context activity, Bill billObj) throws InterruptedException {
+	public int sample2(Context activity, PayAdapter.BillEntityAdapter billObj) throws InterruptedException {
 		try
 		{
 			rtn = posPtr.printerSts();
@@ -197,24 +198,24 @@ public class ESCPOSSample
 			posPtr.printText("BIÊN NHẬN" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_2WIDTH);
 			posPtr.printText("THANH TOÁN TIỀN ĐIỆN" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 
-			posPtr.printNormal("Tên khách hàng: "+billObj.getName()+"\n");
-			posPtr.printNormal("Địa chỉ: "+billObj.getRoad() +"\n");
-			posPtr.printNormal("Mã KH: "+billObj.getCustomerCode()+"\n");
-			posPtr.printNormal("Số công tơ: "+billObj.getElectricityMeter() +"   Số hộ: "+billObj.getHome()+"\n");
-			posPtr.printNormal("Seri HĐĐT: "+billObj.getSeri()+"\n");
+			posPtr.printNormal("Tên khách hàng: "+billObj.getTEN_KHACH_HANG()+"\n");
+			posPtr.printNormal("Địa chỉ: "+billObj.getDIA_CHI() +"\n");
+			posPtr.printNormal("Mã KH: "+billObj.getMA_KHACH_HANG()+"\n");
+			posPtr.printNormal("Số công tơ: "+billObj.getSO_CONG_TO() +"   Số hộ: "+billObj.getSO_HO()+"\n");
+			posPtr.printNormal("Seri HĐĐT: "+billObj.getMA_HOA_DON()+"\n");
 			posPtr.printNormal("Hình thức thanh toán: "+textHTTT+"\n");
-			posPtr.printNormal("Nội dung: thanh toán hóa đơn tiền điện: kỳ " + billObj.getPeriod()+"\n");
-			posPtr.printNormal("Ngày: "+billObj.getStrIssueDate()+"\n");
-			posPtr.printNormal("CSDK: "+textCSDK+"\n");
-			posPtr.printNormal("CSCK: "+textCSKH+"\n");
+			posPtr.printNormal("Nội dung: thanh toán hóa đơn tiền điện: kỳ " + billObj.getTHANG_THANH_TOAN()+"\n");
+			posPtr.printNormal("Ngày: "+billObj.getRequestDate()+"\n");
+			posPtr.printNormal("CSDK: "+billObj.getCSDK()+"\n");
+			posPtr.printNormal("CSCK: "+billObj.getCSCK()+"\n");
 			posPtr.printNormal("--------------------------------");
-			posPtr.printNormal("|"+ demtext(16 - billObj.getNume().length(),billObj.getNume() + "")+"|");
-			posPtr.printText(demtext(14,billObj.getAmountNotTax()+"")+ billObj.getAmountNotTax() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printNormal("|"+ demtext(16 - billObj.getDNTT().length(),billObj.getDNTT() + "")+"|");
+			posPtr.printText(demtext(14,billObj.getTONG_TIEN_CHUA_THUE()+"")+ billObj.getTONG_TIEN_CHUA_THUE() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printNormal("| Thuế GTGT      |");
-			posPtr.printText(demtext(14,billObj.getAmountTax() + "")+ billObj.getAmountTax() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(demtext(14,billObj.getTONG_TIEN_THUE() + "")+ billObj.getTONG_TIEN_THUE() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printNormal("--------------------------------");
 			posPtr.printNormal("| Tổng cộng      |");
-			posPtr.printText(demtext(14,billObj.getAmountTax() +"")+ billObj.getAmountTax() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(demtext(14,billObj.getTIEN_THANH_TOAN() +"")+ billObj.getTIEN_THANH_TOAN() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printNormal("--------------------------------");
 			posPtr.printNormal("\n\n");
 			posPtr.printNormal("Bằng chữ:................\n");
@@ -299,7 +300,7 @@ public class ESCPOSSample
 			posPtr.printBitmap(drawableToBitmap(activity.getResources().getDrawable(R.drawable.ic_evn_hanoi_ecpay_logo)),1,8);
 			posPtr.printNormal("\n\n");
 			posPtr.printText("Cong ty dien luc Ha Noi" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
-			posPtr.printText("THONG BAO TIEN DIEN" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_2WIDTH);
+			posPtr.printText("THONG BAO TIEN DIEN" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText("Khong co gia tri thanh toan" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 
 //            posPtr.printNormal("Ten KH: "+billObj.getName()+"\n");

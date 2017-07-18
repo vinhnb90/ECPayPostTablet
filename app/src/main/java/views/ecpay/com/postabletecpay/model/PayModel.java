@@ -157,6 +157,7 @@ public class PayModel extends CommonModel {
             for(int i = 0, n = listBill.first.size(); i < n; i ++)
             {
                 listBill.first.get(i).setTEN_KHACH_HANG(customer.getTEN_KHANG());
+                listBill.first.get(i).setDIA_CHI(customer.getDIA_CHI());
             }
 
             Collections.sort(listBill.first, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
@@ -165,29 +166,6 @@ public class PayModel extends CommonModel {
         }
         return  mDataPayAdapter;
     }
-
-//    public List<PayAdapter.DataAdapter> refreshDataPayAdapter() {
-//
-//        List<PayAdapter.DataAdapter> mDataPayAdapter = new ArrayList<>();
-//
-//        //get List Customer
-//        List<EntityKhachHang> listCustomer = selectAllCustomer(MainActivity.mEdong);
-//
-//        for(int index = 0; index<listCustomer.size();index++)
-//        {
-//            EntityKhachHang customer = listCustomer.get(index);
-//            String code = customer.getMA_KHANG();
-//            Pair<List<PayAdapter.BillEntityAdapter>, Long> listBill = selectInfoBillOfCustomerToRecycler(MainActivity.mEdong, code);
-//            for(int i = 0, n = listBill.first.size(); i < n; i ++)
-//            {
-//                listBill.first.get(i).setTEN_KHACH_HANG(customer.getTEN_KHANG());
-//            }
-//            Collections.sort(listBill.first, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
-//            PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(customer, listBill.first, listBill.second);
-//            mDataPayAdapter.add(dataAdapter);
-//        }
-//        return  mDataPayAdapter;
-//    }
 
     public List<EntityKhachHang> selectAllCustomer(String edong, int startIndex) {
         return sqLiteConnection.selectAllCustomerFitterBy(edong, startIndex, Common.TYPE_SEARCH.ALL, Common.TEXT_EMPTY);
