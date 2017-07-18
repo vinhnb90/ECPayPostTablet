@@ -1280,8 +1280,8 @@ public class Common {
 
     //region info communication server
     //unit: milli seconds
-    public static long TIME_OUT_CONNECT = 30000;
-
+    public static int TIME_OUT_CONNECT = 40000;
+    public static int TIME_OUT_CONNECT_KSOAP = 30000;
     public static long TIME_OUT_CHECK_CONNECTION = 10000;
 
     public enum COMMAND_ID {

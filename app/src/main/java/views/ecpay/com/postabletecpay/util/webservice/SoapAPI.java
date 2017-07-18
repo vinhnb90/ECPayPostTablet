@@ -103,6 +103,8 @@ import views.ecpay.com.postabletecpay.util.entities.response.GetPCInfo.GetPCInfo
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT_KSOAP;
 
 /**
  * Created by VinhNB on 5/12/2017.
@@ -1179,7 +1181,7 @@ public class SoapAPI {
             SoapPrimitive response = null;
 
             try {
-                ht = new HttpTransportSE(URL);
+                ht = new HttpTransportSE(URL, TIME_OUT_CONNECT_KSOAP);
                 ht.call(SOAP_ACTION, envelope);
                 response = (SoapPrimitive) envelope.getResponse();
             } catch (Exception e) {

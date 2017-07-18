@@ -328,11 +328,12 @@ public class MainPresenter implements IMainPresenter {
                         public void onPost(ListDataZipResponse response) {
                             //nếu kết thúc thì giảm đi 1 thread và kiểm tra nếu là thread cuối thì tắt progress dialog
                             allProcessDownload--;
-                            if (allProcessDownload == ZERO)
-                                mIMainView.finishHidePbarDownload();
 
-                            if (response == null)
+                            if (response == null) {
+                                if (allProcessDownload == ZERO)
+                                    mIMainView.finishHidePbarDownload();
                                 return;
+                            }
 
                             String sData = response.getBodyListDataResponse().getFile_data();
                             if (sData != null && !sData.isEmpty()) {
@@ -402,6 +403,8 @@ public class MainPresenter implements IMainPresenter {
                                             mIMainView.refreshInfoMain();
                                         }
                                     });
+                                    if (allProcessDownload == ZERO)
+                                        mIMainView.finishHidePbarDownload();
                                 }
 
                                 ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
@@ -410,6 +413,8 @@ public class MainPresenter implements IMainPresenter {
                                         mIMainView.refreshInfoMain();
                                     }
                                 });
+                                if (allProcessDownload == ZERO)
+                                    mIMainView.finishHidePbarDownload();
                             }
                         }
 
@@ -545,11 +550,12 @@ public class MainPresenter implements IMainPresenter {
                             public void onPost(ListDataResponse response) {
                                 //nếu kết thúc thì giảm đi 1 thread và kiểm tra nếu là thread cuối thì tắt progress dialog
                                 allProcessDownload--;
-                                if (allProcessDownload == ZERO)
-                                    mIMainView.finishHidePbarDownload();
 
-                                if (response == null)
+                                if (response == null) {
+                                    if (allProcessDownload == ZERO)
+                                        mIMainView.finishHidePbarDownload();
                                     return;
+                                }
 
                                 try {
                                     String sDataCustomer = response.getBodyListDataResponse().getCustomer();
@@ -624,6 +630,8 @@ public class MainPresenter implements IMainPresenter {
                                             mIMainView.refreshInfoMain();
                                         }
                                     });
+                                    if (allProcessDownload == ZERO)
+                                        mIMainView.finishHidePbarDownload();
                                 }
 
                                 ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
@@ -632,6 +640,9 @@ public class MainPresenter implements IMainPresenter {
                                         mIMainView.refreshInfoMain();
                                     }
                                 });
+
+                                if (allProcessDownload == ZERO)
+                                    mIMainView.finishHidePbarDownload();
                             }
 
                             @Override

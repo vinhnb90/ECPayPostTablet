@@ -82,7 +82,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             "`status` TEXT, `idNumber` TEXT, `idNumberDate` TEXT, `idNumberPlace` TEXT, `parentEdong` TEXT, `notYetPushMoney` INTEGER DEFAULT 0)";
 
 
-    private String CREATE_TABLE_EVN_PC = "CREATE TABLE " + TABLE_NAME_EVN_PC + " ( pcId NOT NULL PRIMARY KEY, edong TEXT NOT NULL, strPcId TEXT, parentId INTEGER, " +
+    private String CREATE_TABLE_EVN_PC = "CREATE TABLE " + TABLE_NAME_EVN_PC + " ( pcId INTEGER NOT NULL PRIMARY KEY, edong TEXT NOT NULL, strPcId TEXT, parentId INTEGER, " +
             "strParentId TEXT, " +
             "code TEXT, ext TEXT, fullName TEXT, shortName TEXT, address TEXT, taxCode TEXT, phone1 TEXT, phone2 TEXT, " +
             "fax TEXT, level INTEGER, " +
@@ -303,8 +303,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "'";
         Cursor mCursor = database.rawQuery(query, null);
 
-        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-        {
+        if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
             bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
             bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
         }
@@ -323,8 +322,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong + "'";
         Cursor mCursor = database.rawQuery(query, null);
 
-        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-        {
+        if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
             bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
             bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
         }
@@ -343,8 +341,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong + "' and TRANG_THAI_HOAN_TRA = '" + Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode() + "'";
         Cursor mCursor = database.rawQuery(query, null);
 
-        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-        {
+        if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
             bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
             bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
         }
@@ -361,13 +358,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     public ReportModel.BillInfo countBillVangLai(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
         String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_DEBT_COLLECTION + " bill WHERE bill.E_DONG = '" + edong +
-                "' and GIAO_THU = '"  + Common.TRANG_THAI_GIAO_THU.VANG_LAI.getCode() + "'";
+                "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.VANG_LAI.getCode() + "'";
 //                "                  FROM employees" +
 //                "                  WHERE departments.department_id = employees.department_id)";
         Cursor mCursor = database.rawQuery(query, null);
 
-        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-        {
+        if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
             bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
             bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
         }
@@ -389,24 +385,20 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         String queryDateFrom = "";
         String queryDateTo = "";
-        if(dateFrom != null)
-        {
+        if (dateFrom != null) {
             queryDateFrom = " and date(NGAY_THU) >= date('" + Common.parse(dateFrom.getTime(), Common.DATE_TIME_TYPE.FULL.toString()) + "')";
         }
 
-        if(dateTo != null)
-        {
+        if (dateTo != null) {
             queryDateTo = " and date(NGAY_THU) <= date('" + Common.parse(dateTo.getTime(), Common.DATE_TIME_TYPE.FULL.toString()) + "')";
         }
 
-        if(isMaKH)
-        {
+        if (isMaKH) {
             query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong +
                     "' and MA_KHANG like '%" + customerCode + "%' " + queryDateFrom + queryDateTo + " ORDER BY date(NGAY_THU) DESC";
-        }else
-        {
+        } else {
             query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong +
-                    "' and TEN_KHANG like '%" + customerCode + "%'" + queryDateFrom + queryDateTo  + " ORDER BY date(NGAY_THU) DESC";
+                    "' and TEN_KHANG like '%" + customerCode + "%'" + queryDateFrom + queryDateTo + " ORDER BY date(NGAY_THU) DESC";
         }
 
         Cursor mCursor = database.rawQuery(query, null);
@@ -475,12 +467,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
 
-    private ReportLichSuThanhToanAdapter.LichSuThanhToanData find(String maKH, List<ReportLichSuThanhToanAdapter.LichSuThanhToanData> lst)
-    {
-        for(int i = 0, n = lst.size(); i < n; i ++)
-        {
-            if(lst.get(i).getMA_KHACH_HANG().equalsIgnoreCase(maKH))
-            {
+    private ReportLichSuThanhToanAdapter.LichSuThanhToanData find(String maKH, List<ReportLichSuThanhToanAdapter.LichSuThanhToanData> lst) {
+        for (int i = 0, n = lst.size(); i < n; i++) {
+            if (lst.get(i).getMA_KHACH_HANG().equalsIgnoreCase(maKH)) {
                 return lst.get(i);
             }
         }
@@ -488,14 +477,11 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return null;
     }
 
-    String getTenKhachHangByMaKhachHang(String edong, String MA_KHACH_HANG)
-    {
-        Cursor mCursor = database.rawQuery("SELECT TEN_KHANG FROM "  + TABLE_NAME_CUSTOMER + " WHERE MA_KHANG = '" + MA_KHACH_HANG + "' and E_DONG = '" + edong + "'", null);
-        if(mCursor != null)
-        {
-            if(mCursor.moveToFirst())
-            {
-                return  mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"));
+    String getTenKhachHangByMaKhachHang(String edong, String MA_KHACH_HANG) {
+        Cursor mCursor = database.rawQuery("SELECT TEN_KHANG FROM " + TABLE_NAME_CUSTOMER + " WHERE MA_KHANG = '" + MA_KHACH_HANG + "' and E_DONG = '" + edong + "'", null);
+        if (mCursor != null) {
+            if (mCursor.moveToFirst()) {
+                return mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"));
             }
             mCursor.close();
         }
@@ -503,18 +489,15 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
 
-    public List<ReportLichSuThanhToanAdapter.LichSuThanhToanData> getLichSuThanhToan(String edong, boolean isMaKH, String customerCode)
-    {
+    public List<ReportLichSuThanhToanAdapter.LichSuThanhToanData> getLichSuThanhToan(String edong, boolean isMaKH, String customerCode) {
         List<ReportLichSuThanhToanAdapter.LichSuThanhToanData> lst = new ArrayList<>();
 
 
         String query;
-        if(isMaKH)
-        {
+        if (isMaKH) {
             query = "SELECT * FROM " + TABLE_NAME_HISTORY_PAY + " WHERE E_DONG = '" + edong +
                     "' and MA_KHANG like '%" + customerCode + "%' " + " ORDER BY date(NGAY_PHAT_SINH) DESC";
-        }else
-        {
+        } else {
             query = "SELECT * FROM " + TABLE_NAME_HISTORY_PAY + " WHERE E_DONG = '" + edong +
                     "' and TEN_KHANG like '%" + customerCode + "%' " + " ORDER BY date(NGAY_PHAT_SINH) DESC";
         }
@@ -526,23 +509,20 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
                 ReportLichSuThanhToanAdapter.LichSuThanhToanData data = this.find(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")), lst);
 
-                String name, code ;
+                String name, code;
 
-                if(data == null)
-                {
+                if (data == null) {
 
                     name = mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"));
                     code = mCursor.getString(mCursor.getColumnIndex("MA_KHANG"));
 
-                    if(name == null || name.length() == 0)
-                    {
+                    if (name == null || name.length() == 0) {
                         name = getTenKhachHangByMaKhachHang(MainActivity.mEdong, code);
                     }
 
                     data = new ReportLichSuThanhToanAdapter.LichSuThanhToanData(code, name);
                     lst.add(data);
-                }else
-                {
+                } else {
                     name = data.getTEN_KHACH_HANG();
                     code = data.getMA_KHACH_HANG();
                 }
@@ -591,7 +571,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         }
 
 
-
         return lst;
     }
 
@@ -603,24 +582,20 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         String queryDateFrom = "";
         String queryDateTo = "";
-        if(dateFrom != null)
-        {
+        if (dateFrom != null) {
             queryDateFrom = " and date(NGAY_THU) >= date('" + Common.parse(dateFrom.getTime(), Common.DATE_TIME_TYPE.FULL.toString()) + "')";
         }
 
-        if(dateTo != null)
-        {
+        if (dateTo != null) {
             queryDateTo = " and date(NGAY_THU) <= date('" + Common.parse(dateTo.getTime(), Common.DATE_TIME_TYPE.FULL.toString()) + "')";
         }
 
-        if(isMaKH)
-        {
+        if (isMaKH) {
             query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong +
                     "' and MA_KHANG like '%" + customerCode + "%' and TRANG_THAI_HOAN_TRA = '" + Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode() + "' " + queryDateFrom + queryDateTo + " ORDER BY date(NGAY_THU) DESC";
-        }else
-        {
+        } else {
             query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong +
-                    "' and TEN_KHANG like '%" + customerCode + "%' and TRANG_THAI_HOAN_TRA = '" + Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode() + "' " + queryDateFrom + queryDateTo  + " ORDER BY date(NGAY_THU) DESC";
+                    "' and TEN_KHANG like '%" + customerCode + "%' and TRANG_THAI_HOAN_TRA = '" + Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode() + "' " + queryDateFrom + queryDateTo + " ORDER BY date(NGAY_THU) DESC";
         }
 
         Cursor mCursor = database.rawQuery(query, null);
@@ -736,12 +711,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 //
 //                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.CHUA_TTOAN)) {
 
-                    TransactionOffItem item = new TransactionOffItem();
-                    item.setCustomer_code(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
-                    item.setAmount(mCursor.getLong(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
-                    item.setBill_id(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON"))));
-                    item.setEdong(mCursor.getString(mCursor.getColumnIndex("E_DONG")));
-                    lst.add(item);
+                TransactionOffItem item = new TransactionOffItem();
+                item.setCustomer_code(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
+                item.setAmount(mCursor.getLong(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
+                item.setBill_id(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON"))));
+                item.setEdong(mCursor.getString(mCursor.getColumnIndex("E_DONG")));
+                lst.add(item);
 //                }
 
 
@@ -1201,11 +1176,10 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public long insertEvnPC(ListEvnPCResponse listEvnPCResponse, String edong) {
         ContentValues initialValues = new ContentValues();
-
-        initialValues.put("parentId", listEvnPCResponse.getParentId());
+        initialValues.put("parentId", String.valueOf(listEvnPCResponse.getParentId()));
         initialValues.put("strParentId", listEvnPCResponse.getStrParentId());
         initialValues.put("pcId", listEvnPCResponse.getPcId());
-        initialValues.put("strPcId", listEvnPCResponse.getStrPcId());
+        initialValues.put("strPcId", listEvnPCResponse.getStrPcId() + "");
         initialValues.put("code", listEvnPCResponse.getCode());
         initialValues.put("ext", listEvnPCResponse.getExt());
         initialValues.put("fullName", listEvnPCResponse.getFullName());
@@ -1228,11 +1202,15 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("strDateChanged", listEvnPCResponse.getStrDateChanged());
         initialValues.put("regionId", listEvnPCResponse.getRegionId());
         initialValues.put("parentPcCode", listEvnPCResponse.getParentPcCode());
-        initialValues.put("cardPrefix", listEvnPCResponse.getCardPrefix());
+        initialValues.put("cardPrefix", listEvnPCResponse.getCardPrefix() + "");
         initialValues.put("edong", edong);
-
+        int rowAffect = -1;
         database = getWritableDatabase();
-        int rowAffect = (int) database.insert(TABLE_NAME_EVN_PC, null, initialValues);
+        try {
+            rowAffect = (int) database.insertOrThrow(TABLE_NAME_EVN_PC, null, initialValues);
+        } catch (Exception e) {
+            Log.e(TAG, "insertEvnPC: " + e.getMessage());
+        }
         return rowAffect;
     }
 
@@ -1274,7 +1252,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public long deleteAllPC(String edong) {
         database = this.getWritableDatabase();
-        return database.delete(TABLE_NAME_EVN_PC,  "edong=?", new String[]{edong});
+        return database.delete(TABLE_NAME_EVN_PC, "edong=?", new String[]{edong});
     }
 
     public long checkEvnPCExist(int pcId, String edong) {
@@ -1827,8 +1805,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("SO_LAN_IN_BIEN_NHAN", SO_LAN_IN_BIEN_NHAN);
             initialValues.put("NGAY_DAY", NGAY_DAY);
 
-            if(bodyBillResponse.getRequestDate() != null)
-            {
+            if (bodyBillResponse.getRequestDate() != null) {
                 initialValues.put("NGAY_THU", Common.parse(Common.parseDate(bodyBillResponse.getRequestDate(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
             }
 
@@ -1877,12 +1854,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("NGAY_DAY", NGAY_DAY);
 
 
-
-            if(bodyBillResponse.getRequestDate() != null)
-            {
+            if (bodyBillResponse.getRequestDate() != null) {
                 initialValues.put("NGAY_THU", Common.parse(Common.parseDate(bodyBillResponse.getRequestDate(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
-            }else
-            {
+            } else {
                 initialValues.put("NGAY_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
             }
 
