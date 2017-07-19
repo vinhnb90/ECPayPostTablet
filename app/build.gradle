@@ -73,4 +73,5 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     compile files('libs/simplyprintapi-android-1.4.0.jar')
     compile files('libs/commons-lang-2.6.jar')
+    compile 'com.roughike:bottom-bar:2.3.1'
 }

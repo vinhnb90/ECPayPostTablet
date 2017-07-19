@@ -1,77 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="@dimen/_5sdp"
     android:background="@color/colorRow"
+    android:orientation="horizontal"
     android:padding="@dimen/_2sdp">
-    <TextView
-        android:layout_centerHorizontal="true"
-        android:id="@+id/tvTitleKy"
-        android:layout_width="wrap_content"
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/_5sdp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvTenKH"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:gravity="center_vertical"
+            android:text="Tên khách hàng"
+            android:textSize="@dimen/_10sdp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvMaKH"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:gravity="center_vertical"
+            android:text="PD00111"
+            android:textSize="@dimen/_10sdp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_mid"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:textSize="@dimen/_10sdp"
-        android:text="Kỳ" />
+        android:layout_centerInParent="true"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tvKy"
-        android:layout_centerHorizontal="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvTitleKy"
-        android:layout_marginBottom="@dimen/_5sdp"
-        android:layout_marginTop="@dimen/_5sdp"
-        android:textSize="@dimen/_10sdp"
-        android:text="03/2017" />
+        <TextView
+            android:id="@+id/tvTitleKy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Kỳ: 03/2017"
+            android:textSize="@dimen/_10sdp" />
 
-    <TextView
-        android:id="@+id/tvTenKH"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+        <TextView
+            android:id="@+id/tvKy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:gravity="center"
+            android:text="03/2017"
+            android:textColor="@color/colorRed"
+            android:textSize="@dimen/_10sdp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:layout_marginLeft="@dimen/_5sdp"
-        android:layout_marginTop="@dimen/_2sdp"
-        android:textSize="@dimen/_10sdp"
-        android:text="Tên khách hàng"
-        android:textStyle="bold" />
+        android:layout_toRightOf="@id/ll_mid"
+        android:layout_weight="1.2"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tvMaKH"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/tvTenKH"
-        android:layout_marginBottom="@dimen/_5sdp"
-        android:layout_marginLeft="@dimen/_8sdp"
-        android:layout_marginTop="@dimen/_5sdp"
-        android:textSize="@dimen/_10sdp"
-        android:text="PD00111" />
+        <TextView
+            android:id="@+id/tvLyDo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="right|center_vertical"
+            android:text="Ngày Thu"
+            android:textSize="@dimen/_10sdp" />
+
+    </LinearLayout>
 
 
-    <TextView
-        android:id="@+id/tv_fragment_thanh_toan_total_bills_money"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="@dimen/_30sdp"
-        android:layout_marginRight="@dimen/_8sdp"
-        android:layout_marginTop="@dimen/_2sdp"
-        android:textSize="@dimen/_10sdp"
-        android:text="1.000.000 đ" />
-
-    <TextView
-        android:id="@+id/tvTinhTrang"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/tv_fragment_thanh_toan_total_bills_money"
-        android:layout_marginLeft="@dimen/_30sdp"
-        android:layout_marginRight="@dimen/_8sdp"
-        android:layout_marginTop="@dimen/_5sdp"
-        android:textSize="@dimen/_10sdp"
-        android:text="Đã thu nguồn khác"
-        android:textColor="@color/colorTextGreen" />
-
-</RelativeLayout>
+</LinearLayout>

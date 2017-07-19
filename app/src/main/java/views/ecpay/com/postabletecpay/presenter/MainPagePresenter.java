@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import org.apache.log4j.chainsaw.Main;
+
 import views.ecpay.com.postabletecpay.model.MainPageModel;
 import views.ecpay.com.postabletecpay.model.PayModel;
 import views.ecpay.com.postabletecpay.model.sharedPreference.SharePrefManager;
@@ -38,6 +40,21 @@ public class MainPagePresenter implements IMainPagePresenter {
         this.mIMainPageView = mIMainPageView;
         mainPageModel = new MainPageModel(mIMainPageView.getContextView());
         mSharedPrefLogin = mainPageModel.getManagerSharedPref();
+    }
+
+    @Override
+    public void deleteData() {
+
+        try {
+            Common.deleteAllFileFolderDownload();
+            Common.loadFolder((MainActivity)mIMainPageView.getContextView());
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        mainPageModel.deleteAllData();
+        callInfoMain(MainActivity.mEdong);
     }
 
     //region IMainPagePresenter

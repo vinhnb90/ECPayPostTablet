@@ -13,9 +13,9 @@
 
         <ImageButton
             android:id="@+id/btnBack1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
+            android:layout_margin="@dimen/_5sdp"
             android:background="@null"
             android:src="@mipmap/ic_back" />
 
@@ -24,8 +24,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_margin="15dp"
+            android:layout_margin="@dimen/_5sdp"
             android:text="ĐỊNH DANH THẺ"
+            android:textStyle="bold"
             android:textColor="@color/colorTextWhite"
             android:textSize="20sp" />
 
@@ -50,8 +51,8 @@
 
             <ImageButton
                 android:id="@+id/btnScanCode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/_24sdp"
+                android:layout_height="@dimen/_24sdp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="10dp"
@@ -61,13 +62,11 @@
             <EditText
                 android:id="@+id/eSearchCustomer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_24sdp"
                 android:layout_alignBaseline="@+id/ibtn_frag_thanhtoan_qrcode"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_marginBottom="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_margin="@dimen/_5sdp"
                 android:layout_toLeftOf="@+id/btnScanCode"
                 android:layout_toStartOf="@+id/btnScanCode"
                 android:background="@drawable/bg_edittext"
@@ -75,10 +74,9 @@
                 android:imeOptions="actionSearch"
                 android:inputType="textNoSuggestions|textVisiblePassword"
                 android:lines="1"
-                android:paddingBottom="10dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="50dp"
-                android:paddingTop="10dp"
+                android:textSize="@dimen/_10sdp"
+                android:scrollbars="horizontal"
+                android:maxLines="1"
                 android:scrollHorizontally="true"
                 android:text="" />
 
@@ -103,12 +101,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.5"
+                    android:textColor="@color/colorTextWhite"
+                    android:textSize="@dimen/_10sdp"
                     android:text="Tên Khách Hàng" />
 
                 <EditText
                     android:id="@+id/eSearchTen"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/_24sdp"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:layout_weight="1"
@@ -117,6 +117,7 @@
                     android:inputType="textNoSuggestions|textVisiblePassword"
                     android:lines="1"
                     android:padding="10dp"
+                    android:textSize="@dimen/_10sdp"
                     android:scrollHorizontally="true"
                     android:text="" />
             </LinearLayout>
@@ -133,14 +134,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.5"
+                    android:textColor="@color/colorTextWhite"
+                    android:textSize="@dimen/_10sdp"
                     android:text="Địa Chỉ" />
 
                 <EditText
                     android:id="@+id/eSearchAddress"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/_24sdp"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
+                    android:textSize="@dimen/_10sdp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_edittext"
                     android:imeOptions="actionSearch"
@@ -163,14 +167,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.5"
+                    android:textColor="@color/colorTextWhite"
+                    android:textSize="@dimen/_10sdp"
                     android:text="Điện Thoại" />
 
                 <EditText
                     android:id="@+id/eSearchDT"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/_24sdp"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
+                    android:textSize="@dimen/_10sdp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_edittext"
                     android:imeOptions="actionSearch"
@@ -194,15 +201,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.5"
+                    android:textSize="@dimen/_10sdp"
+                    android:textColor="@color/colorTextWhite"
                     android:text="Số Giấy Tờ" />
 
                 <EditText
                     android:id="@+id/eSearchBookCmis"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/_24sdp"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:layout_weight="1"
+                    android:textSize="@dimen/_10sdp"
                     android:background="@drawable/bg_edittext"
                     android:imeOptions="actionSearch"
                     android:inputType="textNoSuggestions|textVisiblePassword"
@@ -223,8 +233,8 @@
 
             <ImageButton
                 android:id="@+id/btnExpand"
-                android:layout_width="30dp"
-                android:layout_height="20dp"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_15sdp"
                 android:layout_alignParentTop="true"
                 android:layout_centerInParent="true"
                 android:layout_centerVertical="false"
@@ -248,7 +258,7 @@
                 <Button
                     android:id="@+id/btnSearch2"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/_24sdp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_weight="1"

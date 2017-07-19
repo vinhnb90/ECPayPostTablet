@@ -4,6 +4,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by macbook on 4/30/17.
  */
@@ -12,23 +15,39 @@ public class BaoCaoAdapter extends FragmentPagerAdapter {
 
     private static final int FRAGMENT_COUNT = 4;
 
-    public BaoCaoAdapter(FragmentManager fm) {
+
+    Map<Integer, Fragment> fragmentMap;
+
+    IBaoCaoView baoCaoView;
+
+    public BaoCaoAdapter(IBaoCaoView view, FragmentManager fm) {
         super(fm);
+        this.baoCaoView = view;
+        fragmentMap = new HashMap<>();
     }
 
     @Override
     public Fragment getItem(int position) {
+        Fragment fragment = null;
         switch (position){
             case 0:
-                return new BaoCaoTongHopFragment();
+                fragment = BaoCaoTongHopFragment.newInstance(this.baoCaoView);
+                break;
             case 1:
-                return new BaoCaoChiTietFragment();
+                fragment = BaoCaoChiTietFragment.newInstance(this.baoCaoView);
+                break;
             case 2:
-                return new BaoCaoHoanTraFragment();
+                fragment = BaoCaoHoanTraFragment.newInstance(this.baoCaoView);
+                break;
             case 3:
-                return new BaoCaoLichSuFragment();
+                fragment = BaoCaoLichSuFragment.newInstance(this.baoCaoView);
+                break;
         }
-        return null;
+        if(fragment != null)
+        {
+            fragmentMap.put(position, fragment);
+        }
+        return fragment;
     }
 
     @Override
@@ -49,6 +68,12 @@ public class BaoCaoAdapter extends FragmentPagerAdapter {
                 return "Lịch sử KH";
         }
         return null;
+    }
+
+
+    public Fragment getFragment(int pos)
+    {
+        return fragmentMap.get(pos);
     }
 
 }

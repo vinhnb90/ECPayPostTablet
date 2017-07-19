@@ -75,6 +75,16 @@ public class BaoCaoTongHopFragment extends Fragment implements View.OnClickListe
 
     private IReportTongHopPresenter reportTongHopPresenter;
 
+
+    IBaoCaoView baoCaoView;
+
+    public static BaoCaoTongHopFragment newInstance(IBaoCaoView view)
+    {
+        BaoCaoTongHopFragment fragment = new BaoCaoTongHopFragment();
+        fragment.baoCaoView = view;
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -93,6 +103,12 @@ public class BaoCaoTongHopFragment extends Fragment implements View.OnClickListe
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        this.baoCaoView.showBackBtn(false);
     }
 
     @Override

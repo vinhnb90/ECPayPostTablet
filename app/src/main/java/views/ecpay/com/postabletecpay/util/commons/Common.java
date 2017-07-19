@@ -66,9 +66,11 @@ import java.text.Normalizer;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
@@ -1027,16 +1029,16 @@ public class Common {
     }
     public enum MA_GIAO_DICH
     {
-        TTOAN_OFFLINE ("06", "Thanh Toan OFFLINE"),
-        CAP_NHAT_TTHAI_NO("02", "Cap Nhat Trang Thai No"),
-        TT_ONLINE_CHAM_NO_ONLINE("03", "Thanh Toan Online Cham No Online"),
-        TT_ONLINE_CHAM_NO_OFFLINE("04", "Thanh Toan Online Cham No Offline"),
-        CHAM_NO("07", "Cham No"),
-        TT_ONLINE_CHAM_NO_LOI("05", "Thanh Toan Online Cham No Loi"),
-        XU_LY_GIAO_DICH_NGHI_NGO("09", "Xu Ly Giao Dich Nghi Ngo"),
-        GUI_YEU_CAU_HUY("11", "Gui Yeu Cau Huy"),
-        HUY_HOA_DON("08", "Huy Hoa Don"),
-        DAY_CHAM_NO("10", "Day Cham No");
+        TTOAN_OFFLINE ("06", "Thanh Toán OFFLINE"),
+        CAP_NHAT_TTHAI_NO("02", "Cập Nhật Trạng Thái "),
+        TT_ONLINE_CHAM_NO_ONLINE("03", "Thanh Toán Online Chấm Nợ Online"),
+        TT_ONLINE_CHAM_NO_OFFLINE("04", "Thanh Toán Online Chấm Nợ Offline"),
+        CHAM_NO("07", "Chấm Nợ"),
+        TT_ONLINE_CHAM_NO_LOI("05", "Thanh Toán Online Chấm Nợ Lỗi"),
+        XU_LY_GIAO_DICH_NGHI_NGO("09", "Xử Lý Giao Dịch Nghi Ngờ"),
+        GUI_YEU_CAU_HUY("11", "Gửi Yêu Cầu Huỷ"),
+        HUY_HOA_DON("08", "Huỷ Hoá Đơn"),
+        DAY_CHAM_NO("10", "Đẩy Chấm Nợ");
 
         MA_GIAO_DICH(String code, String message) {
             this.code = code;
@@ -1054,6 +1056,19 @@ public class Common {
 
         private final String code;
         private String message;
+
+
+        public static MA_GIAO_DICH findCode(String code)
+        {
+            for (int i = 0, n = values().length; i < n; i ++)
+            {
+                if(values()[i].getCode().equalsIgnoreCase(code))
+                {
+                    return values()[i];
+                }
+            }
+            return null;
+        }
     }
 
 
@@ -2805,10 +2820,30 @@ public class Common {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-
         }
-
-
         return result.toString();
     }
+
+    public static List<String> getDetailVersion() {
+        List<String> result = new ArrayList<>();
+        result.add("Chức năng Đăng nhập");
+        result.add("Chức năng Đăng xuất");
+        result.add("Chức năng Đổi mật khẩu");
+        result.add("Chức năng Thông tin tài khoản");
+        result.add("Chức năng Trang Chủ");
+        result.add("Chức năng Hỗ trợ");
+        result.add("Chức năng Hướng dẫn");
+        result.add("Chức năng đồng bộ");
+        result.add("Chức năng Thanh toán hóa đơn");
+        result.add("Chức năng đẩy hóa đơn chấm nợ");
+        result.add("Chức năng Chuyển về ví tổng");
+        result.add("Chức năng Định danh thẻ khách hàng");
+        result.add("Chức năng Danh sách khách hàng");
+        result.add("Chức năng Đăng ký thẻ eCard");
+        result.add("Cập nhật thông tin khách hàng");
+        result.add("Chức năng Báo cáo");
+        result.add("Chức năng Xóa dữ liệu giao thu");
+        return result;
+    }
+
 }

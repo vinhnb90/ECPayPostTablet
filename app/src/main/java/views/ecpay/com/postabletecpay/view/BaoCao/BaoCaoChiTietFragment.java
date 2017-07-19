@@ -38,6 +38,7 @@ import views.ecpay.com.postabletecpay.model.adapter.CustomerAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.ReportChiTietAdapter;
 import views.ecpay.com.postabletecpay.presenter.IReportChiTietPresenter;
 import views.ecpay.com.postabletecpay.presenter.ReportChiTietPresenter;
+import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.EntityHoaDonThu;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 
@@ -87,6 +88,17 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
     private Calendar tuNgayDate, denNgayDate;
     private IReportChiTietPresenter reportChiTietPresenter;
 
+
+
+    IBaoCaoView baoCaoView;
+
+    public static BaoCaoChiTietFragment newInstance(IBaoCaoView view)
+    {
+        BaoCaoChiTietFragment fragment = new BaoCaoChiTietFragment();
+        fragment.baoCaoView = view;
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -132,7 +144,7 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
 
 
         txtSoHD.setText("0");
-        txtTongTien.setText("0");
+        txtTongTien.setText(Common.convertLongToMoney(0));
         return view;
     }
 
@@ -191,12 +203,24 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         adapter.notifyDataSetChanged();
 
 
-        txtSoHD.setText(String.valueOf(lst.size()));
-
         if (lst.size() == 0)
         {
+            txtSoHD.setText("0");
+            txtTongTien.setText(Common.convertLongToMoney(0));
             showMessage("Không Tồn Tại Hoá Đơn Thoả Mãn Điều Kiện Tìm Kiếm");
             return;
+        }else
+        {
+            txtSoHD.setText(String.valueOf(lst.size()));
+
+            long total = 0;
+            for (int i = 0, n = lst.size();  i < n; i ++){
+                total += lst.get(i).getSO_TIEN_TTOAN();
+            }
+
+
+            txtTongTien.setText(Common.convertLongToMoney(total));
+
         }
     }
 
@@ -209,4 +233,11 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
 
         }
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        this.baoCaoView.showBackBtn(false);
+    }
+
 }

@@ -192,6 +192,33 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         super.close();
     }
 
+
+    public void deleteAllData()
+    {
+        try
+        {
+            database = getReadableDatabase();
+//            String query = "DELETE FROM " + TABLE_NAME_BILL;
+//            database.execSQL(query, null);
+//
+//            query = "DELETE FROM " + TABLE_NAME_DEBT_COLLECTION;
+//            database.execSQL(query, null);
+//
+//
+//            query = "DELETE FROM " + TABLE_NAME_HISTORY_PAY;
+//            database.execSQL(query, null);
+            database.delete(TABLE_NAME_BILL, null, null);
+            database.delete(TABLE_NAME_DEBT_COLLECTION, null, null);
+            database.delete(TABLE_NAME_HISTORY_PAY, null, null);
+
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+    }
+
     //region sqlite
     public void insertOrUpdateAccount(Account account) {
         if (account == null)
@@ -413,6 +440,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     "' and TEN_KHANG like '%" + customerCode + "%'" + queryDateFrom + queryDateTo + " ORDER BY date(NGAY_THU) DESC";
         }
 
+
+        query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " A INNER JOIN ( " + query + ") B ON A.MA_KHANG = B.MA_KHANG";
+
         Cursor mCursor = database.rawQuery(query, null);
 
         if (mCursor != null && mCursor.moveToFirst()) {
@@ -426,7 +456,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 hoaDonThu.setMA_HOA_DON(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON")));
                 hoaDonThu.setMA_KHANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
                 hoaDonThu.setMA_THE(mCursor.getString(mCursor.getColumnIndex("MA_THE")));
-                hoaDonThu.setTEN_KHANG(mCursor.getString(mCursor.getColumnIndex("TEN_KHANG")));
+                hoaDonThu.setTEN_KHANG(mCursor.getString(4));
                 hoaDonThu.setDIA_CHI(mCursor.getString(mCursor.getColumnIndex("DIA_CHI")));
                 hoaDonThu.setTHANG_TTOAN(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
                 hoaDonThu.setPHIEN_TTOAN(mCursor.getInt(mCursor.getColumnIndex("PHIEN_TTOAN")));
@@ -609,6 +639,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     "' and TEN_KHANG like '%" + customerCode + "%' and TRANG_THAI_HOAN_TRA = '" + Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode() + "' " + queryDateFrom + queryDateTo + " ORDER BY date(NGAY_THU) DESC";
         }
 
+        query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " A INNER JOIN ( " + query + ") B ON A.MA_KHANG = B.MA_KHANG";
+
         Cursor mCursor = database.rawQuery(query, null);
 
         if (mCursor != null && mCursor.moveToFirst()) {
@@ -622,7 +654,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 hoaDonThu.setMA_HOA_DON(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON")));
                 hoaDonThu.setMA_KHANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
                 hoaDonThu.setMA_THE(mCursor.getString(mCursor.getColumnIndex("MA_THE")));
-                hoaDonThu.setTEN_KHANG(mCursor.getString(mCursor.getColumnIndex("TEN_KHANG")));
+                hoaDonThu.setTEN_KHANG(mCursor.getString(4));
                 hoaDonThu.setDIA_CHI(mCursor.getString(mCursor.getColumnIndex("DIA_CHI")));
                 hoaDonThu.setTHANG_TTOAN(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
                 hoaDonThu.setPHIEN_TTOAN(mCursor.getInt(mCursor.getColumnIndex("PHIEN_TTOAN")));

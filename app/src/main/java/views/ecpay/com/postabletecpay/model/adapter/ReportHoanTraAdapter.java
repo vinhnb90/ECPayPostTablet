@@ -48,10 +48,9 @@ public class ReportHoanTraAdapter  extends RecyclerView.Adapter<ReportHoanTraAda
         EntityHoaDonThu bill = mBills.get(position);
         holder.tvTenKH.setText(bill.getTEN_KHANG());
         holder.tvMaKH.setText(bill.getMA_KHANG());
-        holder.tv_fragment_thanh_toan_total_bills_money.setText(Common.convertLongToMoney(bill.getSO_TIEN_TTOAN()));
-        holder.tvTinhTrang.setText(Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getMessage());
-        holder.tvKy.setText(Common.parse(bill.getTHANG_TTOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString()));
-
+        holder.tvTongTien.setText(Common.convertLongToMoney(bill.getSO_TIEN_TTOAN()));
+        holder.tvKyTitle.setText("Kỳ: " + Common.parse(bill.getTHANG_TTOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString()));
+        holder.tvLyDo.setText("");
 
     }
 
@@ -65,18 +64,19 @@ public class ReportHoanTraAdapter  extends RecyclerView.Adapter<ReportHoanTraAda
 
         public TextView tvTenKH;
         public TextView tvMaKH;
-        public TextView tvKy;
-        public TextView tv_fragment_thanh_toan_total_bills_money;
-        public TextView tvTinhTrang;
+        public TextView tvTongTien;
+        public TextView tvKyTitle;
+        public TextView tvLyDo;
 
         public RowHoanTraHolder(View itemView) {
             super(itemView);
 
             tvTenKH = (TextView)itemView.findViewById(R.id.tvTenKH);
             tvMaKH = (TextView)itemView.findViewById(R.id.tvMaKH);
-            tvKy = (TextView)itemView.findViewById(R.id.tvKy);
-            tv_fragment_thanh_toan_total_bills_money = (TextView)itemView.findViewById(R.id.tv_fragment_thanh_toan_total_bills_money);
-            tvTinhTrang = (TextView)itemView.findViewById(R.id.tvTinhTrang);
+            tvKyTitle = (TextView)itemView.findViewById(R.id.tvTitleKy);
+            tvTongTien = (TextView)itemView.findViewById(R.id.tvKy);
+            tvLyDo = (TextView)itemView.findViewById(R.id.tvLyDo);
+
 
         }
     }

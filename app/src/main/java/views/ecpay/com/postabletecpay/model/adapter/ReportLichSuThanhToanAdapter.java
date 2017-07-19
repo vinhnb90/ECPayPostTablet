@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -121,22 +122,40 @@ public class ReportLichSuThanhToanAdapter extends RecyclerView.Adapter<ReportLic
         public TextView tvTinhTrang;
         public TextView tv_fragment_thanh_toan_total_bills_money;
 
+        EntityLichSuThanhToan Data;
+
         public RowLichSuHolder(View itemView) {
             super(itemView);
-
 
             tvNgay = (TextView) itemView.findViewById(R.id.tvNgay);
             tvTinhTrang = (TextView) itemView.findViewById(R.id.tvTinhTrang);
             tv_fragment_thanh_toan_total_bills_money = (TextView) itemView.findViewById(R.id.tv_fragment_thanh_toan_total_bills_money);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    reportLichSuThanhToanView.showChiTiet(Data);
+                }
+            });
 
         }
 
 
         public void fillData(EntityLichSuThanhToan data)
         {
+            this.Data = data;
             tvNgay.setText(Common.parse(data.getNGAY_PHAT_SINH(), Common.DATE_TIME_TYPE.ddMMyyyy.toString()));
             tv_fragment_thanh_toan_total_bills_money.setText(String.valueOf(data.getSO_TIEN_TTOAN()));
-            tvTinhTrang.setText(data.getMA_GIAO_DICH());
+
+            Common.MA_GIAO_DICH gd = Common.MA_GIAO_DICH.findCode(data.getMA_GIAO_DICH());
+            if(gd != null)
+            {
+                tvTinhTrang.setText(gd.getMessage());
+            }else
+            {
+                tvTinhTrang.setText("");
+            }
+
         }
     }
 

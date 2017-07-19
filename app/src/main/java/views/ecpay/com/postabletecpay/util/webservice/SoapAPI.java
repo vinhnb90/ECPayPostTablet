@@ -3108,7 +3108,8 @@ public class SoapAPI {
                 ht.call(SOAP_ACTION, envelope);
                 response = (SoapPrimitive) envelope.getResponse();
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(this.getClass().getName(), "Lỗi HttpTransportSE(URL) " + e.getMessage());
+                return null;
             }
 
             if (response == null) {

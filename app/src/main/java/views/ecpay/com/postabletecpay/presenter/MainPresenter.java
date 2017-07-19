@@ -367,6 +367,9 @@ public class MainPresenter implements IMainPresenter {
                                                     mainModel.setChangedGenFile(edong, bookCmis, fileGenResponse.getId_changed(), fileGenResponse.getDate_changed());
 
                                                     for (ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
+                                                        if(listCustomerResponse.getBodyCustomerResponse().getCustomerCode().equals("PH10000012075")) {
+                                                            Log.e(TAG, "synchronizeFileGen Customer " + listCustomerResponse.getBodyCustomerResponse().getName());
+                                                        }
                                                         if (mainModel.checkCustomerExist(listCustomerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
                                                             if (mainModel.insertCustomer(listCustomerResponse) != -1) {
                                                                 Log.i("INFO", "TEST");
@@ -374,6 +377,7 @@ public class MainPresenter implements IMainPresenter {
                                                         }
                                                     }
 
+                                                    Log.e(TAG, "synchronizeFileGen list bill " + fileGenResponse.getBillResponse().size());
                                                     for (ListBillResponse listBillResponse : fileGenResponse.getBillResponse()) {
                                                         listBillResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
                                                         if (mainModel.checkBillExist(listBillResponse.getBodyBillResponse().getBillId()) == 0) {
@@ -387,14 +391,14 @@ public class MainPresenter implements IMainPresenter {
                                                     MainPresenter.this.refreshDataPayAdapter();
 
                                                 } catch (IOException e) {
-                                                    e.printStackTrace();
+                                                    throw e;
                                                 } catch (JSONException e) {
-                                                    e.printStackTrace();
+                                                    throw e;
                                                 }
                                             }
                                         }
                                     }
-                                } catch (IOException e) {
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 } finally {
                                     ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
@@ -571,6 +575,9 @@ public class MainPresenter implements IMainPresenter {
                                                 GsonBuilder gsonBuilder = new GsonBuilder();
                                                 Gson gson = gsonBuilder.create();
                                                 CustomerResponse customerResponse = gson.fromJson(ja.toString(), CustomerResponse.class);
+                                                if(customerResponse.getBodyCustomerResponse().getCustomerCode().equals("PH10000012075")) {
+                                                    Log.e(TAG, "synchronizeData Customer " + customerResponse.getBodyCustomerResponse().getName());
+                                                }
                                                 if (mainModel.checkCustomerExist(customerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
                                                     if (mainModel.insertCustomer(customerResponse) != -1) {
                                                         Log.i("INFO", "SUCCESS");
@@ -593,8 +600,8 @@ public class MainPresenter implements IMainPresenter {
 
                                         try {
                                             String sCustomer = Common.decompress(zipByteBill);
-
                                             JSONArray jsonArray = new JSONArray(sCustomer);
+                                            Log.e(TAG, "synchronizeData list bill " + jsonArray.length());
                                             for (int i = 0; i < jsonArray.length(); i++) {
                                                 JSONObject ja = jsonArray.getJSONObject(i);
                                                 GsonBuilder gsonBuilder = new GsonBuilder();
@@ -616,9 +623,9 @@ public class MainPresenter implements IMainPresenter {
                                             MainPresenter.this.refreshDataPayAdapter();
 
                                         } catch (IOException e) {
-                                            e.printStackTrace();
+                                            throw e;
                                         } catch (JSONException e) {
-                                            e.printStackTrace();
+                                            throw e;
                                         }
                                     }
                                 } catch (Exception e) {
