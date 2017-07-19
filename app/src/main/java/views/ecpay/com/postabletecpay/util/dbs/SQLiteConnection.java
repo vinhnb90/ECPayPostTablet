@@ -878,12 +878,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             return entityHoaDonNo;
     }
 
-    public List<EntityKhachHang> selectAllCustomerFitterBy(String edong, int startIndex, Common.TYPE_SEARCH typeSearch, String infoSearch) {
-        List<EntityKhachHang> customerList = new ArrayList<>();
+    public Pair<List<EntityKhachHang>, Integer> selectAllCustomerFitterBy(String edong, int startIndex, Common.TYPE_SEARCH typeSearch, String infoSearch) {
 
+        List<EntityKhachHang> customerList = new ArrayList<>();
+        int totalRow = 0;
         boolean fail = TextUtils.isEmpty(edong);
         if (fail)
-            return customerList;
+            return new Pair<>(customerList, totalRow);
 
         String query = "";
         String whereQuery1 = "";
@@ -926,7 +927,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         query = "SELECT * FROM (select (select COUNT(*) " +
                 "                from " + TABLE_NAME_CUSTOMER + " t1 " +
                 "                where t1.ID <= t2.ID and " + whereQuery1 +
-                "                ) as Row_Number, * from " + TABLE_NAME_CUSTOMER + " t2 WHERE " + whereQuery2 + " ORDER BY ID) " +
+                "                ) as Row_Number, (select count(*) from " + TABLE_NAME_CUSTOMER + " t1 WHERE  " + whereQuery1 + ") as TONG_ROW, * from " + TABLE_NAME_CUSTOMER + " t2 WHERE " + whereQuery2 + " ORDER BY ID) " +
                 "                  WHERE Row_Number BETWEEN " + ((startIndex - 1) * PayFragment.ROWS_ON_PAGE + 1) + " AND " + ((startIndex) * PayFragment.ROWS_ON_PAGE);
 
         database = this.getWritableDatabase();
@@ -936,7 +937,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             int count = c.getCount();
             do {
 
-
+                totalRow = c.getInt(c.getColumnIndex("TONG_ROW"));
                 EntityKhachHang khachHang = new EntityKhachHang();
                 khachHang.setE_DONG(c.getString(c.getColumnIndex("E_DONG")));
                 khachHang.setMA_KHANG(c.getString(c.getColumnIndex("MA_KHANG")));
@@ -963,7 +964,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         {
             c.close();
         }
-        return customerList;
+        return new Pair<>(customerList, totalRow);
     }
 
 

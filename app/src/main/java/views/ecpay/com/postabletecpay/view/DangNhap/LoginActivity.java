@@ -330,10 +330,10 @@ public class LoginActivity extends BaseActivity implements ILoginView {
     @OnClick(R.id.btLogin)
     public void clickLogin(View view) {
         Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
-
+//
         final String userName = etUsername.getText().toString();
         final String pass = etPass.getText().toString();
-
+//
         if (cbRememberLogin.isChecked()) {
             mILoginPresenter.writeSharedPrefLogin(userName, pass);
         } else
@@ -351,7 +351,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
 //        ///Cheat
 //        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//        intent.putExtra(KEY_EDONG, "01666564963");
+//        intent.putExtra(KEY_EDONG, userName);
 //        startActivity(intent);
 //        this.finish();
     }

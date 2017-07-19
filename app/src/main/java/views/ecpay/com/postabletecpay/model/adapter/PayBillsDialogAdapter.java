@@ -195,7 +195,7 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
                     for(int i = position + 1, n = listBillChecked.size(); i < n; i ++)
                     {
                         if(listBillChecked.get(i).getMA_KHACH_HANG().equalsIgnoreCase(MA_KHACH_HANG) && listBillChecked.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()) &&
-                                !listBillChecked.get(i).isChecked())
+                                !listBillChecked.get(i).isChecked() && listBillChecked.get(i).compareTo(bill) != 0)
                         {
                             lastCHeck = i;
                             break;
@@ -223,12 +223,12 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
                     }
                 }else
                 {
-                    bill.setChecked(checked);
-
                     boolean hasChange = false;
                     for (int i = 0; i <= position; i ++)
                     {
-                        if(listBillChecked.get(i).getMA_KHACH_HANG().equalsIgnoreCase(MA_KHACH_HANG) && listBillChecked.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()))
+                        if(listBillChecked.get(i).getMA_KHACH_HANG().equalsIgnoreCase(MA_KHACH_HANG) &&
+                                listBillChecked.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) &&
+                                listBillChecked.get(i).compareTo(bill) != 0)
                         {
                             if(i != position && listBillChecked.get(i).isChecked())
                             {
@@ -237,6 +237,8 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
                             listBillChecked.get(i).setChecked(false);
                         }
                     }
+                    bill.setChecked(checked);
+
 
                     if (hasChange)
                     {

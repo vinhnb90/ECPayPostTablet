@@ -678,21 +678,21 @@ public class PayFragment extends Fragment implements
 
     //TODO mark Trang
     @Override
-    public void showPayRecyclerPage(List<PayAdapter.DataAdapter> adapterList, int indexBegin, int indexEnd, int pageIndex, int totalPage, String infoSearch, boolean isSeachOnline) {
+    public void showPayRecyclerPage(List<PayAdapter.DataAdapter> adapterList, int indexBegin, int totalPage, String infoSearch, boolean isSeachOnline) {
         try
         {
             btnPre.setEnabled(true);
             btnNext.setEnabled(true);
-            tvPage.setText(String.valueOf(pageIndex).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
+            tvPage.setText(String.valueOf(indexBegin).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
 
             //enable disable button pre next
-            if (pageIndex == FIRST_PAGE_INDEX) {
+            if (indexBegin == FIRST_PAGE_INDEX) {
                 setEnablePreNext(1);
                 if (FIRST_PAGE_INDEX == totalPage)
                     setEnablePreNext(0);
                 else
                     setEnablePreNext(1);
-            } else if (pageIndex == totalPage) {
+            } else if (indexBegin == totalPage) {
                 if (totalPage == FIRST_PAGE_INDEX)
                     setEnablePreNext(0);
                 else
@@ -705,7 +705,7 @@ public class PayFragment extends Fragment implements
                 rvKH.invalidate();
             }
 
-            payAdapter = new PayAdapter(this.getContext(), mIPayPresenter, adapterList, indexBegin, indexEnd);
+            payAdapter = new PayAdapter(this.getContext(), mIPayPresenter, adapterList, indexBegin);
             rvKH.setAdapter(payAdapter);
             rvKH.setLayoutManager(new LinearLayoutManager(getContext()));
             rvKH.setHasFixedSize(true);
