@@ -326,6 +326,9 @@ public class CashTranferFragment extends Fragment implements View.OnClickListene
     @Override
     public void setVisibleBar(boolean visible) {
 
+        if(hLoading == null)
+            return;
+
         if(visible)
             hLoading.setVisibility(View.VISIBLE);
         else

@@ -11,6 +11,7 @@
         android:background="@color/colorBlue"
         android:id="@+id/hHeader">
 
+
         <ImageButton
             android:id="@+id/btnBack1"
             android:layout_width="@dimen/_25sdp"
@@ -25,12 +26,13 @@
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/ibtn_frag_thanhtoan_back"
             android:layout_centerHorizontal="true"
             android:layout_margin="@dimen/_10sdp"
             android:text="CHUYỂN TIỀN VÍ TỔNG"
-            android:textColor="@color/colorTextWhite"
             android:textStyle="bold"
-            android:textSize="@dimen/_16sdp" />
+            android:textColor="@color/colorTextWhite"
+            android:textSize="@dimen/_12sdp" />
 
     </RelativeLayout>
 
@@ -174,7 +176,7 @@
                 <TextView
                     android:id="@+id/textView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/_24sdp"
                     android:layout_marginLeft="@dimen/_20sdp"
                     android:layout_weight="1"
                     android:text="Mã Xác Nhận"
@@ -198,18 +200,19 @@
                         <TextView
                             android:id="@+id/txtCaptcha"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="@dimen/_24sdp"
                             android:layout_weight="1"
                             android:text="TextView"
                             android:textSize="@dimen/_12sdp"
                             android:textColor="#FF0000" />
 
                         <Button
+                            android:layout_marginLeft="@dimen/_5sdp"
+                            android:layout_marginBottom="@dimen/_5sdp"
                             android:id="@+id/btnRefresh"
-                            android:layout_width="@dimen/_20sdp"
-                            android:layout_height="@dimen/_20sdp"
-                            android:background="@drawable/bg_button_white"
-                            android:text="R" />
+                            android:layout_width="@dimen/_24sdp"
+                            android:layout_height="@dimen/_24sdp"
+                            android:background="@drawable/ic_refresh_24" />
                     </LinearLayout>
 
                     <EditText
@@ -230,41 +233,32 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginRight="@dimen/_20sdp"
+                android:layout_marginLeft="@dimen/_20sdp"
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1.5"
-                    android:orientation="horizontal"/>
 
                 <Button
                     android:id="@+id/btnBack"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/_8sdp"
-                    android:layout_marginRight="@dimen/_8sdp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_button_white"
                     android:textSize="@dimen/_12sdp"
+                    android:layout_marginRight="@dimen/_5sdp"
                     android:text="Nhập Lại" />
 
                 <Button
                     android:id="@+id/btnNext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/_10sdp"
+                    android:layout_marginLeft="@dimen/_5sdp"
                     android:layout_weight="1"
                     android:textSize="@dimen/_12sdp"
                     android:background="@drawable/bg_button_white"
                     android:text="Tiếp Tục" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1.5"
-                    android:orientation="horizontal"/>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -275,7 +269,10 @@
         android:layout_height="match_parent"
         android:clickable="true"
         android:focusable="true"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
         <ProgressBar
             android:id="@+id/progressBar3"
