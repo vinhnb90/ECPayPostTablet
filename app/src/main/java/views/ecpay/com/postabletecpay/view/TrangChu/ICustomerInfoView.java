@@ -16,4 +16,6 @@ public interface ICustomerInfoView extends ICommonView {
 
     public void refill(EntityKhachHang customer);
 
+    void back();
+
 }

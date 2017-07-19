@@ -128,6 +128,13 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
         return view;
     }
 
+    @Override
+    public void back() {
+        FragmentTransaction fragmentTransaction = this.getActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.frameLayout, SearchCustomerFragment.newInstance(mEDong));
+        fragmentTransaction.commit();
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onClick(View v) {

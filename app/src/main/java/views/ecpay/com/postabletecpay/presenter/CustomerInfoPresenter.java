@@ -135,7 +135,8 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 //                        customer.setBankName(bankName);
 //                        customer.setBankAccount(bankAcc);
                         UpdateDataBase(customer);
-                        customerInfoView.showMessageText(response.getFooter().getDescription(), Common.TYPE_DIALOG.THANH_CONG);
+                        customerInfoView.back();
+                        customerInfoView.showMessageText("Thành công!", Common.TYPE_DIALOG.THANH_CONG);
                     }else
                     {
 
@@ -265,7 +266,8 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 //                        customer.setBankName(bankName);
 //                        customer.setBankAccount(bankAcc);
                         UpdateDataBase(customer);
-                        customerInfoView.showMessageText(response.getFooter().getDescription(), Common.TYPE_DIALOG.THANH_CONG);
+                        customerInfoView.back();
+                        customerInfoView.showMessageText("Thành công!", Common.TYPE_DIALOG.THANH_CONG);
                     }else
                     {
                         customerInfoView.showMessageText(response.getFooter().getDescription(), Common.TYPE_DIALOG.LOI);
