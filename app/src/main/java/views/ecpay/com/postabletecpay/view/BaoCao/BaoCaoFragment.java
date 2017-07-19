@@ -7,6 +7,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,7 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
  * Created by macbook on 4/28/17.
  */
 
-public class BaoCaoFragment extends Fragment implements View.OnClickListener {
+public class BaoCaoFragment extends Fragment implements View.OnClickListener, IBaoCaoView {
 
     @BindView(R.id.tabs) TabLayout tabLayout;
     @BindView(R.id.view_pager) ViewPager viewPager;
@@ -62,7 +63,7 @@ public class BaoCaoFragment extends Fragment implements View.OnClickListener {
         ((MainActivity)this.getContext()).switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.REPORT);
         ibBack.setOnClickListener(this);
 
-        viewPager.setAdapter(new BaoCaoAdapter(getChildFragmentManager()));
+        viewPager.setAdapter(new BaoCaoAdapter(this, getChildFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
 
         return view;
@@ -95,12 +96,18 @@ public class BaoCaoFragment extends Fragment implements View.OnClickListener {
                 @Override
                 public void run() {
                     try {
-                        Fragment fragment = MainPageFragment.newInstance(mEdong);
-                        if (fragment != null) {
-                            FragmentTransaction fragmentTransaction = BaoCaoFragment.this.getActivity().getSupportFragmentManager().beginTransaction();
-                            fragmentTransaction.replace(R.id.frameLayout, fragment);
-                            fragmentTransaction.commit();
+                        Log.d("TAG", "viewPager.getCurrentItem()  = " + viewPager.getCurrentItem() );
+                        if(viewPager.getCurrentItem() == 3)
+                        {
+                            ((BaoCaoLichSuFragment)((BaoCaoAdapter)viewPager.getAdapter()).getFragment(3)).hideLichSu();
                         }
+
+//                        Fragment fragment = MainPageFragment.newInstance(mEdong);
+//                        if (fragment != null) {
+//                            FragmentTransaction fragmentTransaction = BaoCaoFragment.this.getActivity().getSupportFragmentManager().beginTransaction();
+//                            fragmentTransaction.replace(R.id.frameLayout, fragment);
+//                            fragmentTransaction.commit();
+//                        }
                     }
                     catch (Exception e)
                     {
@@ -110,6 +117,12 @@ public class BaoCaoFragment extends Fragment implements View.OnClickListener {
             }, Common.TIME_DELAY_ANIM);
                 break;
         }
+    }
+
+
+    @Override
+    public void showBackBtn(boolean pshow) {
+        ibBack.setVisibility(pshow ? View.VISIBLE : View.GONE);
     }
 
     public interface OnFragmentInteractionListener {

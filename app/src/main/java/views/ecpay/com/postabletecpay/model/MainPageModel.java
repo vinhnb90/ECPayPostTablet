@@ -61,6 +61,11 @@ public class MainPageModel extends CommonModel {
         return sqLiteConnection.getAllBookCmis();
     }
 
+
+    public void deleteAllData()
+    {
+        sqLiteConnection.deleteAllData();
+    }
     //endregion
 }
 

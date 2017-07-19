@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorBlue">
+
         <ImageButton
             android:id="@+id/ibtn_frag_bao_cao_back"
             android:layout_width="@dimen/_25sdp"
@@ -16,7 +17,8 @@
             android:layout_alignParentTop="true"
             android:layout_margin="@dimen/_8sdp"
             android:background="@null"
-            android:src="@mipmap/ic_back" />
+            android:src="@mipmap/ic_back"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvTitle"

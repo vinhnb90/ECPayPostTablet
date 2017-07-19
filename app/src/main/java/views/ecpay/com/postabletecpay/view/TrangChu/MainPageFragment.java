@@ -256,6 +256,7 @@ public class MainPageFragment extends Fragment implements
         Fragment fragment = null;
         switch (v.getId()) {
             case R.id.btXoaDuLieu:
+                this.showDialogDeleteData();
                 break;
             case R.id.btThanhToan:
                 fragment = PayFragment.newInstance(mEdong);
@@ -501,6 +502,36 @@ public class MainPageFragment extends Fragment implements
         } else {
             tvHelp.setText(Html.fromHtml(Common.getDataFileHelp()));
         }
+
+        dialog.show();
+    }
+
+
+    public void showDialogDeleteData() {
+        final Dialog dialog = new Dialog(this.getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_confirm_delete_data);
+        dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        Button ibClose = (Button) dialog.findViewById(R.id.btn_dialog_logout_cancel);
+
+        Button btOK = (Button) dialog.findViewById(R.id.btn_dialog_logout_ok);
+
+        ibClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        btOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mIMainPagePresenter.deleteData();
+                dialog.dismiss();
+            }
+        });
 
         dialog.show();
     }

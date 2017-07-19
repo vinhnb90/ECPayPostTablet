@@ -1022,16 +1022,16 @@ public class Common {
     }
     public enum MA_GIAO_DICH
     {
-        TTOAN_OFFLINE ("06", "Thanh Toan OFFLINE"),
-        CAP_NHAT_TTHAI_NO("02", "Cap Nhat Trang Thai No"),
-        TT_ONLINE_CHAM_NO_ONLINE("03", "Thanh Toan Online Cham No Online"),
-        TT_ONLINE_CHAM_NO_OFFLINE("04", "Thanh Toan Online Cham No Offline"),
-        CHAM_NO("07", "Cham No"),
-        TT_ONLINE_CHAM_NO_LOI("05", "Thanh Toan Online Cham No Loi"),
-        XU_LY_GIAO_DICH_NGHI_NGO("09", "Xu Ly Giao Dich Nghi Ngo"),
-        GUI_YEU_CAU_HUY("11", "Gui Yeu Cau Huy"),
-        HUY_HOA_DON("08", "Huy Hoa Don"),
-        DAY_CHAM_NO("10", "Day Cham No");
+        TTOAN_OFFLINE ("06", "Thanh Toán OFFLINE"),
+        CAP_NHAT_TTHAI_NO("02", "Cập Nhật Trạng Thái "),
+        TT_ONLINE_CHAM_NO_ONLINE("03", "Thanh Toán Online Chấm Nợ Online"),
+        TT_ONLINE_CHAM_NO_OFFLINE("04", "Thanh Toán Online Chấm Nợ Offline"),
+        CHAM_NO("07", "Chấm Nợ"),
+        TT_ONLINE_CHAM_NO_LOI("05", "Thanh Toán Online Chấm Nợ Lỗi"),
+        XU_LY_GIAO_DICH_NGHI_NGO("09", "Xử Lý Giao Dịch Nghi Ngờ"),
+        GUI_YEU_CAU_HUY("11", "Gửi Yêu Cầu Huỷ"),
+        HUY_HOA_DON("08", "Huỷ Hoá Đơn"),
+        DAY_CHAM_NO("10", "Đẩy Chấm Nợ");
 
         MA_GIAO_DICH(String code, String message) {
             this.code = code;
@@ -1049,6 +1049,19 @@ public class Common {
 
         private final String code;
         private String message;
+
+
+        public static MA_GIAO_DICH findCode(String code)
+        {
+            for (int i = 0, n = values().length; i < n; i ++)
+            {
+                if(values()[i].getCode().equalsIgnoreCase(code))
+                {
+                    return values()[i];
+                }
+            }
+            return null;
+        }
     }
 
 

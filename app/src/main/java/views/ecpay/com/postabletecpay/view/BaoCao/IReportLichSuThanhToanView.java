@@ -3,6 +3,7 @@ package views.ecpay.com.postabletecpay.view.BaoCao;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.adapter.ReportLichSuThanhToanAdapter;
+import views.ecpay.com.postabletecpay.util.entities.EntityLichSuThanhToan;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.view.ICommonView;
 
@@ -15,4 +16,6 @@ public interface IReportLichSuThanhToanView extends ICommonView {
 
 
     void fill(List<ReportLichSuThanhToanAdapter.LichSuThanhToanData> lst);
+
+    void showChiTiet(EntityLichSuThanhToan lichSuThanhToan);
 }

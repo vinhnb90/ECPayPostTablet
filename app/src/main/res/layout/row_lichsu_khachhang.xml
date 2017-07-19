@@ -1,40 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parent_ls_kh"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
     android:layout_marginTop="10dp"
-    android:background="@color/colorRow">
+    android:background="@color/colorRow"
+    android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/tvNgay"
+    <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="10dp"
-        android:text="02/12/2016"
-        android:textSize="@dimen/_12sdp" />
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/tv_fragment_thanh_toan_total_bills_money"
+        <TextView
+            android:id="@+id/tvNgay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:text="02/12/2016"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/linearLayout3"
+        android:layout_alignRight="@+id/linearLayout3"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="@dimen/_15sdp"
-        android:layout_toRightOf="@+id/tvNgay"
-        android:text="1.000.000 đ"
-        android:textSize="@dimen/_12sdp" />
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/tvTinhTrang"
+        <TextView
+            android:id="@+id/tv_fragment_thanh_toan_total_bills_money"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/_15sdp"
+            android:layout_toRightOf="@+id/tvNgay"
+            android:layout_weight="1"
+            android:text="1.000.000 đ"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="false"
+        android:layout_centerInParent="false"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="@dimen/_15sdp"
-        android:layout_toRightOf="@+id/tv_fragment_thanh_toan_total_bills_money"
-        android:text="Chưa thanh toán"
-        android:textColor="@color/colorRed"
-        android:textSize="@dimen/_12sdp" />
+        android:layout_toLeftOf="@+id/ibChiTiet"
+        android:layout_toStartOf="@+id/ibChiTiet"
+        android:layout_weight="1"
+        android:gravity="right"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvTinhTrang"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/_15sdp"
+            android:layout_toRightOf="@+id/tv_fragment_thanh_toan_total_bills_money"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="Chưa thanh toán Chưa thanh toán"
+            android:textColor="@color/colorRed"
+            android:textSize="12sp" />
+    </LinearLayout>
 
     <ImageButton
         android:id="@+id/ibChiTiet"
@@ -45,4 +84,4 @@
         android:background="@null"
         android:src="@mipmap/ic_chitiet" />
 
-</RelativeLayout>
+</LinearLayout>
