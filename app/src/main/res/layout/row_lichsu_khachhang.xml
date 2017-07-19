@@ -2,38 +2,39 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorRow"
-    android:padding="5dp"
-    android:layout_margin="5dp">
+    android:layout_marginBottom="10dp"
+    android:layout_marginTop="10dp"
+    android:background="@color/colorRow">
 
     <TextView
         android:id="@+id/tvNgay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/_12sdp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
         android:text="02/12/2016"
-        android:layout_centerVertical="true"/>
+        android:textSize="@dimen/_12sdp" />
 
     <TextView
         android:id="@+id/tv_fragment_thanh_toan_total_bills_money"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/_12sdp"
-        android:text="1.000.000 đ"
         android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/_15sdp"
         android:layout_toRightOf="@+id/tvNgay"
-        android:layout_marginLeft="@dimen/_15sdp"/>
+        android:text="1.000.000 đ"
+        android:textSize="@dimen/_12sdp" />
 
     <TextView
         android:id="@+id/tvTinhTrang"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/_15sdp"
+        android:layout_toRightOf="@+id/tv_fragment_thanh_toan_total_bills_money"
         android:text="Chưa thanh toán"
         android:textColor="@color/colorRed"
-        android:layout_centerVertical="true"
-        android:textSize="@dimen/_12sdp"
-        android:layout_toRightOf="@+id/tv_fragment_thanh_toan_total_bills_money"
-        android:layout_marginLeft="@dimen/_15sdp"/>
+        android:textSize="@dimen/_12sdp" />
 
     <ImageButton
         android:id="@+id/ibChiTiet"
@@ -42,6 +43,6 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:background="@null"
-        android:src="@mipmap/ic_chitiet"/>
+        android:src="@mipmap/ic_chitiet" />
 
 </RelativeLayout>

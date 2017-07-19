@@ -16,6 +16,6 @@ public class CustomerInfoModel extends CommonModel {
 
     public  long UpdateCustomer(EntityKhachHang customer)
     {
-        return  -1;//sqLiteConnection.updateCustomer(customer);
+        return  sqLiteConnection.updateCustomer(customer);
     }
 }

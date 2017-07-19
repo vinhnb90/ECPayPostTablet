@@ -144,6 +144,9 @@ public class PayFragment extends Fragment implements
     @Nullable
     @BindView(R.id.spine_provider)
     Spinner spine_provider;
+    @Nullable
+    @BindView(R.id.ibtn_frag_thanh_toan_add)
+    ImageButton ibtn_frag_thanh_toan_add;
 
     //Search online
     @Nullable
@@ -419,6 +422,8 @@ public class PayFragment extends Fragment implements
             return;
 
         mPageIndex -= PAGE_INCREMENT;
+        if(mPageIndex < FIRST_PAGE_INDEX)
+            mPageIndex = FIRST_PAGE_INDEX;
         try {
             mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
         } catch (Exception e) {
@@ -457,6 +462,13 @@ public class PayFragment extends Fragment implements
     @Optional
     @OnClick(R.id.btn_frag_thanh_toan_paying)
     public void clickPaying(View view) {
+        hideSearchOnlineProcess();
+//        Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
+        mIPayPresenter.callShowDialogPay();
+    }
+    @Optional
+    @OnClick(R.id.ibtn_frag_thanh_toan_add)
+    public void clickPaying2(View view) {
         hideSearchOnlineProcess();
 //        Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
         mIPayPresenter.callShowDialogPay();
@@ -1034,9 +1046,15 @@ public class PayFragment extends Fragment implements
                 @Override
                 public void onDismiss(DialogInterface dialog) {
 
-                    for (int i = 0, n = mIPayPresenter.getPayModel().getListBillSelected().size(); i < n; i ++)
+                    for (int i = mIPayPresenter.getPayModel().getListBillSelected().size() - 1; i >= 0; i --)
                     {
                         PayAdapter.BillEntityAdapter bill = mIPayPresenter.getPayModel().getListBillSelected().get(i);
+
+                        if(!bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()))
+                        {
+                            payAdapter.UpdateBill(bill);
+                        }
+
                         if(!bill.isChecked() || !bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()))
                         {
                             mIPayPresenter.getPayModel().removeBillSelect(bill.getBillId());

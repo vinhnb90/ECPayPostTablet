@@ -103,6 +103,8 @@ import views.ecpay.com.postabletecpay.util.entities.response.GetPCInfo.GetPCInfo
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT_KSOAP;
 
 /**
  * Created by VinhNB on 5/12/2017.
@@ -1179,7 +1181,7 @@ public class SoapAPI {
             SoapPrimitive response = null;
 
             try {
-                ht = new HttpTransportSE(URL);
+                ht = new HttpTransportSE(URL, TIME_OUT_CONNECT_KSOAP);
                 ht.call(SOAP_ACTION, envelope);
                 response = (SoapPrimitive) envelope.getResponse();
             } catch (Exception e) {
@@ -2050,6 +2052,7 @@ public class SoapAPI {
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             String message = values[0];
+            mHandler.removeCallbacks(handerTimeOut);
             isEndCallSoap = true;
             callBack.onUpdate(message);
         }
@@ -3069,7 +3072,6 @@ public class SoapAPI {
         private AsyncSoapSynchronizeDataCallBack callBack;
         private boolean isEndCallSoap = false;
         private Context context;
-        private ProgressDialog progressDialog;
 
         public AsyncSoapSynchronizeData(AsyncSoapSynchronizeDataCallBack callBack, Context contextView) throws Exception {
             this.callBack = callBack;
@@ -3079,10 +3081,6 @@ public class SoapAPI {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Downloading file ...");
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressDialog.show();
             callBack.onPre(this);
         }
 
@@ -3154,7 +3152,6 @@ public class SoapAPI {
             super.onPostExecute(listDataResponse);
             isEndCallSoap = true;
             callBack.onPost(listDataResponse);
-            progressDialog.dismiss();
         }
 
         public static abstract class AsyncSoapSynchronizeDataCallBack {
@@ -3196,9 +3193,8 @@ public class SoapAPI {
         private AsyncSoapSynchronizeDataZipCallBack callBack;
         private boolean isEndCallSoap = false;
         private Context context;
-        private ProgressDialog progressDialog;
 
-        public AsyncSoapSynchronizeDataZip(AsyncSoapSynchronizeDataZipCallBack callBack, Context context) throws Exception {
+        public AsyncSoapSynchronizeDataZip(final AsyncSoapSynchronizeDataZipCallBack callBack, Context context) throws Exception {
             this.callBack = callBack;
             this.context = context;
         }
@@ -3206,10 +3202,6 @@ public class SoapAPI {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Downloading file ...");
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressDialog.show();
             callBack.onPre(this);
         }
 
@@ -3283,7 +3275,6 @@ public class SoapAPI {
             super.onPostExecute(listDataZipResponse);
             isEndCallSoap = true;
             callBack.onPost(listDataZipResponse);
-            progressDialog.dismiss();
         }
 
         public static abstract class AsyncSoapSynchronizeDataZipCallBack {

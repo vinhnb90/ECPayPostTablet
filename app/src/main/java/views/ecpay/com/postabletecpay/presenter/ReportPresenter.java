@@ -17,4 +17,8 @@ public abstract class ReportPresenter implements IReportPrensenter {
         reportModel = new ReportModel(view.getContextView());
     }
 
+    @Override
+    public ReportModel getModel() {
+        return reportModel;
+    }
 }

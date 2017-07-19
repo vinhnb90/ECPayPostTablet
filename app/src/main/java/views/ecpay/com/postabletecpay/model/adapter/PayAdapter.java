@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindDrawable;
@@ -29,6 +30,7 @@ import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.IPayPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.ThanhToan.IPayView;
 
@@ -73,6 +75,24 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         this.indexEnd = indexEnd;
         this.notifyDataSetChanged();
 
+    }
+
+    public void UpdateBill(PayAdapter.BillEntityAdapter bill )
+    {
+        for(int i = 0, n = this.data.size(); i < n; i ++)
+        {
+            if(this.data.get(i).getInfoKH().getMA_KHANG().equalsIgnoreCase(bill.getMA_KHACH_HANG()))
+            {
+                for (int j = 0, n2 = this.data.get(i).getBillKH().size(); j < n2; j ++)
+                {
+                    if(this.data.get(i).getBillKH().get(j).getBillId() == bill.getBillId())
+                    {
+                        this.data.get(i).getBillKH().get(j).setTRANG_THAI_TT(bill.getTRANG_THAI_TT());
+                        this.data.get(i).getBillKH().get(j).setVI_TTOAN(bill.getVI_TTOAN());
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -259,7 +279,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
     public static class BillEntityAdapter implements Comparable<BillEntityAdapter>{
 
-        private String THANG_THANH_TOAN;
+        private Date THANG_THANH_TOAN;
         private long TIEN_THANH_TOAN;
         private boolean isPrint;
         private String TRANG_THAI_TT;
@@ -271,10 +291,12 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         private String TEN_KHACH_HANG;
         private String DIA_CHI;
         private String MA_DIEN_LUC;
+        private String SO_GCS;
         private String SO_HO;
         private String SO_CONG_TO;
         private String CSDK;
         private String CSCK;
+        private String PHIEN_THANH_TOAN;
         private String MA_HOA_DON;
         private String CHI_TIET_KG;
         private String CHI_TIET_MCS;
@@ -282,6 +304,9 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         private String DNTT;
         private String TONG_TIEN_CHUA_THUE;
         private String TONG_TIEN_THUE;
+        private String MA_DL_MO_RONG;
+        private String TU_NGAY;
+        private String DEN_NGAY;
 
         private String messageError = "";
 
@@ -316,6 +341,22 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             this.MA_KHACH_HANG = MA_KHACH_HANG;
         }
 
+        public String getSO_GCS() {
+            return SO_GCS;
+        }
+
+        public void setSO_GCS(String SO_GCS) {
+            this.SO_GCS = SO_GCS;
+        }
+
+        public String getPHIEN_THANH_TOAN() {
+            return PHIEN_THANH_TOAN;
+        }
+
+        public void setPHIEN_THANH_TOAN(String PHIEN_THANH_TOAN) {
+            this.PHIEN_THANH_TOAN = PHIEN_THANH_TOAN;
+        }
+
         public String getDIA_CHI() {
             return DIA_CHI;
         }
@@ -340,11 +381,11 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             isPrintEnable = printEnable;
         }
 
-        public String getTHANG_THANH_TOAN() {
+        public Date getTHANG_THANH_TOAN() {
             return THANG_THANH_TOAN;
         }
 
-        public void setTHANG_THANH_TOAN(String THANG_THANH_TOAN) {
+        public void setTHANG_THANH_TOAN(Date THANG_THANH_TOAN) {
             this.THANG_THANH_TOAN = THANG_THANH_TOAN;
         }
 
@@ -405,7 +446,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
 
-        public String getBillingBy() {
+        public String getVI_TTOAN() {
             return billingBy;
         }
 
@@ -501,10 +542,34 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             this.TONG_TIEN_THUE = TONG_TIEN_THUE;
         }
 
+        public String getMA_DL_MO_RONG() {
+            return MA_DL_MO_RONG;
+        }
+
+        public void setMA_DL_MO_RONG(String MA_DL_MO_RONG) {
+            this.MA_DL_MO_RONG = MA_DL_MO_RONG;
+        }
+
+        public String getTU_NGAY() {
+            return TU_NGAY;
+        }
+
+        public void setTU_NGAY(String TU_NGAY) {
+            this.TU_NGAY = TU_NGAY;
+        }
+
+        public String getDEN_NGAY() {
+            return DEN_NGAY;
+        }
+
+        public void setDEN_NGAY(String DEN_NGAY) {
+            this.DEN_NGAY = DEN_NGAY;
+        }
+
         @Override
         public int compareTo(@NonNull BillEntityAdapter billEntityAdapter) {
-            long termThis = Common.convertDateToLong(this.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy);
-            long termThat = Common.convertDateToLong(billEntityAdapter.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy);
+            long termThis = this.getTHANG_THANH_TOAN().getTime();
+            long termThat = billEntityAdapter.getTHANG_THANH_TOAN().getTime();
 
             //giảm dần
             return (int) (termThat - termThis);
@@ -566,6 +631,10 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
             holder.setAdapterParent(this);
 
+
+            entity.setChecked(payPresenter.getPayModel().containBillInSelected(entity.getBillId()));
+
+
             holder.cb.setChecked(entity.isChecked());
             if (entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())) {
                 holder.cb.setEnabled(true);
@@ -579,7 +648,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                 holder.tvStatusBill.setText(Common.STATUS_BILLING.DA_THANH_TOAN.getMessage());
                 entity.setPrint(entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()));
             }
-            holder.tvDate.setText(entity.getTHANG_THANH_TOAN());
+            holder.tvDate.setText(Common.parse(entity.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString()));
             holder.tvMoneyBill.setText(Common.convertLongToMoney(entity.getTIEN_THANH_TOAN()));
 
             if (entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())){
@@ -655,9 +724,6 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             public void onCheckedChanged(final CheckBox checkBox, boolean checked) {
                 if (checkBox.isPressed()) {
 
-                    boolean isNotBillPayedTermBefore = false;
-                    boolean isNotBillOldestPayedTermBefore = false;
-
                     int index = position + 1;
                     int indexNotPayedTermOldest = Common.NEGATIVE_ONE;
 
@@ -678,6 +744,16 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                                     checkBox.setChecked(false);
                                 }
                             });
+
+                            for (indexNotPayedTermOldest += 1; indexNotPayedTermOldest < billList.size(); indexNotPayedTermOldest++) {
+                                if (billList.get(indexNotPayedTermOldest).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && billList.get(indexNotPayedTermOldest).isChecked())
+                                {
+                                    payPresenter.getIPayView().showMessageNotifyPayfrag(Common.CODE_REPONSE_BILL_ONLINE.ex10005.getMessage() + Common.TEXT_MULTI_SPACE + bill.getMA_KHACH_HANG());
+                                    return;
+                                }
+                            }
+
+
                            payPresenter.getIPayView().showMessageNotifyPayfrag(Common.CODE_REPONSE_BILL_ONLINE.ex10003.getMessage() + Common.TEXT_MULTI_SPACE + bill.getMA_KHACH_HANG());
                             return;
                         }

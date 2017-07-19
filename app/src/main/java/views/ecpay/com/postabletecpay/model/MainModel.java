@@ -42,7 +42,7 @@ public class MainModel extends CommonModel {
     }
 
     public long insertEvnPC(ListEvnPCResponse listEvnPCResponse, String edong) {
-        return sqLiteConnection.insertEvnPC(listEvnPCResponse,  edong);
+        return sqLiteConnection.insertEvnPC(listEvnPCResponse, edong);
     }
 
     public long deleteAllPC(String edong) {
@@ -109,17 +109,20 @@ public class MainModel extends CommonModel {
         return sqLiteConnection.updateBill(listBillResponse);
     }
 
-    public long getMaxIdChanged(String boockCms) {
-        return getManagerSharedPref().getSharePref(Common.SHARE_REF_CHANGED_GEN_FILE, MODE_PRIVATE).getLong(Common.SHARE_REF_CHANGED_GEN_FILE_ID_ + boockCms, 0);
+    public long getMaxIdChanged(String edong, String boockCms) {
+        return getManagerSharedPref().getSharePref(Common.SHARE_REF_CHANGED_GEN_FILE, MODE_PRIVATE)
+                .getLong(Common.SHARE_REF_CHANGED_GEN_FILE_ID_ + edong + "_" + boockCms, 0);
     }
 
-    public String getMaxDateChanged(String boockCms) {
-        return getManagerSharedPref().getSharePref(Common.SHARE_REF_CHANGED_GEN_FILE, MODE_PRIVATE).getString(Common.SHARE_REF_CHANGED_GEN_FILE_DATE + boockCms, "");
+    public String getMaxDateChanged(String edong, String boockCms) {
+        return getManagerSharedPref().getSharePref(Common.SHARE_REF_CHANGED_GEN_FILE, MODE_PRIVATE).
+                getString(Common.SHARE_REF_CHANGED_GEN_FILE_DATE + edong + "_" + boockCms, "");
     }
 
-    public void setChangedGenFile(String boockCms, Long idChanged, String dateChange) {
-        sharePrefManager.getSharePref(Common.SHARE_REF_CHANGED_GEN_FILE, MODE_PRIVATE).edit().putLong(Common.SHARE_REF_CHANGED_GEN_FILE_ID_ + boockCms, idChanged)
-                .putString(Common.SHARE_REF_CHANGED_GEN_FILE_DATE + boockCms, dateChange).commit();
+    public void setChangedGenFile(String edong, String boockCms, Long idChanged, String dateChange) {
+        sharePrefManager.getSharePref(Common.SHARE_REF_CHANGED_GEN_FILE, MODE_PRIVATE).edit().
+                putLong(Common.SHARE_REF_CHANGED_GEN_FILE_ID_ + edong + "_" + boockCms, idChanged)
+                .putString(Common.SHARE_REF_CHANGED_GEN_FILE_DATE + edong + "_" + boockCms, dateChange).commit();
     }
 
     //endregion

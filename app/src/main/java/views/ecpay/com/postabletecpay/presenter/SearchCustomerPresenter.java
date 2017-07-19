@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
@@ -15,22 +16,31 @@ import org.ecpay.client.test.SecurityUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.CustomerSearchModel;
+import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
 import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
+import views.ecpay.com.postabletecpay.util.entities.response.Base.Respone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.ListEvnPCLoginResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchCustomer.SearchCustomerRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchCustomerBill.BodySearchCustomerBillRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchCustomerBill.SearchCustomerBillRespone;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BillInsideCustomer;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.BodySearchOnlineResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.CustomerInsideBody;
+import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.GetPCInfo.BodyGetPCInfoRespone;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.TrangChu.ISearchCustomerView;
 
+import static views.ecpay.com.postabletecpay.util.commons.Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TAG;
 
 /**
@@ -44,80 +54,9 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
 
     private CustomerSearchModel customerSearchModel;
 
+    Handler handlerDelay = new Handler();
 
-    private  SoapAPI.AsyncSoap.AsyncSoapCallBack<SearchCustomerBillRespone> callBack = new SoapAPI.AsyncSoap.AsyncSoapCallBack<SearchCustomerBillRespone>() {
-        @Override
-        public void onPre(SoapAPI.AsyncSoap soap) {
-
-        }
-
-        @Override
-        public void onUpdate(String message) {
-
-        }
-
-        @Override
-        public void onPost(SearchCustomerBillRespone response) {
-            if (response == null)
-                return;
-            BodySearchCustomerBillRespone body = (BodySearchCustomerBillRespone) response.getBody();
-
-            if (body.getCustomer() == null || body.getCustomer().length() == 0) {
-                searchCustomerView.showMessage(response.getFooter().getDescription());
-                return;
-            }
-
-            searchCustomerView.showMessage(response.getFooter().getDescription());
-
-            String responseData = body.getCustomer();
-            // định dạng kiểu Object JSON
-            Type type = new TypeToken<BodySearchCustomerBillRespone.CustomerObject>() {
-            }.getType();
-            BodySearchCustomerBillRespone.CustomerObject customerObject = null;
-
-            EntityKhachHang customer = null;
-//            try {
-//                customerObject = new Gson().fromJson(responseData, type);
-//
-//
-//                customer = new Customer(
-//                        customerObject.getCode() == null ? null : customerObject.getCode().toString(),
-//                        customerObject.getName() == null ? null : customerObject.getName().toString(),
-//                        customerObject.getAddress() == null ? null : customerObject.getAddress().toString(),
-//                        customerObject.getPcCode() == null ? null : customerObject.getPcCode().toString(),
-//                        customerObject.getPcCodeExt() == null ? null : customerObject.getPcCodeExt().toString(),
-//                        customerObject.getPhoneByevn() == null ? null : customerObject.getPhoneByevn().toString(),
-//                        customerObject.getPhoneByecp() == null ? null : customerObject.getPhoneByecp().toString(),
-//                        customerObject.getBookCmis() == null ? null : customerObject.getBookCmis().toString(),
-//                        customerObject.getElectricityMeter() == null ? null : customerObject.getElectricityMeter().toString(),
-//                        customerObject.getInning() == null ? null : customerObject.getInning().toString(),
-//                        customerObject.getTRANG_THAI_TT() == null ? null : customerObject.getTRANG_THAI_TT().toString(),
-//                        customerObject.getBankAccount() == null ? null : customerObject.getBankAccount().toString(),
-//                        "",
-//                        customerObject.getBankName() == null ? null : customerObject.getBankName().toString(),
-//                        "",
-//                        customerObject.getIdChanged() == null ? null : customerObject.getIdChanged().toString(),
-//                        customerObject.getDateChanged() == null ? null : customerObject.getDateChanged().toString(),
-//                        false);
-//                customer.setCardNo(customerObject.getCardNo() == null ? null : customerObject.getCardNo().toString());
-//            } catch (JsonSyntaxException e) {
-//                e.printStackTrace();
-//            }
-
-            if(customer != null)
-            {
-                List<EntityKhachHang> lst = new ArrayList<>();
-                lst.add(customer);
-                searchCustomerView.refreshView(lst);
-            }
-
-        }
-
-        @Override
-        public void onTimeOut(SoapAPI.AsyncSoap soap) {
-
-        }
-    };
+    SoapAPI.AsyncSoapIncludeTimout<SearchOnlineResponse> currentAsyncSearchOnline;
     public  SearchCustomerPresenter(ISearchCustomerView view, String eDong)
     {
         searchCustomerView = view;
@@ -154,24 +93,22 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     protected void searchOnline(String maKH)
     {
-        Context context = searchCustomerView.getContextView();
-        ConfigInfo configInfo;
-        String versionApp = "";
-        try {
-            versionApp = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+
+        if(currentAsyncSearchOnline != null && currentAsyncSearchOnline.isEndCallSoap())
+        {
+            currentAsyncSearchOnline.cancel(true);
         }
-
+        //setup info login
+        ConfigInfo configInfo;
         try {
-            configInfo = Common.setupInfoRequest(context, mEDong, Common.COMMAND_ID.SEARCH_CUSTOMER_BILL.toString(), versionApp);
+            configInfo = Common.setupInfoRequest(searchCustomerView.getContextView(), mEDong, Common.COMMAND_ID.CUSTOMER_BILL.toString(), Common.getVersionApp(searchCustomerView.getContextView()));
         } catch (Exception e) {
-
+            searchCustomerView.showMessage("Không Tồn Tại Khách Hàng Thoả Mãn Điều Kiện Tìm Kiếm");
             return;
         }
 
-
-        String json = SoapAPI.getJsonSearchCustomerBill(
+        //create request to server
+        String jsonRequestSearchOnline = SoapAPI.getJsonRequestSearchOnline(
                 configInfo.getAGENT(),
                 configInfo.getAgentEncypted(),
                 configInfo.getCommandId(),
@@ -180,47 +117,116 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
                 configInfo.getDiskDriver(),
                 configInfo.getSignatureEncrypted(),
                 maKH,
-                configInfo.getAccountId()
-        );
+                "",
+                configInfo.getAccountId());
 
-
-
-        if (json == null)
+        if (jsonRequestSearchOnline == null)
+        {
+            searchCustomerView.showMessage("Không Tồn Tại Khách Hàng Thoả Mãn Điều Kiện Tìm Kiếm");
             return;
-
-
-
+        }
 
         try {
-            final SoapAPI.AsyncSoap<SearchCustomerBillRespone> soapChangePass = new SoapAPI.AsyncSoap<SearchCustomerBillRespone>(SearchCustomerBillRespone.class, callBack);
+            currentAsyncSearchOnline = new SoapAPI.AsyncSoapIncludeTimout<SearchOnlineResponse>(handlerDelay, SearchOnlineResponse.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
+                @Override
+                public void onPre(SoapAPI.AsyncSoapIncludeTimout soap) {
 
-            if (soapChangePass.getStatus() != AsyncTask.Status.RUNNING) {
-                soapChangePass.execute(json);
+                }
 
-                //thread time out
-                final Thread soapChangePassThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        SearchCustomerBillRespone changePassResponse = null;
+                @Override
+                public void onUpdate(final String message) {
+                    if (message == null || message.isEmpty() || message.trim().equals(""))
+                        return;
+                    try
+                    {
+                        searchCustomerView.showMessage(message);
+                    }catch (Exception e)
+                    {
 
-                        //call time out
+                    }
+                }
+
+                @Override
+                public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
+                    if (response == null) {
                         try {
-                            Thread.sleep(Common.TIME_OUT_CONNECT);
-                        } catch (InterruptedException e) {
-                            searchCustomerView.showMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
-                        } finally {
-                            if (changePassResponse == null) {
-                                soapChangePass.callCountdown(soapChangePass);
+                            searchCustomerView.showMessage("Không Tồn Tại Khách Hàng Thoả Mãn Điều Kiện Tìm Kiếm");
+                        } catch (Exception e) {
+
+                        }
+                        return;
+                    }
+                    BodySearchOnlineResponse body = (BodySearchOnlineResponse) response.getBody();
+
+                    if (body.getCustomer() == null || body.getCustomer().length() == 0) {
+                        searchCustomerView.showMessage(response.getFooter().getDescription());
+                        return;
+                    }
+
+
+                    CustomerInsideBody customerResponse = null;
+                    try {
+                        customerResponse = new Gson().fromJson(body.getCustomer(), CustomerInsideBody.class);
+                    } catch (JsonSyntaxException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    if (customerResponse == null) {
+                        searchCustomerView.showMessage(response.getFooter().getDescription());
+                        return;
+                    }
+                    searchCustomerView.showMessage(response.getFooter().getDescription());
+
+                    EntityKhachHang khachHang = new EntityKhachHang();
+                    khachHang.setE_DONG(MainActivity.mEdong);
+                    khachHang.setMA_KHANG(customerResponse.getCode());
+                    khachHang.setMA_THE(customerResponse.getCardNo());
+                    khachHang.setTEN_KHANG(customerResponse.getName());
+                    khachHang.setDIA_CHI(customerResponse.getAddress());
+                    khachHang.setPHIEN_TTOAN(customerResponse.getInning());
+                    khachHang.setLO_TRINH(customerResponse.getRoad());
+                    khachHang.setSO_GCS(customerResponse.getBookCmis());
+                    khachHang.setDIEN_LUC(customerResponse.getPcCode());
+                    khachHang.setSO_HO("");
+                    khachHang.setSDT_ECPAY(customerResponse.getPhoneByecp());
+                    khachHang.setSDT_EVN(customerResponse.getPhoneByevn());
+                    khachHang.setGIAO_THU(Common.TRANG_THAI_GIAO_THU.VANG_LAI.getCode());
+                    khachHang.setNGAY_GIAO_THU(Calendar.getInstance().getTime());
+
+
+                    if (customerResponse.getCardNo() == null || customerResponse.getCardNo().length() == 0) {
+                        if (customerResponse.getListBill() != null && customerResponse.getListBill().size() != 0) {
+                            BillInsideCustomer billInsideCustomer = customerResponse.getListBill().get(0);
+                            if (billInsideCustomer.getCardNo() == null || billInsideCustomer.getCardNo().length() == 0) {
+                                khachHang.setMA_THE(billInsideCustomer.getCardNo());
                             }
                         }
                     }
-                });
 
-                soapChangePassThread.start();
-            }
+
+                    if (khachHang != null) {
+                        List<EntityKhachHang> lst = new ArrayList<>();
+                        lst.add(khachHang);
+                        searchCustomerView.refreshView(lst);
+                    }
+                }
+
+                @Override
+                public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
+                    try
+                    {
+                        searchCustomerView.showMessage("Không Tồn Tại Khách Hàng Thoả Mãn Điều Kiện Tìm Kiếm");
+                    }catch (Exception e)
+                    {
+
+                    }
+                }
+            });
+            currentAsyncSearchOnline.setUserData(jsonRequestSearchOnline);
+            currentAsyncSearchOnline.execute(jsonRequestSearchOnline);
         } catch (Exception e) {
-            searchCustomerView.showMessage(e.getMessage());
-            return;
+            e.printStackTrace();
         }
 
     }

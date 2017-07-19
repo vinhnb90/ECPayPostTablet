@@ -38,6 +38,7 @@ import views.ecpay.com.postabletecpay.model.adapter.CustomerAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.ReportChiTietAdapter;
 import views.ecpay.com.postabletecpay.presenter.IReportChiTietPresenter;
 import views.ecpay.com.postabletecpay.presenter.ReportChiTietPresenter;
+import views.ecpay.com.postabletecpay.util.entities.EntityHoaDonThu;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 
 /**
@@ -184,7 +185,7 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
     }
 
     @Override
-    public void fill(List<Bill> lst) {
+    public void fill(List<EntityHoaDonThu> lst) {
         ReportChiTietAdapter adapter = (ReportChiTietAdapter)rvDanhSach.getAdapter();
         adapter.setmBills(lst);
         adapter.notifyDataSetChanged();

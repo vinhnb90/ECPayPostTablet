@@ -13,7 +13,7 @@ public interface IMainPresenter {
 
     void synchronizePC() throws Exception;
 
-    void checkAndPostBill();
+    boolean checkAndPostBill();
 
     void refreshDataPayAdapter();
 

@@ -15,10 +15,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.ReportModel;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
+import views.ecpay.com.postabletecpay.model.adapter.ReportLichSuThanhToanAdapter;
+import views.ecpay.com.postabletecpay.presenter.PayPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.EntityDanhSachThu;
 import views.ecpay.com.postabletecpay.util.entities.EntityHoaDonNo;
@@ -41,8 +44,10 @@ import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.EvnPC;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
+import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
 import static android.content.ContentValues.TAG;
+import static views.ecpay.com.postabletecpay.util.commons.Common.DATE_TIME_TYPE.FULL;
 import static views.ecpay.com.postabletecpay.util.commons.Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ONE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_CONFIG;
@@ -79,7 +84,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             "`status` TEXT, `idNumber` TEXT, `idNumberDate` TEXT, `idNumberPlace` TEXT, `parentEdong` TEXT, `notYetPushMoney` INTEGER DEFAULT 0)";
 
 
-    private String CREATE_TABLE_EVN_PC = "CREATE TABLE " + TABLE_NAME_EVN_PC + " ( pcId NOT NULL PRIMARY KEY, edong TEXT NOT NULL, strPcId TEXT, parentId INTEGER, " +
+    private String CREATE_TABLE_EVN_PC = "CREATE TABLE " + TABLE_NAME_EVN_PC + " ( pcId INTEGER NOT NULL PRIMARY KEY, edong TEXT NOT NULL, strPcId TEXT, parentId INTEGER, " +
             "strParentId TEXT, " +
             "code TEXT, ext TEXT, fullName TEXT, shortName TEXT, address TEXT, taxCode TEXT, phone1 TEXT, phone2 TEXT, " +
             "fax TEXT, level INTEGER, " +
@@ -101,19 +106,20 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         - Số điện năng tiêu thụ (DNTT)
         - Tổng tiền chưa thuế (TONG_TIEN_CHUA_THUE)
         - Tổng tiền thuế (TIEN_THUE)
+        - Sổ GCS (SO_GCS)
  */
     private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, `SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
             "`MA_THE` TEXT, `TEN_KHANG` TEXT, `DIA_CHI` TEXT, `THANG_TTOAN` DATE, `PHIEN_TTOAN` TEXT, `SO_TIEN_TTOAN` INTEGER, " +
             "`SO_GCS` TEXT, `DIEN_LUC` TEXT, `SO_HO` TEXT, `SO_DAU_KY` TEXT, `SO_CUOI_KY` TEXT, `SO_CTO` TEXT, `SDT_ECPAY` TEXT, " +
-            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT, `CHI_TIET_KG` TEXT, `CHI_TIET_MCS` TEXT, `CHI_TIET_TIEN_MCS` TEXT, `DNTT` TEXT, "+
-            "`TONG_TIEN_CHUA_THUE` INTEGER, `TIEN_THUE` INTEGER)";
+            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT, `CHI_TIET_KG` TEXT, `CHI_TIET_MCS` TEXT, `CHI_TIET_TIEN_MCS` TEXT, `DNTT` TEXT,"+
+            "`TONG_TIEN_CHUA_THUE` INTEGER, `TIEN_THUE` INTEGER, `MA_DL_MO_RONG` TEXT, `TU_NGAY` TEXT, `DEN_NGAY` TEXT)";
 
     private String CREATE_TABLE_DEBT_COLLECTION = "CREATE TABLE `" + TABLE_NAME_DEBT_COLLECTION + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, `SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
             "`MA_THE` TEXT, `TEN_KHANG` TEXT, `DIA_CHI` TEXT, `THANG_TTOAN` DATE, `PHIEN_TTOAN` TEXT, `SO_TIEN_TTOAN` INTEGER, " +
             "`SO_GCS` TEXT, `DIEN_LUC` TEXT, `SO_HO` TEXT, `SO_DAU_KY` TEXT, `SO_CUOI_KY` TEXT, `SO_CTO` TEXT, `SDT_ECPAY` TEXT, " +
             "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT, `HINH_THUC_TT` TEXT, " +
             "`TRANG_THAI_CHAM_NO` TEXT, `TRANG_THAI_HUY` TEXT, `TRANG_THAI_HOAN_TRA` TEXT, `TRANG_THAI_XU_LY_NGHI_NGO` TEXT, " +
-            "`TRANG_THAI_DAY_CHAM_NO` TEXT, `NGAY_DAY` DATE, `SO_LAN_IN_BIEN_NHAN` INTEGER, `IN_THONG_BAO_DIEN` TEXT)";
+            "`TRANG_THAI_DAY_CHAM_NO` TEXT, `NGAY_DAY` DATE, `NGAY_THU` DATE, `SO_LAN_IN_BIEN_NHAN` INTEGER, `IN_THONG_BAO_DIEN` TEXT)";
 
     private String CREATE_TABLE_HISTORY_PAY = "CREATE TABLE `" + TABLE_NAME_HISTORY_PAY + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, " +
             "`SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
@@ -306,18 +312,17 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public ReportModel.BillInfo countBillDuocGiao(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
-//        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "'";
-//        Cursor mCursor = database.rawQuery(query, null);
-//
-//        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-//        {
-//            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
-//            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
-//        }
-//
-//        if (mCursor != null && !mCursor.isClosed()) {
-//            mCursor.close();
-//        }
+        String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
+            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
+            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
 
         return bill;
 
@@ -326,18 +331,17 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public ReportModel.BillInfo countBillDaThu(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
-//        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status != 0";
-//        Cursor mCursor = database.rawQuery(query, null);
-//
-//        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-//        {
-//            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
-//            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
-//        }
-//
-//        if (mCursor != null && !mCursor.isClosed()) {
-//            mCursor.close();
-//        }
+        String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
+            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
+            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
 
         return bill;
 
@@ -346,18 +350,17 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public ReportModel.BillInfo countBillHoanTra(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
-//        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status != 0 and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
-//        Cursor mCursor = database.rawQuery(query, null);
-//
-//        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-//        {
-//            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
-//            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
-//        }
-//
-//        if (mCursor != null && !mCursor.isClosed()) {
-//            mCursor.close();
-//        }
+        String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong + "' and TRANG_THAI_HOAN_TRA = '" + Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode() + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
+            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
+            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
 
         return bill;
 
@@ -366,283 +369,294 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public ReportModel.BillInfo countBillVangLai(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
-//        String query = "SELECT coalesce(SUM(amount), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " bill WHERE bill.edongKey = '" + edong +
-//                "' and bill.status != 0 and  NOT EXISTS (SELECT * FROM " + TABLE_NAME_CUSTOMER + " customer WHERE bill.customerCode = customer.code)";
-////                "                  FROM employees" +
-////                "                  WHERE departments.department_id = employees.department_id)";
-//        Cursor mCursor = database.rawQuery(query, null);
-//
-//        if(mCursor.getCount() != ZERO && mCursor.moveToFirst())
-//        {
-//            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
-//            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
-//        }
-//
-//        if (mCursor != null && !mCursor.isClosed()) {
-//            mCursor.close();
-//        }
+        String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_DEBT_COLLECTION + " bill WHERE bill.E_DONG = '" + edong +
+                "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.VANG_LAI.getCode() + "'";
+//                "                  FROM employees" +
+//                "                  WHERE departments.department_id = employees.department_id)";
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
+            bill.setAmount(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("SUM"))));
+            bill.setCount(Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT"))));
+        }
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
 
         return bill;
 
     }
 
 
-    public List<Bill> getBillThuByCodeAndDate(String edong, boolean isMaKH, String customerCode, Calendar dateFrom, Calendar dateTo) {
-        List<Bill> lst = new ArrayList<>();
+    public List<EntityHoaDonThu> getBillThuByCodeAndDate(String edong, boolean isMaKH, String customerCode, Calendar dateFrom, Calendar dateTo) {
+        List<EntityHoaDonThu> lst = new ArrayList<>();
 
 
-//        String query;
-//
-//        if(isMaKH)
-//        {
-//            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
-//                    "' and status != 0 and customerCode like '%" + customerCode + "%'";
-//        }else
-//        {
-//            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
-//                    "' and status != 0 and name like '%" + customerCode + "%'";
-//        }
-//
-//        Cursor mCursor = database.rawQuery(query, null);
-//
-//        if (mCursor != null && mCursor.moveToFirst()) {
-//            int count = mCursor.getCount();
-//            do {
-//                String _requestDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
-//                if(_requestDate.length() == 0)
-//                {
-//                    continue;
-//                }
-//
-//                String[] arr = _requestDate.split("/");
-//                if (arr.length != 3)
-//                {
-//                    continue;
-//                }
-//                Calendar calendar = Calendar.getInstance();
-//                calendar.set(intConvertNull(Integer.parseInt(arr[2])), intConvertNull(Integer.parseInt(arr[1])) - 1, intConvertNull(Integer.parseInt(arr[0])));
-//
-//                if((dateFrom != null && calendar.before(dateFrom)) || (dateTo != null && calendar.after(dateTo)))
-//                {
-//                    continue;
-//                }
-//
-//
-//
-//                String _customerCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode")));
-//                String _customerPayCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerPayCode")));
-//                String _billId = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billId")));
-//                String _term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
-//                int _amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
-//                String _period = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("period")));
-//                String _issueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("issueDate")));
-//                String _strIssueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strIssueDate")));
-//                int _status = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")));
-//                String _seri = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("seri")));
-//                String _pcCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCode")));
-//                String _handoverCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("handoverCode")));
-//                String _cashierCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierCode")));
-//                String _bookCmis = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bookCmis")));
-//                String _fromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("fromDate")));
-//                String _toDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("toDate")));
-//                String _strFromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strFromDate")));
-//                String _strToDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strToDate")));
-//                String _home = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("home")));
-//                String _tax = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("tax")));
-//                String _billNum = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billNum")));
-//                String _currency = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("currency")));
-//                String _priceDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("priceDetails")));
-//                String _numeDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("numeDetails")));
-//                String _amountDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("amountDetails")));
-//                String _oldIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("oldIndex")));
-//                String _newIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("newIndex")));
-//                String _nume = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nume")));
-//                int _amountNotTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountNotTax")));
-//                int _amountTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountTax")));
-//                String _multiple = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("multiple")));
-//                String _billType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billType")));
-//                String _typeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("typeIndex")));
-//                String _groupTypeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("groupTypeIndex")));
-//                String _createdDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("createdDate")));
-//                int _idChanged = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("idChanged")));
-//                String _dateChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("dateChanged")));
-//                String _edong = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edong")));
-//                String _pcCodeExt = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCodeExt")));
-//                String _code = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("code")));
-//                String _name = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name")));
-//                String _nameNosign = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nameNosign")));
-//                String _phoneByevn = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByevn")));
-//                String _phoneByecp = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByecp")));
-//                String _electricityMeter = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("electricityMeter")));
-//                String _inning = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("inning")));
-//                String _road = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("road")));
-//                String _station = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("station")));
-//                String _taxCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("taxCode")));
-//                String _trade = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("trade")));
-//                String _countPeriod = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("countPeriod")));
-//                String _team = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("team")));
-//                int _type = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("type")));
-//                String _lastQuery = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("lastQuery")));
-//                int _groupType = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("groupType")));
-//                String _billingChannel = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingChannel")));
-//                String _billingType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingType")));
-//                String _billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
-//                String _cashierPay = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierPay")));
-//                String _edongKey = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edongKey")));
-//                int _isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked")));
-//                long _traceNumber = longConvertNull(mCursor.getLong(mCursor.getColumnIndex("customerPayCode")));
-//
-//                Bill bill = new Bill(_customerCode, _customerPayCode, _billId, _term, _amount, _period, _issueDate, _strIssueDate, _status, _seri, _pcCode, _handoverCode, _cashierCode, _bookCmis, _fromDate, _toDate, _strFromDate, _strToDate, _home, _tax, _billNum, _currency, _priceDetails, _numeDetails, _amountDetails, _oldIndex, _newIndex, _nume, _amountNotTax, _amountTax, _multiple, _billType, _typeIndex, _groupTypeIndex, _createdDate, _idChanged, _dateChanged, _edong, _pcCodeExt, _code, _name, _nameNosign, _phoneByevn, _phoneByecp, _electricityMeter, _inning, _road, _station, _taxCode, _trade, _countPeriod, _team, _type, _lastQuery, _groupType, _billingChannel, _billingType, _billingBy, _cashierPay, _requestDate, _edongKey, _isChecked, _traceNumber);
-//                bill.setRequestDateCal(calendar);
-//                lst.add(bill);
-//
-//            }
-//            while (mCursor.moveToNext());
-//
-//            mCursor.close();
-//        }
+        String query;
 
+        String queryDateFrom = "";
+        String queryDateTo = "";
+        if (dateFrom != null) {
+            queryDateFrom = " and date(NGAY_THU) >= date('" + Common.parse(dateFrom.getTime(), Common.DATE_TIME_TYPE.FULL.toString()) + "')";
+        }
+
+        if (dateTo != null) {
+            queryDateTo = " and date(NGAY_THU) <= date('" + Common.parse(dateTo.getTime(), Common.DATE_TIME_TYPE.FULL.toString()) + "')";
+        }
+
+        if (isMaKH) {
+            query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong +
+                    "' and MA_KHANG like '%" + customerCode + "%' " + queryDateFrom + queryDateTo + " ORDER BY date(NGAY_THU) DESC";
+        } else {
+            query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong +
+                    "' and TEN_KHANG like '%" + customerCode + "%'" + queryDateFrom + queryDateTo + " ORDER BY date(NGAY_THU) DESC";
+        }
+
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor != null && mCursor.moveToFirst()) {
+            int count = mCursor.getCount();
+            do {
+
+                EntityHoaDonThu hoaDonThu = new EntityHoaDonThu();
+
+                hoaDonThu.setE_DONG(mCursor.getString(mCursor.getColumnIndex("E_DONG")));
+                hoaDonThu.setSERI_HDON(mCursor.getString(mCursor.getColumnIndex("SERI_HDON")));
+                hoaDonThu.setMA_HOA_DON(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON")));
+                hoaDonThu.setMA_KHANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
+                hoaDonThu.setMA_THE(mCursor.getString(mCursor.getColumnIndex("MA_THE")));
+                hoaDonThu.setTEN_KHANG(mCursor.getString(mCursor.getColumnIndex("TEN_KHANG")));
+                hoaDonThu.setDIA_CHI(mCursor.getString(mCursor.getColumnIndex("DIA_CHI")));
+                hoaDonThu.setTHANG_TTOAN(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
+                hoaDonThu.setPHIEN_TTOAN(mCursor.getInt(mCursor.getColumnIndex("PHIEN_TTOAN")));
+                hoaDonThu.setSO_TIEN_TTOAN(mCursor.getInt(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
+                hoaDonThu.setSO_GCS(mCursor.getString(mCursor.getColumnIndex("SO_GCS")));
+                hoaDonThu.setDIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
+                hoaDonThu.setSO_HO(mCursor.getString(mCursor.getColumnIndex("SO_HO")));
+                hoaDonThu.setSO_DAU_KY(mCursor.getString(mCursor.getColumnIndex("SO_DAU_KY")));
+                hoaDonThu.setSO_CUOI_KY(mCursor.getString(mCursor.getColumnIndex("SO_CUOI_KY")));
+                hoaDonThu.setSO_CTO(mCursor.getString(mCursor.getColumnIndex("SO_CTO")));
+                hoaDonThu.setSDT_ECPAY(mCursor.getString(mCursor.getColumnIndex("SDT_ECPAY")));
+                hoaDonThu.setSDT_EVN(mCursor.getString(mCursor.getColumnIndex("SDT_EVN")));
+                hoaDonThu.setGIAO_THU(mCursor.getString(mCursor.getColumnIndex("GIAO_THU")));
+                hoaDonThu.setNGAY_GIAO_THU(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
+                hoaDonThu.setTRANG_THAI_TTOAN(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN")));
+                hoaDonThu.setVI_TTOAN(mCursor.getString(mCursor.getColumnIndex("VI_TTOAN")));
+                hoaDonThu.setNGAY_THU(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("NGAY_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
+                hoaDonThu.setHINH_THUC_TT(mCursor.getString(mCursor.getColumnIndex("HINH_THUC_TT")));
+                hoaDonThu.setTRANG_THAI_CHAM_NO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_CHAM_NO")));
+                hoaDonThu.setTRANG_THAI_HUY(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_HUY")));
+                hoaDonThu.setTRANG_THAI_HOAN_TRA(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_HOAN_TRA")));
+                hoaDonThu.setTRANG_THAI_XU_LY_NGHI_NGO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_XU_LY_NGHI_NGO")));
+                hoaDonThu.setTRANG_THAI_DAY_CHAM_NO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_DAY_CHAM_NO")));
+
+                hoaDonThu.setNGAY_DAY(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("NGAY_DAY")), Common.DATE_TIME_TYPE.FULL.toString()));
+                hoaDonThu.setSO_LAN_IN_BIEN_NHAN(mCursor.getInt(mCursor.getColumnIndex("SO_LAN_IN_BIEN_NHAN")));
+                hoaDonThu.setIN_THONG_BAO_DIEN(mCursor.getString(mCursor.getColumnIndex("IN_THONG_BAO_DIEN")));
+
+                lst.add(hoaDonThu);
+
+            }
+            while (mCursor.moveToNext());
+
+            mCursor.close();
+        }
 
         if (lst.size() > 1) {
-            Collections.sort(lst, new Comparator<Bill>() {
-                @Override
-                public int compare(Bill bill, Bill t1) {
-                    if (bill.getRequestDateCal().before(t1.getRequestDateCal()))
-                        return -1;
-                    return 1;
-                }
-            });
+//            Collections.sort(lst, new Comparator<Bill>() {
+//                @Override
+//                public int compare(Bill bill, Bill t1) {
+//                    if (bill.getRequestDateCal().before(t1.getRequestDateCal()))
+//                        return -1;
+//                    return 1;
+//                }
+//            });
         }
 
         return lst;
     }
 
 
-    public List<Bill> getBillHoanTraByCodeAndDate(String edong, boolean isMaKH, String customerCode, Calendar dateFrom, Calendar dateTo) {
-        List<Bill> lst = new ArrayList<>();
+    private ReportLichSuThanhToanAdapter.LichSuThanhToanData find(String maKH, List<ReportLichSuThanhToanAdapter.LichSuThanhToanData> lst) {
+        for (int i = 0, n = lst.size(); i < n; i++) {
+            if (lst.get(i).getMA_KHACH_HANG().equalsIgnoreCase(maKH)) {
+                return lst.get(i);
+            }
+        }
+
+        return null;
+    }
+
+    String getTenKhachHangByMaKhachHang(String edong, String MA_KHACH_HANG) {
+        Cursor mCursor = database.rawQuery("SELECT TEN_KHANG FROM " + TABLE_NAME_CUSTOMER + " WHERE MA_KHANG = '" + MA_KHACH_HANG + "' and E_DONG = '" + edong + "'", null);
+        if (mCursor != null) {
+            if (mCursor.moveToFirst()) {
+                return mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"));
+            }
+            mCursor.close();
+        }
+        return "";
+    }
 
 
-//        String query;
-//
-//        if(isMaKH)
-//        {
-//            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
-//                    "' and status != 0 and customerCode like '%" + customerCode + "%' and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
-//        }else
-//        {
-//            query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong +
-//                    "' and status != 0 and name like '%" + customerCode + "%' and billingType IN ('EDONG_OTHER', 'SOURCE_OTHER', 'TIMEOUT', 'REVERT')";
-//        }
-//
-//        Cursor mCursor = database.rawQuery(query, null);
-//
-//        if (mCursor != null && mCursor.moveToFirst()) {
-//            int count = mCursor.getCount();
-//            do {
-//                String _requestDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("requestDate")));
-//                if(_requestDate.length() == 0)
-//                {
-//                    continue;
-//                }
-//
-//                String[] arr = _requestDate.split("/");
-//                if (arr.length != 3)
-//                {
-//                    continue;
-//                }
-//                Calendar calendar = Calendar.getInstance();
-//                calendar.set(intConvertNull(Integer.parseInt(arr[2])), intConvertNull(Integer.parseInt(arr[1])) - 1, intConvertNull(Integer.parseInt(arr[0])));
-//
-//                if((dateFrom != null && calendar.before(dateFrom)) || (dateTo != null && calendar.after(dateTo)))
-//                {
-//                    continue;
-//                }
-//
-//
-//
-//                String _customerCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerCode")));
-//                String _customerPayCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("customerPayCode")));
-//                String _billId = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billId")));
-//                String _term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("term")));
-//                int _amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amount")));
-//                String _period = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("period")));
-//                String _issueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("issueDate")));
-//                String _strIssueDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strIssueDate")));
-//                int _status = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("status")));
-//                String _seri = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("seri")));
-//                String _pcCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCode")));
-//                String _handoverCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("handoverCode")));
-//                String _cashierCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierCode")));
-//                String _bookCmis = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("bookCmis")));
-//                String _fromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("fromDate")));
-//                String _toDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("toDate")));
-//                String _strFromDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strFromDate")));
-//                String _strToDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strToDate")));
-//                String _home = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("home")));
-//                String _tax = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("tax")));
-//                String _billNum = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billNum")));
-//                String _currency = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("currency")));
-//                String _priceDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("priceDetails")));
-//                String _numeDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("numeDetails")));
-//                String _amountDetails = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("amountDetails")));
-//                String _oldIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("oldIndex")));
-//                String _newIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("newIndex")));
-//                String _nume = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nume")));
-//                int _amountNotTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountNotTax")));
-//                int _amountTax = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("amountTax")));
-//                String _multiple = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("multiple")));
-//                String _billType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billType")));
-//                String _typeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("typeIndex")));
-//                String _groupTypeIndex = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("groupTypeIndex")));
-//                String _createdDate = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("createdDate")));
-//                int _idChanged = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("idChanged")));
-//                String _dateChanged = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("dateChanged")));
-//                String _edong = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edong")));
-//                String _pcCodeExt = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("pcCodeExt")));
-//                String _code = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("code")));
-//                String _name = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name")));
-//                String _nameNosign = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("nameNosign")));
-//                String _phoneByevn = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByevn")));
-//                String _phoneByecp = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phoneByecp")));
-//                String _electricityMeter = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("electricityMeter")));
-//                String _inning = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("inning")));
-//                String _road = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("road")));
-//                String _station = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("station")));
-//                String _taxCode = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("taxCode")));
-//                String _trade = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("trade")));
-//                String _countPeriod = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("countPeriod")));
-//                String _team = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("team")));
-//                int _type = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("type")));
-//                String _lastQuery = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("lastQuery")));
-//                int _groupType = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("groupType")));
-//                String _billingChannel = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingChannel")));
-//                String _billingType = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingType")));
-//                String _billingBy = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("billingBy")));
-//                String _cashierPay = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("cashierPay")));
-//                String _edongKey = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edongKey")));
-//                int _isChecked = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("isChecked")));
-//                long _traceNumber = longConvertNull(mCursor.getLong(mCursor.getColumnIndex("customerPayCode")));
-//
-//                Bill bill = new Bill(_customerCode, _customerPayCode, _billId, _term, _amount, _period, _issueDate, _strIssueDate, _status, _seri, _pcCode, _handoverCode, _cashierCode, _bookCmis, _fromDate, _toDate, _strFromDate, _strToDate, _home, _tax, _billNum, _currency, _priceDetails, _numeDetails, _amountDetails, _oldIndex, _newIndex, _nume, _amountNotTax, _amountTax, _multiple, _billType, _typeIndex, _groupTypeIndex, _createdDate, _idChanged, _dateChanged, _edong, _pcCodeExt, _code, _name, _nameNosign, _phoneByevn, _phoneByecp, _electricityMeter, _inning, _road, _station, _taxCode, _trade, _countPeriod, _team, _type, _lastQuery, _groupType, _billingChannel, _billingType, _billingBy, _cashierPay, _requestDate, _edongKey, _isChecked, _traceNumber);
-//                bill.setRequestDateCal(calendar);
-//                lst.add(bill);
-//
-//            }
-//            while (mCursor.moveToNext());
-//
-//            mCursor.close();
-//        }
+    public List<ReportLichSuThanhToanAdapter.LichSuThanhToanData> getLichSuThanhToan(String edong, boolean isMaKH, String customerCode) {
+        List<ReportLichSuThanhToanAdapter.LichSuThanhToanData> lst = new ArrayList<>();
 
 
-        if (lst.size() > 1) {
-            Collections.sort(lst, new Comparator<Bill>() {
-                @Override
-                public int compare(Bill bill, Bill t1) {
-                    if (bill.getRequestDateCal().before(t1.getRequestDateCal()))
-                        return -1;
-                    return 1;
+        String query;
+        if (isMaKH) {
+            query = "SELECT * FROM " + TABLE_NAME_HISTORY_PAY + " WHERE E_DONG = '" + edong +
+                    "' and MA_KHANG like '%" + customerCode + "%' " + " ORDER BY date(NGAY_PHAT_SINH) DESC";
+        } else {
+            query = "SELECT * FROM " + TABLE_NAME_HISTORY_PAY + " WHERE E_DONG = '" + edong +
+                    "' and TEN_KHANG like '%" + customerCode + "%' " + " ORDER BY date(NGAY_PHAT_SINH) DESC";
+        }
+
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor != null && mCursor.moveToFirst()) {
+            do {
+
+                ReportLichSuThanhToanAdapter.LichSuThanhToanData data = this.find(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")), lst);
+
+                String name, code;
+
+                if (data == null) {
+
+                    name = mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"));
+                    code = mCursor.getString(mCursor.getColumnIndex("MA_KHANG"));
+
+                    if (name == null || name.length() == 0) {
+                        name = getTenKhachHangByMaKhachHang(MainActivity.mEdong, code);
+                    }
+
+                    data = new ReportLichSuThanhToanAdapter.LichSuThanhToanData(code, name);
+                    lst.add(data);
+                } else {
+                    name = data.getTEN_KHACH_HANG();
+                    code = data.getMA_KHACH_HANG();
                 }
-            });
+
+                EntityLichSuThanhToan lichsu = new EntityLichSuThanhToan();
+
+
+                lichsu.setE_DONG(mCursor.getString(mCursor.getColumnIndex("E_DONG")));
+                lichsu.setSERI_HDON(mCursor.getString(mCursor.getColumnIndex("SERI_HDON")));
+                lichsu.setMA_HOA_DON(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON")));
+                lichsu.setMA_KHANG(code);
+                lichsu.setMA_THE(mCursor.getString(mCursor.getColumnIndex("MA_THE")));
+                lichsu.setTEN_KHANG(name);
+                lichsu.setDIA_CHI(mCursor.getString(mCursor.getColumnIndex("DIA_CHI")));
+                lichsu.setTHANG_TTOAN(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
+                lichsu.setPHIEN_TTOAN(mCursor.getInt(mCursor.getColumnIndex("PHIEN_TTOAN")));
+                lichsu.setSO_TIEN_TTOAN(mCursor.getInt(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
+                lichsu.setSO_GCS(mCursor.getString(mCursor.getColumnIndex("SO_GCS")));
+                lichsu.setDIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
+                lichsu.setSO_HO(mCursor.getString(mCursor.getColumnIndex("SO_HO")));
+                lichsu.setSO_DAU_KY(mCursor.getString(mCursor.getColumnIndex("SO_DAU_KY")));
+                lichsu.setSO_CUOI_KY(mCursor.getString(mCursor.getColumnIndex("SO_CUOI_KY")));
+                lichsu.setSO_CTO(mCursor.getString(mCursor.getColumnIndex("SO_CTO")));
+                lichsu.setSDT_ECPAY(mCursor.getString(mCursor.getColumnIndex("SDT_ECPAY")));
+                lichsu.setSDT_EVN(mCursor.getString(mCursor.getColumnIndex("SDT_EVN")));
+                lichsu.setGIAO_THU(mCursor.getString(mCursor.getColumnIndex("GIAO_THU")));
+                lichsu.setNGAY_GIAO_THU(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
+                lichsu.setTRANG_THAI_TTOAN(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN")));
+                lichsu.setVI_TTOAN(mCursor.getString(mCursor.getColumnIndex("VI_TTOAN")));
+
+
+                lichsu.setHINH_THUC_TT(mCursor.getString(mCursor.getColumnIndex("HINH_THUC_TT")));
+                lichsu.setTRANG_THAI_CHAM_NO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_CHAM_NO")));
+                lichsu.setTRANG_THAI_HUY(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_HUY")));
+                lichsu.setTRANG_THAI_NGHI_NGO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_NGHI_NGO")));
+                lichsu.setSO_IN_BIEN_NHAN(mCursor.getInt(mCursor.getColumnIndex("SO_IN_BIEN_NHAN")));
+                lichsu.setIN_THONG_BAO_DIEN(mCursor.getString(mCursor.getColumnIndex("IN_THONG_BAO_DIEN")));
+                lichsu.setNGAY_PHAT_SINH(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("NGAY_PHAT_SINH")), Common.DATE_TIME_TYPE.FULL.toString()));
+                lichsu.setMA_GIAO_DICH(mCursor.getString(mCursor.getColumnIndex("MA_GIAO_DICH")));
+
+                data.getLichSu().add(lichsu);
+            }
+            while (mCursor.moveToNext());
+
+            mCursor.close();
+        }
+
+
+        return lst;
+    }
+
+
+    public List<EntityHoaDonThu> getBillHoanTraByCodeAndDate(String edong, boolean isMaKH, String customerCode, Calendar dateFrom, Calendar dateTo) {
+        List<EntityHoaDonThu> lst = new ArrayList<>();
+
+        String query;
+
+        String queryDateFrom = "";
+        String queryDateTo = "";
+        if (dateFrom != null) {
+            queryDateFrom = " and date(NGAY_THU) >= date('" + Common.parse(dateFrom.getTime(), Common.DATE_TIME_TYPE.FULL.toString()) + "')";
+        }
+
+        if (dateTo != null) {
+            queryDateTo = " and date(NGAY_THU) <= date('" + Common.parse(dateTo.getTime(), Common.DATE_TIME_TYPE.FULL.toString()) + "')";
+        }
+
+        if (isMaKH) {
+            query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong +
+                    "' and MA_KHANG like '%" + customerCode + "%' and TRANG_THAI_HOAN_TRA = '" + Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode() + "' " + queryDateFrom + queryDateTo + " ORDER BY date(NGAY_THU) DESC";
+        } else {
+            query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong +
+                    "' and TEN_KHANG like '%" + customerCode + "%' and TRANG_THAI_HOAN_TRA = '" + Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode() + "' " + queryDateFrom + queryDateTo + " ORDER BY date(NGAY_THU) DESC";
+        }
+
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor != null && mCursor.moveToFirst()) {
+            int count = mCursor.getCount();
+            do {
+
+                EntityHoaDonThu hoaDonThu = new EntityHoaDonThu();
+
+                hoaDonThu.setE_DONG(mCursor.getString(mCursor.getColumnIndex("E_DONG")));
+                hoaDonThu.setSERI_HDON(mCursor.getString(mCursor.getColumnIndex("SERI_HDON")));
+                hoaDonThu.setMA_HOA_DON(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON")));
+                hoaDonThu.setMA_KHANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
+                hoaDonThu.setMA_THE(mCursor.getString(mCursor.getColumnIndex("MA_THE")));
+                hoaDonThu.setTEN_KHANG(mCursor.getString(mCursor.getColumnIndex("TEN_KHANG")));
+                hoaDonThu.setDIA_CHI(mCursor.getString(mCursor.getColumnIndex("DIA_CHI")));
+                hoaDonThu.setTHANG_TTOAN(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
+                hoaDonThu.setPHIEN_TTOAN(mCursor.getInt(mCursor.getColumnIndex("PHIEN_TTOAN")));
+                hoaDonThu.setSO_TIEN_TTOAN(mCursor.getInt(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
+                hoaDonThu.setSO_GCS(mCursor.getString(mCursor.getColumnIndex("SO_GCS")));
+                hoaDonThu.setDIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
+                hoaDonThu.setSO_HO(mCursor.getString(mCursor.getColumnIndex("SO_HO")));
+                hoaDonThu.setSO_DAU_KY(mCursor.getString(mCursor.getColumnIndex("SO_DAU_KY")));
+                hoaDonThu.setSO_CUOI_KY(mCursor.getString(mCursor.getColumnIndex("SO_CUOI_KY")));
+                hoaDonThu.setSO_CTO(mCursor.getString(mCursor.getColumnIndex("SO_CTO")));
+                hoaDonThu.setSDT_ECPAY(mCursor.getString(mCursor.getColumnIndex("SDT_ECPAY")));
+                hoaDonThu.setSDT_EVN(mCursor.getString(mCursor.getColumnIndex("SDT_EVN")));
+                hoaDonThu.setGIAO_THU(mCursor.getString(mCursor.getColumnIndex("GIAO_THU")));
+                hoaDonThu.setNGAY_GIAO_THU(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
+                hoaDonThu.setTRANG_THAI_TTOAN(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN")));
+                hoaDonThu.setVI_TTOAN(mCursor.getString(mCursor.getColumnIndex("VI_TTOAN")));
+                hoaDonThu.setNGAY_THU(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("NGAY_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
+                hoaDonThu.setHINH_THUC_TT(mCursor.getString(mCursor.getColumnIndex("HINH_THUC_TT")));
+                hoaDonThu.setTRANG_THAI_CHAM_NO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_CHAM_NO")));
+                hoaDonThu.setTRANG_THAI_HUY(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_HUY")));
+                hoaDonThu.setTRANG_THAI_HOAN_TRA(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_HOAN_TRA")));
+                hoaDonThu.setTRANG_THAI_XU_LY_NGHI_NGO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_XU_LY_NGHI_NGO")));
+                hoaDonThu.setTRANG_THAI_DAY_CHAM_NO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_DAY_CHAM_NO")));
+
+                hoaDonThu.setNGAY_DAY(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("NGAY_DAY")), Common.DATE_TIME_TYPE.FULL.toString()));
+                hoaDonThu.setSO_LAN_IN_BIEN_NHAN(mCursor.getInt(mCursor.getColumnIndex("SO_LAN_IN_BIEN_NHAN")));
+                hoaDonThu.setIN_THONG_BAO_DIEN(mCursor.getString(mCursor.getColumnIndex("IN_THONG_BAO_DIEN")));
+
+                lst.add(hoaDonThu);
+
+            }
+            while (mCursor.moveToNext());
+
+            mCursor.close();
         }
 
         return lst;
@@ -654,7 +668,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         database = this.getReadableDatabase();
 
-        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "'";// + "' and status = " + ZERO;
+        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "' " +
+                " and TRANG_THAI_TTOAN = '" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "'";// + "' and status = " + ZERO;
         Cursor mCursor = database.rawQuery(query, null);
         int count = mCursor.getCount();
         if (count != ZERO) {
@@ -686,34 +701,34 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     continue;
                 ;
 
-                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC)) {
+//                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC)) {
+//
+//                    this.updateHoaDonThu(MA_HOA_DON, Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC, "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(),
+//                            currentDate, Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
+//
+//
+//                    this.insertLichSuThanhToan(MA_HOA_DON, currentDate, Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
+//                    continue;
+//                }
+//                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC)) {
+//
+//                    this.updateHoaDonThu(MA_HOA_DON, Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC, "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(),
+//                            currentDate, Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
+//
+//
+//                    this.insertLichSuThanhToan(MA_HOA_DON, currentDate, Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
+//                    continue;
+//                }
+//
+//                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.CHUA_TTOAN)) {
 
-                    this.updateHoaDonThu(MA_HOA_DON, Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC, "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(),
-                            currentDate, Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
-
-
-                    this.insertLichSuThanhToan(MA_HOA_DON, currentDate, Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
-                    continue;
-                }
-                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC)) {
-
-                    this.updateHoaDonThu(MA_HOA_DON, Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC, "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(),
-                            currentDate, Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
-
-
-                    this.insertLichSuThanhToan(MA_HOA_DON, currentDate, Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
-                    continue;
-                }
-
-                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.CHUA_TTOAN)) {
-
-                    TransactionOffItem item = new TransactionOffItem();
-                    item.setCustomer_code(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
-                    item.setAmount(mCursor.getLong(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
-                    item.setBill_id(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON"))));
-                    item.setEdong(mCursor.getString(mCursor.getColumnIndex("E_DONG")));
-                    lst.add(item);
-                }
+                TransactionOffItem item = new TransactionOffItem();
+                item.setCustomer_code(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
+                item.setAmount(mCursor.getLong(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
+                item.setBill_id(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON"))));
+                item.setEdong(mCursor.getString(mCursor.getColumnIndex("E_DONG")));
+                lst.add(item);
+//                }
 
 
             } while (mCursor.moveToNext());
@@ -798,7 +813,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             entityHoaDonNo.setMA_THE(c.getString(c.getColumnIndex("MA_THE")));
             entityHoaDonNo.setTEN_KHANG(c.getString(c.getColumnIndex("TEN_KHANG")));
             entityHoaDonNo.setDIA_CHI(c.getString(c.getColumnIndex("DIA_CHI")));
-            entityHoaDonNo.setTHANG_TTOAN(Common.parseDate(c.getString(c.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            entityHoaDonNo.setTHANG_TTOAN(Common.parseDate(c.getString(c.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
             entityHoaDonNo.setPHIEN_TTOAN(c.getInt(c.getColumnIndex("PHIEN_TTOAN")));
             entityHoaDonNo.setSO_TIEN_TTOAN(c.getInt(c.getColumnIndex("SO_TIEN_TTOAN")));
             entityHoaDonNo.setSO_GCS(c.getString(c.getColumnIndex("SO_GCS")));
@@ -810,7 +825,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             entityHoaDonNo.setSDT_ECPAY(c.getString(c.getColumnIndex("SDT_ECPAY")));
             entityHoaDonNo.setSDT_EVN(c.getString(c.getColumnIndex("SDT_EVN")));
             entityHoaDonNo.setGIAO_THU(c.getString(c.getColumnIndex("GIAO_THU")));
-            entityHoaDonNo.setNGAY_GIAO_THU(Common.parseDate(c.getString(c.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            entityHoaDonNo.setNGAY_GIAO_THU(Common.parseDate(c.getString(c.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
             entityHoaDonNo.setTRANG_THAI_TTOAN(c.getString(c.getColumnIndex("TRANG_THAI_TTOAN")));
             entityHoaDonNo.setVI_TTOAN(c.getString(c.getColumnIndex("VI_TTOAN")));
 
@@ -823,48 +838,56 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return entityHoaDonNo;
     }
 
-    public List<EntityKhachHang> selectAllCustomerFitterBy(String edong, Common.TYPE_SEARCH typeSearch, String infoSearch) {
+    public List<EntityKhachHang> selectAllCustomerFitterBy(String edong, int startIndex, Common.TYPE_SEARCH typeSearch, String infoSearch) {
         List<EntityKhachHang> customerList = new ArrayList<>();
 
-        boolean fail = TextUtils.isEmpty(edong) || TextUtils.isEmpty(infoSearch) && typeSearch.getPosition() != Common.TYPE_SEARCH.ALL.getPosition();
+        boolean fail = TextUtils.isEmpty(edong);
         if (fail)
             return customerList;
 
-        String query = null;
+        String query = "";
+        String whereQuery1 = "";
+        String whereQuery2 = "";
         switch (typeSearch.getPosition()) {
             case 0:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "'";
+                whereQuery1 =  " t1.E_DONG = '" + edong + "'";
+                whereQuery2 =  " t2.E_DONG = '" + edong + "'";
                 break;
             case 1:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "' and MA_KHANG like '%" + infoSearch + "%'";
+                whereQuery1 =  " t1.E_DONG = '" + edong + "' and t1.MA_KHANG like '%" + infoSearch + "%'";
+                whereQuery2 =  " t2.E_DONG = '" + edong + "' and t2.MA_KHANG like '%" + infoSearch + "%'";
                 break;
             case 2:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "' and TEN_KHANG like '%" + infoSearch + "%'";
+                whereQuery1 =  " t1.E_DONG = '" + edong + "' and t1.TEN_KHANG like '%" + infoSearch + "%'";
+                whereQuery2 =  " t2.E_DONG = '" + edong + "' and t2.TEN_KHANG like '%" + infoSearch + "%'";
                 break;
             case 3:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "' and SDT_EVN like '%" + infoSearch + "%'";
+                whereQuery1 =  " t1.E_DONG = '" + edong + "' and t1.SDT_EVN like '%" + infoSearch + "%'";
+                whereQuery2 =  " t2.E_DONG = '" + edong + "' and t2.SDT_EVN like '%" + infoSearch + "%'";
                 break;
             case 4:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "' and DIA_CHI like '%" + infoSearch + "%'";
+                whereQuery1 =  " t1.E_DONG = '" + edong + "' and t1.DIA_CHI like '%" + infoSearch + "%'";
+                whereQuery2 =  " t2.E_DONG = '" + edong + "' and t2.DIA_CHI like '%" + infoSearch + "%'";
                 break;
             case 5:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "' and SO_GCS like '%" + infoSearch + "%'";
+                whereQuery1 =  " t1.E_DONG = '" + edong + "' and t1.SO_GCS like '%" + infoSearch + "%'";
+                whereQuery2 =  " t2.E_DONG = '" + edong + "' and t2.SO_GCS like '%" + infoSearch + "%'";
                 break;
             case 6:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "' and LO_TRINH like '%" + infoSearch + "%'";
+                whereQuery1 =  " t1.E_DONG = '" + edong + "' and t1.LO_TRINH like '%" + infoSearch + "%'";
+                whereQuery2 =  " t2.E_DONG = '" + edong + "' and t2.LO_TRINH like '%" + infoSearch + "%'";
                 break;
-
-          /*  case 7:
-                query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong
-                        + "' and code like '%" + infoSearch
-                        + "%' or name like '%" + infoSearch
-                        + "%' or phoneByevn like '%" + infoSearch
-                        + "%' or address like '%" + infoSearch
-                        + "%' or bookCmis like '%" + infoSearch
-                        + "%' or road like '%" + infoSearch
-                        + "%' ";
-                break;*/
+            default:
+                whereQuery1 = " t1.E_DONG = '" + edong + "'";
+                whereQuery2 = " t2.E_DONG = '" + edong + "'";
         }
+
+
+        query = "SELECT * FROM (select (select COUNT(*) " +
+                "                from " + TABLE_NAME_CUSTOMER + " t1 " +
+                "                where t1.ID <= t2.ID and " + whereQuery1 +
+                "                ) as Row_Number, * from " + TABLE_NAME_CUSTOMER + " t2 WHERE " + whereQuery2 + " ORDER BY ID) " +
+                "                  WHERE Row_Number BETWEEN " + ((startIndex - 1) * PayFragment.ROWS_ON_PAGE + 1) + " AND " + ((startIndex) * PayFragment.ROWS_ON_PAGE);
 
         database = this.getWritableDatabase();
         Cursor c = database.rawQuery(query, null);
@@ -888,12 +911,16 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 khachHang.setSDT_ECPAY(c.getString(c.getColumnIndex("SDT_ECPAY")));
                 khachHang.setSDT_EVN(c.getString(c.getColumnIndex("SDT_EVN")));
                 khachHang.setGIAO_THU(c.getString(c.getColumnIndex("GIAO_THU")));
-                khachHang.setNGAY_GIAO_THU(Common.parseDate(c.getString(c.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+                khachHang.setNGAY_GIAO_THU(Common.parseDate(c.getString(c.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
 
                 customerList.add(khachHang);
             }
             while (c.moveToNext());
 
+        }
+
+        if(c != null)
+        {
             c.close();
         }
         return customerList;
@@ -905,31 +932,33 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
 
         String query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE ";
+
+        boolean hasWhere = false;
+
         if (_maKH.length() != 0) {
-            query += "MA_KHANG like '%" + _maKH + "%' or ";
-            query += "MA_THE like '%" + _maKH + "%' ";
-        } else {
-            boolean hasWhere = false;
+            hasWhere = true;
+            query += "(MA_KHANG like '%" + _maKH + "%' or ";
+            query += "MA_THE like '%" + _maKH + "%') ";
+        }
 
-            if (_name.length() > 0) {
-                query += (hasWhere ? "and " : "") + "TEN_KHANG like '%" + _name + "%' ";
-                hasWhere = true;
-            }
+        if (_name.length() > 0) {
+            query += (hasWhere ? "and " : "") + "TEN_KHANG like '%" + _name + "%' ";
+            hasWhere = true;
+        }
 
-            if (_address.length() > 0) {
-                query += (hasWhere ? "and " : "") + "DIA_CHI like '%" + _address + "%' ";
-                hasWhere = true;
-            }
+        if (_address.length() > 0) {
+            query += (hasWhere ? "and " : "") + "DIA_CHI like '%" + _address + "%' ";
+            hasWhere = true;
+        }
 
-            if (_phone.length() > 0) {
-                query += (hasWhere ? "and " : "") + "SDT_ECPAY like '%" + _phone + "%' ";
-                hasWhere = true;
-            }
+        if (_phone.length() > 0) {
+            query += (hasWhere ? "and " : "") + "SDT_ECPAY like '%" + _phone + "%' ";
+            hasWhere = true;
+        }
 
-            if (_bookCmis.length() > 0) {
-                query += (hasWhere ? "and " : "") + "SO_GCS like '%" + _bookCmis + "%' ";
-                hasWhere = true;
-            }
+        if (_bookCmis.length() > 0) {
+            query += (hasWhere ? "and " : "") + "SO_GCS like '%" + _bookCmis + "%' ";
+            hasWhere = true;
         }
 
         database = this.getWritableDatabase();
@@ -952,16 +981,121 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 customer.setSDT_ECPAY(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("SDT_ECPAY"))));
                 customer.setSDT_EVN(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("SDT_EVN"))));
                 customer.setGIAO_THU(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("GIAO_THU"))));
-                customer.setNGAY_GIAO_THU(Common.parseDate(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU"))), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+                customer.setNGAY_GIAO_THU(Common.parseDate(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU"))), Common.DATE_TIME_TYPE.FULL.toString()));
 
 
                 customerList.add(customer);
             }
             while (mCursor.moveToNext());
 
+        }
+
+        if(mCursor != null)
+        {
             mCursor.close();
         }
         return customerList;
+    }
+
+
+    public  List<PayAdapter.BillEntityAdapter> getBillSelectedToPay(String [] billids)
+    {
+        List<PayAdapter.BillEntityAdapter> billList = new ArrayList<>();
+
+        if(billids.length > 0)
+        {
+            database = this.getReadableDatabase();
+            String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + MainActivity.mEdong + "' and TRANG_THAI_TTOAN = '" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "' and (";
+
+            for (int i = 0, n = billids.length; i < n; i ++)
+            {
+                query += (i == 0 ? " MA_HOA_DON = '" : " or MA_HOA_DON = '") + billids[i] + "' ";
+            }
+
+            query += ")";
+
+            query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " A INNER JOIN ( " + query + ") B ON A.MA_KHANG = B.MA_KHANG";
+
+            Cursor mCursor = database.rawQuery(query, null);
+            if (mCursor.getCount() == 0)
+            {
+                mCursor.close();
+                return billList;
+            }
+            if (mCursor.moveToFirst()) {
+                do {
+                    String tenKHang = mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"));
+                    String diaChi = mCursor.getString(mCursor.getColumnIndex("DIA_CHI"));
+                    String viThanhToan = mCursor.getString(mCursor.getColumnIndex("VI_TTOAN"));
+                    String chiTietKhungGia = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_KG"));
+                    String chiTietMucChiSo = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_MCS"));
+                    String chiTietTienTheoChiSo = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_TIEN_MCS"));
+                    String dienNangTieuThu = mCursor.getString(mCursor.getColumnIndex("DNTT"));
+                    String soGCS = mCursor.getString(mCursor.getColumnIndex("SO_GCS"));
+                    String phienTT = mCursor.getString(mCursor.getColumnIndex("PHIEN_TTOAN"));
+                    String soHo = mCursor.getString(mCursor.getColumnIndex("SO_HO"));
+                    String maDienLucMoRong = mCursor.getString(mCursor.getColumnIndex("MA_DL_MO_RONG"));
+                    String tuNgay = mCursor.getString(mCursor.getColumnIndex("TU_NGAY"));
+                    String denNgay = mCursor.getString(mCursor.getColumnIndex("DEN_NGAY"));
+                    String soDauKy = mCursor.getString(mCursor.getColumnIndex("SO_DAU_KY"));
+                    String soCuoiKy = mCursor.getString(mCursor.getColumnIndex("SO_CUOI_KY"));
+                    String soCto = mCursor.getString(mCursor.getColumnIndex("SO_CTO"));
+                    int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("MA_HOA_DON")));
+                    int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
+                    int tienChuaThue = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("TONG_TIEN_CHUA_THUE")));
+                    int tienThue = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("TIEN_THUE")));
+                    String status = mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN"));
+
+                    String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")));
+
+                    PayAdapter.BillEntityAdapter bill = new PayAdapter.BillEntityAdapter();
+                    bill.setTEN_KHACH_HANG(tenKHang);
+                    bill.setDIA_CHI(diaChi);
+                    bill.setBillId(billId);
+                    bill.setVI_TTOAN(viThanhToan);
+                    bill.setSO_GCS(soGCS);
+                    bill.setTIEN_THANH_TOAN(amount);
+                    bill.setTHANG_THANH_TOAN(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
+                    bill.setTRANG_THAI_TT(status);
+                    bill.setPHIEN_THANH_TOAN(phienTT);
+                    bill.setCHI_TIET_KG(chiTietKhungGia);
+                    bill.setCHI_TIET_MCS(chiTietMucChiSo);
+                    bill.setCHI_TIET_TIEN_MCS(chiTietTienTheoChiSo);
+                    bill.setDNTT(dienNangTieuThu);
+                    bill.setTONG_TIEN_CHUA_THUE(tienChuaThue+"");
+                    bill.setTONG_TIEN_THUE(tienThue+"");
+                    bill.setCSDK(soDauKy);
+                    bill.setCSCK(soCuoiKy);
+                    bill.setSO_CONG_TO(soCto);
+                    bill.setMA_DL_MO_RONG(maDienLucMoRong);
+                    bill.setTU_NGAY(tuNgay);
+                    bill.setDEN_NGAY(denNgay);
+                    bill.setSO_HO(soHo);
+                    bill.setMA_DIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
+                    bill.setChecked(true);
+                    bill.setMA_KHACH_HANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
+
+                    bill.setCheckEnable(!bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()));
+
+                    if (bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()) && MainActivity.mEdong.equalsIgnoreCase(viThanhToan))
+                        bill.setPrintEnable(true);
+                    else
+                        bill.setPrintEnable(false);
+
+                    bill.setRequestDate(dateRequest);
+
+                    billList.add(bill);
+                }
+                while (mCursor.moveToNext());
+            }
+
+
+            if (mCursor != null && !mCursor.isClosed()) {
+                mCursor.close();
+            }
+        }
+
+        return billList;
     }
 
     public Pair<List<PayAdapter.BillEntityAdapter>, Long> selectInfoBillOfCustomerToRecycler(String edong, String code) {
@@ -974,7 +1108,10 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         long total = 0;
         if (mCursor.getCount() == 0)
+        {
+            mCursor.close();
             return new Pair<>(billList, total);
+        }
         if (mCursor.moveToFirst()) {
             do {
                 String tenKHang = mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"));
@@ -984,10 +1121,15 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 String chiTietMucChiSo = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_MCS"));
                 String chiTietTienTheoChiSo = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_TIEN_MCS"));
                 String dienNangTieuThu = mCursor.getString(mCursor.getColumnIndex("DNTT"));
+                String soGCS = mCursor.getString(mCursor.getColumnIndex("SO_GCS"));
+                String phienTT = mCursor.getString(mCursor.getColumnIndex("PHIEN_TTOAN"));
                 String soHo = mCursor.getString(mCursor.getColumnIndex("SO_HO"));
                 String soDauKy = mCursor.getString(mCursor.getColumnIndex("SO_DAU_KY"));
                 String soCuoiKy = mCursor.getString(mCursor.getColumnIndex("SO_CUOI_KY"));
                 String soCto = mCursor.getString(mCursor.getColumnIndex("SO_CTO"));
+                String maDienLucMoRong = mCursor.getString(mCursor.getColumnIndex("MA_DL_MO_RONG"));
+                String tuNgay = mCursor.getString(mCursor.getColumnIndex("TU_NGAY"));
+                String denNgay = mCursor.getString(mCursor.getColumnIndex("DEN_NGAY"));
                 int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("MA_HOA_DON")));
                 int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
                 int tienChuaThue = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("TONG_TIEN_CHUA_THUE")));
@@ -996,9 +1138,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
                 total += amount;
 
-                String term = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("THANG_TTOAN")));
-                term = Common.convertDateToDate(term, yyyyMMddHHmmssSSS, Common.DATE_TIME_TYPE.MMyyyy);
-
                 String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")));
 
                 PayAdapter.BillEntityAdapter bill = new PayAdapter.BillEntityAdapter();
@@ -1006,9 +1145,11 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 bill.setDIA_CHI(diaChi);
                 bill.setBillId(billId);
                 bill.setVI_TTOAN(viThanhToan);
+                bill.setSO_GCS(soGCS);
                 bill.setTIEN_THANH_TOAN(amount);
-                bill.setTHANG_THANH_TOAN(term);
+                bill.setTHANG_THANH_TOAN(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
                 bill.setTRANG_THAI_TT(status);
+                bill.setPHIEN_THANH_TOAN(phienTT);
                 bill.setCHI_TIET_KG(chiTietKhungGia);
                 bill.setCHI_TIET_MCS(chiTietMucChiSo);
                 bill.setCHI_TIET_TIEN_MCS(chiTietTienTheoChiSo);
@@ -1019,6 +1160,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 bill.setCSCK(soCuoiKy);
                 bill.setSO_CONG_TO(soCto);
                 bill.setSO_HO(soHo);
+                bill.setMA_DL_MO_RONG(maDienLucMoRong);
+                bill.setTU_NGAY(tuNgay);
+                bill.setDEN_NGAY(denNgay);
                 bill.setMA_DIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
                 bill.setChecked(false);
                 bill.setMA_KHACH_HANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
@@ -1046,7 +1190,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public int countMoneyAllBill(String edong) {
         database = this.getReadableDatabase();
-        String query = "SELECT SUM(SO_TIEN_TTOAN) FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "'";// and status = " + ZERO;
+        String query = "SELECT SUM(SO_TIEN_TTOAN) FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "' " +
+                " and TRANG_THAI_TTOAN = '" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "'";// and status = " + ZERO;
         Cursor mCursor = database.rawQuery(query, null);
         int totalMoney = ERROR_OCCUR;
         if (mCursor.moveToFirst())
@@ -1076,7 +1221,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("E_DONG", customer.getE_DONG());
         initialValues.put("SDT_ECPAY", customer.getSDT_ECPAY());
         initialValues.put("SDT_EVN", customer.getSDT_EVN());
-        initialValues.put("NGAY_GIAO_THU", Common.parse(customer.getNGAY_GIAO_THU(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+        initialValues.put("NGAY_GIAO_THU", Common.parse(customer.getNGAY_GIAO_THU(), Common.DATE_TIME_TYPE.FULL.toString()));
         database = getWritableDatabase();
 
         String query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE MA_KHANG = '" + customer.getMA_KHANG() + "'";
@@ -1109,7 +1254,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("TEN_KHANG", bodyBillResponse.getName());
         initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
 
-        initialValues.put("THANG_TTOAN", bodyBillResponse.getTerm());
+        initialValues.put("THANG_TTOAN", Common.parse(Common.parseDate(Common.convertToDate(bodyBillResponse.getTerm()), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
         initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
         initialValues.put("SO_TIEN_TTOAN", bodyBillResponse.getAmount());
         initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
@@ -1119,9 +1264,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("SO_DAU_KY", bodyBillResponse.getOldIndex());
         initialValues.put("SO_CUOI_KY", bodyBillResponse.getNewIndex());
         initialValues.put("SO_CTO", bodyBillResponse.getElectricityMeter());
+        initialValues.put("MA_DL_MO_RONG", bodyBillResponse.getPcCodeExt());
+        initialValues.put("TU_NGAY", bodyBillResponse.getStrFromDate());
+        initialValues.put("DEN_NGAY", bodyBillResponse.getStrToDate());
         initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
         initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
-        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
         initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
         initialValues.put("VI_TTOAN", "");
         initialValues.put("CHI_TIET_KG", bodyBillResponse.getPriceDetails());
@@ -1130,6 +1278,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("DNTT", bodyBillResponse.getNume());
         initialValues.put("TONG_TIEN_CHUA_THUE", bodyBillResponse.getAmountNotTax());
         initialValues.put("TIEN_THUE",bodyBillResponse.getAmountTax());
+        initialValues.put("SO_GCS",bodyBillResponse.getBookCmis());
 
         database = getWritableDatabase();
 
@@ -1203,11 +1352,10 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public long insertEvnPC(ListEvnPCResponse listEvnPCResponse, String edong) {
         ContentValues initialValues = new ContentValues();
-
-        initialValues.put("parentId", listEvnPCResponse.getParentId());
+        initialValues.put("parentId", String.valueOf(listEvnPCResponse.getParentId()));
         initialValues.put("strParentId", listEvnPCResponse.getStrParentId());
         initialValues.put("pcId", listEvnPCResponse.getPcId());
-        initialValues.put("strPcId", listEvnPCResponse.getStrPcId());
+        initialValues.put("strPcId", listEvnPCResponse.getStrPcId() + "");
         initialValues.put("code", listEvnPCResponse.getCode());
         initialValues.put("ext", listEvnPCResponse.getExt());
         initialValues.put("fullName", listEvnPCResponse.getFullName());
@@ -1230,11 +1378,15 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("strDateChanged", listEvnPCResponse.getStrDateChanged());
         initialValues.put("regionId", listEvnPCResponse.getRegionId());
         initialValues.put("parentPcCode", listEvnPCResponse.getParentPcCode());
-        initialValues.put("cardPrefix", listEvnPCResponse.getCardPrefix());
+        initialValues.put("cardPrefix", listEvnPCResponse.getCardPrefix() + "");
         initialValues.put("edong", edong);
-
+        int rowAffect = -1;
         database = getWritableDatabase();
-        int rowAffect = (int) database.insert(TABLE_NAME_EVN_PC, null, initialValues);
+        try {
+            rowAffect = (int) database.insertOrThrow(TABLE_NAME_EVN_PC, null, initialValues);
+        } catch (Exception e) {
+            Log.e(TAG, "insertEvnPC: " + e.getMessage());
+        }
         return rowAffect;
     }
 
@@ -1276,7 +1428,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public long deleteAllPC(String edong) {
         database = this.getWritableDatabase();
-        return database.delete(TABLE_NAME_EVN_PC,  "edong=?", new String[]{edong});
+        return database.delete(TABLE_NAME_EVN_PC, "edong=?", new String[]{edong});
     }
 
     public long checkEvnPCExist(int pcId, String edong) {
@@ -1383,7 +1535,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("SDT_ECPAY", bodyCustomerResponse.getPhoneByECP());
         initialValues.put("SDT_EVN", bodyCustomerResponse.getPhoneByEVN());
         initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
-        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_CUSTOMER, null, initialValues);
         return rowAffect;
@@ -1407,7 +1559,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("SDT_ECPAY", bodyCustomerResponse.getPhoneByECP());
         initialValues.put("SDT_EVN", bodyCustomerResponse.getPhoneByEVN());
         initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
-        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
 
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_CUSTOMER, null, initialValues);
@@ -1438,29 +1590,25 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return rowAffect;
     }
 
-    public long updateCustomer(Customer customer) {
+    public long updateCustomer(EntityKhachHang customer) {
         ContentValues initialValues = new ContentValues();
 
-        initialValues.put("name", customer.getName());
-        initialValues.put("address", customer.getAddress());
-        initialValues.put("pcCode", customer.getPcCode());
-        initialValues.put("cardNo", customer.getCardNo());
-        initialValues.put("pcCodeExt", customer.getPcCodeExt());
-        initialValues.put("phoneByevn", customer.getPhoneByevn());
-        initialValues.put("phoneByecp", customer.getPhoneByecp());
-        initialValues.put("bookCmis", customer.getBookCmis());
-        initialValues.put("electricityMeter", customer.getElectricityMeter());
-        initialValues.put("inning", customer.getInning());
-        initialValues.put("status", customer.getStatus());
-        initialValues.put("bankAccount", "");
-        initialValues.put("idNumber", customer.getIdNumber());
-        initialValues.put("bankName", "");
-        initialValues.put("isShowBill", 0);
-        initialValues.put("idChanged", customer.getIdChanged());
-        initialValues.put("dateChanged", customer.getDateChanged());
+        initialValues.put("MA_KHANG", customer.getMA_KHANG());
+        initialValues.put("TEN_KHANG", customer.getTEN_KHANG());
+        initialValues.put("MA_THE", customer.getMA_THE());
+        initialValues.put("DIA_CHI", customer.getDIA_CHI());
+        initialValues.put("PHIEN_TTOAN", customer.getPHIEN_TTOAN());
+        initialValues.put("LO_TRINH", customer.getLO_TRINH());
+        initialValues.put("SO_GCS", customer.getSO_GCS());
+        initialValues.put("DIEN_LUC", customer.getDIEN_LUC());
+        initialValues.put("SO_HO", "");
+        initialValues.put("E_DONG", customer.getE_DONG());
+        initialValues.put("SDT_ECPAY", customer.getSDT_ECPAY());
+        initialValues.put("SDT_EVN", customer.getSDT_EVN());
+
 
         database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_CUSTOMER, initialValues, "code = ?", new String[]{customer.getCode()});
+        int rowAffect = (int) database.update(TABLE_NAME_CUSTOMER, initialValues, "MA_KHANG = ?", new String[]{customer.getMA_KHANG()});
         return rowAffect;
     }
 
@@ -1493,7 +1641,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             khachHang.setSDT_ECPAY(c.getString(c.getColumnIndex("SDT_ECPAY")));
             khachHang.setSDT_EVN(c.getString(c.getColumnIndex("SDT_EVN")));
             khachHang.setGIAO_THU(c.getString(c.getColumnIndex("GIAO_THU")));
-            khachHang.setNGAY_GIAO_THU(Common.parseDate(c.getString(c.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            khachHang.setNGAY_GIAO_THU(Common.parseDate(c.getString(c.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
 
             return khachHang;
         }
@@ -1519,7 +1667,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("TEN_KHANG", bodyBillResponse.getName());
         initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
 
-        initialValues.put("THANG_TTOAN", bodyBillResponse.getTerm());
+        initialValues.put("THANG_TTOAN", Common.parse(Common.parseDate(Common.convertToDate(bodyBillResponse.getTerm()), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
         initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
         initialValues.put("SO_TIEN_TTOAN", Common.parseInt(bodyBillResponse.getAmount()));
         initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
@@ -1529,6 +1677,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("SO_DAU_KY", bodyBillResponse.getOldIndex());
         initialValues.put("SO_CUOI_KY", bodyBillResponse.getNewIndex());
         initialValues.put("SO_CTO", bodyBillResponse.getElectricityMeter());
+        initialValues.put("MA_DL_MO_RONG", bodyBillResponse.getPcCodeExt());
+        initialValues.put("TU_NGAY", bodyBillResponse.getStrFromDate());
+        initialValues.put("DEN_NGAY", bodyBillResponse.getStrToDate());
         initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
         initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
         initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
@@ -1541,6 +1692,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("DNTT", bodyBillResponse.getNume());
         initialValues.put("TONG_TIEN_CHUA_THUE", Common.parseInt(bodyBillResponse.getAmountNotTax()));
         initialValues.put("TIEN_THUE",Common.parseInt(bodyBillResponse.getAmountTax()));
+        initialValues.put("SO_GCS",Common.parseInt(bodyBillResponse.getBookCmis()));
                 database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
         return rowAffect;
@@ -1561,7 +1713,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("TEN_KHANG", bodyBillResponse.getName());
         initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
 
-        initialValues.put("THANG_TTOAN", bodyBillResponse.getTerm());
+        initialValues.put("THANG_TTOAN", Common.parse(Common.parseDate(Common.convertToDate(bodyBillResponse.getTerm()), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
         initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
         initialValues.put("SO_TIEN_TTOAN", Common.parseInt(bodyBillResponse.getAmount()));
         initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
@@ -1571,6 +1723,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("SO_DAU_KY", bodyBillResponse.getOldIndex());
         initialValues.put("SO_CUOI_KY", bodyBillResponse.getNewIndex());
         initialValues.put("SO_CTO", bodyBillResponse.getElectricityMeter());
+        initialValues.put("MA_DL_MO_RONG", bodyBillResponse.getPcCodeExt());
+        initialValues.put("TU_NGAY", bodyBillResponse.getStrFromDate());
+        initialValues.put("DEN_NGAY", bodyBillResponse.getStrToDate());
         initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
         initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
         initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
@@ -1583,6 +1738,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("DNTT", bodyBillResponse.getNume());
         initialValues.put("TONG_TIEN_CHUA_THUE", Common.parseInt(bodyBillResponse.getAmountNotTax()));
         initialValues.put("TIEN_THUE",Common.parseInt(bodyBillResponse.getAmountTax()));
+        initialValues.put("SO_GCS",Common.parseInt(bodyBillResponse.getBookCmis()));
 
         database = getWritableDatabase();
         int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
@@ -1605,7 +1761,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("TEN_KHANG", bodyBillResponse.getName());
         initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
 
-        initialValues.put("THANG_TTOAN", bodyBillResponse.getTerm());
+        initialValues.put("THANG_TTOAN", Common.parse(Common.parseDate(Common.convertToDate(bodyBillResponse.getTerm()), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
         initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
         initialValues.put("SO_TIEN_TTOAN", Common.parseInt(bodyBillResponse.getAmount()));
         initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
@@ -1618,7 +1774,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
         initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
         initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
-        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
         initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
 
 
@@ -1737,7 +1893,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("TRANG_THAI_NGHI_NGO", hoaDonThu.getString(hoaDonThu.getColumnIndex("TRANG_THAI_NGHI_NGO")));
         initialValues.put("SO_IN_BIEN_NHAN", hoaDonThu.getString(hoaDonThu.getColumnIndex("SO_IN_BIEN_NHAN")));
         initialValues.put("IN_THONG_BAO_DIEN", hoaDonThu.getString(hoaDonThu.getColumnIndex("IN_THONG_BAO_DIEN")));
-        initialValues.put("NGAY_PHAT_SINH", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+        initialValues.put("NGAY_PHAT_SINH", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
         initialValues.put("MA_GIAO_DICH", MA_GIAO_DICH);
 
         database.insert(TABLE_NAME_HISTORY_PAY, null, initialValues);
@@ -1762,7 +1918,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("TEN_KHANG", lichSuThanhToan.getTEN_KHANG());
         initialValues.put("DIA_CHI", lichSuThanhToan.getDIA_CHI());
 
-        initialValues.put("THANG_TTOAN", Common.parse(lichSuThanhToan.getTHANG_TTOAN(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+        initialValues.put("THANG_TTOAN", Common.parse(lichSuThanhToan.getTHANG_TTOAN(), Common.DATE_TIME_TYPE.FULL.toString()));
         initialValues.put("PHIEN_TTOAN", lichSuThanhToan.getPHIEN_TTOAN());
         initialValues.put("SO_TIEN_TTOAN", lichSuThanhToan.getSO_TIEN_TTOAN());
         initialValues.put("SO_GCS", lichSuThanhToan.getSO_GCS());
@@ -1775,7 +1931,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("SDT_ECPAY", lichSuThanhToan.getSDT_ECPAY());
         initialValues.put("SDT_EVN", lichSuThanhToan.getSDT_EVN());
         initialValues.put("GIAO_THU", lichSuThanhToan.getGIAO_THU());
-        initialValues.put("NGAY_GIAO_THU", Common.parse(lichSuThanhToan.getNGAY_GIAO_THU(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+        initialValues.put("NGAY_GIAO_THU", Common.parse(lichSuThanhToan.getNGAY_GIAO_THU(), Common.DATE_TIME_TYPE.FULL.toString()));
         initialValues.put("VI_TTOAN", lichSuThanhToan.getVI_TTOAN());
 
 
@@ -1786,7 +1942,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("TRANG_THAI_NGHI_NGO", lichSuThanhToan.getTRANG_THAI_NGHI_NGO());
         initialValues.put("SO_IN_BIEN_NHAN", lichSuThanhToan.getSO_IN_BIEN_NHAN());
         initialValues.put("IN_THONG_BAO_DIEN", lichSuThanhToan.getIN_THONG_BAO_DIEN());
-        initialValues.put("NGAY_PHAT_SINH", Common.parse(lichSuThanhToan.getNGAY_PHAT_SINH(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+        initialValues.put("NGAY_PHAT_SINH", Common.parse(lichSuThanhToan.getNGAY_PHAT_SINH(), Common.DATE_TIME_TYPE.FULL.toString()));
         initialValues.put("MA_GIAO_DICH", lichSuThanhToan.getMA_GIAO_DICH());
 
 
@@ -1804,6 +1960,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE MA_HOA_DON = '" + bodyBillResponse.getBillId() + "'";
         Cursor mCursor = database.rawQuery(query, null);
         if (mCursor.moveToFirst()) {
+            mCursor.close();
             ContentValues initialValues = new ContentValues();
 
 
@@ -1817,7 +1974,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("TEN_KHANG", bodyBillResponse.getName());
             initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
 
-            initialValues.put("THANG_TTOAN", bodyBillResponse.getTerm());
+            initialValues.put("THANG_TTOAN", Common.parse(Common.parseDate(Common.convertToDate(bodyBillResponse.getTerm()), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
             initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
             initialValues.put("SO_TIEN_TTOAN", Common.parseInt(bodyBillResponse.getAmount()));
             initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
@@ -1830,7 +1987,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
             initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
             initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
-            initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+            initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
             initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
 
 
@@ -1844,6 +2001,10 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("TRANG_THAI_DAY_CHAM_NO", TRANG_THAI_DAY_CHAM_NO);
             initialValues.put("SO_LAN_IN_BIEN_NHAN", SO_LAN_IN_BIEN_NHAN);
             initialValues.put("NGAY_DAY", NGAY_DAY);
+
+            if (bodyBillResponse.getRequestDate() != null) {
+                initialValues.put("NGAY_THU", Common.parse(Common.parseDate(bodyBillResponse.getRequestDate(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
+            }
 
             database.update(TABLE_NAME_DEBT_COLLECTION, initialValues, "MA_HOA_DON=?", new String[]{String.valueOf(bodyBillResponse.getBillId())});
         } else {
@@ -1861,7 +2022,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("TEN_KHANG", bodyBillResponse.getName());
             initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
 
-            initialValues.put("THANG_TTOAN", bodyBillResponse.getTerm());
+            initialValues.put("THANG_TTOAN", Common.parse(Common.parseDate(Common.convertToDate(bodyBillResponse.getTerm()), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
             initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
             initialValues.put("SO_TIEN_TTOAN", Common.parseInt(bodyBillResponse.getAmount()));
             initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
@@ -1874,7 +2035,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
             initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
             initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
-            initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS));
+            initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
             initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
 
 
@@ -1888,6 +2049,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("TRANG_THAI_DAY_CHAM_NO", TRANG_THAI_DAY_CHAM_NO);
             initialValues.put("SO_LAN_IN_BIEN_NHAN", SO_LAN_IN_BIEN_NHAN);
             initialValues.put("NGAY_DAY", NGAY_DAY);
+
+
+            if (bodyBillResponse.getRequestDate() != null) {
+                initialValues.put("NGAY_THU", Common.parse(Common.parseDate(bodyBillResponse.getRequestDate(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
+            } else {
+                initialValues.put("NGAY_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
+            }
 
             int rowAffect = (int) database.insert(TABLE_NAME_DEBT_COLLECTION, null, initialValues);
         }
@@ -1913,7 +2081,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("TEN_KHANG", entityHoaDonThu.getTEN_KHANG());
             initialValues.put("DIA_CHI", entityHoaDonThu.getDIA_CHI());
 
-            initialValues.put("THANG_TTOAN", Common.parse(entityHoaDonThu.getTHANG_TTOAN(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            initialValues.put("THANG_TTOAN", Common.parse(entityHoaDonThu.getTHANG_TTOAN(), Common.DATE_TIME_TYPE.FULL.toString()));
             initialValues.put("PHIEN_TTOAN", entityHoaDonThu.getPHIEN_TTOAN());
             initialValues.put("SO_TIEN_TTOAN", entityHoaDonThu.getSO_TIEN_TTOAN());
             initialValues.put("SO_GCS", entityHoaDonThu.getSO_GCS());
@@ -1926,7 +2094,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("SDT_ECPAY", entityHoaDonThu.getSDT_ECPAY());
             initialValues.put("SDT_EVN", entityHoaDonThu.getSDT_EVN());
             initialValues.put("GIAO_THU", entityHoaDonThu.getGIAO_THU());
-            initialValues.put("NGAY_GIAO_THU", Common.parse(entityHoaDonThu.getNGAY_GIAO_THU(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            initialValues.put("NGAY_GIAO_THU", Common.parse(entityHoaDonThu.getNGAY_GIAO_THU(), Common.DATE_TIME_TYPE.FULL.toString()));
             initialValues.put("VI_TTOAN", entityHoaDonThu.getVI_TTOAN());
 
 
@@ -1939,7 +2107,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("IN_THONG_BAO_DIEN", entityHoaDonThu.getIN_THONG_BAO_DIEN());
             initialValues.put("TRANG_THAI_DAY_CHAM_NO", entityHoaDonThu.getTRANG_THAI_DAY_CHAM_NO());
             initialValues.put("SO_LAN_IN_BIEN_NHAN", entityHoaDonThu.getSO_LAN_IN_BIEN_NHAN());
-            initialValues.put("NGAY_DAY", Common.parse(entityHoaDonThu.getNGAY_DAY(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            initialValues.put("NGAY_DAY", Common.parse(entityHoaDonThu.getNGAY_DAY(), Common.DATE_TIME_TYPE.FULL.toString()));
 
             database.update(TABLE_NAME_DEBT_COLLECTION, initialValues, "MA_HOA_DON=?", new String[]{String.valueOf(entityHoaDonThu.getMA_HOA_DON())});
         } else {
@@ -1956,7 +2124,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("TEN_KHANG", entityHoaDonThu.getTEN_KHANG());
             initialValues.put("DIA_CHI", entityHoaDonThu.getDIA_CHI());
 
-            initialValues.put("THANG_TTOAN", Common.parse(entityHoaDonThu.getTHANG_TTOAN(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            initialValues.put("THANG_TTOAN", Common.parse(entityHoaDonThu.getTHANG_TTOAN(), Common.DATE_TIME_TYPE.FULL.toString()));
             initialValues.put("PHIEN_TTOAN", entityHoaDonThu.getPHIEN_TTOAN());
             initialValues.put("SO_TIEN_TTOAN", entityHoaDonThu.getSO_TIEN_TTOAN());
             initialValues.put("SO_GCS", entityHoaDonThu.getSO_GCS());
@@ -1969,7 +2137,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("SDT_ECPAY", entityHoaDonThu.getSDT_ECPAY());
             initialValues.put("SDT_EVN", entityHoaDonThu.getSDT_EVN());
             initialValues.put("GIAO_THU", entityHoaDonThu.getGIAO_THU());
-            initialValues.put("NGAY_GIAO_THU", Common.parse(entityHoaDonThu.getNGAY_GIAO_THU(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            initialValues.put("NGAY_GIAO_THU", Common.parse(entityHoaDonThu.getNGAY_GIAO_THU(), Common.DATE_TIME_TYPE.FULL.toString()));
             initialValues.put("VI_TTOAN", entityHoaDonThu.getVI_TTOAN());
 
 
@@ -1982,8 +2150,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("IN_THONG_BAO_DIEN", entityHoaDonThu.getIN_THONG_BAO_DIEN());
             initialValues.put("TRANG_THAI_DAY_CHAM_NO", entityHoaDonThu.getTRANG_THAI_DAY_CHAM_NO());
             initialValues.put("SO_LAN_IN_BIEN_NHAN", entityHoaDonThu.getSO_LAN_IN_BIEN_NHAN());
-            initialValues.put("NGAY_DAY", Common.parse(entityHoaDonThu.getNGAY_DAY(), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()));
+            initialValues.put("NGAY_DAY", Common.parse(entityHoaDonThu.getNGAY_DAY(), Common.DATE_TIME_TYPE.FULL.toString()));
 
+            initialValues.put("NGAY_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
 
             int rowAffect = (int) database.insert(TABLE_NAME_DEBT_COLLECTION, null, initialValues);
         }
@@ -2002,26 +2171,26 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("SOURCE_OTHER")) //Hoá đơn được thanh toán từ nguồn khác:
         {
             initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
-            this.insertLichSuThanhToan(bodyBillResponse, "", "03", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "02");
+            this.insertLichSuThanhToan(bodyBillResponse, "", "03", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "02");
         } else if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("EDONG_OTHER")) //Hoá đơn được thanh toán bởi số ví khác:
         {
             initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
             initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "04", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "02");
+            this.insertLichSuThanhToan(bodyBillResponse, "", "04", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "02");
 
             //Chấm nợ thành công
         } else if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("BILLING") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
             initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "07");
+            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
             this.insertHoaDonThu(bodyBillResponse, "", "02", "02", "", "", "", "", 0, "", "");
 
             //Chấm nợ không thành công, thanh toan bởi nguồn khác
         } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("SOURCE_OTHER") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
             initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "03", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "07");
+            this.insertLichSuThanhToan(bodyBillResponse, "", "03", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
             this.insertHoaDonThu(bodyBillResponse, "", "03", "05", "", "01", "", "", 0, "", "");
 
             //Chấm nợ không thành công, thanh toan bởi ví khác
@@ -2029,14 +2198,14 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
             initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "04", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "07");
+            this.insertLichSuThanhToan(bodyBillResponse, "", "04", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
             this.insertHoaDonThu(bodyBillResponse, "", "04", "05", "", "01", "", "", 0, "", "");
 
             //Chấm nợ không thành công, chấm
         } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("ERROR") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
             initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "04", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "07");
+            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "04", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
             this.insertHoaDonThu(bodyBillResponse, "", "02", "04", "", "", "", "", 0, "", "");
 
             //Huỷ hoá đơn thành
@@ -2045,19 +2214,19 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
                 initialValues.put("VI_TTOAN", "");
 
-                this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "08");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "08");
                 this.insertHoaDonThu(bodyBillResponse, "", "", "", "01", "01", "", "", 0, "", "");
 
             } else {//Huỷ hoá đơn thành, tk != tk dang nhap
                 initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
                 initialValues.put("VI_TTOAN", "");
 
-                this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "08");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "08");
             }
         } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("TIMEOUT")) {
             initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
             initialValues.put("VI_TTOAN", "");
-            this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "", "01", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "09");
+            this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "", "01", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "09");
             if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
                 this.insertHoaDonThu(bodyBillResponse, "", "", "", "", "01", "01", "", 0, "", "");
             }
@@ -2065,7 +2234,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         } else if (bodyBillResponse.getBillingType().equalsIgnoreCase("TIMEOUT")) {
             initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
             initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
-            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "02", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS), "09");
+            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "02", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "09");
             if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
                 this.insertHoaDonThu(bodyBillResponse, "", "", "", "", "", "02", "", 0, "", "");
             }

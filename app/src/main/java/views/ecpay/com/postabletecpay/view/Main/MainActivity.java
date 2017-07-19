@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.view.Main;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -45,17 +46,21 @@ public class MainActivity extends AppCompatActivity implements
     private IMainPresenter iMainPresenter;
     private static boolean isLoginCall;
 
+    private ProgressDialog progressDialog;
+
     private Handler mHander = new Handler();
     private Runnable mRunableCheckPostBill = new Runnable() {
         @Override
         public void run() {
             boolean currentConnect = Common.isNetworkConnected(MainActivity.this);
-            if (!hasNetworkLast && currentConnect) {
+            boolean posted= true;
+//            if (!hasNetworkLast && currentConnect) {
                 if (iMainPresenter != null) {
-                    iMainPresenter.checkAndPostBill();
+                    posted = iMainPresenter.checkAndPostBill();
                 }
-            }
-            hasNetworkLast = currentConnect;
+//            }
+            if(posted)
+                hasNetworkLast = currentConnect;
             if (mHander != null && mRunableCheckPostBill != null)
                 mHander.postDelayed(mRunableCheckPostBill, Common.TIME_OUT_CHECK_CONNECTION);
         }
@@ -78,12 +83,27 @@ public class MainActivity extends AppCompatActivity implements
     public void refreshInfoMain() {
         //check fragment
         Fragment fragmentVisibling = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
-            return;
-        }
-
         if (fragmentVisibling instanceof MainPageFragment)
             ((MainPageFragment) fragmentVisibling).refreshInfoMain();
+    }
+
+    @Override
+    public void startShowPbarDownload() {
+        if(progressDialog == null)
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Downloading file ...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+    }
+
+    @Override
+    public void finishHidePbarDownload() {
+        if(progressDialog != null)
+        {
+            progressDialog.dismiss();
+            //kết thúc thì refresh lại thông tin nếu đang ở mainPage
+            refreshInfoMain();
+        }
     }
 
     public enum ID_MENU_BOTTOM {
