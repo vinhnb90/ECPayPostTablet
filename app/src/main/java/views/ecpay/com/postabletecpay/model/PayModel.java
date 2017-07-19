@@ -141,16 +141,16 @@ public class PayModel extends CommonModel {
         this.mListBillSelected = mListBillSelected;
     }
 
-    public List<PayAdapter.DataAdapter> getInforRowCustomerFitterBy(int startIndex, Common.TYPE_SEARCH typeSearch, String infoSearch) {
+    public Pair<List<PayAdapter.DataAdapter>, Integer> getInforRowCustomerFitterBy(int startIndex, Common.TYPE_SEARCH typeSearch, String infoSearch) {
 
         List<PayAdapter.DataAdapter> mDataPayAdapter = new ArrayList<>();
 
         //get List Customer
-        List<EntityKhachHang> listCustomer = sqLiteConnection.selectAllCustomerFitterBy(MainActivity.mEdong, startIndex, typeSearch, infoSearch);
+        Pair<List<EntityKhachHang>, Integer> listCustomer = sqLiteConnection.selectAllCustomerFitterBy(MainActivity.mEdong, startIndex, typeSearch, infoSearch);
 
-        for(int index = 0; index<listCustomer.size();index++)
+        for(int index = 0; index<listCustomer.first.size();index++)
         {
-            EntityKhachHang customer = listCustomer.get(index);
+            EntityKhachHang customer = listCustomer.first.get(index);
             String code = customer.getMA_KHANG();
             Pair<List<PayAdapter.BillEntityAdapter>, Long> listBill = selectInfoBillOfCustomerToRecycler(MainActivity.mEdong, code);
 
@@ -164,10 +164,10 @@ public class PayModel extends CommonModel {
             PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(customer, listBill.first, listBill.second);
             mDataPayAdapter.add(dataAdapter);
         }
-        return  mDataPayAdapter;
+        return  new Pair<>(mDataPayAdapter, listCustomer.second);
     }
 
-    public List<EntityKhachHang> selectAllCustomer(String edong, int startIndex) {
+    public Pair<List<EntityKhachHang>, Integer> selectAllCustomer(String edong, int startIndex) {
         return sqLiteConnection.selectAllCustomerFitterBy(edong, startIndex, Common.TYPE_SEARCH.ALL, Common.TEXT_EMPTY);
     }
 
@@ -272,7 +272,7 @@ public class PayModel extends CommonModel {
 
 
     public interface AsyncSoapCallBack{
-        public void onPost(List<PayAdapter.DataAdapter> result);
+        public void onPost(Pair<List<PayAdapter.DataAdapter>, Integer> result);
 
     }
 }

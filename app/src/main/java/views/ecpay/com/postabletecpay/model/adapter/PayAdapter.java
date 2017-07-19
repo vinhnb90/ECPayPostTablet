@@ -45,7 +45,6 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     private Context sContext;
 
     //giá trị billList[0] = mAdapterList[indexBegin] , billList[billList.size()] = mAdapterList[indexEnd]
-    private int indexBegin, indexEnd;
     private IPayPresenter payPresenter;
 
     private List<DataAdapter> data = new ArrayList<>();
@@ -59,11 +58,9 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
     private boolean onBind;
 
-    public PayAdapter(Context sContext, IPayPresenter presenter, List<DataAdapter> data, int indexBegin, int indexEnd) {
+    public PayAdapter(Context sContext, IPayPresenter presenter, List<DataAdapter> data, int indexBegin) {
         this.sContext = sContext;
         this.data = data;
-        this.indexBegin = indexBegin;
-        this.indexEnd = indexEnd;
         this.payPresenter = presenter;
     }
 
@@ -71,8 +68,6 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     public void UpdateAdapter(List<DataAdapter> data, int indexBegin, int indexEnd)
     {
         this.data = data;
-        this.indexBegin = indexBegin;
-        this.indexEnd = indexEnd;
         this.notifyDataSetChanged();
 
     }
@@ -525,8 +520,18 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             long termThis = this.getTHANG_THANH_TOAN().getTime();
             long termThat = billEntityAdapter.getTHANG_THANH_TOAN().getTime();
 
-            //giảm dần
-            return (int) (termThat - termThis);
+            if(termThat > termThis)
+                return  -1;
+            else if(termThat < termThis)
+                return  1;
+            else
+            {
+                if(!billEntityAdapter.getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()))
+                    return -1;
+                if(!this.getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()))
+                    return 1;
+                return 0;
+            }
         }
 
         public static Comparator<BillEntityAdapter> TermComparatorBillEntityAdapter
@@ -684,7 +689,8 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                     BillEntityAdapter bill = billList.get(position);
                     //TODO check hóa đơn xa nhất
                     for (; index < billList.size(); index++) {
-                        if (billList.get(index).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && !billList.get(index).isChecked())
+                        if (billList.get(index).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) &&
+                                !billList.get(index).isChecked() && bill.compareTo(billList.get(index)) != 0)
                             indexNotPayedTermOldest = index;
                     }
 
@@ -717,10 +723,12 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                     } else {
                         //TODO check hóa đơn liên tục fragment khi unchecked
 
+                        bill.setChecked(checked);
+                        payPresenter.addSelectBillToPay(bill, false);
                         boolean hasChange = false;
-                        for (int i = 0; i <= position; i ++)
+                        for (int i = 0; i < position; i ++)
                         {
-                            if(billList.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()))
+                            if(billList.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && billList.get(i).compareTo(bill) != 0)
                             {
                                 if(i != position && billList.get(i).isChecked())
                                 {
