@@ -1,87 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/parent_ls_kh"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
-    android:layout_marginTop="10dp"
+    android:layout_marginBottom="@dimen/_2sdp"
+    android:layout_marginTop="@dimen/_2sdp"
     android:background="@color/colorRow"
     android:gravity="center_vertical">
 
     <LinearLayout
+        android:gravity="center_horizontal|center_vertical"
         android:id="@+id/linearLayout3"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:layout_weight="1"
+        android:weightSum="1"
         android:orientation="horizontal">
 
         <TextView
+            android:gravity="center_horizontal|center_vertical"
             android:id="@+id/tvNgay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_weight="1"
-            android:text="02/12/2016"
-            android:textSize="12sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/linearLayout3"
-        android:layout_alignRight="@+id/linearLayout3"
-        android:layout_centerVertical="true"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tv_fragment_thanh_toan_total_bills_money"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/_15sdp"
-            android:layout_toRightOf="@+id/tvNgay"
-            android:layout_weight="1"
-            android:text="1.000.000 đ"
-            android:textSize="12sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="false"
-        android:layout_centerInParent="false"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/ibChiTiet"
-        android:layout_toStartOf="@+id/ibChiTiet"
-        android:layout_weight="1"
-        android:gravity="right"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tvTinhTrang"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/_15sdp"
-            android:layout_toRightOf="@+id/tv_fragment_thanh_toan_total_bills_money"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="Chưa thanh toán Chưa thanh toán"
+            android:layout_weight="0.2"
+            tools:text="02/12/2016"
+            android:textSize="@dimen/_10sdp" />
+
+
+        <TextView
+            android:gravity="center_horizontal|center_vertical"
+            android:id="@+id/tv_fragment_thanh_toan_total_bills_money"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.3"
+            tools:text="1.000.000 đ"
+            android:textSize="@dimen/_10sdp" />
+
+        <TextView
+            android:padding="@dimen/_2sdp"
+            android:gravity="center_horizontal|center_vertical"
+            android:id="@+id/tvTinhTrang"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            tools:text="Chưa thanh toán Chưa thanh toáChưa thanh toán Chưa thanh toáChưa thanh toán Chưa thanh toá"
             android:textColor="@color/colorRed"
-            android:textSize="12sp" />
+            android:textSize="@dimen/_10sdp" />
+
+        <ImageButton
+            android:gravity="center_horizontal|center_vertical"
+            android:layout_width="0dp"
+            android:layout_weight="0.1"
+            android:layout_height="wrap_content"
+            android:id="@+id/ibChiTiet"
+            android:background="@null"
+            android:src="@mipmap/ic_chitiet" />
     </LinearLayout>
 
-    <ImageButton
-        android:id="@+id/ibChiTiet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:background="@null"
-        android:src="@mipmap/ic_chitiet" />
+
 
 </LinearLayout>

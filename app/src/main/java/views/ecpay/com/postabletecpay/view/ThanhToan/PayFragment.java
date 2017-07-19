@@ -795,7 +795,7 @@ public class PayFragment extends Fragment implements
         if (TextUtils.isEmpty(message))
             return;
 
-        tvTitleSearch.setVisibility(View.GONE);
+        tvTitleSearch.setVisibility(View.VISIBLE);
         rvProgressSearchOnline.setVisibility(View.VISIBLE);
         pbarSearchOnline.setVisibility(View.GONE);
         ibtnCancelSearchOnline.setVisibility(View.GONE);

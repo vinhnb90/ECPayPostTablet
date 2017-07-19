@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDiskIOException;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
@@ -220,39 +221,45 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     //region sqlite
     public void insertOrUpdateAccount(Account account) {
-        if (account == null)
-            return;
+        try {
+            if (account == null)
+                return;
 
-        ContentValues initialValues = new ContentValues();
-        initialValues.put("edong", account.getEdong());
-        initialValues.put("name", account.getName());
-        initialValues.put("address", account.getAddress());
-        initialValues.put("phone", account.getPhone());
-        initialValues.put("email", account.getEmail());
-        initialValues.put("birthday", account.getBirthday());
-        initialValues.put("session", account.getSession());
-        initialValues.put("balance", account.getBalance());
-        initialValues.put("lockMoney", account.getLockMoney());
-        initialValues.put("changePIN", (account.isChangePIN() == true) ? "1" : "0");
-        initialValues.put("verified", account.getVerified());
-        initialValues.put("mac", account.getMac());
-        initialValues.put("ip", account.getIp());
-        initialValues.put("strLoginTime", account.getStrLoginTime());
-        initialValues.put("strLogoutTime", account.getStrLogoutTime());
-        initialValues.put("type", account.getType());
-        initialValues.put("status", account.getStatus());
-        initialValues.put("idNumber", account.getIdNumber());
-        initialValues.put("idNumberDate", account.getIdNumberDate());
-        initialValues.put("idNumberPlace", account.getIdNumberPlace());
-        initialValues.put("parentEdong", account.getParentEdong());
 
-        database = getWritableDatabase();
-        int rowAffect = (int) database.insertWithOnConflict(TABLE_NAME_ACCOUNT, null, initialValues, SQLiteDatabase.CONFLICT_IGNORE);
-        if (rowAffect == ERROR_OCCUR) {
-            rowAffect = database.update(TABLE_NAME_ACCOUNT, initialValues, "edong=?", new String[]{account.getEdong()});  // number 1 is the _id here, update to variable for your code
-        }
-        if (rowAffect == ERROR_OCCUR) {
-            Log.e(TAG, "insertOrUpdateAccount: cannot update or insert data to account table");
+            ContentValues initialValues = new ContentValues();
+            initialValues.put("edong", account.getEdong());
+            initialValues.put("name", account.getName());
+            initialValues.put("address", account.getAddress());
+            initialValues.put("phone", account.getPhone());
+            initialValues.put("email", account.getEmail());
+            initialValues.put("birthday", account.getBirthday());
+            initialValues.put("session", account.getSession());
+            initialValues.put("balance", account.getBalance());
+            initialValues.put("lockMoney", account.getLockMoney());
+            initialValues.put("changePIN", (account.isChangePIN() == true) ? "1" : "0");
+            initialValues.put("verified", account.getVerified());
+            initialValues.put("mac", account.getMac());
+            initialValues.put("ip", account.getIp());
+            initialValues.put("strLoginTime", account.getStrLoginTime());
+            initialValues.put("strLogoutTime", account.getStrLogoutTime());
+            initialValues.put("type", account.getType());
+            initialValues.put("status", account.getStatus());
+            initialValues.put("idNumber", account.getIdNumber());
+            initialValues.put("idNumberDate", account.getIdNumberDate());
+            initialValues.put("idNumberPlace", account.getIdNumberPlace());
+            initialValues.put("parentEdong", account.getParentEdong());
+
+            database = getWritableDatabase();
+            int rowAffect = (int) database.insertWithOnConflict(TABLE_NAME_ACCOUNT, null, initialValues, SQLiteDatabase.CONFLICT_IGNORE);
+            if (rowAffect == ERROR_OCCUR) {
+                rowAffect = database.update(TABLE_NAME_ACCOUNT, initialValues, "edong=?", new String[]{account.getEdong()});  // number 1 is the _id here, update to variable for your code
+            }
+            if (rowAffect == ERROR_OCCUR) {
+                Log.e(TAG, "insertOrUpdateAccount: cannot update or insert data to account table");
+            }
+        }catch (Exception e)
+        {
+            Log.e(TAG, "database : " +e.getMessage() );
         }
     }
 
@@ -833,42 +840,42 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
     public EntityHoaDonNo getHoaDonNo(long billID) {
-        EntityHoaDonNo entityHoaDonNo = new EntityHoaDonNo();
-        database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE MA_HOA_DON ='" + billID + "'";
-        Cursor c = database.rawQuery(query, null);
+            EntityHoaDonNo entityHoaDonNo = new EntityHoaDonNo();
+            database = this.getReadableDatabase();
+            String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE MA_HOA_DON ='" + billID + "'";
+            Cursor c = database.rawQuery(query, null);
 
-        if (c.moveToFirst()) {
-            entityHoaDonNo.setE_DONG(c.getString(c.getColumnIndex("E_DONG")));
-            entityHoaDonNo.setMA_HOA_DON(c.getString(c.getColumnIndex("MA_HOA_DON")));
-            entityHoaDonNo.setSERI_HDON(c.getString(c.getColumnIndex("SERI_HDON")));
-            entityHoaDonNo.setMA_KHANG(c.getString(c.getColumnIndex("MA_KHANG")));
-            entityHoaDonNo.setMA_THE(c.getString(c.getColumnIndex("MA_THE")));
-            entityHoaDonNo.setTEN_KHANG(c.getString(c.getColumnIndex("TEN_KHANG")));
-            entityHoaDonNo.setDIA_CHI(c.getString(c.getColumnIndex("DIA_CHI")));
-            entityHoaDonNo.setTHANG_TTOAN(Common.parseDate(c.getString(c.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
-            entityHoaDonNo.setPHIEN_TTOAN(c.getInt(c.getColumnIndex("PHIEN_TTOAN")));
-            entityHoaDonNo.setSO_TIEN_TTOAN(c.getInt(c.getColumnIndex("SO_TIEN_TTOAN")));
-            entityHoaDonNo.setSO_GCS(c.getString(c.getColumnIndex("SO_GCS")));
-            entityHoaDonNo.setDIEN_LUC(c.getString(c.getColumnIndex("DIEN_LUC")));
-            entityHoaDonNo.setSO_HO(c.getString(c.getColumnIndex("SO_HO")));
-            entityHoaDonNo.setSO_DAU_KY(c.getString(c.getColumnIndex("SO_DAU_KY")));
-            entityHoaDonNo.setSO_CUOI_KY(c.getString(c.getColumnIndex("SO_CUOI_KY")));
-            entityHoaDonNo.setSO_CTO(c.getString(c.getColumnIndex("SO_CTO")));
-            entityHoaDonNo.setSDT_ECPAY(c.getString(c.getColumnIndex("SDT_ECPAY")));
-            entityHoaDonNo.setSDT_EVN(c.getString(c.getColumnIndex("SDT_EVN")));
-            entityHoaDonNo.setGIAO_THU(c.getString(c.getColumnIndex("GIAO_THU")));
-            entityHoaDonNo.setNGAY_GIAO_THU(Common.parseDate(c.getString(c.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
-            entityHoaDonNo.setTRANG_THAI_TTOAN(c.getString(c.getColumnIndex("TRANG_THAI_TTOAN")));
-            entityHoaDonNo.setVI_TTOAN(c.getString(c.getColumnIndex("VI_TTOAN")));
+            if (c.moveToFirst()) {
+                entityHoaDonNo.setE_DONG(c.getString(c.getColumnIndex("E_DONG")));
+                entityHoaDonNo.setMA_HOA_DON(c.getString(c.getColumnIndex("MA_HOA_DON")));
+                entityHoaDonNo.setSERI_HDON(c.getString(c.getColumnIndex("SERI_HDON")));
+                entityHoaDonNo.setMA_KHANG(c.getString(c.getColumnIndex("MA_KHANG")));
+                entityHoaDonNo.setMA_THE(c.getString(c.getColumnIndex("MA_THE")));
+                entityHoaDonNo.setTEN_KHANG(c.getString(c.getColumnIndex("TEN_KHANG")));
+                entityHoaDonNo.setDIA_CHI(c.getString(c.getColumnIndex("DIA_CHI")));
+                entityHoaDonNo.setTHANG_TTOAN(Common.parseDate(c.getString(c.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
+                entityHoaDonNo.setPHIEN_TTOAN(c.getInt(c.getColumnIndex("PHIEN_TTOAN")));
+                entityHoaDonNo.setSO_TIEN_TTOAN(c.getInt(c.getColumnIndex("SO_TIEN_TTOAN")));
+                entityHoaDonNo.setSO_GCS(c.getString(c.getColumnIndex("SO_GCS")));
+                entityHoaDonNo.setDIEN_LUC(c.getString(c.getColumnIndex("DIEN_LUC")));
+                entityHoaDonNo.setSO_HO(c.getString(c.getColumnIndex("SO_HO")));
+                entityHoaDonNo.setSO_DAU_KY(c.getString(c.getColumnIndex("SO_DAU_KY")));
+                entityHoaDonNo.setSO_CUOI_KY(c.getString(c.getColumnIndex("SO_CUOI_KY")));
+                entityHoaDonNo.setSO_CTO(c.getString(c.getColumnIndex("SO_CTO")));
+                entityHoaDonNo.setSDT_ECPAY(c.getString(c.getColumnIndex("SDT_ECPAY")));
+                entityHoaDonNo.setSDT_EVN(c.getString(c.getColumnIndex("SDT_EVN")));
+                entityHoaDonNo.setGIAO_THU(c.getString(c.getColumnIndex("GIAO_THU")));
+                entityHoaDonNo.setNGAY_GIAO_THU(Common.parseDate(c.getString(c.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
+                entityHoaDonNo.setTRANG_THAI_TTOAN(c.getString(c.getColumnIndex("TRANG_THAI_TTOAN")));
+                entityHoaDonNo.setVI_TTOAN(c.getString(c.getColumnIndex("VI_TTOAN")));
 
-        }
+            }
 
 
-        if (c != null && !c.isClosed()) {
-            c.close();
-        }
-        return entityHoaDonNo;
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            return entityHoaDonNo;
     }
 
     public List<EntityKhachHang> selectAllCustomerFitterBy(String edong, int startIndex, Common.TYPE_SEARCH typeSearch, String infoSearch) {
