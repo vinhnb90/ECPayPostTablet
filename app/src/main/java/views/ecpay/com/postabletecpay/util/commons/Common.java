@@ -2531,7 +2531,8 @@ public class Common {
         buttonOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clickYesNoDialog.doClickYes();
+                if(clickYesNoDialog != null)
+                    clickYesNoDialog.doClickYes();
                 alertDialog.dismiss();
             }
         });
@@ -2539,7 +2540,8 @@ public class Common {
         buttonCancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                clickYesNoDialog.doClickNo();
+                if(clickYesNoDialog != null)
+                    clickYesNoDialog.doClickNo();
                 alertDialog.dismiss();
             }
         });

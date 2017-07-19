@@ -132,7 +132,7 @@ public class CashTranferPresenter implements ICashTranferPresenter{
         try {
             configInfo = Common.setupInfoRequest(context, mEDong, Common.COMMAND_ID.CASH_TRANSFER.toString(), versionApp);
         } catch (Exception e) {
-
+            iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
             return;
         }
 

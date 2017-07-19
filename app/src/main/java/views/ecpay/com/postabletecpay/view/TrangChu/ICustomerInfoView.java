@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.view.TrangChu;
 
+import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.view.ICommonView;
@@ -11,7 +12,7 @@ import views.ecpay.com.postabletecpay.view.ICommonView;
 public interface ICustomerInfoView extends ICommonView {
     public void setLoading(boolean pShow);
 
-    public void showMessageText(String message);
+    public void showMessageText(String message, Common.TYPE_DIALOG typeLoi);
 
     public void refill(EntityKhachHang customer);
 

@@ -1004,7 +1004,7 @@ public class PayPresenter implements IPayPresenter {
                     if (codeResponse != Common.CODE_REPONSE_API_CHECK_TRAINS.eBILLING) {
                         try
                         {
-                            mIPayView.showMessageNotifyDeleteOnlineDialog(codeResponse.getMessage(), Common.TYPE_DIALOG.LOI);
+                            mIPayView.showMessageNotifyDeleteOnlineDialog("Lỗi hệ thống!", Common.TYPE_DIALOG.LOI);
                             mIPayView.visibleButtonDeleteDialog(SHOW_ALL);
                             return;
                         }catch (Exception e)

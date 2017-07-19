@@ -268,7 +268,8 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
     @Override
     public void showMessage(String message) {
         try{
-            Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
+            Common.showDialog(this.getContext(), null, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), message, true, Common.TYPE_DIALOG.LOI);
+//            Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
         }catch (Exception e)
         {
 

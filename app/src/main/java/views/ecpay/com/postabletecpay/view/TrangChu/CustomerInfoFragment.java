@@ -24,6 +24,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.CustomerInfoPresenter;
+import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.EntityKhachHang;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
@@ -221,9 +222,10 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
     }
 
     @Override
-    public void showMessageText(String message) {
+    public void showMessageText(String message, Common.TYPE_DIALOG typeLoi) {
         try{
-            Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
+            Common.showDialog(this.getContext(), null, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), message, true, typeLoi);
+//            Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
         }catch (Exception e)
         {
 

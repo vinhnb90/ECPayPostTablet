@@ -82,7 +82,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
         {
             try
             {
-                customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString());
+                customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString(), Common.TYPE_DIALOG.LOI);
             }catch (Exception e)
             {
 
@@ -106,7 +106,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                         return;
                     try
                     {
-                        customerInfoView.showMessageText(message);
+                        customerInfoView.showMessageText(message, Common.TYPE_DIALOG.LOI);
                     }catch (Exception e)
                     {
 
@@ -120,7 +120,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                     {
                         try
                         {
-                            customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                            customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString(), Common.TYPE_DIALOG.LOI);
                         }catch (Exception e)
                         {
 
@@ -128,7 +128,6 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                         return;
                     }
 
-                    customerInfoView.showMessageText(response.getFooter().getDescription());
                     if(response.getFooter().getResponseCode().equals("000"))
                     {
                         customer.setMA_THE(eCard);
@@ -136,6 +135,11 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 //                        customer.setBankName(bankName);
 //                        customer.setBankAccount(bankAcc);
                         UpdateDataBase(customer);
+                        customerInfoView.showMessageText(response.getFooter().getDescription(), Common.TYPE_DIALOG.THANH_CONG);
+                    }else
+                    {
+
+                        customerInfoView.showMessageText(response.getFooter().getDescription(), Common.TYPE_DIALOG.LOI);
                     }
                 }
 
@@ -143,7 +147,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                 public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
                     try
                     {
-                        customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                        customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
                     }catch (Exception e)
                     {
 
@@ -175,7 +179,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 
             try
             {
-                customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString());
+                customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString(), Common.TYPE_DIALOG.LOI);
             }catch (Exception e1)
             {
 
@@ -208,7 +212,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
         {
             try
             {
-                customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString());
+                customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString(), Common.TYPE_DIALOG.LOI);
             }catch (Exception e)
             {
 
@@ -232,7 +236,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                         return;
                     try
                     {
-                        customerInfoView.showMessageText(message);
+                        customerInfoView.showMessageText(message, Common.TYPE_DIALOG.LOI);
                     }catch (Exception e)
                     {
 
@@ -246,7 +250,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                     {
                         try
                         {
-                            customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                            customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString(), Common.TYPE_DIALOG.LOI);
                         }catch (Exception e)
                         {
 
@@ -254,7 +258,6 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                         return;
                     }
 
-                    customerInfoView.showMessageText(response.getFooter().getDescription());
                     if(response.getFooter().getResponseCode().equals("000"))
                     {
                         customer.setMA_THE(eCard);
@@ -262,8 +265,10 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 //                        customer.setBankName(bankName);
 //                        customer.setBankAccount(bankAcc);
                         UpdateDataBase(customer);
+                        customerInfoView.showMessageText(response.getFooter().getDescription(), Common.TYPE_DIALOG.THANH_CONG);
                     }else
                     {
+                        customerInfoView.showMessageText(response.getFooter().getDescription(), Common.TYPE_DIALOG.LOI);
 
                     }
                 }
@@ -272,7 +277,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                 public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
                     try
                     {
-                        customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                        customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
                     }catch (Exception e)
                     {
 
