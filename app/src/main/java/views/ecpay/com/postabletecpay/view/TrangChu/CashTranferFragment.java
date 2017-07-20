@@ -306,7 +306,8 @@ public class CashTranferFragment extends Fragment implements View.OnClickListene
     @Override
     public void showError(String message) {
         try{
-            Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
+            Common.showDialog(this.getContext(), null, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), message, true, Common.TYPE_DIALOG.LOI);
+//            Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
         }catch (Exception e)
         {
 
@@ -316,7 +317,8 @@ public class CashTranferFragment extends Fragment implements View.OnClickListene
     @Override
     public void showText(String message) {
         try{
-            Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
+            Common.showDialog(this.getContext(), null, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), message, true, Common.TYPE_DIALOG.THANH_CONG);
+//            Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
         }catch (Exception e)
         {
 

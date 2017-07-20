@@ -74,6 +74,7 @@ public class BaoCaoLichSuFragment extends Fragment implements View.OnClickListen
         return fragment;
     }
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

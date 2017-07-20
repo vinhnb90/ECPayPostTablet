@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_marginTop="@dimen/_3sdp"
+        android:id="@+id/ll_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <EditText
+            android:layout_marginRight="@dimen/_5sdp"
+            android:id="@+id/etSearch"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_marginLeft="@dimen/_5sdp"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:background="@drawable/bg_edittext_border"
+            android:drawableLeft="@drawable/ic_search_black_24dp"
+            android:hint="Tìm kiếm báo cáo"
+            android:textSize="@dimen/_8sdp" />
+
+        <RadioGroup
+            android:layout_marginRight="@dimen/_5sdp"
+            android:id="@+id/rgSearch"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/_5sdp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:padding="@dimen/_1sdp">
+
+            <RadioButton
+                android:id="@+id/rbMaKH"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:checked="true"
+                android:text="Mã KH"
+                android:textSize="@dimen/_8sdp" />
+
+            <RadioButton
+                android:id="@+id/rbTenKH"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/_15sdp"
+                android:text="Tên KH"
+                android:textSize="@dimen/_8sdp" />
+
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:padding="@dimen/_1sdp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/texttttView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Hoá Đơn"
+                android:textSize="@dimen/_10sdp" />
+
+            <TextView
+                android:id="@+id/txtSoHD"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="5"
+                android:textSize="@dimen/_10sdp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.7"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Tổng Tiền"
+                android:textSize="@dimen/_10sdp" />
+
+            <TextView
+                android:id="@+id/txtTongTien"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="5"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/_10sdp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/btnExport"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/ic_export_excel" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/llDate"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_below="@+id/etSearch"-->
+        <!--android:layout_marginLeft="5dp"-->
+        <!--android:layout_marginRight="5dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:gravity="center_vertical">-->
+
+        <!--<TextView-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:textSize="12sp"-->
+            <!--android:text="Từ ngày:" />-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/etTuNgay"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="2"-->
+            <!--android:textSize="12sp"-->
+            <!--android:background="@drawable/bg_edittext_border"-->
+            <!--android:drawableRight="@mipmap/ic_calendar"/>-->
+
+        <!--<TextView-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="Đến ngày:"-->
+            <!--android:textSize="12sp"-->
+            <!--android:layout_marginLeft="5dp"/>-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/etDenNgay"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="2"-->
+            <!--android:textSize="12sp"-->
+            <!--android:background="@drawable/bg_edittext_border"-->
+            <!--android:drawableRight="@mipmap/ic_calendar"/>-->
+
+    <!--</LinearLayout>-->
+
+    <RelativeLayout
+        android:id="@+id/ll_top2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll_top"
+        android:layout_margin="@dimen/_3sdp"
+        android:orientation="horizontal">
+        <TextView
+            android:gravity="center_vertical|center_horizontal"
+            android:id="@+id/tvGachNgang"
+            android:layout_width="@dimen/_8sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_centerHorizontal="true"
+            android:textStyle="bold"
+            android:textSize="@dimen/_15sdp"
+            android:textColor="@color/colorTextBlack"
+            android:text="-" />
+        <EditText
+            android:layout_toLeftOf="@+id/tvGachNgang"
+            android:id="@+id/etTuNgay"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_20sdp"
+            android:background="@drawable/bg_edittext_border"
+            android:drawableLeft="@mipmap/ic_calendar"
+            android:hint="Từ ngày"
+            android:maxLines="1"
+            android:textSize="@dimen/_8sdp" />
+
+
+
+        <EditText
+            android:layout_toRightOf="@id/tvGachNgang"
+            android:id="@+id/etDenNgay"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_20sdp"
+            android:textSize="@dimen/_8sdp"
+            android:background="@drawable/bg_edittext_border"
+            android:drawableLeft="@mipmap/ic_calendar"
+            android:maxLines="1"
+            android:hint="Đến ngày" />
+    </RelativeLayout>
+
+
+    <Button
+        android:id="@+id/btnTimKiem"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_below="@+id/ll_top2"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/bg_button"
+        android:paddingLeft="@dimen/_50sdp"
+        android:paddingRight="@dimen/_50sdp"
+        android:layout_marginTop="@dimen/_3sdp"
+        android:text="TÌM KIẾM"
+        android:textColor="@color/colorTextWhite" />
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_margin="@dimen/_5sdp"
+        android:id="@+id/rvDanhSach"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/linearLayout"
+        android:layout_below="@+id/btnTimKiem">
+
+    </android.support.v7.widget.RecyclerView>
+</RelativeLayout>

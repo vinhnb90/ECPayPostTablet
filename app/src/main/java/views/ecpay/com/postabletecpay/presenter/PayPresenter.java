@@ -139,7 +139,7 @@ public class PayPresenter implements IPayPresenter {
             try {
                 PayModel.AsyncSearchOffline asyncSearchOffline = new PayModel.AsyncSearchOffline(pageIndex, mPayModel, new PayModel.AsyncSoapCallBack() {
                     @Override
-                    public void onPost(final List<PayAdapter.DataAdapter> result) {
+                    public void onPost(final Pair<List<PayAdapter.DataAdapter>, Integer> result) {
                         /*
                         List<PayAdapter.DataAdapter> fitter = new ArrayList<>();
                         int indexBegin = 0;
@@ -184,7 +184,7 @@ public class PayPresenter implements IPayPresenter {
 //                                    refreshTotalBillsAndTotalMoneyInFragment(edong, Common.STATUS_BILLING.CHUA_THANH_TOAN);
                                     try
                                     {
-                                        mIPayView.showPayRecyclerPage(result, pageIndex, 10, pageIndex, 40, infoSearch, isSeachOnline);
+                                        mIPayView.showPayRecyclerPage(result.first, pageIndex, (int)Math.ceil(result.second * 1.0 / PayFragment.ROWS_ON_PAGE), infoSearch, isSeachOnline);
                                     }catch (Exception e)
                                     {
 
@@ -404,13 +404,14 @@ public class PayPresenter implements IPayPresenter {
                     dataAdapter.getBillKH().add(bill);
 
                 }
+                dataAdapter.sortBills();
                 dataAdapter.setTotalMoney(totalMoney);
 
                 List<PayAdapter.DataAdapter> adapters = new ArrayList<PayAdapter.DataAdapter>();
                 adapters.add(dataAdapter);
 
                 try {
-                    mIPayView.showPayRecyclerPage(adapters, 0, 0, 1, 1, "", false);
+                    mIPayView.showPayRecyclerPage(adapters, 1, 1, "", false);
                 } catch (Exception e) {
                     e.printStackTrace();
                     mIPayView.hideSearchOnlineProcess();
@@ -471,7 +472,7 @@ public class PayPresenter implements IPayPresenter {
             mIPayView.showPayingRviewDialogFinish();
             return;
         }
-
+//TODO mark
         if(!isPayOnline) { //Thanh Toan Offline
             //Kiểm tra địa bàn thanh toán
 
@@ -1005,7 +1006,7 @@ public class PayPresenter implements IPayPresenter {
                     if (codeResponse != Common.CODE_REPONSE_API_CHECK_TRAINS.eBILLING) {
                         try
                         {
-                            mIPayView.showMessageNotifyDeleteOnlineDialog(codeResponse.getMessage(), Common.TYPE_DIALOG.LOI);
+                            mIPayView.showMessageNotifyDeleteOnlineDialog("Lỗi hệ thống!", Common.TYPE_DIALOG.LOI);
                             mIPayView.visibleButtonDeleteDialog(SHOW_ALL);
                             return;
                         }catch (Exception e)

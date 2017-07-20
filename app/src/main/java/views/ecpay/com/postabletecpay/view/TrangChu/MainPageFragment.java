@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -150,6 +151,7 @@ public class MainPageFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        onSaveInstanceState(savedInstanceState);
         mIMainPagePresenter = new MainPagePresenter(this);
         mILogoutPresenter = new LogoutPresenter(this);
     }
@@ -170,6 +172,11 @@ public class MainPageFragment extends Fragment implements
         ((MainActivity) this.getContextView()).switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.HOME);
         this.refreshInfoMain();
         return curentFragment;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDiskIOException;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
@@ -221,39 +222,45 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     //region sqlite
     public void insertOrUpdateAccount(Account account) {
-        if (account == null)
-            return;
+        try {
+            if (account == null)
+                return;
 
-        ContentValues initialValues = new ContentValues();
-        initialValues.put("edong", account.getEdong());
-        initialValues.put("name", account.getName());
-        initialValues.put("address", account.getAddress());
-        initialValues.put("phone", account.getPhone());
-        initialValues.put("email", account.getEmail());
-        initialValues.put("birthday", account.getBirthday());
-        initialValues.put("session", account.getSession());
-        initialValues.put("balance", account.getBalance());
-        initialValues.put("lockMoney", account.getLockMoney());
-        initialValues.put("changePIN", (account.isChangePIN() == true) ? "1" : "0");
-        initialValues.put("verified", account.getVerified());
-        initialValues.put("mac", account.getMac());
-        initialValues.put("ip", account.getIp());
-        initialValues.put("strLoginTime", account.getStrLoginTime());
-        initialValues.put("strLogoutTime", account.getStrLogoutTime());
-        initialValues.put("type", account.getType());
-        initialValues.put("status", account.getStatus());
-        initialValues.put("idNumber", account.getIdNumber());
-        initialValues.put("idNumberDate", account.getIdNumberDate());
-        initialValues.put("idNumberPlace", account.getIdNumberPlace());
-        initialValues.put("parentEdong", account.getParentEdong());
 
-        database = getWritableDatabase();
-        int rowAffect = (int) database.insertWithOnConflict(TABLE_NAME_ACCOUNT, null, initialValues, SQLiteDatabase.CONFLICT_IGNORE);
-        if (rowAffect == ERROR_OCCUR) {
-            rowAffect = database.update(TABLE_NAME_ACCOUNT, initialValues, "edong=?", new String[]{account.getEdong()});  // number 1 is the _id here, update to variable for your code
-        }
-        if (rowAffect == ERROR_OCCUR) {
-            Log.e(TAG, "insertOrUpdateAccount: cannot update or insert data to account table");
+            ContentValues initialValues = new ContentValues();
+            initialValues.put("edong", account.getEdong());
+            initialValues.put("name", account.getName());
+            initialValues.put("address", account.getAddress());
+            initialValues.put("phone", account.getPhone());
+            initialValues.put("email", account.getEmail());
+            initialValues.put("birthday", account.getBirthday());
+            initialValues.put("session", account.getSession());
+            initialValues.put("balance", account.getBalance());
+            initialValues.put("lockMoney", account.getLockMoney());
+            initialValues.put("changePIN", (account.isChangePIN() == true) ? "1" : "0");
+            initialValues.put("verified", account.getVerified());
+            initialValues.put("mac", account.getMac());
+            initialValues.put("ip", account.getIp());
+            initialValues.put("strLoginTime", account.getStrLoginTime());
+            initialValues.put("strLogoutTime", account.getStrLogoutTime());
+            initialValues.put("type", account.getType());
+            initialValues.put("status", account.getStatus());
+            initialValues.put("idNumber", account.getIdNumber());
+            initialValues.put("idNumberDate", account.getIdNumberDate());
+            initialValues.put("idNumberPlace", account.getIdNumberPlace());
+            initialValues.put("parentEdong", account.getParentEdong());
+
+            database = getWritableDatabase();
+            int rowAffect = (int) database.insertWithOnConflict(TABLE_NAME_ACCOUNT, null, initialValues, SQLiteDatabase.CONFLICT_IGNORE);
+            if (rowAffect == ERROR_OCCUR) {
+                rowAffect = database.update(TABLE_NAME_ACCOUNT, initialValues, "edong=?", new String[]{account.getEdong()});  // number 1 is the _id here, update to variable for your code
+            }
+            if (rowAffect == ERROR_OCCUR) {
+                Log.e(TAG, "insertOrUpdateAccount: cannot update or insert data to account table");
+            }
+        }catch (Exception e)
+        {
+            Log.e(TAG, "database : " +e.getMessage() );
         }
     }
 
@@ -339,7 +346,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public ReportModel.BillInfo countBillDuocGiao(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
-        String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "'";
+
+        String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM (SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "') AS BILL "
+                + " JOIN (SELECT * FROM " + TABLE_NAME_CUSTOMER+ " WHERE E_DONG = '" + edong + "') AS CUSTOMER ON BILL.MA_KHANG = CUSTOMER.MA_KHANG";
         Cursor mCursor = database.rawQuery(query, null);
 
         if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
@@ -358,7 +367,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public ReportModel.BillInfo countBillDaThu(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
-        String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong + "'";
+        String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM ( SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong + "') AS BILL"
+                + " JOIN (SELECT * FROM " + TABLE_NAME_CUSTOMER+ " WHERE E_DONG = '" + edong + "') AS CUSTOMER ON BILL.MA_KHANG = CUSTOMER.MA_KHANG";
         Cursor mCursor = database.rawQuery(query, null);
 
         if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
@@ -377,7 +387,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public ReportModel.BillInfo countBillHoanTra(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
-        String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong + "' and TRANG_THAI_HOAN_TRA = '" + Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode() + "'";
+        String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM ( SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + edong + "' and TRANG_THAI_HOAN_TRA = '" + Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode() + "') AS BILL"
+                + " JOIN (SELECT * FROM " + TABLE_NAME_CUSTOMER+ " WHERE E_DONG = '" + edong + "') AS CUSTOMER ON BILL.MA_KHANG = CUSTOMER.MA_KHANG";
         Cursor mCursor = database.rawQuery(query, null);
 
         if (mCursor.getCount() != ZERO && mCursor.moveToFirst()) {
@@ -396,8 +407,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public ReportModel.BillInfo countBillVangLai(String edong) {
         ReportModel.BillInfo bill = new ReportModel.BillInfo();
-        String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM " + TABLE_NAME_DEBT_COLLECTION + " bill WHERE bill.E_DONG = '" + edong +
-                "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.VANG_LAI.getCode() + "'";
+        String query = "SELECT coalesce(SUM(SO_TIEN_TTOAN), 0) AS SUM, COUNT(*) AS COUNT FROM ( SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " bill WHERE bill.E_DONG = '" + edong +
+                "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.VANG_LAI.getCode() + "' ) AS BILL"
+                + " JOIN (SELECT * FROM " + TABLE_NAME_CUSTOMER+ " WHERE E_DONG = '" + edong + "') AS CUSTOMER ON BILL.MA_KHANG = CUSTOMER.MA_KHANG";
 //                "                  FROM employees" +
 //                "                  WHERE departments.department_id = employees.department_id)";
         Cursor mCursor = database.rawQuery(query, null);
@@ -699,8 +711,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         database = this.getReadableDatabase();
 
-        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "' " +
-                " and TRANG_THAI_TTOAN = '" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "'";// + "' and status = " + ZERO;
+//        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "' " +
+//                " and TRANG_THAI_TTOAN = '" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "'";// + "' and status = " + ZERO;
+
+        String query = "SELECT COUNT(*) AS COUNT FROM(SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU ='" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "'  and TRANG_THAI_TTOAN ='" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "' ) AS BILL " +
+                "JOIN (SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "') AS CUSTOMER ON BILL.MA_KHANG = CUSTOMER.MA_KHANG";
+
         Cursor mCursor = database.rawQuery(query, null);
         int count = mCursor.getCount();
         if (count != ZERO) {
@@ -714,52 +730,25 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
 
-    public List<TransactionOffItem> selectOfflineBill() {
+    public List<PayAdapter.BillEntityAdapter> selectOfflineBill() {
         database = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE E_DONG = '" + MainActivity.mEdong + "' and HINH_THUC_TT = '" + Common.HINH_THUC_TTOAN.OFFLINE.getCode() + "' and TRANG_THAI_DAY_CHAM_NO = '" + Common.TRANG_THAI_DAY_CHAM_NO.CHUA_DAY.getCode() + "'";
         Cursor mCursor = database.rawQuery(query, null);
 
-        List<TransactionOffItem> lst = new ArrayList<>();
+        List<PayAdapter.BillEntityAdapter> lst = new ArrayList<>();
 
         if (mCursor != null && mCursor.moveToFirst()) {
             do {
 
-                String MA_HOA_DON = mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON"));
-                String currentDate = Common.getDateTimeNow(Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS);
+                int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("MA_HOA_DON")));
+                int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
 
-                Common.TRANG_THAI_TTOAN trangThaiTtoan = getTrangThaiThanhToanHoaDonNo(MA_HOA_DON);
-                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.NULL))
-                    continue;
-                ;
+                PayAdapter.BillEntityAdapter bill = new PayAdapter.BillEntityAdapter();
+                bill.setBillId(billId);
+                bill.setTIEN_THANH_TOAN(amount);
+                bill.setMA_KHACH_HANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
 
-//                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC)) {
-//
-//                    this.updateHoaDonThu(MA_HOA_DON, Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC, "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(),
-//                            currentDate, Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
-//
-//
-//                    this.insertLichSuThanhToan(MA_HOA_DON, currentDate, Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
-//                    continue;
-//                }
-//                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC)) {
-//
-//                    this.updateHoaDonThu(MA_HOA_DON, Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC, "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(),
-//                            currentDate, Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
-//
-//
-//                    this.insertLichSuThanhToan(MA_HOA_DON, currentDate, Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
-//                    continue;
-//                }
-//
-//                if (trangThaiTtoan.equal(Common.TRANG_THAI_TTOAN.CHUA_TTOAN)) {
-
-                TransactionOffItem item = new TransactionOffItem();
-                item.setCustomer_code(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
-                item.setAmount(mCursor.getLong(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
-                item.setBill_id(Long.parseLong(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON"))));
-                item.setEdong(mCursor.getString(mCursor.getColumnIndex("E_DONG")));
-                lst.add(item);
-//                }
+                lst.add(bill);
 
 
             } while (mCursor.moveToNext());
@@ -777,6 +766,20 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                                 String TRANG_THAI_DAY_CHAM_NO, String NGAY_DAY, String TRANG_THAI_HOAN_TRA) {
         database = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
+        contentValues.put("TRANG_THAI_TTOAN", TRANG_THAI_TTOAN.getCode());
+        contentValues.put("TRANG_THAI_CHAM_NO", TRANG_THAI_CHAM_NO);
+        contentValues.put("TRANG_THAI_DAY_CHAM_NO", TRANG_THAI_DAY_CHAM_NO);
+        contentValues.put("NGAY_DAY", NGAY_DAY);
+        contentValues.put("TRANG_THAI_HOAN_TRA", TRANG_THAI_HOAN_TRA);
+        database.update(TABLE_NAME_DEBT_COLLECTION, contentValues, "MA_HOA_DON = ?", new String[]{MA_HOA_DON});
+    }
+
+
+    public void updateHoaDonThu(String MA_HOA_DON, String VI_TTOAN, Common.TRANG_THAI_TTOAN TRANG_THAI_TTOAN,
+                                String TRANG_THAI_CHAM_NO, String TRANG_THAI_DAY_CHAM_NO, String NGAY_DAY, String TRANG_THAI_HOAN_TRA) {
+        database = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("VI_TTOAN", VI_TTOAN);
         contentValues.put("TRANG_THAI_TTOAN", TRANG_THAI_TTOAN.getCode());
         contentValues.put("TRANG_THAI_CHAM_NO", TRANG_THAI_CHAM_NO);
         contentValues.put("TRANG_THAI_DAY_CHAM_NO", TRANG_THAI_DAY_CHAM_NO);
@@ -831,50 +834,108 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
     public EntityHoaDonNo getHoaDonNo(long billID) {
-        EntityHoaDonNo entityHoaDonNo = new EntityHoaDonNo();
-        database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE MA_HOA_DON ='" + billID + "'";
-        Cursor c = database.rawQuery(query, null);
+            EntityHoaDonNo entityHoaDonNo = new EntityHoaDonNo();
+            database = this.getReadableDatabase();
+            String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE MA_HOA_DON ='" + billID + "'";
+            Cursor c = database.rawQuery(query, null);
 
-        if (c.moveToFirst()) {
-            entityHoaDonNo.setE_DONG(c.getString(c.getColumnIndex("E_DONG")));
-            entityHoaDonNo.setMA_HOA_DON(c.getString(c.getColumnIndex("MA_HOA_DON")));
-            entityHoaDonNo.setSERI_HDON(c.getString(c.getColumnIndex("SERI_HDON")));
-            entityHoaDonNo.setMA_KHANG(c.getString(c.getColumnIndex("MA_KHANG")));
-            entityHoaDonNo.setMA_THE(c.getString(c.getColumnIndex("MA_THE")));
-            entityHoaDonNo.setTEN_KHANG(c.getString(c.getColumnIndex("TEN_KHANG")));
-            entityHoaDonNo.setDIA_CHI(c.getString(c.getColumnIndex("DIA_CHI")));
-            entityHoaDonNo.setTHANG_TTOAN(Common.parseDate(c.getString(c.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
-            entityHoaDonNo.setPHIEN_TTOAN(c.getInt(c.getColumnIndex("PHIEN_TTOAN")));
-            entityHoaDonNo.setSO_TIEN_TTOAN(c.getInt(c.getColumnIndex("SO_TIEN_TTOAN")));
-            entityHoaDonNo.setSO_GCS(c.getString(c.getColumnIndex("SO_GCS")));
-            entityHoaDonNo.setDIEN_LUC(c.getString(c.getColumnIndex("DIEN_LUC")));
-            entityHoaDonNo.setSO_HO(c.getString(c.getColumnIndex("SO_HO")));
-            entityHoaDonNo.setSO_DAU_KY(c.getString(c.getColumnIndex("SO_DAU_KY")));
-            entityHoaDonNo.setSO_CUOI_KY(c.getString(c.getColumnIndex("SO_CUOI_KY")));
-            entityHoaDonNo.setSO_CTO(c.getString(c.getColumnIndex("SO_CTO")));
-            entityHoaDonNo.setSDT_ECPAY(c.getString(c.getColumnIndex("SDT_ECPAY")));
-            entityHoaDonNo.setSDT_EVN(c.getString(c.getColumnIndex("SDT_EVN")));
-            entityHoaDonNo.setGIAO_THU(c.getString(c.getColumnIndex("GIAO_THU")));
-            entityHoaDonNo.setNGAY_GIAO_THU(Common.parseDate(c.getString(c.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
-            entityHoaDonNo.setTRANG_THAI_TTOAN(c.getString(c.getColumnIndex("TRANG_THAI_TTOAN")));
-            entityHoaDonNo.setVI_TTOAN(c.getString(c.getColumnIndex("VI_TTOAN")));
+            if (c.moveToFirst()) {
+                entityHoaDonNo.setE_DONG(c.getString(c.getColumnIndex("E_DONG")));
+                entityHoaDonNo.setMA_HOA_DON(c.getString(c.getColumnIndex("MA_HOA_DON")));
+                entityHoaDonNo.setSERI_HDON(c.getString(c.getColumnIndex("SERI_HDON")));
+                entityHoaDonNo.setMA_KHANG(c.getString(c.getColumnIndex("MA_KHANG")));
+                entityHoaDonNo.setMA_THE(c.getString(c.getColumnIndex("MA_THE")));
+                entityHoaDonNo.setTEN_KHANG(c.getString(c.getColumnIndex("TEN_KHANG")));
+                entityHoaDonNo.setDIA_CHI(c.getString(c.getColumnIndex("DIA_CHI")));
+                entityHoaDonNo.setTHANG_TTOAN(Common.parseDate(c.getString(c.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
+                entityHoaDonNo.setPHIEN_TTOAN(c.getInt(c.getColumnIndex("PHIEN_TTOAN")));
+                entityHoaDonNo.setSO_TIEN_TTOAN(c.getInt(c.getColumnIndex("SO_TIEN_TTOAN")));
+                entityHoaDonNo.setSO_GCS(c.getString(c.getColumnIndex("SO_GCS")));
+                entityHoaDonNo.setDIEN_LUC(c.getString(c.getColumnIndex("DIEN_LUC")));
+                entityHoaDonNo.setSO_HO(c.getString(c.getColumnIndex("SO_HO")));
+                entityHoaDonNo.setSO_DAU_KY(c.getString(c.getColumnIndex("SO_DAU_KY")));
+                entityHoaDonNo.setSO_CUOI_KY(c.getString(c.getColumnIndex("SO_CUOI_KY")));
+                entityHoaDonNo.setSO_CTO(c.getString(c.getColumnIndex("SO_CTO")));
+                entityHoaDonNo.setSDT_ECPAY(c.getString(c.getColumnIndex("SDT_ECPAY")));
+                entityHoaDonNo.setSDT_EVN(c.getString(c.getColumnIndex("SDT_EVN")));
+                entityHoaDonNo.setGIAO_THU(c.getString(c.getColumnIndex("GIAO_THU")));
+                entityHoaDonNo.setNGAY_GIAO_THU(Common.parseDate(c.getString(c.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
+                entityHoaDonNo.setTRANG_THAI_TTOAN(c.getString(c.getColumnIndex("TRANG_THAI_TTOAN")));
+                entityHoaDonNo.setVI_TTOAN(c.getString(c.getColumnIndex("VI_TTOAN")));
 
-        }
+            }
 
 
-        if (c != null && !c.isClosed()) {
-            c.close();
-        }
-        return entityHoaDonNo;
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            return entityHoaDonNo;
     }
 
-    public List<EntityKhachHang> selectAllCustomerFitterBy(String edong, int startIndex, Common.TYPE_SEARCH typeSearch, String infoSearch) {
-        List<EntityKhachHang> customerList = new ArrayList<>();
 
+    public EntityHoaDonThu getHoaDonThu(long billID) {
+        EntityHoaDonThu hoaDonThu = new EntityHoaDonThu();
+
+        database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME_DEBT_COLLECTION + " WHERE MA_HOA_DON ='" + billID + "'";
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor.moveToFirst()) {
+
+
+
+
+            hoaDonThu.setE_DONG(mCursor.getString(mCursor.getColumnIndex("E_DONG")));
+            hoaDonThu.setSERI_HDON(mCursor.getString(mCursor.getColumnIndex("SERI_HDON")));
+            hoaDonThu.setMA_HOA_DON(mCursor.getString(mCursor.getColumnIndex("MA_HOA_DON")));
+            hoaDonThu.setMA_KHANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
+            hoaDonThu.setMA_THE(mCursor.getString(mCursor.getColumnIndex("MA_THE")));
+            hoaDonThu.setTEN_KHANG(mCursor.getString(4));
+            hoaDonThu.setDIA_CHI(mCursor.getString(mCursor.getColumnIndex("DIA_CHI")));
+            hoaDonThu.setTHANG_TTOAN(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
+            hoaDonThu.setPHIEN_TTOAN(mCursor.getInt(mCursor.getColumnIndex("PHIEN_TTOAN")));
+            hoaDonThu.setSO_TIEN_TTOAN(mCursor.getInt(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
+            hoaDonThu.setSO_GCS(mCursor.getString(mCursor.getColumnIndex("SO_GCS")));
+            hoaDonThu.setDIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
+            hoaDonThu.setSO_HO(mCursor.getString(mCursor.getColumnIndex("SO_HO")));
+            hoaDonThu.setSO_DAU_KY(mCursor.getString(mCursor.getColumnIndex("SO_DAU_KY")));
+            hoaDonThu.setSO_CUOI_KY(mCursor.getString(mCursor.getColumnIndex("SO_CUOI_KY")));
+            hoaDonThu.setSO_CTO(mCursor.getString(mCursor.getColumnIndex("SO_CTO")));
+            hoaDonThu.setSDT_ECPAY(mCursor.getString(mCursor.getColumnIndex("SDT_ECPAY")));
+            hoaDonThu.setSDT_EVN(mCursor.getString(mCursor.getColumnIndex("SDT_EVN")));
+            hoaDonThu.setGIAO_THU(mCursor.getString(mCursor.getColumnIndex("GIAO_THU")));
+            hoaDonThu.setNGAY_GIAO_THU(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
+            hoaDonThu.setTRANG_THAI_TTOAN(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN")));
+            hoaDonThu.setVI_TTOAN(mCursor.getString(mCursor.getColumnIndex("VI_TTOAN")));
+            hoaDonThu.setNGAY_THU(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("NGAY_THU")), Common.DATE_TIME_TYPE.FULL.toString()));
+            hoaDonThu.setHINH_THUC_TT(mCursor.getString(mCursor.getColumnIndex("HINH_THUC_TT")));
+            hoaDonThu.setTRANG_THAI_CHAM_NO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_CHAM_NO")));
+            hoaDonThu.setTRANG_THAI_HUY(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_HUY")));
+            hoaDonThu.setTRANG_THAI_HOAN_TRA(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_HOAN_TRA")));
+            hoaDonThu.setTRANG_THAI_XU_LY_NGHI_NGO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_XU_LY_NGHI_NGO")));
+            hoaDonThu.setTRANG_THAI_DAY_CHAM_NO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_DAY_CHAM_NO")));
+
+            hoaDonThu.setNGAY_DAY(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("NGAY_DAY")), Common.DATE_TIME_TYPE.FULL.toString()));
+            hoaDonThu.setSO_LAN_IN_BIEN_NHAN(mCursor.getInt(mCursor.getColumnIndex("SO_LAN_IN_BIEN_NHAN")));
+            hoaDonThu.setIN_THONG_BAO_DIEN(mCursor.getString(mCursor.getColumnIndex("IN_THONG_BAO_DIEN")));
+
+
+        }
+
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return hoaDonThu;
+    }
+
+    public Pair<List<EntityKhachHang>, Integer> selectAllCustomerFitterBy(String edong, int startIndex, Common.TYPE_SEARCH typeSearch, String infoSearch) {
+
+        List<EntityKhachHang> customerList = new ArrayList<>();
+        int totalRow = 0;
         boolean fail = TextUtils.isEmpty(edong);
         if (fail)
-            return customerList;
+            return new Pair<>(customerList, totalRow);
 
         String query = "";
         String whereQuery1 = "";
@@ -917,7 +978,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         query = "SELECT * FROM (select (select COUNT(*) " +
                 "                from " + TABLE_NAME_CUSTOMER + " t1 " +
                 "                where t1.ID <= t2.ID and " + whereQuery1 +
-                "                ) as Row_Number, * from " + TABLE_NAME_CUSTOMER + " t2 WHERE " + whereQuery2 + " ORDER BY ID) " +
+                "                ) as Row_Number, (select count(*) from " + TABLE_NAME_CUSTOMER + " t1 WHERE  " + whereQuery1 + ") as TONG_ROW, * from " + TABLE_NAME_CUSTOMER + " t2 WHERE " + whereQuery2 + " ORDER BY ID) " +
                 "                  WHERE Row_Number BETWEEN " + ((startIndex - 1) * PayFragment.ROWS_ON_PAGE + 1) + " AND " + ((startIndex) * PayFragment.ROWS_ON_PAGE);
 
         database = this.getWritableDatabase();
@@ -927,6 +988,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             int count = c.getCount();
             do {
 
+                totalRow = c.getInt(c.getColumnIndex("TONG_ROW"));
                 EntityKhachHang khachHang = new EntityKhachHang();
                 khachHang.setE_DONG(c.getString(c.getColumnIndex("E_DONG")));
                 khachHang.setMA_KHANG(c.getString(c.getColumnIndex("MA_KHANG")));
@@ -953,7 +1015,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         {
             c.close();
         }
-        return customerList;
+        return new Pair<>(customerList, totalRow);
     }
 
 
@@ -1241,8 +1303,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public int countMoneyAllBill(String edong) {
         database = this.getReadableDatabase();
-        String query = "SELECT SUM(SO_TIEN_TTOAN) FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "' " +
-                " and TRANG_THAI_TTOAN = '" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "'";// and status = " + ZERO;
+//        String query = "SELECT  FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "' " +
+//                " and TRANG_THAI_TTOAN = '" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "'";// and status = " + ZERO;
+
+        String query = "SELECT SUM(SO_TIEN_TTOAN) FROM(SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU ='" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "'  and TRANG_THAI_TTOAN ='" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "' ) AS BILL " +
+                "JOIN (SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "') AS CUSTOMER ON BILL.MA_KHANG = CUSTOMER.MA_KHANG";
+
+
         Cursor mCursor = database.rawQuery(query, null);
         int totalMoney = ERROR_OCCUR;
         if (mCursor.moveToFirst())

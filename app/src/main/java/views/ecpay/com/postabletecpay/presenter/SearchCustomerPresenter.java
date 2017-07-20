@@ -85,7 +85,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
 
         if(lst.size() == 0)
         {
-            searchCustomerView.showMessage("Không Tồn Tại Khách Hàng Thoả Mãn Điều Kiện Tìm Kiếm");
+            searchCustomerView.showMessage("Mã khách hàng không tồn tại!");
         }
 
     }
@@ -103,7 +103,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
         try {
             configInfo = Common.setupInfoRequest(searchCustomerView.getContextView(), mEDong, Common.COMMAND_ID.CUSTOMER_BILL.toString(), Common.getVersionApp(searchCustomerView.getContextView()));
         } catch (Exception e) {
-            searchCustomerView.showMessage("Không Tồn Tại Khách Hàng Thoả Mãn Điều Kiện Tìm Kiếm");
+            searchCustomerView.showMessage(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
             return;
         }
 
@@ -122,7 +122,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
 
         if (jsonRequestSearchOnline == null)
         {
-            searchCustomerView.showMessage("Không Tồn Tại Khách Hàng Thoả Mãn Điều Kiện Tìm Kiếm");
+            searchCustomerView.showMessage(Common.CODE_REPONSE_API_CHECK_TRAINS.ex10002.getMessage());
             return;
         }
 
@@ -150,7 +150,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
                 public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
                     if (response == null) {
                         try {
-                            searchCustomerView.showMessage("Không Tồn Tại Khách Hàng Thoả Mãn Điều Kiện Tìm Kiếm");
+                            searchCustomerView.showMessage("Mã khách hàng không tồn tại!");
                         } catch (Exception e) {
 
                         }
@@ -216,7 +216,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
                 public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
                     try
                     {
-                        searchCustomerView.showMessage("Không Tồn Tại Khách Hàng Thoả Mãn Điều Kiện Tìm Kiếm");
+                        searchCustomerView.showMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
                     }catch (Exception e)
                     {
 

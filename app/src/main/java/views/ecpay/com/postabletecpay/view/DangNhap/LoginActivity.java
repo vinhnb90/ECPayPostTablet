@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,7 +14,9 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -271,7 +274,48 @@ public class LoginActivity extends BaseActivity implements ILoginView {
             return;
         }
     }
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if(ev.getAction() == MotionEvent.ACTION_UP) {
+            final View view = getCurrentFocus();
 
+            if(view != null) {
+                final boolean consumed = super.dispatchTouchEvent(ev);
+
+                final View viewTmp = getCurrentFocus();
+                final View viewNew = viewTmp != null ? viewTmp : view;
+
+                if(viewNew.equals(view)) {
+                    final Rect rect = new Rect();
+                    final int[] coordinates = new int[2];
+
+                    view.getLocationOnScreen(coordinates);
+
+                    rect.set(coordinates[0], coordinates[1], coordinates[0] + view.getWidth(), coordinates[1] + view.getHeight());
+
+                    final int x = (int) ev.getX();
+                    final int y = (int) ev.getY();
+
+                    if(rect.contains(x, y)) {
+                        return consumed;
+                    }
+                }
+                else if(viewNew instanceof EditText) {
+                    return consumed;
+                }
+
+                final InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                inputMethodManager.hideSoftInputFromWindow(viewNew.getWindowToken(), 0);
+
+                viewNew.clearFocus();
+
+                return consumed;
+            }
+        }
+
+        return super.dispatchTouchEvent(ev);
+    }
 
     @Override
     public void showTextUserPass(String userName, String pass) {
@@ -330,10 +374,10 @@ public class LoginActivity extends BaseActivity implements ILoginView {
     @OnClick(R.id.btLogin)
     public void clickLogin(View view) {
         Common.runAnimationClickViewScale(view, R.anim.scale_view_push, Common.TIME_DELAY_ANIM);
-
+//
         final String userName = etUsername.getText().toString();
         final String pass = etPass.getText().toString();
-
+//
         if (cbRememberLogin.isChecked()) {
             mILoginPresenter.writeSharedPrefLogin(userName, pass);
         } else
@@ -351,7 +395,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
 //        ///Cheat
 //        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//        intent.putExtra(KEY_EDONG, "01666564963");
+//        intent.putExtra(KEY_EDONG, userName);
 //        startActivity(intent);
 //        this.finish();
     }

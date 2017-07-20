@@ -12,13 +12,13 @@ import views.ecpay.com.postabletecpay.util.entities.response.Base.BodyRespone;
 public class BodyPostBillReponse extends BodyRespone {
     @SerializedName("List")
     @Expose
-    private ListPostBill listPostBill;
+    private String listPostBill;
 
-    public ListPostBill getListPostBill() {
+    public String getListPostBill() {
         return listPostBill;
     }
 
-    public void setListPostBill(ListPostBill listPostBill) {
+    public void setListPostBill(String listPostBill) {
         this.listPostBill = listPostBill;
     }
 }

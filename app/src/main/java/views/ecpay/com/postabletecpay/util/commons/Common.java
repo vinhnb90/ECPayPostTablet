@@ -987,6 +987,7 @@ public class Common {
     public enum TRANG_THAI_DAY_CHAM_NO
     {
         CHUA_DAY ("01", "Chua Day"),
+        DA_DAY ("02", "Da Day"),
         KHONG_THANH_CONG ("03", "Khong Thanh Cong");
 
         TRANG_THAI_DAY_CHAM_NO(String code, String message) {
@@ -1349,7 +1350,7 @@ public class Common {
             if (this == LOGOUT)
                 return "LOGOUT";
             if (this == PUT_TRANSACTION_OFF)
-                return "PUT-TRANSACTION-OFF";
+                return "PUSH-TRANSACTION-OFF";
             if (this == CASH_TRANSFER)
                 return "CASH-TRANSFER";
             if (this == GET_PC_INFO)
@@ -2538,7 +2539,8 @@ public class Common {
         buttonOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clickYesNoDialog.doClickYes();
+                if(clickYesNoDialog != null)
+                    clickYesNoDialog.doClickYes();
                 alertDialog.dismiss();
             }
         });
@@ -2546,7 +2548,8 @@ public class Common {
         buttonCancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                clickYesNoDialog.doClickNo();
+                if(clickYesNoDialog != null)
+                    clickYesNoDialog.doClickNo();
                 alertDialog.dismiss();
             }
         });
