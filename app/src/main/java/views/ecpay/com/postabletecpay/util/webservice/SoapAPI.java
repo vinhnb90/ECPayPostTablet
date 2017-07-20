@@ -3328,7 +3328,7 @@ public class SoapAPI {
         protected void onPreExecute() {
             super.onPreExecute();
             progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Downloading file ...");
+            progressDialog.setMessage("Đang đồng bộ dữ liệu ...");
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             progressDialog.show();
             callBack.onPre(this);

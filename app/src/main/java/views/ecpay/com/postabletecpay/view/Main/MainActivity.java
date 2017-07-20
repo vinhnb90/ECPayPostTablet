@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements
     public void startShowPbarDownload() {
         if(progressDialog == null)
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Downloading file ...");
+        progressDialog.setMessage("Đang đồng bộ dữ liệu ...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false);

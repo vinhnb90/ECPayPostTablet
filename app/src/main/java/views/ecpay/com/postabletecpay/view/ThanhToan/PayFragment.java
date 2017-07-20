@@ -319,13 +319,11 @@ public class PayFragment extends Fragment implements
         return payFragment;
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
     }
-
 
     @Override
     public Common.PROVIDER_CODE getProviderCodeSelected() {
@@ -354,7 +352,6 @@ public class PayFragment extends Fragment implements
         } catch (Exception e) {
 
         }
-
 
         List<String> list = new ArrayList<>();
         for (int i = 0; i < Common.PROVIDER_CODE.values().length; i ++)
@@ -387,7 +384,6 @@ public class PayFragment extends Fragment implements
 
         return rootView;
     }
-
 
     @Override
     public void updateBillSelectToPay(List<PayAdapter.BillEntityAdapter> lst)
@@ -542,7 +538,6 @@ public class PayFragment extends Fragment implements
     }
     //endregion
 
-
     //region listener etTextBarcode
 //    @Optional
 //    @OnTextChanged(R.id.et_frag_thanh_toan_search)
@@ -590,6 +585,7 @@ public class PayFragment extends Fragment implements
         }
 //        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
     }
+
 
     @Override
     public void onDestroyView() {
@@ -668,7 +664,6 @@ public class PayFragment extends Fragment implements
         hideAllProcessDeleteBillOnline();
     }
     //endregion
-
 
     //region IPayView
     @Override
@@ -1372,7 +1367,6 @@ public class PayFragment extends Fragment implements
             rvKH.setLayoutManager(linearLayoutManager);
     }
     //endregion
-
 
     public void fillResultToSearchText(String textBarcode) {
         if (TextUtils.isEmpty(textBarcode) || etSearch == null)
