@@ -711,7 +711,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 //        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "' " +
 //                " and TRANG_THAI_TTOAN = '" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "'";// + "' and status = " + ZERO;
 
-        String query = "SELECT COUNT(*) AS COUNT FROM(SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU ='" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "'  and TRANG_THAI_TTOAN ='" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "' ) AS BILL " +
+        String query = "SELECT COUNT(*) AS COUNT FROM(SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and TRANG_THAI_TTOAN ='" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "' ) AS BILL " +
                 "JOIN (SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "') AS CUSTOMER ON BILL.MA_KHANG = CUSTOMER.MA_KHANG";
 
         Cursor mCursor = database.rawQuery(query, null);
@@ -1191,7 +1191,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 //        String query = "SELECT  FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "' " +
 //                " and TRANG_THAI_TTOAN = '" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "'";// and status = " + ZERO;
 
-        String query = "SELECT SUM(SO_TIEN_TTOAN) FROM(SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU ='" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "'  and TRANG_THAI_TTOAN ='" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "' ) AS BILL " +
+        String query = "SELECT SUM(SO_TIEN_TTOAN) FROM(SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and TRANG_THAI_TTOAN ='" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "' ) AS BILL " +
                 "JOIN (SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "') AS CUSTOMER ON BILL.MA_KHANG = CUSTOMER.MA_KHANG";
 
 

@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -2323,7 +2324,6 @@ public class Common {
 
     }
 
-
     //delay animations when view is clicked
     public static final int TIME_DELAY_ANIM = 250;
     public static final int LONG_TIME_DELAY_ANIM = 1000;
@@ -2615,6 +2615,19 @@ public class Common {
         }
 
         return versionApp;
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(
+                activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
+    public void hideKeyboard(View view, Activity activity) {
+        InputMethodManager inputMethodManager =(InputMethodManager)activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     //endregion
