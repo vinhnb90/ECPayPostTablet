@@ -1109,7 +1109,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     bill.setSO_HO(soHo);
 
                     if (c != null && c.moveToFirst()) {
-                        bill.setMA_DL_MO_RONG(c.getString(c.getColumnIndex("fullname")));
+                        bill.setMA_DL_MO_RONG(c.getString(c.getColumnIndex("fullName")));
                     }
 
                     bill.setMA_DIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));

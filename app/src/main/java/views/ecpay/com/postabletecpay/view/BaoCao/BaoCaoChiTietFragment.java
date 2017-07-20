@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -103,8 +104,7 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
 
 
     Unbinder unbinder;
-    private boolean readExcel;
-    public static ReportChiTietAdapter adapter;
+    private ReportChiTietAdapter adapter;
     private Calendar tuNgayDate, denNgayDate;
     private IReportChiTietPresenter reportChiTietPresenter;
 
@@ -127,8 +127,6 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
 
         tuNgayDate = Calendar.getInstance();
         denNgayDate = Calendar.getInstance();
-        readExcel = false;
-
 
         btnExport.setOnClickListener(this);
         btnTimKiem.setOnClickListener(this);
@@ -159,8 +157,8 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rvDanhSach.setLayoutManager(layoutManager);
 
-
-        rvDanhSach.setAdapter(new ReportChiTietAdapter());
+        adapter = new ReportChiTietAdapter();
+        rvDanhSach.setAdapter(adapter);
         rvDanhSach.invalidate();
 
 
@@ -194,11 +192,14 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
             return;
         }
         if (v.getId() == R.id.btnExport){
-            if (!readExcel) {
-                readExcel = true;
-                saveExcelFile(getContext(), "My_excel.xls");
+            if (adapter.getmBills().size() != 0) {
+                Date date = new Date();
+                String strDateFormat = "dd/MM/yyyy";
+                SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
+                saveExcelFile("Bao cao thu chi tiet" +sdf.format(date) +".xls");
+
             }else {
-                readExcelFile(getContext(),"My_excel.xls");
+                Toast.makeText(getContext(),"Không có hóa đơn",Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -268,7 +269,7 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         super.onStart();
         this.baoCaoView.showBackBtn(false);
     }
-    private static boolean saveExcelFile(Context context, String fileName) {
+    private boolean saveExcelFile(String fileName) {
 
         // check if available and not read only
         if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
@@ -288,13 +289,16 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         cs.setFillForegroundColor(HSSFColor.LIME.index);
         cs.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 
+        CellStyle cs1 = wb.createCellStyle();
+        cs1.setFillForegroundColor(HSSFColor.WHITE.index);
+        cs1.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         //New Sheet
         Sheet sheet1 = null;
         sheet1 = wb.createSheet("myOrder");
 
         // Generate column headings
         Row row1 = sheet1.createRow(0);
-        c = row1.createCell(3);
+        c = row1.createCell(2);
         c.setCellValue("BÁO CÁO THU CHI TIẾT");
         c.setCellStyle(cs);
 
@@ -319,10 +323,10 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         c = row.createCell(4);
         c.setCellValue("Ngày Thu");
         c.setCellStyle(cs);
-        Bangexcel(c,cs,sheet1);
-        sheet1.setColumnWidth(0, (15 * 500));
+        Bangexcel(c,cs1,sheet1);
+        sheet1.setColumnWidth(0, (15 * 300));
         sheet1.setColumnWidth(1, (15 * 500));
-        sheet1.setColumnWidth(2, (15 * 500));
+        sheet1.setColumnWidth(2, (15 * 300));
         sheet1.setColumnWidth(3, (15 * 500));
         sheet1.setColumnWidth(4, (15 * 500));
 
@@ -333,8 +337,8 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         try {
             os = new FileOutputStream(file);
             wb.write(os);
-            Log.w("FileUtils", "Writing file" + file);
             success = true;
+            Toast.makeText(getContext(),"Đã xuất ra file excel thành công",Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             Log.w("FileUtils", "Error writing " + file, e);
         } catch (Exception e) {
@@ -349,8 +353,9 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         return success;
     }
 
-    private static void Bangexcel(Cell c, CellStyle cs, Sheet sheet1){
+    private void Bangexcel(Cell c, CellStyle cs, Sheet sheet1){
         if (adapter.getmBills().size() != 0) {
+
             for (int i = 0; i < adapter.getmBills().size(); i++) {
                 Row row = sheet1.createRow(i + 4);
 
@@ -363,58 +368,19 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
                 c.setCellStyle(cs);
 
                 c = row.createCell(2);
-                c.setCellValue(adapter.getmBills().get(i).getPHIEN_TTOAN());
+                c.setCellValue(Common.parse(adapter.getmBills().get(i).getTHANG_TTOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString()));
                 c.setCellStyle(cs);
 
                 c = row.createCell(3);
-                c.setCellValue(adapter.getmBills().get(i).getSO_TIEN_TTOAN());
+                c.setCellValue(adapter.getmBills().get(i).getSO_TIEN_TTOAN()+"");
                 c.setCellStyle(cs);
 
                 c = row.createCell(4);
-                c.setCellValue(adapter.getmBills().get(i).getNGAY_THU());
+                c.setCellValue(Common.parse(adapter.getmBills().get(i).getNGAY_THU(), Common.DATE_TIME_TYPE.ddMMyyyy.toString()));
                 c.setCellStyle(cs);
             }
         }
 
-    }
-
-    private static void readExcelFile(Context context, String filename) {
-
-        if (!isExternalStorageAvailable() || isExternalStorageReadOnly())
-        {
-            Log.e("a", "Storage not available or read only");
-            return;
-        }
-
-        try{
-            // Creating Input Stream
-            File file = new File(Common.PATH_FOLDER_LOG, filename);
-            FileInputStream myInput = new FileInputStream(file);
-
-            // Create a POIFSFileSystem object
-            POIFSFileSystem myFileSystem = new POIFSFileSystem(myInput);
-
-            // Create a workbook using the File System
-            HSSFWorkbook myWorkBook = new HSSFWorkbook(myFileSystem);
-
-            // Get the first sheet from workbook
-            HSSFSheet mySheet = myWorkBook.getSheetAt(0);
-
-            /** We now need something to iterate through the cells.**/
-            Iterator rowIter = mySheet.rowIterator();
-
-            while(rowIter.hasNext()){
-                HSSFRow myRow = (HSSFRow) rowIter.next();
-                Iterator cellIter = myRow.cellIterator();
-                while(cellIter.hasNext()){
-                    HSSFCell myCell = (HSSFCell) cellIter.next();
-                    Log.d("a", "Cell Value: " +  myCell.toString());
-                    Toast.makeText(context, "cell Value: " + myCell.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        }catch (Exception e){e.printStackTrace(); }
-
-        return;
     }
 
     public static boolean isExternalStorageReadOnly() {
