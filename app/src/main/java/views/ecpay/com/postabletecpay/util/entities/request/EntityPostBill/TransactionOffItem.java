@@ -8,24 +8,27 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class TransactionOffItem {
-    @SerializedName("customer-code")
+    @SerializedName("customerCode")
     @Expose
     private String customer_code;
-    @SerializedName("provide-code")
+    @SerializedName("provideCode")
     @Expose
     private String provide_code;
     @SerializedName("amount")
     @Expose
     private Long amount;
-    @SerializedName("bill-id")
+    @SerializedName("billId")
     @Expose
     private Long bill_id;
     @SerializedName("edong")
     @Expose
     private String edong;
-    @SerializedName("audit-number")
+    @SerializedName("auditNumber")
     @Expose
     private String audit_number;
+    @SerializedName("pcCode")
+    @Expose
+    private String pcCode;
 
     public String getCustomer_code() {
         return customer_code;
@@ -73,5 +76,13 @@ public class TransactionOffItem {
 
     public void setAudit_number(String audit_number) {
         this.audit_number = audit_number;
+    }
+
+    public String getPcCode() {
+        return pcCode;
+    }
+
+    public void setPcCode(String pcCode) {
+        this.pcCode = pcCode;
     }
 }

@@ -23,15 +23,20 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.model.MainModel;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.ConfigInfo;
+import views.ecpay.com.postabletecpay.util.entities.EntityHoaDonThu;
+import views.ecpay.com.postabletecpay.util.entities.EntityLichSuThanhToan;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.TransactionOffItem;
 import views.ecpay.com.postabletecpay.util.entities.response.Base.Respone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BillResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityBillOnline.BillingOnlineRespone;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityBillOnline.BodyBillingOnlineRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.CustomerResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityDataZip.ListDataZipResponse;
@@ -41,6 +46,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEvnPC
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.FileGenResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListBillResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityFileGen.ListCustomerResponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityPostBill.BodyPostBillReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityPostBill.PostBillResponse;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.Main.IMainView;
@@ -66,7 +72,7 @@ public class MainPresenter implements IMainPresenter {
     private static List<PayAdapter.DataAdapter> mDataPayAdapter = new ArrayList<>();
 
     private int allProcessDownload;
-    private SoapAPI.AsyncSoapIncludeTimout<PostBillResponse> CurrentPostBillAsync = null;
+    private List<SoapAPI.AsyncSoapIncludeTimout<BillingOnlineRespone>> CurrentPostBillAsync = new ArrayList<>();
 
     public MainPresenter(IMainView mIMainView, String edong) {
         this.mIMainView = mIMainView;
@@ -703,46 +709,71 @@ public class MainPresenter implements IMainPresenter {
     @Override
     public boolean checkAndPostBill() {
 
-        if (CurrentPostBillAsync != null && !CurrentPostBillAsync.isEndCallSoap()) {
+        if (CurrentPostBillAsync != null && !CurrentPostBillAsync.isEmpty()) {
             return false;
         }
 
-        ArrayList<TransactionOffItem> lstTransactionOff = (ArrayList<TransactionOffItem>) mainModel.selectOfflineBill();
+        List<PayAdapter.BillEntityAdapter> lstTransactionOff = mainModel.selectOfflineBill();
         if (lstTransactionOff.size() == 0)
             return true;
 
 
-        Context context = mIMainView.getContextView();
-
-
-        ConfigInfo configInfo;
-
-        try {
-            configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.PUT_TRANSACTION_OFF.toString(), Common.getVersionApp(mIMainView.getContextView()));////TO-DO:NEED CHECK HERE AGAIN, mainModel.getPcCode());
-        } catch (Exception e) {
-            mIMainView.showTextMessage(e.getMessage());
-            return false;
-        }
-
-
-//        String signatureEncrypted = "";
-//        try {
-//            String dataSign = Common.getDataSignRSA(
-//                    configInfo.getAGENT(), configInfo.getCommandId(), configInfo.getAuditNumber(), configInfo.getMacAdressHexValue(),
-//                    configInfo.getDiskDriver(), mainModel.getPcCode(), configInfo.getAccountId(), configInfo.getPRIVATE_KEY().trim());
-//            Log.d(TAG, "setupInfoRequest: " + dataSign);
-//            signatureEncrypted = SecurityUtils.sign(dataSign, configInfo.getPRIVATE_KEY().trim());
-//            Log.d(TAG, "setupInfoRequest: " + signatureEncrypted);
-//        } catch (Exception e) {
-//        }
-//        configInfo.setSignatureEncrypted(signatureEncrypted);
-
         for (int i = 0, n = lstTransactionOff.size(); i < n; i++) {
-            lstTransactionOff.get(i).setProvide_code(Common.PROVIDER_DEFAULT);
-            lstTransactionOff.get(i).setAudit_number(String.valueOf(configInfo.getAuditNumber()));
+            try {
+                payOnline(lstTransactionOff.get(i));
+            } catch (Exception e) {
+            }
         }
 
-        String jsonRequestPushBill = SoapAPI.getJsonRequestPostBill(
+        return false;
+    }
+
+
+
+    @Override
+    public void refreshDataPayAdapter() {
+    }
+
+    @Override
+    public List<PayAdapter.DataAdapter> getDataPayAdapter() {
+        return mDataPayAdapter;
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    void payOnline(final PayAdapter.BillEntityAdapter bill) throws Exception {
+
+        ConfigInfo configInfo = null;
+        try {
+            configInfo = Common.setupInfoRequest(mIMainView.getContextView(), MainActivity.mEdong, Common.COMMAND_ID.BILLING.toString(), Common.getVersionApp(mIMainView.getContextView()));
+        } catch (Exception e) {
+            bill.setMessageError(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_AGENT.toString());
+
+            return;
+        }
+
+
+        //Số ví edong thực hiện thanh toán
+        String phone = MainActivity.mEdong;
+        Long amount = bill.getTIEN_THANH_TOAN();
+
+        //Phiên làm việc của TNV đang thực hiện
+        String session = mainModel.getSession(MainActivity.mEdong);
+
+        /**
+         * Luồng quầy thu đang năng : DT0813
+         * Luồng tài khoản tiền điện : DT0807
+         * Còn lại sử dụng DT0605
+         *
+         * ECPAY mặc định sử dụng DT0605
+         */
+
+        String partnerCode = Common.PARTNER_CODE_DEFAULT;
+
+        String providerCode = Common.PROVIDER_DEFAULT;
+
+        //create request to server
+        String jsonRequestBillOnline = SoapAPI.getJsonRequestBillOnline(
                 configInfo.getAGENT(),
                 configInfo.getAgentEncypted(),
                 configInfo.getCommandId(),
@@ -750,93 +781,258 @@ public class MainPresenter implements IMainPresenter {
                 configInfo.getMacAdressHexValue(),
                 configInfo.getDiskDriver(),
                 configInfo.getSignatureEncrypted(),
-                lstTransactionOff,
+                bill.getMA_KHACH_HANG(),
+                session,
+                bill.getBillId(),
+                amount,
+                phone,
+                providerCode,
+                partnerCode,
                 configInfo.getAccountId());
 
+        if (jsonRequestBillOnline == null) {
+            bill.setMessageError(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_REQUEST.toString());
 
-        if (jsonRequestPushBill != null) {
-            try {
-                CurrentPostBillAsync = new SoapAPI.AsyncSoapIncludeTimout<PostBillResponse>(mHandler, PostBillResponse.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
+            return;
+        }
+
+
+        final SoapAPI.AsyncSoapIncludeTimout<BillingOnlineRespone> billingOnlineResponeAsyncSoap = new SoapAPI.AsyncSoapIncludeTimout<BillingOnlineRespone>(mHandler, BillingOnlineRespone.class,
+                new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
                     @Override
                     public void onPre(SoapAPI.AsyncSoapIncludeTimout soap) {
 
                     }
 
                     @Override
-                    public void onUpdate(String message) {
-
+                    public void onUpdate(final String message) {
+                        CurrentPostBillAsync.remove(this);
                     }
 
                     @Override
                     public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
-                        if (response != null) {
 
+                        if (response == null) {
+                            CurrentPostBillAsync.remove(this);
+                            return;
                         }
+
+                        //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu không thành công
+                        final Common.CODE_REPONSE_BILL_ONLINE codeResponse = Common.CODE_REPONSE_BILL_ONLINE.findCodeMessage(response.getFooter().getResponseCode());
+                        BodyBillingOnlineRespone body = response.getBodyByType();
+
+                        if (codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e825.getCode())) {
+                            /**
+                             * Trường hợp hóa đơn đã được thanh toán bởi nguồn khác: Không thực hiện thanh toán hóa đơn
+                             */
+                            hoaDonDaThanhToanBoiNguonKhac(body);
+                            bill.setTRANG_THAI_TT(Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC.getCode());
+                            bill.setVI_TTOAN("");
+                            bill.setMessageError(Common.CODE_REPONSE_BILL_ONLINE.ex10006.getMessage());
+
+                        }else if (codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e814.getCode())) {
+                            /**
+                             * Trường hợp hóa đơn đã được thanh toán bởi ví khác: Không thực hiện thanh toán hóa đơn
+                             */
+                            hoaDonDaThanhToanBoiViKhac(body);
+                            bill.setTRANG_THAI_TT(Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC.getCode());
+                            bill.setVI_TTOAN(body.getPaymentEdong());
+                            bill.setMessageError(Common.CODE_REPONSE_BILL_ONLINE.ex10007.getMessage());
+                        }else if (!codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e000.getCode())
+                                &&
+                                !codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e095.getCode())) {
+                            /**
+                             * Hóa đơn chấm nợ lỗi: Không thực hiện thanh toán hóa đơn
+                             */
+                            hoaDonChamNoLoi(body);
+                            bill.setMessageError(Common.CODE_REPONSE_BILL_ONLINE.ex10009.getMessage());
+                        }else
+                        {
+                            String gateEVN = body.getBillingType();
+                            if(codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e000.getCode()) && gateEVN.equalsIgnoreCase("ON"))
+                            {//Thanh Toan THanh Cong Trong Gio Mo Ket Noi ECPay -> EVN
+                                hoaDonThanhCongTrongGioMoKetNoi(body);
+                            }else
+                            {//Thanh Toan Thanh Cong Trong Gio Dong Ket Noi ECPay -> EVN
+                                hoaDonThanhCongTrongGioDongKetNoi(body);
+                            }
+
+                            bill.setTRANG_THAI_TT(Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+                            bill.setVI_TTOAN(MainActivity.mEdong);
+                            bill.setMessageError(Common.CODE_REPONSE_BILL_ONLINE.ex10008.getMessage());
+                        }
+
+
+
+                        CurrentPostBillAsync.remove(soap);
                     }
 
                     @Override
                     public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
-
+                        CurrentPostBillAsync.remove(soap);
                     }
                 });
-                CurrentPostBillAsync.execute(jsonRequestPushBill);
-                return true;
-            } catch (Exception e) {
-                CurrentPostBillAsync = null;
-                mIMainView.showTextMessage(e.getMessage());
-                return false;
-            }
 
-        }
-        return false;
+        CurrentPostBillAsync.add(billingOnlineResponeAsyncSoap);
+        billingOnlineResponeAsyncSoap.execute(jsonRequestBillOnline);
     }
 
-    @Override
-    public void refreshDataPayAdapter() {
-//        mDataPayAdapter.clear();
-//        List<PayAdapter.PayEntityAdapter> listKH = new ArrayList<>();
-//        //get List Customer
-//        List<EntityKhachHang> listCustomer = mainModel.selectAllCustomer(edong);
-//
-//        //with every one
-//        int index = 0;
-//        int maxIndex = listCustomer.size();
-//        for (; index < maxIndex; index++) {
-//            EntityKhachHang customer = listCustomer.get(index);
-//
-//            PayAdapter.PayEntityAdapter pay = new PayAdapter.PayEntityAdapter();
-//            pay.setEdong(edong);
-//            pay.setTenKH(customer.getTEN_KHANG());
-//            pay.setDiaChi(customer.getDIA_CHI());
-//            //get loTrinh
-//            pay.setLoTrinh(customer.getLO_TRINH());
-//            pay.setMaKH(customer.getMA_KHANG());
-//            //get totalMoney
-//            long totalMoney = mainModel.countMoneyAllBillOfCustomer(edong, customer.getMA_KHANG());
-//            pay.setTongTien(totalMoney);
-//            //check status pay
-////            boolean isPayed = mainModel.checkStatusPayedOfCustormer(edong, customer.getCode());
-////            pay.setPayed(isPayed);
-////            pay.setShowBill(customer.isShowBill());
-//
-//            listKH.add(pay);
-//        }
-//
-//        for(index = 0; index<listKH.size();index++)
-//        {
-//            PayAdapter.PayEntityAdapter customer = listKH.get(index);
-//            String code = customer.getMaKH();
-//            List<PayAdapter.BillEntityAdapter> listBill = mainModel.selectInfoBillOfCustomerToRecycler(edong, code);
-//            Collections.sort(listBill, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
-//            PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(customer, listBill);
-//            mDataPayAdapter.add(dataAdapter);
-//        }
+
+    private void hoaDonThanhCongTrongGioDongKetNoi(BodyBillingOnlineRespone respone) {
+        //TODO mark
+        /**
+         * Trong giờ mở cổng kết nối thanh toán từ ECPAY sang EVN
+         * (Trường hợp thanh toán thành công mã e000 && Trạng thái thanh toán ON/OFF billingType API trả về = ON)
+         * Cập nhật Danh sách hóa đơn nợ (Bill table) đã lưu trong máy
+         * Ví thanh toán edong = Ví đăng nhập
+         * Trạng thái thanh toán status = 02_Đã thanh toán
+         */
+
+        mainModel.updateHoaDonNo(respone.getBillId(), Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode(), MainActivity.mEdong);
+
+        //Lưu vào danh sách THU
+        EntityHoaDonThu entityHoaDonThu = EntityHoaDonThu.copy(mainModel.getHoaDonNo(respone.getBillId()));
+
+        //Update Hoa Don Thu
+        mainModel.updateHoaDonThu(String.valueOf(respone.getBillId()), MainActivity.mEdong, Common.TRANG_THAI_TTOAN.DA_TTOAN,
+                Common.TRANG_THAI_CHAM_NO.DANG_CHO_XU_LY.getCode(), Common.TRANG_THAI_DAY_CHAM_NO.DA_DAY.getCode(), Common.parse(new Date(), Common.DATE_TIME_TYPE.FULL.toString()), "");
+
+
+
+        //Lưu lại lịch sử thanh toán
+        EntityLichSuThanhToan entityLichSuThanhToan = EntityLichSuThanhToan.copy(entityHoaDonThu);
+        entityLichSuThanhToan.setNGAY_PHAT_SINH(new Date());
+        entityLichSuThanhToan.setMA_GIAO_DICH(Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
+        mainModel.insertLichSuThanhToan(entityLichSuThanhToan);
     }
 
-    @Override
-    public List<PayAdapter.DataAdapter> getDataPayAdapter() {
-        return mDataPayAdapter;
+
+
+    private void hoaDonThanhCongTrongGioMoKetNoi(BodyBillingOnlineRespone respone) {
+        //TODO mark
+        /**
+         * Trong giờ mở cổng kết nối thanh toán từ ECPAY sang EVN
+         * (Trường hợp thanh toán thành công mã e000 && Trạng thái thanh toán ON/OFF billingType API trả về = ON)
+         * Cập nhật Danh sách hóa đơn nợ (Bill table) đã lưu trong máy
+         * Ví thanh toán edong = Ví đăng nhập
+         * Trạng thái thanh toán status = 02_Đã thanh toán
+         */
+
+        mainModel.updateHoaDonNo(respone.getBillId(), Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode(), MainActivity.mEdong);
+
+        //Lưu vào danh sách THU
+        EntityHoaDonThu entityHoaDonThu = mainModel.getHoaDonThu(respone.getBillId());
+
+
+        //Update Hoa Don Thu
+        mainModel.updateHoaDonThu(String.valueOf(respone.getBillId()), MainActivity.mEdong, Common.TRANG_THAI_TTOAN.DA_TTOAN,
+                Common.TRANG_THAI_CHAM_NO.DA_CHAM.getCode(), Common.TRANG_THAI_DAY_CHAM_NO.DA_DAY.getCode(), Common.parse(new Date(), Common.DATE_TIME_TYPE.FULL.toString()), "");
+
+
+
+
+        //Lưu lại lịch sử thanh toán
+        EntityLichSuThanhToan entityLichSuThanhToan = EntityLichSuThanhToan.copy(entityHoaDonThu);
+        entityLichSuThanhToan.setNGAY_PHAT_SINH(new Date());
+        entityLichSuThanhToan.setMA_GIAO_DICH(Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
+        mainModel.insertLichSuThanhToan(entityLichSuThanhToan);
     }
+
+    private void hoaDonChamNoLoi(BodyBillingOnlineRespone respone) {
+        /**
+         * Hóa đơn chấm nợ lỗi: Không thực hiện thanh toán hóa đơn
+         * Cập nhật Danh sách hóa đơn nợ (Bill table) đã lưu trong máy
+         * Ví thanh toán edong = Ví đăng nhập
+         * Trạng thái thanh toán status = (SRS không yêu cầu cập nhật trường này)
+         */
+
+        mainModel.updateHoaDonNo(respone.getBillId(), Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode(), "");
+
+        //Lưu vào danh sách THU
+        EntityHoaDonThu entityHoaDonThu = mainModel.getHoaDonThu(respone.getBillId());
+
+        //Update Hoa Don Thu
+        mainModel.updateHoaDonThu(String.valueOf(respone.getBillId()), "", Common.TRANG_THAI_TTOAN.DA_TTOAN,
+                Common.TRANG_THAI_CHAM_NO.CHAM_LOI.getCode(), Common.TRANG_THAI_DAY_CHAM_NO.DA_DAY.getCode(), Common.parse(new Date(), Common.DATE_TIME_TYPE.FULL.toString()), Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
+
+
+        //Lưu lại lịch sử thanh toán
+        EntityLichSuThanhToan entityLichSuThanhToan = EntityLichSuThanhToan.copy(entityHoaDonThu);
+        entityLichSuThanhToan.setNGAY_PHAT_SINH(new Date());
+        entityLichSuThanhToan.setMA_GIAO_DICH(Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
+        mainModel.insertLichSuThanhToan(entityLichSuThanhToan);
+
+    }
+
+    private void hoaDonDaThanhToanBoiViKhac(BodyBillingOnlineRespone response) {
+        /**
+         * Trường hợp hóa đơn đã được thanh toán bởi ví khác: Không thực hiện thanh toán hóa đơn
+         * Cập nhật Danh sách hóa đơn nợ (Bill table) đã lưu trong máy
+         * Ví thanh toán edong = Ví thanh toán do server trả về
+         * Trạng thái thanh toán status = 04_Đã thanh toán bởi ví khác
+         */
+
+        mainModel.updateHoaDonNo(response.getBillId(), Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC.getCode(), response.getPaymentEdong());
+
+
+        //Update Hoa Don Thu
+        mainModel.updateHoaDonThu(String.valueOf(response.getBillId()), response.getPaymentEdong(), Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC,
+                "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(), Common.parse(new Date(), Common.DATE_TIME_TYPE.FULL.toString()),
+                Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
+
+
+
+
+        //Lưu lại lịch sử thanh toán
+        EntityLichSuThanhToan entityLichSuThanhToan = EntityLichSuThanhToan.copy(mainModel.getHoaDonNo(response.getBillId()));
+
+        entityLichSuThanhToan.setVI_TTOAN(response.getPaymentEdong());
+        entityLichSuThanhToan.setHINH_THUC_TT(Common.HINH_THUC_TTOAN.OFFLINE.getCode());
+        entityLichSuThanhToan.setTRANG_THAI_TTOAN(Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC.getCode());
+        entityLichSuThanhToan.setTRANG_THAI_CHAM_NO("");
+        entityLichSuThanhToan.setTRANG_THAI_HUY("");
+        entityLichSuThanhToan.setIN_THONG_BAO_DIEN("");
+        entityLichSuThanhToan.setSO_IN_BIEN_NHAN(0);
+
+        entityLichSuThanhToan.setNGAY_PHAT_SINH(new Date());
+        entityLichSuThanhToan.setMA_GIAO_DICH(Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
+        mainModel.insertLichSuThanhToan(entityLichSuThanhToan);
+
+
+    }
+
+    private void hoaDonDaThanhToanBoiNguonKhac(BodyBillingOnlineRespone respone) {
+        /** Trường hợp hóa đơn đã được thanh toán bởi nguồn khác: Không thực hiện thanh toán hóa đơn
+         * Cập nhật Danh sách hóa đơn nợ (Bill table) đã lưu trong máy
+         * Ví thanh toán edong = null
+         * Trạng thái thanh toán status = 03_Đã thanh toán bởi nguồn khác (Trong database = 2)
+         */
+
+        mainModel.updateHoaDonNo(respone.getBillId(), Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC.getCode(), "");
+
+        //Update Hoa Don Thu
+        mainModel.updateHoaDonThu(String.valueOf(respone.getBillId()), "", Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC,
+                "", Common.TRANG_THAI_DAY_CHAM_NO.KHONG_THANH_CONG.getCode(), Common.parse(new Date(), Common.DATE_TIME_TYPE.FULL.toString()), Common.TRANG_THAI_HOAN_TRA.CHUA_TRA.getCode());
+
+
+        //Lưu lại lịch sử thanh toán
+        EntityLichSuThanhToan entityLichSuThanhToan = EntityLichSuThanhToan.copy(mainModel.getHoaDonNo(respone.getBillId()));
+
+        entityLichSuThanhToan.setVI_TTOAN("");
+        entityLichSuThanhToan.setHINH_THUC_TT(Common.HINH_THUC_TTOAN.OFFLINE.getCode());
+        entityLichSuThanhToan.setTRANG_THAI_TTOAN(Common.TRANG_THAI_TTOAN.TTOAN_BOI_NGUON_KHAC.getCode());
+        entityLichSuThanhToan.setTRANG_THAI_CHAM_NO("");
+        entityLichSuThanhToan.setTRANG_THAI_HUY("");
+        entityLichSuThanhToan.setIN_THONG_BAO_DIEN("");
+        entityLichSuThanhToan.setSO_IN_BIEN_NHAN(0);
+
+        entityLichSuThanhToan.setNGAY_PHAT_SINH(new Date());
+        entityLichSuThanhToan.setMA_GIAO_DICH(Common.MA_GIAO_DICH.DAY_CHAM_NO.getCode());
+        mainModel.insertLichSuThanhToan(entityLichSuThanhToan);
+
+
+    }
+
 
     /* private SoapAPI.AsyncSoapSynchronizeDataZip.AsyncSoapSynchronizeDataZipCallBack callBackFileGen = new SoapAPI.AsyncSoapSynchronizeDataZip.AsyncSoapSynchronizeDataZipCallBack() {
          @Override

@@ -29,6 +29,9 @@ public class ListPostBill {
     @SerializedName("description")
     @Expose
     private String description;
+    @SerializedName("pcCode")
+    @Expose
+    private String pcCode;
 
     public String getCustomerCode() {
         return customerCode;
@@ -84,5 +87,13 @@ public class ListPostBill {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getPcCode() {
+        return pcCode;
+    }
+
+    public void setPcCode(String pcCode) {
+        this.pcCode = pcCode;
     }
 }

@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements
                 hasNetworkLast = currentConnect;
             if (mHander != null && mRunableCheckPostBill != null)
                 mHander.postDelayed(mRunableCheckPostBill, Common.TIME_OUT_CHECK_CONNECTION);
+            iMainPresenter.checkAndPostBill();
         }
     };
 

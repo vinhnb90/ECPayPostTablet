@@ -403,13 +403,14 @@ public class PayPresenter implements IPayPresenter {
                     dataAdapter.getBillKH().add(bill);
 
                 }
+                dataAdapter.sortBills();
                 dataAdapter.setTotalMoney(totalMoney);
 
                 List<PayAdapter.DataAdapter> adapters = new ArrayList<PayAdapter.DataAdapter>();
                 adapters.add(dataAdapter);
 
                 try {
-                    mIPayView.showPayRecyclerPage(adapters, 0, 1, "", false);
+                    mIPayView.showPayRecyclerPage(adapters, 1, 1, "", false);
                 } catch (Exception e) {
                     e.printStackTrace();
                     mIPayView.hideSearchOnlineProcess();

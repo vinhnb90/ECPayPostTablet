@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -828,6 +829,12 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         public List<BillEntityAdapter> getBillKH() {
             return billKH;
+        }
+
+        public void sortBills()
+        {
+
+            Collections.sort(billKH, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
         }
 
 
