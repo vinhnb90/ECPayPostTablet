@@ -14,12 +14,16 @@ import com.sewoo.jpos.printer.LKPrint;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.StringTokenizer;
 
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
+import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Bill;
 
 //import java.io.UnsupportedEncodingException;
@@ -79,7 +83,7 @@ public class ESCPOSSample
 		try {
             posPtr.printBitmap(drawableToBitmap(activity.getResources().getDrawable(R.drawable.ic_evn_hanoi_ecpay_logo)),1,8);
 			posPtr.printNormal("\n\n");
-			posPtr.printText(Common.unAccent(Common.PROVIDER_CODE.findCodeMessage(billObj.getMA_DIEN_LUC()).getMessage()) +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(Common.unAccent(billObj.getMA_DL_MO_RONG()) +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText("BIEN NHAN" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_2WIDTH);
 			posPtr.printText("THANH TOAN TIEN DIEN" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 
@@ -150,7 +154,7 @@ public class ESCPOSSample
 		try {
 			posPtr.printBitmap(drawableToBitmap(activity.getResources().getDrawable(R.drawable.ic_evn_hanoi_ecpay_logo)),1,8);
 			posPtr.printNormal("\n\n");
-			posPtr.printText(Common.unAccent(Common.PROVIDER_CODE.findCodeMessage(billObj.getMA_DIEN_LUC()).getMessage()) +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(Common.unAccent(billObj.getMA_DL_MO_RONG()+"") +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText("BIEN NHAN" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_2WIDTH);
 			posPtr.printText("THANH TOAN TIEN ĐIEN" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 
@@ -158,35 +162,36 @@ public class ESCPOSSample
 			posPtr.printNormal("Dia chi: "+Common.unAccent(billObj.getDIA_CHI()) +"\n");
 			posPtr.printNormal("Ma KH: "+billObj.getMA_KHACH_HANG()+"\n");
 			posPtr.printNormal("So GCS: "+billObj.getSO_GCS()+"\n");
-			posPtr.printNormal("So cong to: "+billObj.getSO_CONG_TO() +"   Số hộ: "+billObj.getSO_HO()+"\n");
-			posPtr.printNormal("Hình thức thanh toán: tien mat\n");
-			posPtr.printNormal("Nội dung: thanh toán hóa đơn tiền điện: kỳ " + billObj.getTHANG_THANH_TOAN()+"\n");
+			posPtr.printNormal("So cong to: "+billObj.getSO_CONG_TO() +"   So ho: "+billObj.getSO_HO()+"\n");
+			posPtr.printNormal("Hinh thuc thanh toan: tien mat\n");
+			posPtr.printNormal("Noi dung: thanh toan hoa don tien dien: ky " + billObj.getTHANG_THANH_TOAN()+"\n");
 
 			posPtr.printNormal("--------------------------------");
-			posPtr.printNormal("|"+ demtext(16,billObj.getDNTT() + "")+ billObj.getDNTT()+"|");
+			posPtr.printNormal("|"+ demtext(14,billObj.getDNTT() + "")+ billObj.getDNTT()+"kwh|");
             posPtr.printText(demtext(14,billObj.getTONG_TIEN_CHUA_THUE()+"")+ billObj.getTONG_TIEN_CHUA_THUE() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
             posPtr.printNormal("| Thanh tien     |");
             posPtr.printText(demtext(14,billObj.getTONG_TIEN_CHUA_THUE())+ billObj.getTONG_TIEN_CHUA_THUE() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
             posPtr.printNormal("--------------------------------");
-            posPtr.printNormal("| Thuế GTGT      |");
+            posPtr.printNormal("| Thue GTGT      |");
 			posPtr.printText(demtext(14,billObj.getTONG_TIEN_THUE() + "")+ billObj.getTONG_TIEN_THUE() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printNormal("--------------------------------");
-			posPtr.printNormal("| Tổng cộng      |");
+			posPtr.printNormal("| Tong cong      |");
 			posPtr.printText(demtext(14,billObj.getTIEN_THANH_TOAN() +"")+ billObj.getTIEN_THANH_TOAN() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printNormal("--------------------------------");
 			posPtr.printNormal("\n\n");
-			posPtr.printNormal("Bằng chữ:................\n");
-			posPtr.printNormal("Ngày: "+ billObj.getRequestDate()+"\n");
-			posPtr.printText("Nhân viên" +"\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			String tien = ReadNumber.numberToString(billObj.getTIEN_THANH_TOAN());
+			posPtr.printNormal("Bang chu:"+ Common.unAccent(tien)+"\n");
+			posPtr.printNormal("Ngay: "+ billObj.getRequestDate()+"\n");
+			posPtr.printText("Nhan vien" +"\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText(nameNV +"\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText("0976956559" +"\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printNormal("Khach hang vui long giu lai bien nhan sau khi thanh toan.\n");
-			posPtr.printText("Xin cảm ơn!" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText("Xin cam on!" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText("ECPAY kinh moi quy khach hang vui long: " +"\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-			posPtr.printText("+ Truy cap trang web http://cskh.hcmpc.com.vn đe nhan hoa don dien tu " +"\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText("+ Truy cap trang web http://cskh.hcmpc.com.vn de nhan hoa don dien tu " +"\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText("+ Kiem tra cac thong tin phia tren, neu co van de can giai dap lien he Trung tam cham soc khach hang 1900561230*" +"\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText("ĐT sua chua: 0976208447" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-			posPtr.printText("--/lần in (2)/--"+"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText("--/lan in (2)/--"+"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.lineFeed(4);
 			posPtr.cutPaper();
 
@@ -246,7 +251,7 @@ public class ESCPOSSample
 		try {
 			posPtr.printBitmap(drawableToBitmap(activity.getResources().getDrawable(R.drawable.ic_evn_hanoi_ecpay_logo)),1,8);
 			posPtr.printNormal("\n\n");
-			posPtr.printText(Common.unAccent(billEntityAdapter.getMA_DL_MO_RONG()) +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(Common.unAccent(billEntityAdapter.getMA_DL_MO_RONG()+ "") +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText(Common.unAccent("THÔNG BÁO TIỀN ĐIỆN") +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText(Common.unAccent("(Không có giá trị thanh toán)") +"\n", LKPrint.LK_ALIGNMENT_CENTER,
 					LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
@@ -263,9 +268,9 @@ public class ESCPOSSample
 			posPtr.printNormal("--------------------------------");
 			posPtr.printNormal("| DNTT | Don gia |   Thanh tien|");
 			posPtr.printNormal("--------------------------------");
-			for (int i = 0; i <= tienTheoChiSos.size();i++){
-				posPtr.printText(demtext(7,tienTheoChiSos.get(i).getChiSo() + "")+ tienTheoChiSos.get(i).getChiSo() +"kwh|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-				posPtr.printText(demtext(10,tienTheoChiSos.get(i).getDonGia() + "")+ tienTheoChiSos.get(i).getDonGia() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			for (int i = 0; i <tienTheoChiSos.size();i++){
+				posPtr.printText("|"+demtext(4,tienTheoChiSos.get(i).getChiSo() + "")+ tienTheoChiSos.get(i).getChiSo() +"kwh|", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+				posPtr.printText(demtext(10,tienTheoChiSos.get(i).getDonGia() + "")+ tienTheoChiSos.get(i).getDonGia() +"|", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 				posPtr.printText(demtext(14,tienTheoChiSos.get(i).getTienTheoChiSo() + "")+ tienTheoChiSos.get(i).getTienTheoChiSo() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 
 			}
@@ -293,6 +298,59 @@ public class ESCPOSSample
 		return 0;
 	}
 
+	public int baoCao(Context activity, Account account, int hdGiao, long tienGiao, int hdThu, long tienThu, int hdVangLai, long tienVangLai, int hdTraKH, long tienTraKHt) throws InterruptedException {
+		try
+		{
+			rtn = posPtr.printerSts();
+			if( rtn != 0 )  return rtn;
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+			return rtn;
+		}
+
+		try {
+			posPtr.printBitmap(drawableToBitmap(activity.getResources().getDrawable(R.drawable.logoecpay)),1,8);
+			posPtr.printNormal("\n\n");
+			posPtr.printText(Common.unAccent("TỔNG HỢP GIAO THU") +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printNormal("\n\n");
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			posPtr.printNormal("Ngay in: "+ dateFormat.format(new Date()) +"\n");
+			posPtr.printNormal("Thu ngan vien: "+ Common.unAccent(account.getName()) +"\n");
+			posPtr.printNormal("--------------------------------");
+			posPtr.printNormal("|        | So HD |   Tong Tien |");
+			posPtr.printNormal("--------------------------------");
+
+			posPtr.printNormal("|  "+ "Giao" + demtext(7,"Giao")+"|");
+			posPtr.printText(demtext(8,hdGiao+"")+ hdGiao +"|", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(demtext(14,tienGiao+"")+ tienGiao +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printNormal("--------------------------------");
+			posPtr.printNormal("|  "+ "Thu" + demtext(7,"Thu")+"|");
+			posPtr.printText(demtext(8,hdThu+"")+ hdThu +"|", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(demtext(14,tienThu+"")+ tienThu +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printNormal("--------------------------------");
+			posPtr.printNormal("|  "+ "Ton" + demtext(7,"Ton")+"|");
+			posPtr.printText(demtext(8,String.valueOf(hdGiao - (hdThu - hdVangLai)))+ String.valueOf(hdGiao - (hdThu - hdVangLai)) +"|", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(demtext(14,Common.convertLongToMoney(tienGiao - (tienThu - tienVangLai))+"")+ (tienGiao - (tienThu - tienVangLai)) +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printNormal("--------------------------------");
+			posPtr.printNormal("\n\n");
+			posPtr.printNormal("Trong do: "+"\n");
+			posPtr.printNormal("Vang lai" + demtext(11,"Vang lai")+"|");
+			posPtr.printText(demtext(8,hdVangLai +"")+ hdVangLai +"|", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(demtext(13,tienVangLai+"")+ tienVangLai +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+
+			posPtr.printNormal("Hoan tra" + demtext(11,"Hoan tra")+"|");
+			posPtr.printText(demtext(8,hdTraKH +"")+ hdTraKH +"|", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(demtext(13,tienTraKHt+"")+ tienTraKHt +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+
+			posPtr.lineFeed(4);
+			posPtr.cutPaper();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
 	private class TienTheoChiSo{
 		private String chiSo;
 		private String tienTheoChiSo;

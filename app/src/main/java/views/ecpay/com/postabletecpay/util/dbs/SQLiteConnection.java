@@ -594,7 +594,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 lichsu.setTRANG_THAI_TTOAN(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN")));
                 lichsu.setVI_TTOAN(mCursor.getString(mCursor.getColumnIndex("VI_TTOAN")));
 
-
                 lichsu.setHINH_THUC_TT(mCursor.getString(mCursor.getColumnIndex("HINH_THUC_TT")));
                 lichsu.setTRANG_THAI_CHAM_NO(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_CHAM_NO")));
                 lichsu.setTRANG_THAI_HUY(mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_HUY")));
@@ -928,7 +927,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             int count = c.getCount();
             do {
 
-
                 EntityKhachHang khachHang = new EntityKhachHang();
                 khachHang.setE_DONG(c.getString(c.getColumnIndex("E_DONG")));
                 khachHang.setMA_KHANG(c.getString(c.getColumnIndex("MA_KHANG")));
@@ -1015,7 +1013,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 customer.setGIAO_THU(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("GIAO_THU"))));
                 customer.setNGAY_GIAO_THU(Common.parseDate(stringConvertNull(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU"))), Common.DATE_TIME_TYPE.FULL.toString()));
 
-
                 customerList.add(customer);
             }
             while (mCursor.moveToNext());
@@ -1054,6 +1051,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 mCursor.close();
                 return billList;
             }
+
             if (mCursor.moveToFirst()) {
                 do {
                     String tenKHang = mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"));
@@ -1079,7 +1077,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     String status = mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN"));
 
                     String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")));
-
+                    String selectFullName = "SELECT fullname FROM " + TABLE_NAME_EVN_PC + " WHERE code = '" + mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")) + "'";
+                    Cursor c = database.rawQuery(selectFullName, null);
+                    if (c.getCount() == 0)
+                    {
+                        c.close();
+                        return null;
+                    }
                     PayAdapter.BillEntityAdapter bill = new PayAdapter.BillEntityAdapter();
                     bill.setTEN_KHACH_HANG(tenKHang);
                     bill.setDIA_CHI(diaChi);
@@ -1099,10 +1103,15 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     bill.setCSDK(soDauKy);
                     bill.setCSCK(soCuoiKy);
                     bill.setSO_CONG_TO(soCto);
-                    bill.setMA_DL_MO_RONG(maDienLucMoRong);
+
                     bill.setTU_NGAY(tuNgay);
                     bill.setDEN_NGAY(denNgay);
                     bill.setSO_HO(soHo);
+
+                    if (c != null && c.moveToFirst()) {
+                        bill.setMA_DL_MO_RONG(c.getString(c.getColumnIndex("fullname")));
+                    }
+
                     bill.setMA_DIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
                     bill.setChecked(true);
                     bill.setMA_KHACH_HANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
@@ -1199,6 +1208,16 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 bill.setChecked(false);
                 bill.setMA_KHACH_HANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
 
+                String selectFullName = "SELECT fullname FROM " + TABLE_NAME_EVN_PC + " WHERE code = '" + mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")) + "'";
+                Cursor c = database.rawQuery(selectFullName, null);
+                if (c.getCount() == 0)
+                {
+                    c.close();
+                    return null;
+                }
+                if (c != null && c.moveToFirst()) {
+                    bill.setMA_DL_MO_RONG(c.getString(c.getColumnIndex("fullName")));
+                }
                 bill.setCheckEnable(!bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()));
 
                 if (bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()) && MainActivity.mEdong.equalsIgnoreCase(viThanhToan))
@@ -1286,7 +1305,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("TEN_KHANG", bodyBillResponse.getName());
         initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
 
-        initialValues.put("THANG_TTOAN", Common.parse(Common.parseDate(Common.convertToDate(bodyBillResponse.getTerm()), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
+        initialValues.put("THANG_TTOAN", Common.parse(Common.parseDate(Common.convertToDate(bodyBillResponse.getTerm()), Common.DATE_TIME_TYPE.ddMMyyyy.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
         initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
         initialValues.put("SO_TIEN_TTOAN", bodyBillResponse.getAmount());
         initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());

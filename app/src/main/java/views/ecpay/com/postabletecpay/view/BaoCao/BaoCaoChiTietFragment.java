@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -24,9 +25,27 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -84,7 +103,8 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
 
 
     Unbinder unbinder;
-
+    private boolean readExcel;
+    public static ReportChiTietAdapter adapter;
     private Calendar tuNgayDate, denNgayDate;
     private IReportChiTietPresenter reportChiTietPresenter;
 
@@ -107,6 +127,7 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
 
         tuNgayDate = Calendar.getInstance();
         denNgayDate = Calendar.getInstance();
+        readExcel = false;
 
 
         btnExport.setOnClickListener(this);
@@ -172,6 +193,14 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
             reportChiTietPresenter.search(rbMaKH.isChecked(), etSearch.getText().toString(), etTuNgay.getText().length() == 0 ? null : tuNgayDate, etDenNgay.getText().length() == 0 ? null : denNgayDate);
             return;
         }
+        if (v.getId() == R.id.btnExport){
+            if (!readExcel) {
+                readExcel = true;
+                saveExcelFile(getContext(), "My_excel.xls");
+            }else {
+                readExcelFile(getContext(),"My_excel.xls");
+            }
+        }
     }
 
 
@@ -198,7 +227,7 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void fill(List<EntityHoaDonThu> lst) {
-        ReportChiTietAdapter adapter = (ReportChiTietAdapter)rvDanhSach.getAdapter();
+        adapter = (ReportChiTietAdapter)rvDanhSach.getAdapter();
         adapter.setmBills(lst);
         adapter.notifyDataSetChanged();
 
@@ -239,5 +268,168 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         super.onStart();
         this.baoCaoView.showBackBtn(false);
     }
+    private static boolean saveExcelFile(Context context, String fileName) {
 
+        // check if available and not read only
+        if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
+            Log.e("a", "Storage not available or read only");
+            return false;
+        }
+
+        boolean success = false;
+
+        //New Workbook
+        Workbook wb = new HSSFWorkbook();
+
+        Cell c = null;
+
+        //Cell style for header row
+        CellStyle cs = wb.createCellStyle();
+        cs.setFillForegroundColor(HSSFColor.LIME.index);
+        cs.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+
+        //New Sheet
+        Sheet sheet1 = null;
+        sheet1 = wb.createSheet("myOrder");
+
+        // Generate column headings
+        Row row1 = sheet1.createRow(0);
+        c = row1.createCell(3);
+        c.setCellValue("BÁO CÁO THU CHI TIẾT");
+        c.setCellStyle(cs);
+
+        Row row = sheet1.createRow(3);
+
+        c = row.createCell(0);
+        c.setCellValue("Mã Khách Hàng");
+        c.setCellStyle(cs);
+
+        c = row.createCell(1);
+        c.setCellValue("Tên");
+        c.setCellStyle(cs);
+
+        c = row.createCell(2);
+        c.setCellValue("Kỳ");
+        c.setCellStyle(cs);
+
+        c = row.createCell(3);
+        c.setCellValue("Số Tiền");
+        c.setCellStyle(cs);
+
+        c = row.createCell(4);
+        c.setCellValue("Ngày Thu");
+        c.setCellStyle(cs);
+        Bangexcel(c,cs,sheet1);
+        sheet1.setColumnWidth(0, (15 * 500));
+        sheet1.setColumnWidth(1, (15 * 500));
+        sheet1.setColumnWidth(2, (15 * 500));
+        sheet1.setColumnWidth(3, (15 * 500));
+        sheet1.setColumnWidth(4, (15 * 500));
+
+        // Create a path where we will place our List of objects on external storage
+        File file = new File(Common.PATH_FOLDER_LOG + fileName);
+        FileOutputStream os = null;
+
+        try {
+            os = new FileOutputStream(file);
+            wb.write(os);
+            Log.w("FileUtils", "Writing file" + file);
+            success = true;
+        } catch (IOException e) {
+            Log.w("FileUtils", "Error writing " + file, e);
+        } catch (Exception e) {
+            Log.w("FileUtils", "Failed to save file", e);
+        } finally {
+            try {
+                if (null != os)
+                    os.close();
+            } catch (Exception ex) {
+            }
+        }
+        return success;
+    }
+
+    private static void Bangexcel(Cell c, CellStyle cs, Sheet sheet1){
+        if (adapter.getmBills().size() != 0) {
+            for (int i = 0; i < adapter.getmBills().size(); i++) {
+                Row row = sheet1.createRow(i + 4);
+
+                c = row.createCell(0);
+                c.setCellValue(adapter.getmBills().get(i).getMA_KHANG());
+                c.setCellStyle(cs);
+
+                c = row.createCell(1);
+                c.setCellValue(adapter.getmBills().get(i).getTEN_KHANG());
+                c.setCellStyle(cs);
+
+                c = row.createCell(2);
+                c.setCellValue(adapter.getmBills().get(i).getPHIEN_TTOAN());
+                c.setCellStyle(cs);
+
+                c = row.createCell(3);
+                c.setCellValue(adapter.getmBills().get(i).getSO_TIEN_TTOAN());
+                c.setCellStyle(cs);
+
+                c = row.createCell(4);
+                c.setCellValue(adapter.getmBills().get(i).getNGAY_THU());
+                c.setCellStyle(cs);
+            }
+        }
+
+    }
+
+    private static void readExcelFile(Context context, String filename) {
+
+        if (!isExternalStorageAvailable() || isExternalStorageReadOnly())
+        {
+            Log.e("a", "Storage not available or read only");
+            return;
+        }
+
+        try{
+            // Creating Input Stream
+            File file = new File(Common.PATH_FOLDER_LOG, filename);
+            FileInputStream myInput = new FileInputStream(file);
+
+            // Create a POIFSFileSystem object
+            POIFSFileSystem myFileSystem = new POIFSFileSystem(myInput);
+
+            // Create a workbook using the File System
+            HSSFWorkbook myWorkBook = new HSSFWorkbook(myFileSystem);
+
+            // Get the first sheet from workbook
+            HSSFSheet mySheet = myWorkBook.getSheetAt(0);
+
+            /** We now need something to iterate through the cells.**/
+            Iterator rowIter = mySheet.rowIterator();
+
+            while(rowIter.hasNext()){
+                HSSFRow myRow = (HSSFRow) rowIter.next();
+                Iterator cellIter = myRow.cellIterator();
+                while(cellIter.hasNext()){
+                    HSSFCell myCell = (HSSFCell) cellIter.next();
+                    Log.d("a", "Cell Value: " +  myCell.toString());
+                    Toast.makeText(context, "cell Value: " + myCell.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        }catch (Exception e){e.printStackTrace(); }
+
+        return;
+    }
+
+    public static boolean isExternalStorageReadOnly() {
+        String extStorageState = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(extStorageState)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isExternalStorageAvailable() {
+        String extStorageState = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(extStorageState)) {
+            return true;
+        }
+        return false;
+    }
 }
