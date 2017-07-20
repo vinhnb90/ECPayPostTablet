@@ -393,6 +393,7 @@ public class PayPresenter implements IPayPresenter {
                     bill.setMA_DIEN_LUC(billInsideCustomer.getPcCode());
                     bill.setChecked(false);
                     bill.setMA_KHACH_HANG(billInsideCustomer.getCustomerCode());
+                    bill.setSO_CONG_TO(billInsideCustomer.getElectricityMeter());
 
                     bill.setCheckEnable(true);
 

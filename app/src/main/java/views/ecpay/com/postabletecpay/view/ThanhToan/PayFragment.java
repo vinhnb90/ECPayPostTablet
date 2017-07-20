@@ -77,6 +77,7 @@ import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYes
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.Printer.ESCPOSSample;
+import views.ecpay.com.postabletecpay.view.Printer.Printer;
 import views.ecpay.com.postabletecpay.view.Printer.ReceiptUtility;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 import views.ecpay.com.postabletecpay.view.Util.BarcodeScannerDialog;
@@ -95,7 +96,6 @@ public class PayFragment extends Fragment implements
     public static final int FIRST_PAGE_INDEX = 1;
     public static final int PAGE_INCREMENT = 1;
     public static final int ROWS_ON_PAGE = 10;
-    protected static final String[] DEVICE_NAMES = new String[] { "BTPTR", "SIMPLY" };
     @Nullable
     @BindView(R.id.et_frag_thanh_toan_search)
     EditText etSearch;
@@ -242,27 +242,6 @@ public class PayFragment extends Fragment implements
     public static final int RESPONSE_BARCODE = 1000;
 
 
-    //region Bluetooth
-    private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothPort bluetoothPort;
-    ArrayAdapter<String> adapter;
-    private Vector<BluetoothDevice> remoteDevices;
-    private static final int REQUEST_ENABLE_BT = 2;
-    private ListView listBluetooth;
-    private Thread hThread;
-    private BroadcastReceiver discoveryResult;
-    private BroadcastReceiver searchFinish;
-    private BroadcastReceiver searchStart;
-    private static ProgressDialog pDialog;
-    private boolean isThongbao;
-    private boolean isSimply;
-    private boolean isBluetoothConnected;
-    private SimplyPrintController controller;
-    protected static ArrayAdapter<String> arrayAdapter;
-    protected List<BluetoothDevice> foundDevice;
-    private List<byte[]> receipts = null;
-    //endregion
-
     private Common.PROVIDER_CODE ProviderSelect = Common.PROVIDER_CODE.NCCNONE ;
 
     public enum VISIBLE_BUTTON_DELETE_DIALOG {
@@ -322,7 +301,6 @@ public class PayFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -344,7 +322,6 @@ public class PayFragment extends Fragment implements
         ((MainActivity)this.getContextView()).switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.PAY);
         setUpRecyclerFragment(rootView);
         //first page
-        isBluetoothConnected = false;
         typeSearch = Common.TYPE_SEARCH.ALL;
         mPageIndex = FIRST_PAGE_INDEX;
         try {
@@ -590,25 +567,6 @@ public class PayFragment extends Fragment implements
     @Override
     public void onDestroyView() {
         mIPayPresenter.cancelSeachOnline();
-        if (isBluetoothConnected) {
-            if (!isSimply) {
-                try {
-                    saveSettingFile();
-                    bluetoothPort.disconnect();
-                } catch (IOException e) {
-                    Log.e(TAG, e.getMessage(), e);
-                } catch (InterruptedException e) {
-                    Log.e(TAG, e.getMessage(), e);
-                }
-                if ((hThread != null) && (hThread.isAlive())) {
-                    hThread.interrupt();
-                    hThread = null;
-                }
-                isBluetoothConnected = false;
-            }else {
-                stopConnection();
-            }
-        }
         super.onDestroyView();
     }
 
@@ -905,32 +863,25 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void PrintThongBaoDien(PayAdapter.DataAdapter data) {
-        isThongbao = true;
-        if (!isBluetoothConnected) {
-            dialogChonMayIn();
-        }else
-            if (!isSimply) {
-                printer(true);
-            }else {
-                receipts = new ArrayList<byte[]>();
-                receipts.add(ReceiptUtility.genReceiptTest(getContext()));
-                controller.startPrinting(receipts.size(), 120, 120);
-            }
+//        isThongbao = true;
+//        if (!isBluetoothConnected) {
+//            dialogChonMayIn();
+//        }else
+//            if (!isSimply) {
+//                printer(true,data.getBill());
+//            }else {
+//                receipts = new ArrayList<byte[]>();
+//                receipts.add(ReceiptUtility.genReceiptTest(getContext()));
+//                controller.startPrinting(receipts.size(), 120, 120);
+//            }
+        Printer printer = new Printer(getActivity(),Printer.THONG_BAO,data.getBillKH().get(0));
+        printer.Action();
     }
 
     @Override
     public void PrintHoaDon(PayAdapter.BillEntityAdapter bill) {
-        isThongbao = false;
-        if (!isBluetoothConnected) {
-            dialogChonMayIn();
-        }else
-            if (!isSimply) {
-                printer(false);
-            } else {
-                receipts = new ArrayList<byte[]>();
-                receipts.add(ReceiptUtility.genReceiptTest(getContext()));
-                controller.startPrinting(receipts.size(), 120, 120);
-            }
+        Printer printer = new Printer(getActivity(),Printer.BIEN_NHAN,bill);
+        printer.Action();
     }
 
     @Override
@@ -1372,483 +1323,5 @@ public class PayFragment extends Fragment implements
         if (TextUtils.isEmpty(textBarcode) || etSearch == null)
             return;
         etSearch.setText(textBarcode);
-    }
-// region Setup Bluetooth
-    private void openBluetooth(){
-        loadSettingFile();
-        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
-        addPairedDevices();
-        discoveryResult = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                String key;
-                BluetoothDevice remoteDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if(remoteDevice != null)
-                {
-                    if(remoteDevice.getBondState() != BluetoothDevice.BOND_BONDED)
-                    {
-                        key = remoteDevice.getName() +"\n["+remoteDevice.getAddress()+"]";
-                    }
-                    else
-                    {
-                        key = remoteDevice.getName() +"\n["+remoteDevice.getAddress()+"] [Paired]";
-                    }
-                    if(bluetoothPort.isValidAddress(remoteDevice.getAddress()))
-                    {
-                        remoteDevices.add(remoteDevice);
-                        adapter.add(key);
-                    }
-                }
-            }
-        };
-        getContext().registerReceiver(discoveryResult, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-        searchStart = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-
-            }
-        };
-        searchFinish = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                showDialogListBlueTooth();
-                pDialog.dismiss();
-            }
-        };
-        getContext().registerReceiver(searchFinish, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
-
-    }
-    //endregion
-    //region Bluetooth
-    private void bluetoothSetup() {
-        // Initialize
-        bluetoothPort = BluetoothPort.getInstance();
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            // Device does not support Bluetooth
-            return;
-        }
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            openBluetooth();
-        }else {
-            openBluetooth();
-        }
-    }
-
-    private static final String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "//temp";
-    private static final String fileName = dir + "//BTPrinter";
-    private String lastConnAddr;
-
-    private void loadSettingFile() {
-        int rin = 0;
-        char[] buf = new char[128];
-        try {
-            FileReader fReader = new FileReader(fileName);
-            rin = fReader.read(buf);
-            if (rin > 0) {
-                lastConnAddr = new String(buf, 0, rin);
-            }
-            fReader.close();
-        } catch (FileNotFoundException e) {
-            Log.i(TAG, "Connection history not exists.");
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void saveSettingFile() {
-        try {
-            File tempDir = new File(dir);
-            if (!tempDir.exists()) {
-                tempDir.mkdir();
-            }
-            FileWriter fWriter = new FileWriter(fileName);
-            if (lastConnAddr != null)
-                fWriter.write(lastConnAddr);
-            fWriter.close();
-        } catch (FileNotFoundException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-    }
-
-    // clear device data used list.
-    private void clearBtDevData() {
-        remoteDevices = new Vector<BluetoothDevice>();
-    }
-
-    // add paired device to list
-    private void addPairedDevices() {
-        BluetoothDevice pairedDevice;
-        Iterator<BluetoothDevice> iter = (mBluetoothAdapter.getBondedDevices()).iterator();
-        while (iter.hasNext()) {
-            pairedDevice = iter.next();
-            if (bluetoothPort.isValidAddress(pairedDevice.getAddress())) {
-                remoteDevices.add(pairedDevice);
-                adapter.add(pairedDevice.getName() + "\n[" + pairedDevice.getAddress() + "] [Paired]");
-            }
-        }
-    }
-
-    private void showDialogListBlueTooth() {
-        final Dialog dialog = new Dialog(this.getActivity());
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_listbluetooth);
-        dialog.getWindow().setLayout(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
-        listBluetooth = (ListView) dialog.findViewById(R.id.dl_list_bluetooth);
-        listBluetooth.setAdapter(adapter);
-        // Connect - click the List item.
-        listBluetooth.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                BluetoothDevice btDev = remoteDevices.elementAt(arg2);
-                try {
-                    if (mBluetoothAdapter.isDiscovering()) {
-                        mBluetoothAdapter.cancelDiscovery();
-                    }
-                    btConn(btDev);
-                    dialog.dismiss();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
-            }
-        });
-        dialog.show();
-    }
-
-    // Bluetooth Connection method.
-    private void btConn(final BluetoothDevice btDev) throws IOException {
-        new connTask().execute(btDev);
-    }
-
-    // Bluetooth Disconnection method.
-    private void btDisconn() {
-        try {
-            bluetoothPort.disconnect();
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-        if ((hThread != null) && (hThread.isAlive()))
-            hThread.interrupt();
-        // UI
-        listBluetooth.setEnabled(true);
-    }
-
-    // Bluetooth Connection Task.
-    private class connTask extends AsyncTask<BluetoothDevice, Void, Integer> {
-        private final ProgressDialog dialog = new ProgressDialog(getContext());
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Integer doInBackground(BluetoothDevice... params) {
-            Integer retVal = null;
-            try {
-                bluetoothPort.connect(params[0]);
-                lastConnAddr = params[0].getAddress();
-                retVal = new Integer(0);
-            } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
-                retVal = new Integer(-1);
-            }
-            return retVal;
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-            if(result.intValue() == 0)	// Connection success.
-            {
-                RequestHandler rh = new RequestHandler();
-                hThread = new Thread(rh);
-                hThread.start();
-                // UI
-                listBluetooth.setEnabled(false);
-                if(dialog.isShowing())
-                    dialog.dismiss();
-                Toast toast = Toast.makeText(getContext(), "Đã kết nối bluetooth", Toast.LENGTH_SHORT);
-                toast.show();
-                isBluetoothConnected =true;
-                if (isThongbao)
-                    printer(true);
-                else
-                    printer(false);
-            }
-            else	// Connection failed.
-            {
-                if(dialog.isShowing())
-                    dialog.dismiss();
-            }
-            super.onPostExecute(result);
-        }
-    }
-
-    private void printer(boolean isThongBao){
-        int results = 0;
-        ESCPOSSample sample = new ESCPOSSample();
-        try {
-            if (!isThongBao)
-                results = sample.sample1(getContext());
-            else
-                results = sample.Thongbao(getContext());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        if (results != 0) {
-            switch (results) {
-                case ESCPOSConst.STS_PAPEREMPTY:
-                    Log.e(getClass().getName(),"Paper empty");
-                    break;
-                case ESCPOSConst.STS_COVEROPEN:
-                    Log.e(getClass().getName(),"cover open");
-                    break;
-                case ESCPOSConst.STS_PAPERNEAREMPTY:
-                    Log.e(getClass().getName(),"page near empty");
-                    break;
-            }
-        }
-    }
-
-    public void stopConnection() {
-        SimplyPrintController.ConnectionMode connectionMode = controller.getConnectionMode();
-        if(connectionMode == SimplyPrintController.ConnectionMode.BLUETOOTH_2) {
-            controller.stopBTv2();
-        } else if(connectionMode == SimplyPrintController.ConnectionMode.BLUETOOTH_4) {
-            controller.disconnectBTv4();
-        }
-    }
-    //endregion
-
-    //region Chon May In
-    public void dialogChonMayIn() {
-        final Dialog dialog = new Dialog(getContext());
-        dialog.setContentView(R.layout.dialog_listbluetooth);
-
-        String[] connections = new String[2];
-        connections[0] = "Simply";
-        connections[1] = "Sewoo";
-
-        ListView listView = (ListView)dialog.findViewById(R.id.dl_list_bluetooth);
-        listView.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, connections));
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(position == 0) {
-                    isSimply = true;
-                    controller = new SimplyPrintController(getContext(), new SimplyConnection());
-                    Object[] pairedObjects = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray();
-                    final BluetoothDevice[] pairedDevices = new BluetoothDevice[pairedObjects.length];
-                    for(int i = 0; i < pairedObjects.length; ++i) {
-                        pairedDevices[i] = (BluetoothDevice)pairedObjects[i];
-                    }
-                    controller.scanBTv2(DEVICE_NAMES, 120);
-                    final ArrayAdapter<String> mArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
-                    for (int i = 0; i < pairedDevices.length; ++i) {
-                        mArrayAdapter.add(pairedDevices[i].getName());
-                    }
-                    dialog.dismiss();
-                    final Dialog dialog = new Dialog(getContext());
-                    dialog.setContentView(R.layout.dialog_listbluetooth);
-
-                    ListView listView = (ListView)dialog.findViewById(R.id.dl_list_bluetooth);
-                    listView.setAdapter(mArrayAdapter);
-                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            controller.startBTv2(pairedDevices[position]);
-                            dialog.dismiss();
-                        }
-
-                    });
-                    dialog.show();
-                } else if(position == 1) {
-                    bluetoothSetup();
-                    isSimply = false;
-                    dialog.dismiss();
-                    if (!bluetoothPort.isConnected()) {
-                        if (!mBluetoothAdapter.isDiscovering()) {
-                            clearBtDevData();
-                            adapter.clear();
-                            mBluetoothAdapter.startDiscovery();
-                            pDialog = new ProgressDialog(getActivity());
-                            pDialog.show();
-                            pDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                            pDialog.setContentView(R.layout.progress_dialog);
-                        } else {
-                            mBluetoothAdapter.cancelDiscovery();
-                        }
-                    }else {
-                        if (isThongbao)
-                            printer(true);
-                        else
-                            printer(false);
-                    }
-                }
-            }
-
-        });
-        dialog.show();
-    }
-
-    //endregion
-    private class SimplyConnection implements SimplyPrintController.SimplyPrintControllerListener{
-        @Override
-        public void onBTv2Detected() {
-        }
-
-        @Override
-        public void onBTv2DeviceListRefresh(List<BluetoothDevice> foundDevices) {
-            foundDevice = foundDevices;
-            if(arrayAdapter != null) {
-                arrayAdapter.clear();
-                for(int i = 0; i < foundDevices.size(); ++i) {
-                    arrayAdapter.add(foundDevices.get(i).getName());
-                }
-                arrayAdapter.notifyDataSetChanged();
-            }
-        }
-
-        @Override
-        public void onBTv2Connected(BluetoothDevice bluetoothDevice) {
-            isBluetoothConnected = true;
-            receipts = new ArrayList<byte[]>();
-//                receipts.add(ReceiptUtility.genReceipt(MainActivity.this));
-            receipts.add(ReceiptUtility.genReceiptTest(getContext()));
-            controller.startPrinting(receipts.size(), 120, 120);
-        }
-
-        @Override
-        public void onBTv2Disconnected() {
-            Log.e(getClass().getName(),"Disconnected");
-        }
-
-        @Override
-        public void onBTv2ScanStopped() {
-            Toast.makeText(getContext(),"error",Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onBTv2ScanTimeout() {
-            Log.e(getClass().getName(),"Scan Timeout");
-        }
-
-        @Override
-        public void onBTv4DeviceListRefresh(List<BluetoothDevice> foundDevices) {
-            foundDevice = foundDevices;
-            if(arrayAdapter != null) {
-                arrayAdapter.clear();
-                for(int i = 0; i < foundDevices.size(); ++i) {
-                    arrayAdapter.add(foundDevices.get(i).getName());
-                }
-                arrayAdapter.notifyDataSetChanged();
-            }
-        }
-
-        @Override
-        public void onBTv4Connected() {
-        }
-
-        @Override
-        public void onBTv4Disconnected() {
-        }
-
-        @Override
-        public void onBTv4ScanStopped() {
-        }
-
-        @Override
-        public void onBTv4ScanTimeout() {
-        }
-
-        @Override
-        public void onReturnDeviceInfo(Hashtable<String, String> deviceInfoTable) {
-            String productId = deviceInfoTable.get("productId");
-            String firmwareVersion = deviceInfoTable.get("firmwareVersion");
-            String bootloaderVersion = deviceInfoTable.get("bootloaderVersion");
-            String hardwareVersion = deviceInfoTable.get("hardwareVersion");
-            String isUsbConnected = deviceInfoTable.get("isUsbConnected");
-            String isCharging = deviceInfoTable.get("isCharging");
-            String batteryLevel = deviceInfoTable.get("batteryLevel");
-
-        }
-
-        @Override
-        public void onReturnPrinterResult(SimplyPrintController.PrinterResult printerResult) {
-            if(printerResult == SimplyPrintController.PrinterResult.SUCCESS) {
-            } else if(printerResult == SimplyPrintController.PrinterResult.NO_PAPER) {
-            } else if(printerResult == SimplyPrintController.PrinterResult.WRONG_CMD) {
-            } else if(printerResult == SimplyPrintController.PrinterResult.OVERHEAT) {
-
-            }
-        }
-
-        @Override
-        public void onReturnGetDarknessResult(int value) {
-        }
-
-        @Override
-        public void onReturnSetDarknessResult(boolean isSuccess) {
-            if(isSuccess) {
-            } else {
-            }
-        }
-
-        @Override
-        public void onRequestPrinterData(int index, boolean isReprint) {
-            controller.sendPrinterData(receipts.get(index));
-            if(isReprint) {
-
-            } else {
-            }
-        }
-
-        @Override
-        public void onPrinterOperationEnd() {
-
-        }
-
-        @Override
-        public void onBatteryLow(SimplyPrintController.BatteryStatus batteryStatus) {
-            if(batteryStatus == SimplyPrintController.BatteryStatus.LOW) {
-            } else if(batteryStatus == SimplyPrintController.BatteryStatus.CRITICALLY_LOW) {
-            }
-        }
-
-        @Override
-        public void onBTv2DeviceNotFound() {
-        }
-
-
-        @Override
-        public void onError(SimplyPrintController.Error errorState) {
-            if(errorState == SimplyPrintController.Error.UNKNOWN) {
-            } else if(errorState == SimplyPrintController.Error.CMD_NOT_AVAILABLE) {
-            } else if(errorState == SimplyPrintController.Error.TIMEOUT) {
-            } else if(errorState == SimplyPrintController.Error.DEVICE_BUSY) {
-            } else if(errorState == SimplyPrintController.Error.INPUT_OUT_OF_RANGE) {
-            } else if(errorState == SimplyPrintController.Error.INPUT_INVALID) {
-            } else if(errorState == SimplyPrintController.Error.CRC_ERROR) {
-            } else if(errorState == SimplyPrintController.Error.FAIL_TO_START_BTV2) {
-            } else if(errorState == SimplyPrintController.Error.COMM_LINK_UNINITIALIZED) {
-            } else if(errorState == SimplyPrintController.Error.BTV2_ALREADY_STARTED) {
-            }
-        }
     }
 }

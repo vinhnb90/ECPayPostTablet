@@ -53,6 +53,12 @@ public class BodyBillResponse {
     @SerializedName("toDate")
     @Expose
     private String toDate;
+    @SerializedName("strFromDate")
+    @Expose
+    private String strFromDate;
+    @SerializedName("strToDate")
+    @Expose
+    private String strToDate;
     @SerializedName("home")
     @Expose
     private String home;
@@ -113,7 +119,9 @@ public class BodyBillResponse {
     @SerializedName("billingBy")
     @Expose
     private String billingBy;
-
+    @SerializedName("pcCodeExt")
+    @Expose
+    private String pcCodeExt;
     @SerializedName("electricityMeter")
     @Expose
     private String electricityMeter;
@@ -482,5 +490,29 @@ public class BodyBillResponse {
 
     public void setRequestDate(String requestDate) {
         this.requestDate = requestDate;
+    }
+
+    public String getPcCodeExt() {
+        return pcCodeExt;
+    }
+
+    public void setPcCodeExt(String pcCodeExt) {
+        this.pcCodeExt = pcCodeExt;
+    }
+
+    public String getStrFromDate() {
+        return strFromDate;
+    }
+
+    public void setStrFromDate(String strFromDate) {
+        this.strFromDate = strFromDate;
+    }
+
+    public String getStrToDate() {
+        return strToDate;
+    }
+
+    public void setStrToDate(String strToDate) {
+        this.strToDate = strToDate;
     }
 }

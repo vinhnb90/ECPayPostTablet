@@ -3,6 +3,7 @@ package views.ecpay.com.postabletecpay.view.BaoCao;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -50,8 +51,9 @@ public class BaoCaoFragment extends Fragment implements View.OnClickListener, IB
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        onSaveInstanceState(savedInstanceState);
     }
 
     @Override

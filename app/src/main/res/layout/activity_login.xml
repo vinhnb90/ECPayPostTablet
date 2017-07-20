@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
+    android:clickable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
 
     <ImageView
@@ -12,17 +14,6 @@
         android:layout_alignParentBottom="true"
         android:adjustViewBounds="true"
         android:src="@drawable/login1" />
-
-
-    <!--
-        <TextView
-            android:id="@+id/tv_ac_login_message"
-            android:textStyle="italic"
-            android:layout_below="@+id/ivLogo"
-            android:textColor="@color/colorRed"
-            android:gravity="center_horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />-->
 
 
     <ImageView

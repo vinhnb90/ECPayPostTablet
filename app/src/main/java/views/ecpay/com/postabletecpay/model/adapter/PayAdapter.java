@@ -140,6 +140,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             if(payPresenter.getPayModel().containBillInSelected(data.get(position).getBillKH().get(i).getBillId()))
             {
                 isShowBill = true;
+                data.get(position).setBill(data.get(position).getBillKH().get(i));
                 break;
             }
         }
@@ -286,10 +287,12 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         private String TEN_KHACH_HANG;
         private String DIA_CHI;
         private String MA_DIEN_LUC;
+        private String SO_GCS;
         private String SO_HO;
         private String SO_CONG_TO;
         private String CSDK;
         private String CSCK;
+        private String PHIEN_THANH_TOAN;
         private String MA_HOA_DON;
         private String CHI_TIET_KG;
         private String CHI_TIET_MCS;
@@ -297,6 +300,9 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         private String DNTT;
         private String TONG_TIEN_CHUA_THUE;
         private String TONG_TIEN_THUE;
+        private String MA_DL_MO_RONG;
+        private String TU_NGAY;
+        private String DEN_NGAY;
 
         private String messageError = "";
 
@@ -329,6 +335,22 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         public void setMA_KHACH_HANG(String MA_KHACH_HANG) {
             this.MA_KHACH_HANG = MA_KHACH_HANG;
+        }
+
+        public String getSO_GCS() {
+            return SO_GCS;
+        }
+
+        public void setSO_GCS(String SO_GCS) {
+            this.SO_GCS = SO_GCS;
+        }
+
+        public String getPHIEN_THANH_TOAN() {
+            return PHIEN_THANH_TOAN;
+        }
+
+        public void setPHIEN_THANH_TOAN(String PHIEN_THANH_TOAN) {
+            this.PHIEN_THANH_TOAN = PHIEN_THANH_TOAN;
         }
 
         public String getDIA_CHI() {
@@ -514,6 +536,30 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         public void setTONG_TIEN_THUE(String TONG_TIEN_THUE) {
             this.TONG_TIEN_THUE = TONG_TIEN_THUE;
+        }
+
+        public String getMA_DL_MO_RONG() {
+            return MA_DL_MO_RONG;
+        }
+
+        public void setMA_DL_MO_RONG(String MA_DL_MO_RONG) {
+            this.MA_DL_MO_RONG = MA_DL_MO_RONG;
+        }
+
+        public String getTU_NGAY() {
+            return TU_NGAY;
+        }
+
+        public void setTU_NGAY(String TU_NGAY) {
+            this.TU_NGAY = TU_NGAY;
+        }
+
+        public String getDEN_NGAY() {
+            return DEN_NGAY;
+        }
+
+        public void setDEN_NGAY(String DEN_NGAY) {
+            this.DEN_NGAY = DEN_NGAY;
         }
 
         @Override
@@ -797,6 +843,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     public static class DataAdapter {
         private EntityKhachHang infoKH;
         private List<BillEntityAdapter> billKH;
+        private BillEntityAdapter bill;
         private long totalMoney;
         private boolean isShowBill;
 
@@ -813,6 +860,14 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         public void setTotalMoney(long totalMoney) {
             this.totalMoney = totalMoney;
+        }
+
+        public BillEntityAdapter getBill() {
+            return bill;
+        }
+
+        public void setBill(BillEntityAdapter bill) {
+            this.bill = bill;
         }
 
         public boolean isShowBill() {

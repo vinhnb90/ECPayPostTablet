@@ -63,6 +63,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.security.PrivateKey;
 import java.text.DecimalFormatSymbols;
+import java.text.Normalizer;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -74,6 +75,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -331,6 +333,11 @@ public class Common {
         }
     }
 
+    public static String unAccent(String s) {
+        String temp = Normalizer.normalize(s, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(temp).replaceAll("").replaceAll("Đ", "D").replace("đ", "d");
+    }
     public enum STATE_OF_DEBT {
         NULL(0, ""),
         CHUA_CHAM(1, "Chưa chấm nợ"),

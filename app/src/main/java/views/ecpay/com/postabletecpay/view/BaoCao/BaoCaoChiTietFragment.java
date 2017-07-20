@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -24,9 +25,28 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -84,7 +104,7 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
 
 
     Unbinder unbinder;
-
+    private ReportChiTietAdapter adapter;
     private Calendar tuNgayDate, denNgayDate;
     private IReportChiTietPresenter reportChiTietPresenter;
 
@@ -99,6 +119,11 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         return fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -107,7 +132,6 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
 
         tuNgayDate = Calendar.getInstance();
         denNgayDate = Calendar.getInstance();
-
 
         btnExport.setOnClickListener(this);
         btnTimKiem.setOnClickListener(this);
@@ -138,8 +162,8 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rvDanhSach.setLayoutManager(layoutManager);
 
-
-        rvDanhSach.setAdapter(new ReportChiTietAdapter());
+        adapter = new ReportChiTietAdapter();
+        rvDanhSach.setAdapter(adapter);
         rvDanhSach.invalidate();
 
 
@@ -172,6 +196,17 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
             reportChiTietPresenter.search(rbMaKH.isChecked(), etSearch.getText().toString(), etTuNgay.getText().length() == 0 ? null : tuNgayDate, etDenNgay.getText().length() == 0 ? null : denNgayDate);
             return;
         }
+        if (v.getId() == R.id.btnExport){
+            if (adapter.getmBills().size() != 0) {
+                Date date = new Date();
+                String strDateFormat = "dd/MM/yyyy";
+                SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
+                saveExcelFile("Bao cao thu chi tiet" +sdf.format(date) +".xls");
+
+            }else {
+                Toast.makeText(getContext(),"Không có hóa đơn",Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
 
@@ -198,7 +233,7 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void fill(List<EntityHoaDonThu> lst) {
-        ReportChiTietAdapter adapter = (ReportChiTietAdapter)rvDanhSach.getAdapter();
+        adapter = (ReportChiTietAdapter)rvDanhSach.getAdapter();
         adapter.setmBills(lst);
         adapter.notifyDataSetChanged();
 
@@ -239,5 +274,133 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         super.onStart();
         this.baoCaoView.showBackBtn(false);
     }
+    private boolean saveExcelFile(String fileName) {
 
+        // check if available and not read only
+        if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
+            Log.e("a", "Storage not available or read only");
+            return false;
+        }
+
+        boolean success = false;
+
+        //New Workbook
+        Workbook wb = new HSSFWorkbook();
+
+        Cell c = null;
+
+        //Cell style for header row
+        CellStyle cs = wb.createCellStyle();
+        cs.setFillForegroundColor(HSSFColor.LIME.index);
+        cs.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+
+        CellStyle cs1 = wb.createCellStyle();
+        cs1.setFillForegroundColor(HSSFColor.WHITE.index);
+        cs1.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        //New Sheet
+        Sheet sheet1 = null;
+        sheet1 = wb.createSheet("myOrder");
+
+        // Generate column headings
+        Row row1 = sheet1.createRow(0);
+        c = row1.createCell(2);
+        c.setCellValue("BÁO CÁO THU CHI TIẾT");
+        c.setCellStyle(cs);
+
+        Row row = sheet1.createRow(3);
+
+        c = row.createCell(0);
+        c.setCellValue("Mã Khách Hàng");
+        c.setCellStyle(cs);
+
+        c = row.createCell(1);
+        c.setCellValue("Tên");
+        c.setCellStyle(cs);
+
+        c = row.createCell(2);
+        c.setCellValue("Kỳ");
+        c.setCellStyle(cs);
+
+        c = row.createCell(3);
+        c.setCellValue("Số Tiền");
+        c.setCellStyle(cs);
+
+        c = row.createCell(4);
+        c.setCellValue("Ngày Thu");
+        c.setCellStyle(cs);
+        Bangexcel(c,cs1,sheet1);
+        sheet1.setColumnWidth(0, (15 * 300));
+        sheet1.setColumnWidth(1, (15 * 500));
+        sheet1.setColumnWidth(2, (15 * 300));
+        sheet1.setColumnWidth(3, (15 * 500));
+        sheet1.setColumnWidth(4, (15 * 500));
+
+        // Create a path where we will place our List of objects on external storage
+        File file = new File(Common.PATH_FOLDER_LOG + fileName);
+        FileOutputStream os = null;
+
+        try {
+            os = new FileOutputStream(file);
+            wb.write(os);
+            success = true;
+            Toast.makeText(getContext(),"Đã xuất ra file excel thành công",Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Log.w("FileUtils", "Error writing " + file, e);
+        } catch (Exception e) {
+            Log.w("FileUtils", "Failed to save file", e);
+        } finally {
+            try {
+                if (null != os)
+                    os.close();
+            } catch (Exception ex) {
+            }
+        }
+        return success;
+    }
+
+    private void Bangexcel(Cell c, CellStyle cs, Sheet sheet1){
+        if (adapter.getmBills().size() != 0) {
+
+            for (int i = 0; i < adapter.getmBills().size(); i++) {
+                Row row = sheet1.createRow(i + 4);
+
+                c = row.createCell(0);
+                c.setCellValue(adapter.getmBills().get(i).getMA_KHANG());
+                c.setCellStyle(cs);
+
+                c = row.createCell(1);
+                c.setCellValue(adapter.getmBills().get(i).getTEN_KHANG());
+                c.setCellStyle(cs);
+
+                c = row.createCell(2);
+                c.setCellValue(Common.parse(adapter.getmBills().get(i).getTHANG_TTOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString()));
+                c.setCellStyle(cs);
+
+                c = row.createCell(3);
+                c.setCellValue(adapter.getmBills().get(i).getSO_TIEN_TTOAN()+"");
+                c.setCellStyle(cs);
+
+                c = row.createCell(4);
+                c.setCellValue(Common.parse(adapter.getmBills().get(i).getNGAY_THU(), Common.DATE_TIME_TYPE.ddMMyyyy.toString()));
+                c.setCellStyle(cs);
+            }
+        }
+
+    }
+
+    public static boolean isExternalStorageReadOnly() {
+        String extStorageState = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(extStorageState)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isExternalStorageAvailable() {
+        String extStorageState = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(extStorageState)) {
+            return true;
+        }
+        return false;
+    }
 }

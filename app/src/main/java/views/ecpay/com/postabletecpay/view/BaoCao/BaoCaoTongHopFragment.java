@@ -24,6 +24,8 @@ import views.ecpay.com.postabletecpay.presenter.ReportTongHopPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.view.ICommonView;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
+import views.ecpay.com.postabletecpay.view.Printer.Printer;
 
 /**
  * Created by macbook on 4/30/17.
@@ -73,6 +75,11 @@ public class BaoCaoTongHopFragment extends Fragment implements View.OnClickListe
 
     Unbinder unbinder;
 
+    Account account;
+    int hdGiao, hdThu,hdVangLai,hdTraKH;
+    long tienGiao, tienThu,tienVangLai,tienTraKHt;
+
+
     private IReportTongHopPresenter reportTongHopPresenter;
 
 
@@ -113,11 +120,24 @@ public class BaoCaoTongHopFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-
+        if(v.getId() == R.id.btInBaoCao){
+            Printer printer = new Printer(getActivity(),Printer.BAO_CAO,account,hdGiao,tienGiao,hdThu,tienThu,hdVangLai,tienVangLai,hdTraKH,tienTraKHt);
+            printer.Action();
+        }
     }
 
     @Override
     public void fill(Account account, int hdGiao, long tienGiao, int hdThu, long tienThu, int hdVangLai, long tienVangLai, int hdTraKH, long tienTraKHt) {
+        this.account = account;
+        this.hdGiao = hdGiao;
+        this.tienGiao =  tienGiao;
+        this.hdThu = hdThu;
+        this.tienThu = tienThu;
+        this.hdVangLai = hdVangLai;
+        this.tienVangLai = tienVangLai;
+        this.hdTraKH = hdTraKH;
+        this.tienTraKHt = tienTraKHt;
+
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         tvNgayIn.setText(dateFormat.format(new Date()));
 
