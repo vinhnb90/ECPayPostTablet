@@ -676,6 +676,7 @@ public class PayFragment extends Fragment implements
         return getContext();
     }
 
+    //TODO mark Trang
     @Override
     public void showPayRecyclerPage(List<PayAdapter.DataAdapter> adapterList, int indexBegin, int totalPage, String infoSearch, boolean isSeachOnline) {
         try
@@ -795,7 +796,7 @@ public class PayFragment extends Fragment implements
         if (TextUtils.isEmpty(message))
             return;
 
-        tvTitleSearch.setVisibility(View.GONE);
+        tvTitleSearch.setVisibility(View.VISIBLE);
         rvProgressSearchOnline.setVisibility(View.VISIBLE);
         pbarSearchOnline.setVisibility(View.GONE);
         ibtnCancelSearchOnline.setVisibility(View.GONE);
@@ -967,7 +968,7 @@ public class PayFragment extends Fragment implements
                     //dismiss
                 }
             };
-            Common.showDialog(getContext(), yesNoDialog, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), tvMessageDialog.getText().toString(), false, typeDialog);
+            Common.showDialog(PayFragment.this.getContextView(), yesNoDialog, Common.TEXT_DIALOG.TITLE_DEFAULT.toString(), tvMessageDialog.getText().toString(), false, typeDialog);
         }
     }
 

@@ -209,7 +209,7 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
                         for (lastCHeck += 1; lastCHeck < listBillChecked.size(); lastCHeck++) {
                             if(listBillChecked.get(lastCHeck).getMA_KHACH_HANG().equalsIgnoreCase(MA_KHACH_HANG) && listBillChecked.get(lastCHeck).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && listBillChecked.get(lastCHeck).isChecked())
                             {
-                                iPayView.processUnCheckedBillDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10005.getMessage() + Common.TEXT_MULTI_SPACE + bill.getMA_KHACH_HANG(), Common.TYPE_DIALOG.LOI);
+                                iPayView.processUnCheckedBillDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10005.getMessage() + Common.TEXT_MULTI_SPACE + listBillChecked.get(lastCHeck).getMA_KHACH_HANG(), Common.TYPE_DIALOG.LOI);
                                 showDialog = true;
 
                             }

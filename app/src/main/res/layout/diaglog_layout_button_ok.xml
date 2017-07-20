@@ -21,18 +21,20 @@
             android:background="@android:color/transparent"
             android:orientation="vertical">
 
+
+
             <TextView
                 android:id="@+id/tv_dialog_layout_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimary"
                 android:gravity="center_horizontal"
-                android:padding="@dimen/_15sdp"
+                android:padding="@dimen/_5sdp"
                 android:text="Thông báo"
                 android:textAllCaps="true"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/_22sdp"
-                android:textStyle="normal" />
+                android:textSize="@dimen/_12sdp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_gravity="center"
@@ -50,7 +52,7 @@
                     android:layout_height="@dimen/_20sdp" />
 
                 <TextView
-                    android:layout_marginLeft="@dimen/_2sdp"
+                    android:layout_marginLeft="@dimen/_5sdp"
                     android:layout_toRightOf="@+id/ibtn_dialog_layout_ico1n"
                     android:id="@+id/tv_dialog_layout_message"
                     android:layout_width="wrap_content"
@@ -76,7 +78,7 @@
             <Button
                 android:id="@+id/btn_dialog_layout_button_cancel"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_24sdp"
                 android:layout_marginRight="@dimen/_50sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_gray"
@@ -87,7 +89,7 @@
             <Button
                 android:id="@+id/btn_dialog_layout_button_ok"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_24sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_button_orange"
                 android:textSize="@dimen/_10sdp"

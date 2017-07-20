@@ -470,7 +470,7 @@ public class PayPresenter implements IPayPresenter {
             mIPayView.showPayingRviewDialogFinish();
             return;
         }
-
+//TODO mark
         if(!isPayOnline) { //Thanh Toan Offline
             //Kiểm tra địa bàn thanh toán
 
