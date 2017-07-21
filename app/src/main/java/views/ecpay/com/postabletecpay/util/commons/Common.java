@@ -645,7 +645,7 @@ public class Common {
                 return "Kiểm tra kết nối wifi!";
 
             if (ERR_NETWORK == this)
-                return "Kiểm tra kết nối internet của wifi!";
+                return "Kiểm tra kết nối mạng!";
 
             if (LOGIN_ERR_USER == this)
                 return "Tên đăng nhập là chữ thường, chữ hoa, các kí tự đặc biệt, dưới 8 kí tự và không để trống!";
@@ -797,10 +797,10 @@ public class Common {
 
     public enum CODE_REPONSE_SEARCH_ONLINE {
         e000("000", "Khách hàng còn nợ"),
-        e2013("2013", "Mã KH không thuộc đơn vị nào đã khai báo trong hệ thống"),
-        e0017("0017", "Không tồn tại KH nào thỏa mãn điều kiện tra cứu"),
-        e0025("0025", "KH không còn nợ hóa đơn nào tại thời điểm hiện tại."),
-        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ");
+        e2013("2013", "Khách hàng không thuộc điện lực khai báo!"),
+        e0017("0017", "Khách hàng không tồn tại!"),
+        e0025("0025", "Khách hàng không còn nợ hóa đơn nào tại thời điểm hiện tại."),
+        e9999("9999", "Lỗi hệ thống!");
 
         CODE_REPONSE_SEARCH_ONLINE(String code, String message) {
             this.code = code;

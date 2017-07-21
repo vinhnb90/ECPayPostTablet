@@ -1116,7 +1116,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
             if (mCursor.moveToFirst()) {
                 do {
-                    String tenKHang = mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"));
+                    String tenKHang = mCursor.getString(4);
                     String diaChi = mCursor.getString(mCursor.getColumnIndex("DIA_CHI"));
                     String viThanhToan = mCursor.getString(mCursor.getColumnIndex("VI_TTOAN"));
                     String chiTietKhungGia = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_KG"));
@@ -1141,7 +1141,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")));
                     String selectFullName = "SELECT fullname FROM " + TABLE_NAME_EVN_PC + " WHERE code = '" + mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")) + "'";
                     Cursor c = database.rawQuery(selectFullName, null);
-                    if (c.getCount() == 0)
+                    if (c!= null && c.getCount() == 0)
                     {
                         c.close();
                         return null;
@@ -1188,6 +1188,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     bill.setRequestDate(dateRequest);
 
                     billList.add(bill);
+
+                    if (c!= null )
+                        c.close();
                 }
                 while (mCursor.moveToNext());
             }
@@ -1290,6 +1293,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 bill.setRequestDate(dateRequest);
 
                 billList.add(bill);
+
+                if(c != null)
+                    c.close();
             }
             while (mCursor.moveToNext());
         }
