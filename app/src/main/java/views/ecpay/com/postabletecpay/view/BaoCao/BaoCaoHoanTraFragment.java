@@ -169,9 +169,9 @@ public class BaoCaoHoanTraFragment extends Fragment implements View.OnClickListe
         }if (v.getId() == R.id.btnExport){
             if (adapter.getmBills().size() != 0) {
                 Date date = new Date();
-                String strDateFormat = "dd/MM/yyyy";
+                String strDateFormat = "dd_MM_yyyy";
                 SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
-                saveExcelFile("Bao cao hoan tra" +sdf.format(date) +".xls");
+                saveExcelFile("Bao_cao_hoan_tra_" +sdf.format(date) +".xls");
 
             }else {
                 Toast.makeText(getContext(),"Không có hóa đơn",Toast.LENGTH_LONG).show();
@@ -317,7 +317,7 @@ public class BaoCaoHoanTraFragment extends Fragment implements View.OnClickListe
         sheet1.setColumnWidth(6, (15 * 500));
 
         // Create a path where we will place our List of objects on external storage
-        File file = new File(Common.PATH_FOLDER_LOG + fileName);
+        File file = new File(Common.PATH_FOLDER_LOG , fileName);
         FileOutputStream os = null;
 
         try {

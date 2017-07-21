@@ -331,7 +331,8 @@ public class CashTranferFragment extends Fragment implements View.OnClickListene
         if(visible)
             hLoading.setVisibility(View.VISIBLE);
         else
-            hLoading.setVisibility(View.GONE);
+            if (hLoading != null)
+                hLoading.setVisibility(View.GONE);
     }
 
     void refreshCaptcha()
