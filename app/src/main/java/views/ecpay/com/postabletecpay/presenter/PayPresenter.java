@@ -305,7 +305,7 @@ public class PayPresenter implements IPayPresenter {
                 public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
                     if(response != null)
                     {
-
+                        mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                         Common.CODE_REPONSE_SEARCH_ONLINE codeResponse = Common.CODE_REPONSE_SEARCH_ONLINE.findCodeMessage(response.getFooter().getResponseCode());
                         if (codeResponse != Common.CODE_REPONSE_SEARCH_ONLINE.e000) {
                             mIPayView.showMessageNotifySearchOnline(codeResponse.getMessage(), Common.TYPE_DIALOG.LOI);
@@ -404,7 +404,7 @@ public class PayPresenter implements IPayPresenter {
                     dataAdapter.getBillKH().add(bill);
 
                 }
-                dataAdapter.sortBills();
+                //dataAdapter.sortBills();
                 dataAdapter.setTotalMoney(totalMoney);
 
                 List<PayAdapter.DataAdapter> adapters = new ArrayList<PayAdapter.DataAdapter>();
@@ -631,7 +631,7 @@ public class PayPresenter implements IPayPresenter {
                             }
                             return;
                         }
-
+                        mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                         //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu không thành công
                         final Common.CODE_REPONSE_BILL_ONLINE codeResponse = Common.CODE_REPONSE_BILL_ONLINE.findCodeMessage(response.getFooter().getResponseCode());
                         BodyBillingOnlineRespone body = response.getBodyByType();
@@ -770,6 +770,11 @@ public class PayPresenter implements IPayPresenter {
                         @Override
                         public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
 
+                            if(response == null)
+                            {
+                                mIPayView.showPayingRviewDialogFinish();
+                                mIPayView.refreshAdapterPayRecyclerListBills(false);
+                            }
                             if(response != null && response.getFooter().getResponseCode().equalsIgnoreCase("000"))
                             {
                                 final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -778,7 +783,7 @@ public class PayPresenter implements IPayPresenter {
                                 BodyBalanceRespone.ResponseRequestBalance resBalance = gson.fromJson(((BodyBalanceRespone)response.getBody()).getResponseRequestBalance(), BodyBalanceRespone.ResponseRequestBalance.class);
                                 mPayModel.updateSoDuKhaDung(resBalance.geteDong(), resBalance.getBalance(), resBalance.getLockMoney());
                             }
-
+                            mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                             showMessageSuccess(tienTT_THanhCong);
                             mIPayView.showPayingRviewDialogFinish();
                             mIPayView.refreshAdapterPayRecyclerListBills(false);
@@ -997,7 +1002,7 @@ public class PayPresenter implements IPayPresenter {
                     if (response == null) {
                         return;
                     }
-
+                    mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                     // Kiểm tra trạng thái thanh toán hóa đơn (tương đương API CHECK-TRANS)
                     // Nếu hóa đơn không do TNV thanh toán  Thông báo lỗi
                     // Nếu hóa đơn không ở trạng thái đã thanh toán sang EVN hoặc chờ xử lý chấm nợ  Thông báo lỗi
@@ -1223,7 +1228,7 @@ public class PayPresenter implements IPayPresenter {
                     if (response == null) {
                         return;
                     }
-
+                    mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                     // Kiểm tra trạng thái thanh toán hóa đơn (tương đương API CHECK-TRANS)
                     // Nếu hóa đơn không do TNV thanh toán  Thông báo lỗi
                     // Nếu hóa đơn không ở trạng thái đã thanh toán sang EVN hoặc chờ xử lý chấm nợ  Thông báo lỗi

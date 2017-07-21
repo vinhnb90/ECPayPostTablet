@@ -31,6 +31,7 @@ import com.roughike.bottombar.OnTabSelectListener;
 
 import org.apache.log4j.chainsaw.Main;
 
+import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.IMainPresenter;
 import views.ecpay.com.postabletecpay.presenter.MainPresenter;
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements
     public void startShowPbarDownload() {
         if(progressDialog == null)
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Downloading file ...");
+        progressDialog.setMessage("Đang đồng bộ dữ liệu ...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false);
@@ -490,6 +491,19 @@ public class MainActivity extends AppCompatActivity implements
 
     public interface IOnPauseScannerBarcodeListner {
         public void pause();
+    }
+
+    @Override
+    public void showRespone(String code, String description) {
+        if(!Config.isShowRespone())
+            return;
+
+        try {
+            Toast.makeText(this, "CODE: " + code + "\n DESCRIPTION: " + description, Toast.LENGTH_LONG).show();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
 }

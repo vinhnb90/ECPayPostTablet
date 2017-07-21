@@ -160,7 +160,7 @@ public class PayModel extends CommonModel {
                 listBill.first.get(i).setDIA_CHI(customer.getDIA_CHI());
             }
 
-            Collections.sort(listBill.first, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
+            //Collections.sort(listBill.first, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
             PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(customer, listBill.first, listBill.second);
             mDataPayAdapter.add(dataAdapter);
         }

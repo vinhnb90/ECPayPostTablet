@@ -20,6 +20,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/*
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -28,7 +29,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-
+*/
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,6 +41,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.ReportChiTietAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.ReportHoanTraAdapter;
@@ -253,7 +255,7 @@ public class BaoCaoHoanTraFragment extends Fragment implements View.OnClickListe
         }
 
         boolean success = false;
-
+        /*
         //New Workbook
         Workbook wb = new HSSFWorkbook();
 
@@ -336,9 +338,10 @@ public class BaoCaoHoanTraFragment extends Fragment implements View.OnClickListe
             } catch (Exception ex) {
             }
         }
+        */
         return success;
     }
-
+    /*
     private static void Bangexcel(Cell c, CellStyle cs, Sheet sheet1){
         if (adapter.getmBills().size() != 0) {
 
@@ -376,6 +379,7 @@ public class BaoCaoHoanTraFragment extends Fragment implements View.OnClickListe
         }
 
     }
+    */
 
     public static boolean isExternalStorageReadOnly() {
         String extStorageState = Environment.getExternalStorageState();
@@ -391,5 +395,18 @@ public class BaoCaoHoanTraFragment extends Fragment implements View.OnClickListe
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void showRespone(String code, String description) {
+        if(!Config.isShowRespone())
+            return;
+
+        try {
+            Toast.makeText(this.getContext(), "CODE: " + code, Toast.LENGTH_LONG).show();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }

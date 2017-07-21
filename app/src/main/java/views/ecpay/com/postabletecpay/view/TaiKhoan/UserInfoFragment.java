@@ -22,12 +22,14 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Optional;
 import butterknife.Unbinder;
+import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.ILogoutPresenter;
 import views.ecpay.com.postabletecpay.presenter.IUserInfoPresenter;
@@ -370,5 +372,18 @@ public class UserInfoFragment extends Fragment implements IUserInfoView, ILogout
     //endregion
 
     public interface OnFragmentInteractionListener {
+    }
+
+    @Override
+    public void showRespone(String code, String description) {
+        if(!Config.isShowRespone())
+            return;
+
+        try {
+            Toast.makeText(this.getContext(), "CODE: " + code + "\n DESCRIPTION: " + description, Toast.LENGTH_LONG).show();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }

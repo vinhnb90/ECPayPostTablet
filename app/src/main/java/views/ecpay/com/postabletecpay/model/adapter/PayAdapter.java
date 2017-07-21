@@ -112,7 +112,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
         holder.tvTenKH.setText(entityAdapter.getTEN_KHANG());
         holder.tvDiaChi.setText(entityAdapter.getDIA_CHI());
-        holder.tvLoTrinh.setText(entityAdapter.getLO_TRINH());
+        holder.tvLoTrinh.setText((entityAdapter.getLO_TRINH() != null && entityAdapter.getLO_TRINH().trim().length() != 0 ? (entityAdapter.getLO_TRINH().trim() + "-") : "") + entityAdapter.getSO_GCS());
         holder.tvTongTien.setText(Common.convertLongToMoney(data.get(position).getTotalMoney()));
         holder.tvMaKH.setText(code);
 
@@ -613,6 +613,8 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public void setBillList(String edong, String code, List<BillEntityAdapter> billList, int posCustomer) {
+
+            Collections.sort(billList, BillEntityAdapter.TermComparatorBillEntityAdapter);
             this.billList = new ArrayList<>();
             this.billList.addAll(billList);
             this.code = code;

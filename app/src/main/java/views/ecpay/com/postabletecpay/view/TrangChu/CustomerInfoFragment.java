@@ -22,6 +22,7 @@ import org.w3c.dom.Text;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.CustomerInfoPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
@@ -239,6 +240,19 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
         }
     }
 
+
+    @Override
+    public void showRespone(String code, String description) {
+        if(!Config.isShowRespone())
+            return;
+
+        try {
+            Toast.makeText(this.getContext(), "CODE: " + code + "\n DESCRIPTION: " + description, Toast.LENGTH_LONG).show();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
     @Override
     public void refill(EntityKhachHang customer) {
         this.fill(customer);

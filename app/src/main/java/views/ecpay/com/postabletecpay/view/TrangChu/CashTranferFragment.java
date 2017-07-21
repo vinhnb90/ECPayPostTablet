@@ -32,6 +32,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.CashTranferModel;
 import views.ecpay.com.postabletecpay.presenter.CashTranferPresenter;
@@ -328,6 +329,9 @@ public class CashTranferFragment extends Fragment implements View.OnClickListene
     @Override
     public void setVisibleBar(boolean visible) {
 
+        if(hLoading == null)
+            return;
+
         if(visible)
             hLoading.setVisibility(View.VISIBLE);
         else
@@ -340,6 +344,19 @@ public class CashTranferFragment extends Fragment implements View.OnClickListene
         txtCaptcha.setText(Common.createCapcha(6));
     }
 
+
+    @Override
+    public void showRespone(String code, String description) {
+        if(!Config.isShowRespone())
+            return;
+
+        try {
+            Toast.makeText(this.getContext(), "CODE: " + code + "\n DESCRIPTION: " + description, Toast.LENGTH_LONG).show();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
     @Override
     public  void onBack()
     {

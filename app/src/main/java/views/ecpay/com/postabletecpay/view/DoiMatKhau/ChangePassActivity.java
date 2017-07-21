@@ -23,6 +23,7 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.ChangePassPresenter;
 import views.ecpay.com.postabletecpay.presenter.IChangePassPresenter;
@@ -220,6 +221,19 @@ public class ChangePassActivity extends ActionBarActivity implements IChangePass
 
     private IChangePassPresenter mIChangePassPresenter;
 
+
+    @Override
+    public void showRespone(String code, String description) {
+        if(!Config.isShowRespone())
+            return;
+
+        try {
+            Toast.makeText(this, "CODE: " + code + "\n DESCRIPTION: " + description, Toast.LENGTH_LONG).show();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
     @Override
     public Context getContextView() {
         return this;

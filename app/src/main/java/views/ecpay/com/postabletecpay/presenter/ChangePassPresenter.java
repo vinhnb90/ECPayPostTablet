@@ -193,7 +193,7 @@ public class ChangePassPresenter implements IChangePassPresenter {
         @Override
         public void onPost(ChangePassResponse response) {
             mIChangePassView.hidePbar();
-
+            mIChangePassView.showRespone(response.getFooterChangePassResponse().getResponseCode(), response.getFooterChangePassResponse().getDescription());
             if (response == null) {
                 mIChangePassView.showText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return;
