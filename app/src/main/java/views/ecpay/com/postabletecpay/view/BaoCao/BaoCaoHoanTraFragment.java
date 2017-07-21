@@ -30,6 +30,15 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 */
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -255,7 +264,6 @@ public class BaoCaoHoanTraFragment extends Fragment implements View.OnClickListe
         }
 
         boolean success = false;
-        /*
         //New Workbook
         Workbook wb = new HSSFWorkbook();
 
@@ -338,10 +346,10 @@ public class BaoCaoHoanTraFragment extends Fragment implements View.OnClickListe
             } catch (Exception ex) {
             }
         }
-        */
+
         return success;
     }
-    /*
+
     private static void Bangexcel(Cell c, CellStyle cs, Sheet sheet1){
         if (adapter.getmBills().size() != 0) {
 
@@ -379,7 +387,6 @@ public class BaoCaoHoanTraFragment extends Fragment implements View.OnClickListe
         }
 
     }
-    */
 
     public static boolean isExternalStorageReadOnly() {
         String extStorageState = Environment.getExternalStorageState();
