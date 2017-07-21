@@ -25,7 +25,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-/*
+
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -38,7 +38,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-*/
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -285,7 +285,7 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         }
 
         boolean success = false;
-    /*
+
         //New Workbook
         Workbook wb = new HSSFWorkbook();
 
@@ -357,10 +357,10 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
             } catch (Exception ex) {
             }
         }
-        */
+
         return success;
     }
-    /*
+
     private void Bangexcel(Cell c, CellStyle cs, Sheet sheet1){
         if (adapter.getmBills().size() != 0) {
 
@@ -390,7 +390,7 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         }
 
     }
-    */
+
     public static boolean isExternalStorageReadOnly() {
         String extStorageState = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(extStorageState)) {
