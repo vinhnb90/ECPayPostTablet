@@ -35,6 +35,7 @@ import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.ILoginPresenter;
 import views.ecpay.com.postabletecpay.presenter.LoginPresenter;
@@ -419,4 +420,17 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
     private ILoginPresenter mILoginPresenter;
     //endregion
+
+    @Override
+    public void showRespone(String code, String description) {
+        if(!Config.isShowRespone())
+            return;
+
+        try {
+            Toast.makeText(this, "CODE: " + code + "\n DESCRIPTION: " + description, Toast.LENGTH_LONG).show();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

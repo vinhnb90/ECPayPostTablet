@@ -292,6 +292,7 @@ public class LoginPresenter implements ILoginPresenter {
             if (response == null)
                 return;
 
+            mILoginView.showRespone(response.getFooterLoginResponse().getResponseCode(), response.getFooterLoginResponse().getDescription());
             mILoginView.hidePbarLogin();
 
             if (response == null) {

@@ -68,6 +68,7 @@ import butterknife.OnPageChange;
 import butterknife.OnTextChanged;
 import butterknife.Optional;
 import butterknife.Unbinder;
+import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.PayBillsDialogAdapter;
@@ -232,7 +233,7 @@ public class PayFragment extends Fragment implements
     private PayAdapter payAdapter;
     private IPayPresenter mIPayPresenter;
     private String mEdong;
-    private int mPageIndex;
+    private int mPageIndex, mPageTotal;
     private Unbinder unbinder;
     private Common.TYPE_SEARCH typeSearch;
     private PayBillsDialogAdapter payBillsDialogAdapter;
@@ -324,6 +325,7 @@ public class PayFragment extends Fragment implements
         //first page
         typeSearch = Common.TYPE_SEARCH.ALL;
         mPageIndex = FIRST_PAGE_INDEX;
+        mPageTotal = mPageIndex;
         try {
             mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
         } catch (Exception e) {
@@ -381,6 +383,10 @@ public class PayFragment extends Fragment implements
             return;
 
         mPageIndex += PAGE_INCREMENT;
+
+        if(mPageIndex >= mPageTotal)
+            mPageIndex = mPageTotal;
+
         try {
             mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString(), false);
         } catch (Exception e) {
@@ -515,23 +521,13 @@ public class PayFragment extends Fragment implements
     }
     //endregion
 
-    //region listener etTextBarcode
-//    @Optional
-//    @OnTextChanged(R.id.et_frag_thanh_toan_search)
-//    public void onTextChangeBarcode(CharSequence s, int start, int before, int count) {
-//        if (dialogBarcode == null || tvTextBarcode == null)
-//            return;
-//
-////        tvTextBarcode.setEnabled(!textBarcode.equals(Common.TEXT_EMPTY) ? true : false);
-//    }
-
-    //endregion
 
     //region listener tablayout
     @Optional
     @OnPageChange(R.id.vpage_frag_thanh_toan)
     public void onPageSelected(int position) {
         mPageIndex = FIRST_PAGE_INDEX;
+        mPageTotal = mPageIndex;
         typeSearch = Common.TYPE_SEARCH.findMessage(position);
         boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
         if (isSeachOnline)
@@ -575,6 +571,7 @@ public class PayFragment extends Fragment implements
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         //first page
         mPageIndex = FIRST_PAGE_INDEX;
+        mPageTotal = mPageIndex;
         final boolean isSeachOnline = checkUserNeedSearchOnline(etSearch.getText().toString());
 
         if (isSeachOnline) {
@@ -605,14 +602,6 @@ public class PayFragment extends Fragment implements
         }
     }
 
-    /*@OnClick(R.id.etSearch)
-    public void doClick(View view) {
-        mPageIndex = FIRST_PAGE_INDEX;
-        mIPayPresenter.callPayRecycler(mEdong, mPageIndex, typeSearch, etSearch.getText().toString());
-        //get size real tablayout
-//        showRecyclerViewWidthTabLayout();
-    }*/
-
     //endregion
 
     //region listerner et reason delete bill
@@ -634,6 +623,8 @@ public class PayFragment extends Fragment implements
     public void showPayRecyclerPage(List<PayAdapter.DataAdapter> adapterList, int indexBegin, int totalPage, String infoSearch, boolean isSeachOnline) {
         try
         {
+            mPageTotal = totalPage;
+
             btnPre.setEnabled(true);
             btnNext.setEnabled(true);
             tvPage.setText(String.valueOf(indexBegin).concat(Common.TEXT_SLASH).concat(String.valueOf(totalPage)));
@@ -1323,5 +1314,17 @@ public class PayFragment extends Fragment implements
         if (TextUtils.isEmpty(textBarcode) || etSearch == null)
             return;
         etSearch.setText(textBarcode);
+    }
+    @Override
+    public void showRespone(String code, String description) {
+        if(!Config.isShowRespone())
+            return;
+
+        try {
+            Toast.makeText(this.getContext(), "CODE: " + code + "\nDESCRIPTION: " + description, Toast.LENGTH_LONG).show();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }

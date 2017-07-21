@@ -156,6 +156,17 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
                         }
                         return;
                     }
+
+                    searchCustomerView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
+
+
+
+                    if (!response.getFooter().getResponseCode().equalsIgnoreCase("000")) {
+                        searchCustomerView.showMessage(response.getFooter().getDescription());
+                        return;
+                    }
+
+
                     BodySearchOnlineResponse body = (BodySearchOnlineResponse) response.getBody();
 
                     if (body.getCustomer() == null || body.getCustomer().length() == 0) {

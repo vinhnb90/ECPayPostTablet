@@ -163,7 +163,7 @@ public class LogoutPresenter implements  ILogoutPresenter{
             if (response == null) {
                 return;
             }
-
+            iLogoutView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
             Common.CODE_REPONSE_LOGOUT codeResponse = Common.CODE_REPONSE_LOGOUT.findCodeMessage(response.getFooter().getResponseCode());
             if (codeResponse != Common.CODE_REPONSE_LOGOUT.e000) {
                 iLogoutView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);

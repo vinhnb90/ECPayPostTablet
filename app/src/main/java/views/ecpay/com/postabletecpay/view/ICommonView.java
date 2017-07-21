@@ -8,4 +8,7 @@ import android.content.Context;
 
 public interface ICommonView {
     Context getContextView();
+
+    void showRespone(String code, String description);
+
 }

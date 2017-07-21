@@ -37,6 +37,7 @@ import butterknife.OnClick;
 import butterknife.Optional;
 import butterknife.Unbinder;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
+import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.CustomerAdapter;
 import views.ecpay.com.postabletecpay.presenter.ISearchCustomerPresenter;
@@ -273,6 +274,19 @@ public class SearchCustomerFragment extends Fragment implements ISearchCustomerV
         }catch (Exception e)
         {
 
+        }
+    }
+
+    @Override
+    public void showRespone(String code, String description) {
+        if(!Config.isShowRespone())
+            return;
+
+        try {
+            Toast.makeText(this.getContext(), "CODE: " + code + "\n DESCRIPTION: " + description, Toast.LENGTH_LONG).show();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 }

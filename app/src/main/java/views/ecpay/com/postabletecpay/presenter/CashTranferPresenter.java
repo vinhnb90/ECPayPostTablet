@@ -73,8 +73,10 @@ public class CashTranferPresenter implements ICashTranferPresenter{
 
         @Override
         public void onPost(CashTranferRespone response) {
+            if(response == null)
+                return;
             iCashTranferView.setVisibleBar(false);
-
+            iCashTranferView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
             if (response == null) {
                 iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return;

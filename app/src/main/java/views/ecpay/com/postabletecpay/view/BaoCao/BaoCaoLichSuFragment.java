@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -23,6 +24,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.ReportLichSuThanhToanAdapter;
 import views.ecpay.com.postabletecpay.presenter.IReportLichSuThanhToanPresenter;
@@ -171,6 +173,19 @@ public class BaoCaoLichSuFragment extends Fragment implements View.OnClickListen
         }else
         {
             this.baoCaoView.showBackBtn(false);
+        }
+    }
+
+    @Override
+    public void showRespone(String code, String description) {
+        if(!Config.isShowRespone())
+            return;
+
+        try {
+            Toast.makeText(this.getContext(), "CODE: " + code, Toast.LENGTH_LONG).show();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 }

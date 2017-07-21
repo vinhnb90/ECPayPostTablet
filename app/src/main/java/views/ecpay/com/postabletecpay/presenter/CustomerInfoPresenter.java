@@ -128,6 +128,8 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                         return;
                     }
 
+
+                    customerInfoView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                     if(response.getFooter().getResponseCode().equals("000"))
                     {
                         customer.setMA_THE(eCard);
@@ -258,7 +260,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                         }
                         return;
                     }
-
+                    customerInfoView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                     if(response.getFooter().getResponseCode().equals("000"))
                     {
                         customer.setMA_THE(eCard);

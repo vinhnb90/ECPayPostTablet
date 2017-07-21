@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -18,6 +19,7 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.IReportTongHopPresenter;
 import views.ecpay.com.postabletecpay.presenter.ReportTongHopPresenter;
@@ -164,6 +166,18 @@ public class BaoCaoTongHopFragment extends Fragment implements View.OnClickListe
     }
 
 
+    @Override
+    public void showRespone(String code, String description) {
+        if(!Config.isShowRespone())
+            return;
+
+        try {
+            Toast.makeText(this.getContext(), "CODE: " + code, Toast.LENGTH_LONG).show();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
     @Override
     public Context getContextView() {
         return this.getContext();
