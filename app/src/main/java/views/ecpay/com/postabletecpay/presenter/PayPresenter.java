@@ -393,6 +393,10 @@ public class PayPresenter implements IPayPresenter {
                     bill.setMA_DIEN_LUC(billInsideCustomer.getPcCode());
                     bill.setChecked(false);
                     bill.setMA_KHACH_HANG(billInsideCustomer.getCustomerCode());
+
+                    bill.setTEN_KHACH_HANG(khachHang.getTEN_KHANG());
+
+
                     bill.setSO_CONG_TO(billInsideCustomer.getElectricityMeter());
 
                     bill.setCheckEnable(true);
@@ -988,7 +992,9 @@ public class PayPresenter implements IPayPresenter {
                         public void run() {
                             try
                             {
-                                mIPayView.showMessageNotifyDeleteOnlineDialog(message, Common.TYPE_DIALOG.LOI);
+                                mIPayView.showMessageNotifyDeleteOnlineDialog("Lỗi kết nối server!", Common.TYPE_DIALOG.LOI);
+                                mIPayView.visibleButtonDeleteDialog(SHOW_ALL);
+                                return;
                             }catch (Exception e)
                             {
                                 e.printStackTrace();
@@ -1000,6 +1006,15 @@ public class PayPresenter implements IPayPresenter {
                 @Override
                 public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
                     if (response == null) {
+                        try
+                        {
+                            mIPayView.showMessageNotifyDeleteOnlineDialog("Lỗi hệ thống!", Common.TYPE_DIALOG.LOI);
+                            mIPayView.visibleButtonDeleteDialog(SHOW_ALL);
+                            return;
+                        }catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
                         return;
                     }
                     mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());

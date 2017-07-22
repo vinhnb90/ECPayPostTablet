@@ -90,26 +90,25 @@ public class ESCPOSSample
             posPtr.printNormal("Dia chi: "+ Common.unAccent(billObj.getDIA_CHI()) +"\n");
             posPtr.printNormal("Ma KH: "+billObj.getMA_KHACH_HANG()+"\n");
             posPtr.printNormal("So cong to: "+billObj.getSO_CONG_TO() +"   So ho: "+billObj.getSO_HO()+"\n");
-			if (Character.toString(billObj.getMA_DIEN_LUC().charAt(2)).equals("H")
-					||Character.toString(billObj.getMA_DIEN_LUC().charAt(2)).equals("A")
-					||Character.toString(billObj.getMA_DIEN_LUC().charAt(2)).equals("D")){
+			if (Character.toString(billObj.getMA_DIEN_LUC().charAt(1)).equals("H")
+					||Character.toString(billObj.getMA_DIEN_LUC().charAt(1)).equals("A")
+					||Character.toString(billObj.getMA_DIEN_LUC().charAt(1)).equals("D")){
 				posPtr.printNormal("Seri HDDT: "+billObj.getMA_HOA_DON()+"\n");
-			} else if (Character.toString(billObj.getMA_DIEN_LUC().charAt(2)).equals("C")
-					||Character.toString(billObj.getMA_DIEN_LUC().charAt(2)).equals("A")){
+			} else if (Character.toString(billObj.getMA_DIEN_LUC().charAt(1)).equals("C")
+					||Character.toString(billObj.getMA_DIEN_LUC().charAt(1)).equals("A")){
 				posPtr.printNormal("Id Hoa don: "+billObj.getMA_HOA_DON()+"\n");
 			}
             posPtr.printNormal("Hinh thuc thanh toan: "+textHTTT+"\n");
-            posPtr.printNormal("Noi dung thanh toan tien dien: ky " + billObj.getTHANG_THANH_TOAN()+ "tu ngay"+ billObj.getTU_NGAY()+"den ngay"+billObj.getDEN_NGAY()+"\n\n");
+            posPtr.printNormal("Noi dung thanh toan tien dien: ky " + billObj.getTHANG_THANH_TOAN()+ "tu ngay "+ billObj.getTU_NGAY()+"den ngay "+billObj.getDEN_NGAY()+"\n\n");
             posPtr.printNormal("CSDK: "+billObj.getCSDK()+"\n");
             posPtr.printNormal("CSCK: "+billObj.getCSCK()+"\n");
             posPtr.printNormal("--------------------------------");
             posPtr.printNormal("| DNTT | Don gia |   Thanh tien|");
 			posPtr.printNormal("--------------------------------");
-            for (int i = 0; i <= tienTheoChiSos.size();i++){
-                posPtr.printText(demtext(7,tienTheoChiSos.get(i).getChiSo() + "")+ tienTheoChiSos.get(i).getChiSo() +"kwh|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-                posPtr.printText(demtext(10,tienTheoChiSos.get(i).getDonGia() + "")+ tienTheoChiSos.get(i).getDonGia() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-                posPtr.printText(demtext(14,tienTheoChiSos.get(i).getTienTheoChiSo() + "")+ tienTheoChiSos.get(i).getTienTheoChiSo() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-
+            for (int i = 0; i < tienTheoChiSos.size();i++){
+				posPtr.printText("|"+demtext(4,tienTheoChiSos.get(i).getChiSo() + "")+ tienTheoChiSos.get(i).getChiSo() +"kwh|", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+				posPtr.printText(demtext(10,tienTheoChiSos.get(i).getDonGia() + "")+ tienTheoChiSos.get(i).getDonGia() +"|", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+				posPtr.printText(demtext(14,tienTheoChiSos.get(i).getTienTheoChiSo() + "")+ tienTheoChiSos.get(i).getTienTheoChiSo() +"|\n", LKPrint.LK_ALIGNMENT_RIGHT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
             }
 			posPtr.printNormal("--------------------------------");
             posPtr.printNormal("|  "+  billObj.getDNTT() + demtext(12,billObj.getDNTT() + "")+"kwh|");
@@ -168,7 +167,7 @@ public class ESCPOSSample
 			posPtr.printNormal("Dia chi: "+Common.unAccent(billObj.getDIA_CHI()) +"\n");
 			posPtr.printNormal("Ma KH: "+billObj.getMA_KHACH_HANG()+"\n");
 			posPtr.printNormal("So GCS: "+billObj.getSO_GCS()+"\n");
-			if (Character.toString(billObj.getMA_DIEN_LUC().charAt(2)).equals("E")){
+			if (Character.toString(billObj.getMA_DIEN_LUC().charAt(1)).equals("E")){
 				posPtr.printNormal("So cong to: "+billObj.getSO_CONG_TO() +"   So ho: "+billObj.getSO_HO()+"\n");
 				posPtr.printNormal("Seri HDDT: "+billObj.getMA_HOA_DON()+"\n");
 			}
@@ -198,9 +197,9 @@ public class ESCPOSSample
 			posPtr.printText("Xin cam on!" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText("ECPAY kinh moi quy khach hang vui long: " +"\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			String webCSKH = null;
-			if (Character.toString(billObj.getMA_DIEN_LUC().charAt(2)).equals("E")){
+			if (Character.toString(billObj.getMA_DIEN_LUC().charAt(1)).equals("E")){
 				webCSKH = "http://cskh.hcmpc.com.vn";
-			}else if (Character.toString(billObj.getMA_DIEN_LUC().charAt(2)).equals("B")){
+			}else if (Character.toString(billObj.getMA_DIEN_LUC().charAt(1)).equals("B")){
 				webCSKH = "http://cskh.evnspc.com.vn";
 			}
 			posPtr.printText("+ Truy cap trang web "+webCSKH +" de nhan hoa don dien tu " +"\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
@@ -272,19 +271,19 @@ public class ESCPOSSample
 			posPtr.printText(Common.unAccent("(Không có giá trị thanh toán)") +"\n", LKPrint.LK_ALIGNMENT_CENTER,
 					LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printNormal("Ky hoa don: "+ billEntityAdapter.getTHANG_THANH_TOAN() +"\n");
-			if (Character.toString(billEntityAdapter.getMA_DIEN_LUC().charAt(2)).equals("E")
-					||Character.toString(billEntityAdapter.getMA_DIEN_LUC().charAt(2)).equals("C")){
+			if (Character.toString(billEntityAdapter.getMA_DIEN_LUC().charAt(1)).equals("E")
+					||Character.toString(billEntityAdapter.getMA_DIEN_LUC().charAt(1)).equals("C")){
 				posPtr.printNormal("Tu: "+billEntityAdapter.getTU_NGAY() +" den: "+billEntityAdapter.getDEN_NGAY()+"\n");
 			}
 			posPtr.printNormal("Ten KH: "+ Common.unAccent(billEntityAdapter.getTEN_KHACH_HANG()) +"\n");
 			posPtr.printNormal("Dia chi: "+ Common.unAccent(billEntityAdapter.getDIA_CHI()) +"\n");
 			posPtr.printNormal("Ma KH: "+billEntityAdapter.getMA_KHACH_HANG()+"\n");
 			posPtr.printNormal("So cong to: "+billEntityAdapter.getSO_CONG_TO() +"   So ho: "+billEntityAdapter.getSO_HO()+"\n");
-			if (Character.toString(billEntityAdapter.getMA_DIEN_LUC().charAt(2)).equals("B")){
+			if (Character.toString(billEntityAdapter.getMA_DIEN_LUC().charAt(1)).equals("B")){
 				posPtr.printNormal("So GCS: "+billEntityAdapter.getSO_GCS()+"\n");
 			}
 			posPtr.printNormal("ID hoa don: "+billEntityAdapter.getMA_HOA_DON()+"\n");
-			if (Character.toString(billEntityAdapter.getMA_DIEN_LUC().charAt(2)).equals("E")
+			if (Character.toString(billEntityAdapter.getMA_DIEN_LUC().charAt(1)).equals("E")
 					||Character.toString(billEntityAdapter.getMA_DIEN_LUC().charAt(2)).equals("C")){
 				posPtr.printNormal("CSDK: "+billEntityAdapter.getCSDK()+"\n");
 				posPtr.printNormal("CSCK: "+billEntityAdapter.getCSCK()+"\n");
@@ -406,39 +405,39 @@ public class ESCPOSSample
 		}
 	}
 	private void checkLogo(PayAdapter.BillEntityAdapter bill,Context context){
-		if (Character.toString(bill.getMA_DIEN_LUC().charAt(2)).equals("H")||Character.toString(bill.getMA_DIEN_LUC().charAt(2)).equals("A")){
+		if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("H")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("A")){
 			try {
-				posPtr.printBitmap(drawableToBitmap(context.getResources().getDrawable(R.drawable.ic_evn_npc)),1,8);
+				posPtr.printBitmap(drawableToBitmap(context.getResources().getDrawable(R.drawable.ic_evn_npc)),1,9);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}else if (Character.toString(bill.getMA_DIEN_LUC().charAt(2)).equals("C")){
+		}else if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("C")){
 			try {
-				posPtr.printBitmap(drawableToBitmap(context.getResources().getDrawable(R.drawable.ic_evn_cpc)),1,8);
+				posPtr.printBitmap(drawableToBitmap(context.getResources().getDrawable(R.drawable.ic_evn_cpc)),1,9);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}else if (Character.toString(bill.getMA_DIEN_LUC().charAt(2)).equals("B")){
+		}else if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("B")){
 			try {
-				posPtr.printBitmap(drawableToBitmap(context.getResources().getDrawable(R.drawable.ic_evn_spc)),1,8);
+				posPtr.printBitmap(drawableToBitmap(context.getResources().getDrawable(R.drawable.ic_evn_spc)),1,9);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}else if (Character.toString(bill.getMA_DIEN_LUC().charAt(2)).equals("D")){
+		}else if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("D")){
 			try {
-				posPtr.printBitmap(drawableToBitmap(context.getResources().getDrawable(R.drawable.ic_evn_hanoi)),1,8);
+				posPtr.printBitmap(drawableToBitmap(context.getResources().getDrawable(R.drawable.ic_evn_hanoi)),1,9);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}else if (Character.toString(bill.getMA_DIEN_LUC().charAt(2)).equals("E")){
+		}else if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("E")){
 			try {
-				posPtr.printBitmap(drawableToBitmap(context.getResources().getDrawable(R.drawable.ic_evn_hcmc)),1,8);
+				posPtr.printBitmap(drawableToBitmap(context.getResources().getDrawable(R.drawable.ic_evn_hcmc)),1,9);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}else {
 			try {
-				posPtr.printBitmap(drawableToBitmap(context.getResources().getDrawable(R.drawable.logoecpay2)),1,8);
+				posPtr.printBitmap(drawableToBitmap(context.getResources().getDrawable(R.drawable.logoecpay2)),1,9);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -446,14 +445,14 @@ public class ESCPOSSample
 	}
 	public int checkDienLuc(Context context,PayAdapter.BillEntityAdapter bill){
 		int result =0;
-		if (Character.toString(bill.getMA_DIEN_LUC().charAt(2)).equals("H")||Character.toString(bill.getMA_DIEN_LUC().charAt(2)).equals("A")
-				||Character.toString(bill.getMA_DIEN_LUC().charAt(2)).equals("D")||Character.toString(bill.getMA_DIEN_LUC().charAt(2)).equals("c")){
+		if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("H")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("A")
+				||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("D")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("c")){
 			try {
 				result = bienNhanHN(context,bill);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}else if (Character.toString(bill.getMA_DIEN_LUC().charAt(2)).equals("E")||Character.toString(bill.getMA_DIEN_LUC().charAt(2)).equals("B")){
+		}else if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("E")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("B")){
 			try {
 				result = bienNhanHCMC(context, bill);
 			}catch (InterruptedException e) {
