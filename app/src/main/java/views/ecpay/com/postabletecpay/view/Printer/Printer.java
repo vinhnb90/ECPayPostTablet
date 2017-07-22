@@ -400,7 +400,7 @@ public class Printer {
         ESCPOSSample sample = new ESCPOSSample();
         try {
             if (isThongbao == BIEN_NHAN) {
-                results = sample.sample2(context, bill);
+                results = sample.checkDienLuc(context,bill);
             }
             else if (isThongbao ==THONG_BAO ) {
                 results = sample.Thongbao(context, bill);
