@@ -2334,6 +2334,9 @@ public class Common {
 
     //delay animations when view is clicked
     public static final int TIME_DELAY_ANIM = 250;
+    public static final int TIME_DELAY_DOWNLOAD = 1000;
+    public static final int TIME_DELAY_MIN_DOWNLOAD = 100;
+    public static final int TIME_DELAY_ELEMENT_DOWNLOAD = 50;
     public static final int LONG_TIME_DELAY_ANIM = 1000;
     public static final int MORE_LONG_TIME_DELAY_ANIM = 2000;
 
@@ -2400,6 +2403,32 @@ public class Common {
         ERROR,
         SUCCESS,
         FINISH;
+    }
+
+    public enum STATUS_DOWNLOAD {
+        BOOK_CMIS_START("Đang đồng bộ sổ..."),
+        BOOK_CMIS_ERROR("Không nhận được dữ liệu sổ..."),
+        BOOK_CMIS_END("Hoàn tất dồng bộ sổ."),
+
+        GET_PC_INFO_START("Đang đồng bộ Điện lực..."),
+        GET_PC_INFO_ERROR("Không nhận được dữ liệu Điện lực..."),
+        GET_PC_INFO_END("Hoàn tất dồng bộ Điện lực."),
+
+        GET_FILE_GEN_START("Đang đồng bộ file..."),
+        GET_FILE_GEN_END("Hoàn tất đồng bộ file."),
+
+        SYNC_DATA_START("Đang đồng bộ dữ liệu mới nhất..."),
+        SYNC_DATA_END("Hoàn tất đồng bộ dữ liệu mới nhất.");
+
+        private String title;
+
+        STATUS_DOWNLOAD(String title) {
+            this.title = title;
+        }
+
+        public String getTitle() {
+            return title;
+        }
     }
 
     public static String getDateTimeNow(Common.DATE_TIME_TYPE formatDate) {

@@ -144,7 +144,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
             return;
         }
 
-        //this.LoadPCInfo(edong, "01683861612");
+        //this.syncPcEVN(edong, "01683861612");
 
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.putExtra(KEY_EDONG, edong);
@@ -172,109 +172,6 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    protected void LoadPCInfo(String edong, String phoneName) {
-        Context context = this.getContext();
-        ConfigInfo configInfo;
-        String versionApp = "";
-        try {
-            versionApp = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.GET_PC_INFO.toString(), versionApp);
-        } catch (Exception e) {
-
-            return;
-        }
-
-
-        String json = SoapAPI.getJsonGetPCInfo(
-                configInfo.getAGENT(),
-                configInfo.getAgentEncypted(),
-                configInfo.getCommandId(),
-                configInfo.getAuditNumber(),
-                configInfo.getMacAdressHexValue(),
-                configInfo.getDiskDriver(),
-                configInfo.getSignatureEncrypted(),
-                "",
-                "",
-                "",
-                "",
-                "",
-                configInfo.getAccountId()
-        );
-
-
-        if (json == null)
-            return;
-
-
-        try {
-            final SoapAPI.AsyncSoapGetPCInfo soap = new SoapAPI.AsyncSoapGetPCInfo(phoneName, new SoapAPI.AsyncSoapGetPCInfo.AsyncSoapGetPCInfoCallBack() {
-                @Override
-                public void onPre(SoapAPI.AsyncSoapGetPCInfo soap) {
-
-                }
-
-                @Override
-                public void onUpdate(String message) {
-
-                }
-
-                @Override
-                public void onPost(GetPCInfoRespone response, String phone) {
-                    Log.d("LOG", "phone = " + phone);
-
-                    String responseLoginResponseData = ((BodyGetPCInfoRespone) response.getBody()).getListEvnPCLoginResponse();
-                    // định dạng kiểu Object JSON
-                    Type type = new TypeToken<List<ListEvnPCLoginResponse>>() {
-                    }.getType();
-                    List<ListEvnPCLoginResponse> responseLoginResponse = null;
-                    try {
-                        responseLoginResponse = new Gson().fromJson(responseLoginResponseData, type);
-                    } catch (JsonSyntaxException e) {
-                        e.printStackTrace();
-                    }
-
-
-                }
-
-                @Override
-                public void onTimeOut(SoapAPI.AsyncSoapGetPCInfo soap) {
-
-                }
-            });
-
-            if (soap.getStatus() != AsyncTask.Status.RUNNING) {
-                soap.execute(json);
-
-                //thread time out
-                final Thread soapChangePassThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ChangePassResponse changePassResponse = null;
-
-                        //call time out
-                        try {
-                            Thread.sleep(Common.TIME_OUT_CONNECT);
-                        } catch (InterruptedException e) {
-                        } finally {
-                            if (changePassResponse == null) {
-                                soap.callCountdown(soap);
-                            }
-                        }
-                    }
-                });
-
-                soapChangePassThread.start();
-            }
-        } catch (Exception e) {
-            return;
-        }
-    }
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if(ev.getAction() == MotionEvent.ACTION_UP) {

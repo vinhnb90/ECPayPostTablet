@@ -15,4 +15,8 @@ public interface IMainView extends ICommonView{
     void startShowPbarDownload();
 
     void finishHidePbarDownload();
+
+    void updatePbarDownload(String message, int statusProcess);
+
+    void updateDelayPbarDownload(String title,  int statusProcess, final int timeDelay);
 }

@@ -188,6 +188,10 @@ public class MainModel extends CommonModel {
         sqLiteConnection.updateHoaDonThu( MA_HOA_DON,  VI_TTOAN, TRANG_THAI_TTOAN,
                  TRANG_THAI_CHAM_NO,  TRANG_THAI_DAY_CHAM_NO,  NGAY_DAY,  TRANG_THAI_HOAN_TRA);
     }
+
+    public Cursor getCursorEvnPc(String edong) {
+        return sqLiteConnection.getCursorEvnPc(edong);
+    }
     //endregion
 }
 
