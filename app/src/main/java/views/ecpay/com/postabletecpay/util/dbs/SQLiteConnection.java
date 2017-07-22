@@ -1107,6 +1107,9 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
             query = "SELECT * FROM " + TABLE_NAME_CUSTOMER + " A INNER JOIN ( " + query + ") B ON A.MA_KHANG = B.MA_KHANG";
 
+            String qqq = "SELECT * FROM ( " + query + " ) AS BILL  LEFT JOIN " + TABLE_NAME_EVN_PC + " AS PC ON BILL.DIEN_LUC = PC.code";
+
+
             Cursor mCursor = database.rawQuery(query, null);
             if (mCursor.getCount() == 0)
             {
@@ -1139,13 +1142,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     String status = mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN"));
 
                     String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")));
-                    String selectFullName = "SELECT fullname FROM " + TABLE_NAME_EVN_PC + " WHERE code = '" + mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")) + "'";
-                    Cursor c = database.rawQuery(selectFullName, null);
-                    if (c!= null && c.getCount() == 0)
-                    {
-                        c.close();
-                        return null;
-                    }
+
                     PayAdapter.BillEntityAdapter bill = new PayAdapter.BillEntityAdapter();
                     bill.setTEN_KHACH_HANG(tenKHang);
                     bill.setDIA_CHI(diaChi);
@@ -1170,9 +1167,11 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     bill.setDEN_NGAY(denNgay);
                     bill.setSO_HO(soHo);
 
-                    if (c != null && c.moveToFirst()) {
-                        bill.setMA_DL_MO_RONG(c.getString(c.getColumnIndex("fullName")));
+                    String fullname = mCursor.getString(mCursor.getColumnIndex("fullName"));
+                    if (fullname == null) {
+                        fullname = "";
                     }
+                    bill.setMA_DL_MO_RONG(fullname);
 
                     bill.setMA_DIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
                     bill.setChecked(true);
@@ -1189,8 +1188,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
                     billList.add(bill);
 
-                    if (c!= null )
-                        c.close();
                 }
                 while (mCursor.moveToNext());
             }
@@ -1209,7 +1206,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         List<PayAdapter.BillEntityAdapter> billList = new ArrayList<>();
 
         database = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and MA_KHANG ='" + code + "' ORDER BY THANG_TTOAN DESC";
+        String query = "SELECT * FROM ( " + "SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and MA_KHANG ='" + code + "' ORDER BY THANG_TTOAN DESC ) AS BILL " +
+                " LEFT JOIN " + TABLE_NAME_EVN_PC + " AS PC ON BILL.DIEN_LUC = PC.code";
         Cursor mCursor = database.rawQuery(query, null);
 
         long total = 0;
@@ -1273,16 +1271,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 bill.setChecked(false);
                 bill.setMA_KHACH_HANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
 
-                String selectFullName = "SELECT fullname FROM " + TABLE_NAME_EVN_PC + " WHERE code = '" + mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")) + "'";
-                Cursor c = database.rawQuery(selectFullName, null);
-                if (c.getCount() == 0)
+
+                String fullname = mCursor.getString(mCursor.getColumnIndex("fullName"));
+                if(fullname == null)
                 {
-                    c.close();
-                    return null;
+                    fullname = "";
                 }
-                if (c != null && c.moveToFirst()) {
-                    bill.setMA_DL_MO_RONG(c.getString(c.getColumnIndex("fullName")));
-                }
+                bill.setMA_DL_MO_RONG(fullname);
                 bill.setCheckEnable(!bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()));
 
                 if (bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()) && MainActivity.mEdong.equalsIgnoreCase(viThanhToan))
@@ -1293,9 +1288,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 bill.setRequestDate(dateRequest);
 
                 billList.add(bill);
-
-                if(c != null)
-                    c.close();
             }
             while (mCursor.moveToNext());
         }
