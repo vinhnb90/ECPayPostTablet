@@ -112,7 +112,6 @@ public class CustomerInfoFragment extends Fragment implements ICustomerInfoView,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_customer_info, container, false);
         unbinder = ButterKnife.bind(this, view);
-
         customerInfoPresenter = new CustomerInfoPresenter(this);
 
 

@@ -1,6 +1,7 @@
 package views.ecpay.com.postabletecpay.view.BaoCao;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -103,7 +104,7 @@ public class BaoCaoTongHopFragment extends Fragment implements View.OnClickListe
         reportTongHopPresenter = new ReportTongHopPresenter(this);
 
         btInBaoCao.setOnClickListener(this);
-
+        setRetainInstance(true);
         reportTongHopPresenter.fill();
         return view;
     }
@@ -113,7 +114,6 @@ public class BaoCaoTongHopFragment extends Fragment implements View.OnClickListe
         super.onDestroyView();
         unbinder.unbind();
     }
-
     @Override
     public void onStart() {
         super.onStart();

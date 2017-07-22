@@ -56,7 +56,7 @@
         <Button
             android:id="@+id/btTimKiem"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/_24sdp"
+            android:layout_height="@dimen/_20sdp"
             android:layout_below="@+id/etSearch"
             android:layout_centerHorizontal="true"
             android:layout_margin="@dimen/_3sdp"
@@ -89,8 +89,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp">
+            android:paddingBottom="@dimen/_5sdp"
+            android:paddingTop="@dimen/_5sdp">
 
             <TextView
                 android:id="@+id/textView5"
@@ -108,7 +108,7 @@
                 android:gravity="right"
                 android:text="Phạm Duy Đạt"
                 android:textColor="@android:color/black"
-                android:textSize="14sp"
+                android:textSize="@dimen/_10sdp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -116,14 +116,14 @@
             android:layout_width="match_parent"
             android:layout_height="0.1dp"
             android:background="@drawable/bg_button_gray"
-            android:orientation="horizontal"></LinearLayout>
+            android:orientation="horizontal"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp">
+            android:paddingBottom="@dimen/_5sdp"
+            android:paddingTop="@dimen/_5sdp">
 
             <TextView
                 android:id="@+id/textView51"
@@ -131,7 +131,7 @@
                 android:layout_height="wrap_content"
                 android:text="Mã Khách Hàng:"
                 android:textColor="@android:color/black"
-                android:textSize="14sp" />
+                android:textSize="@dimen/_8sdp" />
 
             <TextView
                 android:id="@+id/tvMaKH"
@@ -141,7 +141,7 @@
                 android:gravity="right"
                 android:text="Phạm Duy Đạt"
                 android:textColor="@android:color/black"
-                android:textSize="14sp"
+                android:textSize="@dimen/_8sdp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -157,8 +157,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp">
+            android:paddingBottom="@dimen/_5sdp"
+            android:paddingTop="@dimen/_5sdp">
 
             <TextView
                 android:id="@+id/textView52"
@@ -166,7 +166,7 @@
                 android:layout_height="wrap_content"
                 android:text="Kỳ Thanh Toán:"
                 android:textColor="@android:color/black"
-                android:textSize="14sp" />
+                android:textSize="@dimen/_8sdp" />
 
             <TextView
                 android:id="@+id/tvKyThanhToan"
@@ -176,7 +176,7 @@
                 android:gravity="right"
                 android:text="Phạm Duy Đạt"
                 android:textColor="@android:color/black"
-                android:textSize="14sp"
+                android:textSize="@dimen/_8sdp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -192,8 +192,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp">
+            android:paddingBottom="@dimen/_5sdp"
+            android:paddingTop="@dimen/_5sdp">
 
             <TextView
                 android:id="@+id/textView53"
@@ -201,7 +201,7 @@
                 android:layout_height="wrap_content"
                 android:text="Ngày Phát Sinh:"
                 android:textColor="@android:color/black"
-                android:textSize="14sp" />
+                android:textSize="@dimen/_8sdp" />
 
             <TextView
                 android:id="@+id/tvNgayPhatSinh"
@@ -211,7 +211,7 @@
                 android:gravity="right"
                 android:text="Phạm Duy Đạt"
                 android:textColor="@android:color/black"
-                android:textSize="14sp"
+                android:textSize="@dimen/_8sdp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -227,8 +227,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp">
+            android:paddingBottom="@dimen/_5sdp"
+            android:paddingTop="@dimen/_5sdp">
 
             <TextView
                 android:id="@+id/textView54"
@@ -236,7 +236,7 @@
                 android:layout_height="wrap_content"
                 android:text="Số Tiền:"
                 android:textColor="@android:color/black"
-                android:textSize="14sp" />
+                android:textSize="@dimen/_8sdp" />
 
             <TextView
                 android:id="@+id/tvSoTien"
@@ -246,7 +246,7 @@
                 android:gravity="right"
                 android:text="1234"
                 android:textColor="@color/colorRed"
-                android:textSize="14sp"
+                android:textSize="@dimen/_8sdp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -262,8 +262,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp">
+            android:paddingBottom="@dimen/_5sdp"
+            android:paddingTop="@dimen/_5sdp">
 
             <TextView
                 android:id="@+id/textView55"
@@ -271,7 +271,7 @@
                 android:layout_height="wrap_content"
                 android:text="Trạng Thái:"
                 android:textColor="@android:color/black"
-                android:textSize="14sp" />
+                android:textSize="@dimen/_8sdp" />
 
             <TextView
                 android:id="@+id/tvTrangThai"
@@ -281,7 +281,7 @@
                 android:gravity="right"
                 android:text="Phạm Duy Đạt"
                 android:textColor="@android:color/black"
-                android:textSize="14sp"
+                android:textSize="@dimen/_8sdp"
                 android:textStyle="bold" />
         </LinearLayout>
 
