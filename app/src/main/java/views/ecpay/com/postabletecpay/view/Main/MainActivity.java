@@ -55,12 +55,9 @@ public class MainActivity extends AppCompatActivity implements
     private static boolean isLoginCall;
 
     private ProgressDialog progressDialog;
-<<<<<<< HEAD
     private Handler progressBarHandler = new Handler();
 
-=======
     private String showProgress = "SHOW_DIALOG" ;
->>>>>>> datpd
     private Handler mHander = new Handler();
     private Runnable mRunableCheckPostBill = new Runnable() {
         @Override
@@ -126,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void finishHidePbarDownload() {
-<<<<<<< HEAD
         if (progressDialog == null)
             return;
         progressBarHandler.post(new Runnable() {
@@ -164,13 +160,6 @@ public class MainActivity extends AppCompatActivity implements
                                            }
                                        }, timeDelay
         );
-=======
-        if(progressDialog != null&& progressDialog.isShowing())
-        {
-            progressDialog.dismiss();
-            refreshInfoMain();
-        }
->>>>>>> datpd
     }
 
     public enum ID_MENU_BOTTOM {
@@ -388,13 +377,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onDestroy() {
         if (mHander != null && mRunableCheckPostBill != null)
             mHander.removeCallbacks(mRunableCheckPostBill);
-<<<<<<< HEAD
         isLoginCall = false;
-=======
-//        if (progressDialog != null && progressDialog.isShowing()){
-//            progressDialog.cancel();
-//        }
->>>>>>> datpd
         super.onDestroy();
     }
 
