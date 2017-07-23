@@ -414,7 +414,6 @@ public class MainPageFragment extends Fragment implements
     }
 
     public void refreshInfoMain() {
-//        Toast.makeText(getContext(), "call", Toast.LENGTH_SHORT).show();
         mIMainPagePresenter.callInfoMain(mEdong);
     }
 

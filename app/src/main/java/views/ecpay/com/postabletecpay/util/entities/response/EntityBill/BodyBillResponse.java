@@ -228,12 +228,12 @@ public class BodyBillResponse {
         this.customerCode = customerCode;
     }
 
-    public String getBillId() {
-        return billId;
-    }
-
     public void setBillId(String billId) {
         this.billId = billId;
+    }
+
+    public String getBillId() {
+        return billId;
     }
 
     public String getTerm() {

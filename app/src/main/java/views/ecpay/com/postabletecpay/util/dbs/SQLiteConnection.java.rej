@@ -1,9 +1,0 @@
-diff a/app/src/main/java/views/ecpay/com/postabletecpay/util/dbs/SQLiteConnection.java b/app/src/main/java/views/ecpay/com/postabletecpay/util/dbs/SQLiteConnection.java	(rejected hunks)
-@@ -650,7 +650,6 @@
- 
-         database = this.getReadableDatabase();
- 
--        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "'";// + "' and status = " + ZERO;
- //        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "'";// + "' and status = " + ZERO;
-         String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE edongKey = '" + edong + "' and status = " + ZERO;
-         Cursor mCursor = database.rawQuery(query, null);
