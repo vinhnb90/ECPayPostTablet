@@ -55,8 +55,12 @@ public class MainActivity extends AppCompatActivity implements
     private static boolean isLoginCall;
 
     private ProgressDialog progressDialog;
+<<<<<<< HEAD
     private Handler progressBarHandler = new Handler();
 
+=======
+    private String showProgress = "SHOW_DIALOG" ;
+>>>>>>> datpd
     private Handler mHander = new Handler();
     private Runnable mRunableCheckPostBill = new Runnable() {
         @Override
@@ -122,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void finishHidePbarDownload() {
+<<<<<<< HEAD
         if (progressDialog == null)
             return;
         progressBarHandler.post(new Runnable() {
@@ -159,6 +164,13 @@ public class MainActivity extends AppCompatActivity implements
                                            }
                                        }, timeDelay
         );
+=======
+        if(progressDialog != null&& progressDialog.isShowing())
+        {
+            progressDialog.dismiss();
+            refreshInfoMain();
+        }
+>>>>>>> datpd
     }
 
     public enum ID_MENU_BOTTOM {
@@ -217,7 +229,9 @@ public class MainActivity extends AppCompatActivity implements
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        if (progressDialog != null) {
+            savedInstanceState.putBoolean(showProgress, progressDialog.isShowing());
+        }
         hasNetworkLast = Common.isNetworkConnected(this);
         mHander.postDelayed(mRunableCheckPostBill, Common.TIME_OUT_CHECK_CONNECTION);
         try {
@@ -299,6 +313,16 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
     }
+    @Override
+    public void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        if (state != null){
+            if (state.getBoolean("SHOW_DIALOG") && progressDialog.isShowing()){
+                startShowPbarDownload();
+            }
+        }
+    }
+
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -364,7 +388,13 @@ public class MainActivity extends AppCompatActivity implements
     protected void onDestroy() {
         if (mHander != null && mRunableCheckPostBill != null)
             mHander.removeCallbacks(mRunableCheckPostBill);
+<<<<<<< HEAD
         isLoginCall = false;
+=======
+//        if (progressDialog != null && progressDialog.isShowing()){
+//            progressDialog.cancel();
+//        }
+>>>>>>> datpd
         super.onDestroy();
     }
 

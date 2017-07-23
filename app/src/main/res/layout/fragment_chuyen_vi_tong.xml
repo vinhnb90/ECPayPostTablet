@@ -128,7 +128,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/bg_button_white"
                     android:ems="30"
-                    android:inputType="number|numberSigned|numberDecimal"
+                    android:inputType="numberSigned|numberDecimal"
                     android:padding="@dimen/_5sdp"
                     android:textSize="@dimen/_13sdp" />
 

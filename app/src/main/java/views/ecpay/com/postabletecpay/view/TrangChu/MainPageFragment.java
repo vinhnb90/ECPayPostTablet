@@ -153,6 +153,7 @@ public class MainPageFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         onSaveInstanceState(savedInstanceState);
+        setRetainInstance(true);
         mIMainPagePresenter = new MainPagePresenter(this);
         mILogoutPresenter = new LogoutPresenter(this);
     }
