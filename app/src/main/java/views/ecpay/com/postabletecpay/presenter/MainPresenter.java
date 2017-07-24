@@ -801,10 +801,10 @@ public class MainPresenter implements IMainPresenter {
                                 throw new Exception("sDataCustomer empty!");
                             }
 
-                            String compress = Gzip.compress(sDataCustomer);
-                            String sCustomer = Gzip.decompress(compress);
-//                            byte[] zipByteCustomer = Base64.decodeBase64(sDataCustomer.getBytes());
-//                            String sCustomer = Common.decompress(zipByteCustomer);
+//                            String compress = Gzip.compress(sDataCustomer);
+//                            String sCustomer = Gzip.decompress(compress);
+                            byte[] zipByteCustomer = Base64.decodeBase64(sDataCustomer.getBytes());
+                            String sCustomer = Common.decompress(zipByteCustomer);
                             JSONArray jsonArray = new JSONArray(sCustomer);
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject ja = jsonArray.getJSONObject(i);

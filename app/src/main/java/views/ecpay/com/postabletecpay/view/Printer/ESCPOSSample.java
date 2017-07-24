@@ -83,7 +83,7 @@ public class ESCPOSSample
 		try {
             checkLogo(billObj,activity);
 			posPtr.printNormal("\n\n");
-			posPtr.printText(Common.unAccent(billObj.getMA_DL_MO_RONG()) +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(Common.unAccent(billObj.getTEN_DIEN_LUC()) +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText("BIEN NHAN" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_2WIDTH);
 			posPtr.printText("THANH TOAN TIEN DIEN" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printNormal("Ten KH: "+ Common.unAccent(billObj.getTEN_KHACH_HANG()) +"\n");
@@ -159,7 +159,7 @@ public class ESCPOSSample
 		try {
 			checkLogo(billObj,activity);
 			posPtr.printNormal("\n\n");
-			posPtr.printText(Common.unAccent(billObj.getMA_DL_MO_RONG()+"") +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(Common.unAccent(billObj.getTEN_DIEN_LUC()+"") +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText("BIEN NHAN" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_2WIDTH);
 			posPtr.printText("THANH TOAN TIEN ĐIEN" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 
@@ -266,7 +266,7 @@ public class ESCPOSSample
 			posPtr.printNormal("Tong cong ty dien luc \n");
 			posPtr.printBitmap(drawableToBitmap(activity.getResources().getDrawable(R.drawable.logoecpay2)),1,8);
 			posPtr.printNormal("\n\n");
-			posPtr.printText(Common.unAccent(billEntityAdapter.getMA_DL_MO_RONG()+ "") +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText(Common.unAccent(billEntityAdapter.getTEN_DIEN_LUC()+ "") +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText(Common.unAccent("THÔNG BÁO TIỀN ĐIỆN") +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText(Common.unAccent("(Không có giá trị thanh toán)") +"\n", LKPrint.LK_ALIGNMENT_CENTER,
 					LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
@@ -375,7 +375,7 @@ public class ESCPOSSample
 		}
 		return 0;
 	}
-	private class TienTheoChiSo{
+	public static class TienTheoChiSo{
 		private String chiSo;
 		private String tienTheoChiSo;
 		private String donGia;
@@ -461,7 +461,7 @@ public class ESCPOSSample
 		}
 		return result;
 	}
-	private String dateCurent(){
+	public static String dateCurent(){
 		Date date = new Date();
 		String strDateFormat = "dd/MM/yyyy";
 		SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);

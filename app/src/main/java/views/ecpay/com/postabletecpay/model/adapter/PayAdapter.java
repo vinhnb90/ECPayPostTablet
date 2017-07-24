@@ -288,7 +288,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         private String DNTT;
         private String TONG_TIEN_CHUA_THUE;
         private String TONG_TIEN_THUE;
-        private String MA_DL_MO_RONG;
+        private String TEN_DIEN_LUC;
         private String TU_NGAY;
         private String DEN_NGAY;
 
@@ -527,12 +527,12 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             this.TONG_TIEN_THUE = TONG_TIEN_THUE;
         }
 
-        public String getMA_DL_MO_RONG() {
-            return (MA_DL_MO_RONG == null) ? "" : MA_DL_MO_RONG;
+        public String getTEN_DIEN_LUC() {
+            return (TEN_DIEN_LUC == null) ? "" : TEN_DIEN_LUC;
         }
 
-        public void setMA_DL_MO_RONG(String MA_DL_MO_RONG) {
-            this.MA_DL_MO_RONG = MA_DL_MO_RONG;
+        public void setTEN_DIEN_LUC(String TEN_DIEN_LUC) {
+            this.TEN_DIEN_LUC = TEN_DIEN_LUC;
         }
 
         public String getTU_NGAY() {

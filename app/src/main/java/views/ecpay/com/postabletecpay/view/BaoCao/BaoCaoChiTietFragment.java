@@ -331,7 +331,7 @@ public class BaoCaoChiTietFragment extends Fragment implements View.OnClickListe
         sheet1.setColumnWidth(4, (15 * 500));
 
         // Create a path where we will place our List of objects on external storage
-        File file = new File(Common.PATH_FOLDER_LOG ,fileName);
+        File file = new File(Common.PATH_FOLDER_BAO_CAO_CHI_TIET ,fileName);
         FileOutputStream os = null;
 
         try {
