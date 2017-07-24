@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.bbpos.simplyprint.SimplyPrintController;
+import com.sewoo.jpos.printer.LKPrint;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import views.ecpay.com.postabletecpay.R;
+import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
+import views.ecpay.com.postabletecpay.util.commons.Common;
 
 import static android.content.ContentValues.TAG;
 
@@ -131,7 +134,7 @@ public class ReceiptUtility {
         return output;
     }
 
-    public static byte[] genReceipt(Context context) {
+    public static byte[] genReceiptTest(Context context, PayAdapter.BillEntityAdapter billObj) {
         int lineWidth = 384;
         int size0NoEmphasizeLineWidth = 384 / 8; //line width / font width
         String singleLine = "";
@@ -143,353 +146,9 @@ public class ReceiptUtility {
             doubleLine += "=";
         }
 
-        Bitmap logoBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.bbpos);
+
         int logoTargetWidth = 300;
-        byte[] d1 = convertBitmap(logoBitmap, logoTargetWidth, 150);
-
-        Bitmap barcodeBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.barcode);
-        int barcodeTargetHeight = 50;
-        int barcodeTargetWidth = 384;
-        byte[] d2 = convertBarcode(barcodeBitmap, barcodeTargetWidth, 160);
-
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            baos.write(INIT);
-            baos.write(POWER_ON);
-            baos.write(NEW_LINE);
-            baos.write(ALIGN_CENTER);
-
-            for (int j = 0; j < d1.length / logoTargetWidth; ++j) {
-                baos.write(hexToByteArray("1B2A00"));
-                baos.write((byte) logoTargetWidth);
-                baos.write((byte) (logoTargetWidth >> 8));
-                byte[] temp = new byte[logoTargetWidth];
-                System.arraycopy(d1, j * logoTargetWidth, temp, 0, temp.length);
-                baos.write(temp);
-                baos.write(NEW_LINE);
-            }
-
-            baos.write(NEW_LINE);
-            baos.write(CHAR_SPACING_0);
-
-            baos.write(FONT_SIZE_0);
-            baos.write(EMPHASIZE_ON);
-            baos.write(FONT_5X12);
-            baos.write("Suite 1602, 16/F, Tower 2".getBytes());
-            baos.write(NEW_LINE);
-            baos.write("Nina Tower, No 8 Yeung Uk Road".getBytes());
-            baos.write(NEW_LINE);
-            baos.write("Tsuen Wan, N.T., Hong Kong".getBytes());
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-
-            baos.write(FONT_SIZE_1);
-            baos.write(FONT_5X12);
-            baos.write("OFFICIAL RECEIPT".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(FONT_SIZE_0);
-            baos.write(EMPHASIZE_OFF);
-            baos.write(FONT_10X18);
-            baos.write("Form No. 2524".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(FONT_8X12);
-            baos.write(singleLine.getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(ALIGN_LEFT);
-
-            baos.write(FONT_10X18);
-            baos.write("TRX NO ".getBytes());
-            baos.write(EMPHASIZE_ON);
-            baos.write("2014-000556-000029".getBytes());
-            baos.write(NEW_LINE);
-            baos.write(EMPHASIZE_OFF);
-            baos.write("DATE/TIME ".getBytes());
-            baos.write(EMPHASIZE_ON);
-            baos.write("08/20/2014 10:42:46 AM".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_OFF);
-            baos.write(FONT_8X12);
-            baos.write(singleLine.getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_ON);
-            baos.write(FONT_10X18);
-            baos.write("Tai Man".getBytes());
-            baos.write(NEW_LINE);
-            baos.write("Chan".getBytes());
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_OFF);
-            baos.write("FORM NO : ".getBytes());
-            baos.write(EMPHASIZE_ON);
-            baos.write("0605".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_OFF);
-            baos.write("TYPE : ".getBytes());
-            baos.write(EMPHASIZE_ON);
-            baos.write("AP".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_OFF);
-            baos.write("PERIOD COVERED : ".getBytes());
-            baos.write(EMPHASIZE_ON);
-            baos.write("2014-8-20".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_OFF);
-            baos.write("ASSESSMENT NO : ".getBytes());
-            baos.write(EMPHASIZE_ON);
-            baos.write("885".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_OFF);
-            baos.write("DUE DATE : ".getBytes());
-            baos.write(EMPHASIZE_ON);
-            baos.write("2014-8-20".getBytes());
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-
-            int fontSize = 0;
-            int fontWidth = 10 * (fontSize + 1) + (fontSize + 1);
-            String s1 = "PARTICULARS";
-            String s2 = "AMOUNT";
-            String s = s1;
-            int numOfCharacterPerLine = lineWidth / fontWidth;
-            for (int i = 0; i < numOfCharacterPerLine - s1.length() - s2.length(); ++i) {
-                s += " ";
-            }
-            s += s2;
-            baos.write(s.getBytes());
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-
-            fontSize = 0;
-            fontWidth = 10 * (fontSize + 1);
-
-            s1 = "BASIC";
-            s2 = "100.00";
-            s = s1;
-            numOfCharacterPerLine = lineWidth / fontWidth;
-            for (int i = 0; i < numOfCharacterPerLine - s1.length() - s2.length(); ++i) {
-                s += " ";
-            }
-            s += s2;
-            baos.write(EMPHASIZE_OFF);
-            baos.write(s.getBytes());
-            baos.write(NEW_LINE);
-
-            s1 = "    SUBCHANGE";
-            s2 = "500.00";
-            s = s1;
-            for (int i = 0; i < numOfCharacterPerLine - s1.length() - s2.length(); ++i) {
-                s += " ";
-            }
-            s += s2;
-            baos.write(s.getBytes());
-            baos.write(NEW_LINE);
-
-            s1 = "    INTEREST";
-            s2 = "0.00";
-            s = s1;
-            for (int i = 0; i < numOfCharacterPerLine - s1.length() - s2.length(); ++i) {
-                s += " ";
-            }
-            s += s2;
-            baos.write(s.getBytes());
-            baos.write(NEW_LINE);
-
-            s1 = "    COMPROMISE";
-            s2 = "0.00";
-            s = s1;
-            for (int i = 0; i < numOfCharacterPerLine - s1.length() - s2.length(); ++i) {
-                s += " ";
-            }
-            s += s2;
-            baos.write(s.getBytes());
-            baos.write(NEW_LINE);
-
-            s1 = "TOTAL";
-            s2 = "500.00";
-            s = s1;
-            for (int i = 0; i < numOfCharacterPerLine - s1.length() - s2.length(); ++i) {
-                s += " ";
-            }
-            s += s2;
-            baos.write(s.getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(FONT_8X12);
-            baos.write(singleLine.getBytes());
-            baos.write(NEW_LINE);
-
-            s1 = "TOTAL AMOUNT DUE";
-            s2 = "600.00";
-            s = s1;
-            for (int i = 0; i < numOfCharacterPerLine - s1.length() - s2.length(); ++i) {
-                s += " ";
-            }
-            s += s2;
-            baos.write(FONT_10X18);
-            baos.write(s.getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(FONT_8X12);
-            baos.write(doubleLine.getBytes());
-            baos.write(NEW_LINE);
-
-            s1 = "TOTAL AMOUNT PAID";
-            s2 = "600.00";
-            s = s1;
-            for (int i = 0; i < numOfCharacterPerLine - s1.length() - s2.length(); ++i) {
-                s += " ";
-            }
-            s += s2;
-            baos.write(FONT_10X18);
-            baos.write(s.getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_ON);
-            baos.write("SIX HUNDRED DOLLARS DIRHAMS ONLY".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_OFF);
-            baos.write(FONT_8X12);
-            baos.write(singleLine.getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(FONT_10X18);
-            baos.write("MANNER OF PAYMENT".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_ON);
-            baos.write(" ACCOUNTS RECEIVABLE".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_OFF);
-            baos.write("TYPE OF PAYMENT".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_ON);
-            baos.write(" FULL".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_OFF);
-            baos.write("MODE OF PAYMENT".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_ON);
-            baos.write("  CASH".getBytes());
-            baos.write(NEW_LINE);
-
-            s1 = "  AMOUNT";
-            s2 = "600.00";
-            s = s1;
-            for (int i = 0; i < numOfCharacterPerLine - s1.length() - s2.length(); ++i) {
-                s += " ";
-            }
-            s += s2;
-            baos.write(EMPHASIZE_OFF);
-            baos.write(s.getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write("REMARKS".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_ON);
-            baos.write("TEST".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_OFF);
-            baos.write(FONT_8X12);
-            baos.write(singleLine.getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(ALIGN_CENTER);
-
-            baos.write(FONT_SIZE_1);
-            baos.write(EMPHASIZE_ON);
-            baos.write(FONT_8X12);
-            baos.write("CARDHOLDER'S COPY".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(ALIGN_LEFT);
-
-            baos.write(FONT_SIZE_0);
-            baos.write(EMPHASIZE_OFF);
-            baos.write(singleLine.getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(ALIGN_CENTER);
-            baos.write(FONT_5X12);
-            baos.write("This is to certify that the amount indicated herein has".getBytes());
-            baos.write(NEW_LINE);
-            baos.write("been received by the undersigned".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-
-            baos.write(EMPHASIZE_ON);
-            baos.write(FONT_10X18);
-            baos.write("Chan Siu Ming".getBytes());
-            baos.write(NEW_LINE);
-
-            baos.write(hexToByteArray("1D6B21"));
-            baos.write(barcodeTargetHeight);
-            baos.write((byte) barcodeTargetWidth);
-            baos.write((byte) (barcodeTargetWidth >> 8));
-            baos.write(d2);
-            baos.write(NEW_LINE);
-
-            baos.write(SimplyPrintController.getUnicodeCommand("谢谢"));
-            baos.write(NEW_LINE);
-            baos.write(SimplyPrintController.getUnicodeCommand("Cảm ơn bạn"));
-            baos.write(NEW_LINE);
-
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-            baos.write(NEW_LINE);
-
-            baos.write(POWER_OFF);
-
-            return baos.toByteArray();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static byte[] genReceiptTest(Context context) {
-        int lineWidth = 384;
-        int size0NoEmphasizeLineWidth = 384 / 8; //line width / font width
-        String singleLine = "";
-        for (int i = 0; i < size0NoEmphasizeLineWidth; ++i) {
-            singleLine += "-";
-        }
-        String doubleLine = "";
-        for (int i = 0; i < size0NoEmphasizeLineWidth; ++i) {
-            doubleLine += "=";
-        }
-
-        Bitmap logoBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_evn_hanoi_ecpay_logo);
-        int logoTargetWidth = 300;
-        byte[] d1 = convertBitmap(logoBitmap, logoTargetWidth, 150);
+        byte[] d1 = convertBitmap(checkLogo(billObj,context), logoTargetWidth, 150);
 
 
         try {
@@ -514,7 +173,7 @@ public class ReceiptUtility {
             baos.write(EMPHASIZE_ON);
             baos.write(CHAR_SPACING_0);
             baos.write(FONT_5X12);
-            baos.write(SimplyPrintController.getUnicodeCommand("Công ty Điện Lực Hoàn Kiếm"));
+            baos.write(SimplyPrintController.getUnicodeCommand(billObj.getTEN_DIEN_LUC()));
             baos.write(NEW_LINE);
             baos.write(SimplyPrintController.getUnicodeCommand("BIÊN NHẬN"));
             baos.write(NEW_LINE);
@@ -524,19 +183,19 @@ public class ReceiptUtility {
 
             baos.write(ALIGN_LEFT);
 
-            String textKH = "Tên KH: Nguyễn Văn Dũng";
+            String textKH = "Tên KH: "+ billObj.getTEN_KHACH_HANG();
             writeLongText(baos, textKH, size0NoEmphasizeLineWidth);
-            String textDiaChi = "Địa chỉ: Hoàn Kiếm";
+            String textDiaChi = "Địa chỉ:"+ billObj.getDIA_CHI();
             writeLongText(baos, textDiaChi, size0NoEmphasizeLineWidth);
-            String maKH = "Mã KH: PD223133323123";
+            String maKH = "Mã KH: "+billObj.getMA_KHACH_HANG();
             writeLongText(baos, maKH, size0NoEmphasizeLineWidth);
 
 
             /**
              * Loại 2 dòng unicode
              */
-            String s1 = "Số Công tơ: 1234567891";
-            String s2 = "Số hộ: 12345678901";
+            String s1 = "Số Công tơ: "+ billObj.getSO_CONG_TO();
+            String s2 = "Số hộ: "+ billObj.getSO_HO();
 
             List<String> mutilText_2 = new ArrayList<>();
             mutilText_2.add(s1);
@@ -545,37 +204,21 @@ public class ReceiptUtility {
             writeLongTextMultiCollum(baos, lineWidth, padding, TYPE_TEXT.UNICODE_2_COLLUMN, mutilText_2);
 
             /**
-             * Loại 4 dòng unicode
-             */
-        /*    String s1 = "Số Công tơ: ";
-            String s2 = "3123321231";
-            String s3 = "Số hộ: ";
-            String s4 = "1233122131A";
-            List<String> mutilText = new ArrayList<>();
-            mutilText.add(s1);
-            mutilText.add(s2);
-            mutilText.add(s3);
-            mutilText.add(s4);
-
-            int padding = 2;
-            writeLongTextMultiCollum(baos, lineWidth, padding, TYPE_TEXT.UNICODE_4_COLLUMN, mutilText);*/
-
-            /**
              * Loại 3 dòng unicode
              */
 
             baos.write(NEW_LINE);
             baos.write(NEW_LINE);
-            writeLongText(baos, "Seri HĐTT: ADHDHHDJDSHDJS", size0NoEmphasizeLineWidth);
+            writeLongText(baos, "Seri HĐTT: "+ billObj.getBillId(), size0NoEmphasizeLineWidth);
             baos.write(NEW_LINE);
             writeLongText(baos, "Hình thức thanh toán: Tiền mặt", size0NoEmphasizeLineWidth);
             baos.write(NEW_LINE);
-            String noiDung = "Nội dung: thanh toán hóa đơn tiền điện kỳ 06/2017 từ ngày 01/06/2017 đến 30/06/2017";
+            String noiDung = "Nội dung: thanh toán hóa đơn tiền điện kỳ "+ Common.parse(billObj.getTHANG_THANH_TOAN(),Common.DATE_TIME_TYPE.MMyyyy.toString())+" từ ngày "+ billObj.getTU_NGAY()+" đến ngày " + billObj.getDEN_NGAY();
             writeLongText(baos, noiDung, size0NoEmphasizeLineWidth);
             baos.write(NEW_LINE);
-            baos.write(SimplyPrintController.getUnicodeCommand("CSĐK: 12331233312"));
+            baos.write(SimplyPrintController.getUnicodeCommand("CSĐK: "+ billObj.getCSDK()));
             baos.write(NEW_LINE);
-            baos.write(SimplyPrintController.getUnicodeCommand("CSCK: 13333333333"));
+            baos.write(SimplyPrintController.getUnicodeCommand("CSCK: "+ billObj.getCSCK()));
             baos.write(NEW_LINE);
             baos.write(NEW_LINE);
 
@@ -591,62 +234,58 @@ public class ReceiptUtility {
             baos.write(NEW_LINE);
             baos.write(doubleLine.getBytes());
             baos.write(NEW_LINE);
-
-            mutilText_3.clear();
-            mutilText_3.add("50");
-            mutilText_3.add("1.484");
-            mutilText_3.add("74.200");
-            padding = 2;
-            writeLongTextMultiCollum(baos, lineWidth, padding, TYPE_TEXT.UNICODE_3_COLLUMN, mutilText_3);
-            baos.write(NEW_LINE);
-
-            mutilText_3.clear();
-            mutilText_3.add("50");
-            mutilText_3.add("1.484");
-            mutilText_3.add("74.200");
-            padding = 2;
-            writeLongTextMultiCollum(baos, lineWidth, padding, TYPE_TEXT.UNICODE_3_COLLUMN, mutilText_3);
-            baos.write(NEW_LINE);
-
-            mutilText_3.clear();
-            mutilText_3.add("50");
-            mutilText_3.add("1.484");
-            mutilText_3.add("74.200");
-            padding = 2;
-            writeLongTextMultiCollum(baos, lineWidth, padding, TYPE_TEXT.UNICODE_3_COLLUMN, mutilText_3);
-            baos.write(NEW_LINE);
+            String MCS[] = billObj.getCHI_TIET_MCS().split(";");
+            String TIEN[] = billObj.getCHI_TIET_TIEN_MCS().split(";");
+            String DG[] = billObj.getCHI_TIET_KG().split(";");
+            ArrayList<ESCPOSSample.TienTheoChiSo> tienTheoChiSos = new ArrayList<>();
+            for(int i=0; i<MCS.length; i++){
+                ESCPOSSample.TienTheoChiSo tienTheoChiSo = new ESCPOSSample.TienTheoChiSo();
+                tienTheoChiSo.setChiSo(MCS[i]);
+                tienTheoChiSo.setDonGia(DG[i]);
+                tienTheoChiSo.setTienTheoChiSo(TIEN[i]);
+                tienTheoChiSos.add(tienTheoChiSo);
+            }
+            for (int i = 0; i < tienTheoChiSos.size();i++){
+                mutilText_3.clear();
+                mutilText_3.add(tienTheoChiSos.get(i).getChiSo());
+                mutilText_3.add(tienTheoChiSos.get(i).getDonGia());
+                mutilText_3.add(tienTheoChiSos.get(i).getTienTheoChiSo());
+                padding = 2;
+                writeLongTextMultiCollum(baos, lineWidth, padding, TYPE_TEXT.UNICODE_3_COLLUMN, mutilText_3);
+                baos.write(NEW_LINE);
+            }
 
             baos.write(singleLine.getBytes());
             baos.write(NEW_LINE);
 
             mutilText_2.clear();
-            mutilText_2.add("216 KWh");
-            mutilText_2.add("466.211");
+            mutilText_2.add(billObj.getDNTT() + " KWh");
+            mutilText_2.add(billObj.getTONG_TIEN_CHUA_THUE());
             padding = 4;
             writeLongTextMultiCollum(baos, lineWidth, padding, TYPE_TEXT.UNICODE_2_COLLUMN, mutilText_2);
             baos.write(NEW_LINE);
 
             mutilText_2.clear();
             mutilText_2.add("Thuế GTGT");
-            mutilText_2.add("46.621");
+            mutilText_2.add(billObj.getTONG_TIEN_THUE());
             padding = 4;
             writeLongTextMultiCollum(baos, lineWidth, padding, TYPE_TEXT.UNICODE_2_COLLUMN, mutilText_2);
             baos.write(NEW_LINE);
 
             mutilText_2.clear();
             mutilText_2.add("Tổng tiền");
-            mutilText_2.add("466.211");
+            mutilText_2.add(billObj.getTIEN_THANH_TOAN() + "");
             padding = 4;
             writeLongTextMultiCollum(baos, lineWidth, padding, TYPE_TEXT.UNICODE_2_COLLUMN, mutilText_2);
             baos.write(NEW_LINE);
 
-            String tienChu = "Bằng chữ: Một triệu ba trăm, Một triệu ba trăm, Một triệu ba trăm, Một triệu ba trăm, Một triệu ba trăm,";
+            String tienChu = "Bằng chữ: " + Common.unAccent(billObj.getTIEN_THANH_TOAN()+"");
             writeLongText(baos, tienChu, size0NoEmphasizeLineWidth);
             baos.write(NEW_LINE);
             baos.write(NEW_LINE);
             baos.write(NEW_LINE);
             baos.write(ALIGN_RIGHT);
-            baos.write(SimplyPrintController.getUnicodeCommand("Hà nội, ngày 31/06/2017"));
+            baos.write(SimplyPrintController.getUnicodeCommand("Hà nội, ngày " + ESCPOSSample.dateCurent()));
             baos.write(NEW_LINE);
             baos.write(SimplyPrintController.getUnicodeCommand("Người thu tiền"));
             baos.write(NEW_LINE);
@@ -784,4 +423,22 @@ public class ReceiptUtility {
         }
 
     }
+    private static Bitmap checkLogo(PayAdapter.BillEntityAdapter bill, Context context){
+        Bitmap logoBitmap = null;
+        if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("H")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("A")){
+            logoBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_evn_npc);
+        }else if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("C")){
+            logoBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_evn_cpc);
+        }else if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("B")){
+            logoBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_evn_spc);
+        }else if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("D")){
+            logoBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_evn_hanoi);
+        }else if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("E")){
+            logoBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_evn_hcmc);
+        }else {
+            logoBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.logoecpay2);
+        }
+        return logoBitmap;
+    }
+
 }

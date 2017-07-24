@@ -1392,6 +1392,8 @@ public class Common {
     //    public static final String PATH_FOLDER_DATA = PATH_FOLDER_ROOT + "Data" + File.separator;
     public static final String PATH_FOLDER_HELP = PATH_FOLDER_ROOT + "Help" + File.separator;
     public static final String PATH_FOLDER_LOG = PATH_FOLDER_ROOT + "Log" + File.separator;
+    public static final String PATH_FOLDER_BAO_CAO_CHI_TIET = PATH_FOLDER_ROOT + "BaoCaoChiTiet" + File.separator;
+    public static final String PATH_FOLDER_BAO_CAO_HOAN_TRA = PATH_FOLDER_ROOT + "BaoCaoHoanTra" + File.separator;
     //endregion
 
     //region info connect API SOAP

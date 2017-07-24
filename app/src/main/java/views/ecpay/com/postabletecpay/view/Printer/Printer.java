@@ -111,7 +111,10 @@ public class Printer {
             printer(billEntityAdapter);
         }else {
             receipts = new ArrayList<byte[]>();
-            receipts.add(ReceiptUtility.genReceiptTest(context));
+            for (int i = 0, n = dataAdapter.size(); i < n; i ++) {
+                receipts.add(ReceiptUtility.genReceiptTest(context,dataAdapter.get(i)));
+            }
+
             controller.startPrinting(receipts.size(), 120, 120);
         }
     }
@@ -465,7 +468,9 @@ public class Printer {
             Common.isBluetoothConnected = true;
             receipts = new ArrayList<byte[]>();
 //                receipts.add(ReceiptUtility.genReceipt(MainActivity.this));
-            receipts.add(ReceiptUtility.genReceiptTest(context));
+            for (int i = 0, n = dataAdapter.size(); i < n; i ++) {
+                receipts.add(ReceiptUtility.genReceiptTest(context,dataAdapter.get(i)));
+            }
             controller.startPrinting(receipts.size(), 120, 120);
         }
 
