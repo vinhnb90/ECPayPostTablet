@@ -16,103 +16,27 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.Ch
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.TrangChu.CashTranferFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.ICashTranferView;
 
+import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.LONG_TIME_DELAY_ANIM;
 
 /**
  * Created by MyPC on 20/06/2017.
  */
 
-public class CashTranferPresenter implements ICashTranferPresenter{
+public class CashTranferPresenter implements ICashTranferPresenter {
 
-    private  ICashTranferView iCashTranferView;
+    private ICashTranferView iCashTranferView;
 
 
     private CashTranferModel cashTranferModel;
     private String mEDong;
 
-    private SoapAPI.AsyncSoapCashTranfer.AsyncSoapCashTranferCallBack callBack = new SoapAPI.AsyncSoapCashTranfer.AsyncSoapCashTranferCallBack() {
-        @Override
-        public void onPre(final SoapAPI.AsyncSoapCashTranfer soapChangePass) {
-            if (soapChangePass == null)
-                return;
 
-            //check wifi
-            boolean isHasWifi = Common.isConnectingWifi(iCashTranferView.getContextView());
-            boolean isHasNetwork = Common.isNetworkConnected(iCashTranferView.getContextView());
-
-            if (!isHasWifi) {
-                iCashTranferView.setVisibleBar(false);
-                iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
-
-                soapChangePass.setEndCallSoap(true);
-                soapChangePass.cancel(true);
-            }
-
-            if (!isHasNetwork) {
-                iCashTranferView.setVisibleBar(false);
-                iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
-
-                soapChangePass.setEndCallSoap(true);
-                soapChangePass.cancel(true);
-            }
-
-            iCashTranferView.setVisibleBar(true);
-        }
-
-        @Override
-        public void onUpdate(String message) {
-            iCashTranferView.setVisibleBar(false);
-            if (message == null || message.isEmpty() || message.trim().equals(""))
-                return;
-
-            iCashTranferView.showText(message);
-        }
-
-        @Override
-        public void onPost(CashTranferRespone response) {
-            if(response == null)
-                return;
-            iCashTranferView.setVisibleBar(false);
-            iCashTranferView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
-            if (response == null) {
-                iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
-                return;
-            }
-
-
-            if(response.getFooter().getResponseCode().equals("000")) //Success
-            {
-
-                Account account = cashTranferModel.getAccountInfo(mEDong);
-                account.setBalance(account.getBalance() - response.getBody().getAmount());
-                cashTranferModel.writeSqliteAccountTable(account);
-
-                iCashTranferView.showText(response.getFooter().getDescription());
-
-                iCashTranferView.onBack();
-            }else
-            {
-                iCashTranferView.showText(response.getFooter().getDescription());
-            }
-
-        }
-
-        @Override
-        public void onTimeOut(final SoapAPI.AsyncSoapCashTranfer soapChangePass) {
-            //thread call asyntask is running. must call in other thread to update UI
-            iCashTranferView.setVisibleBar(false);
-            if (!soapChangePass.isEndCallSoap()) {
-                soapChangePass.cancel(true);
-                iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
-            }
-        }
-    };
-
-    public CashTranferPresenter(ICashTranferView view, String eDong)
-    {
+    public CashTranferPresenter(ICashTranferView view, String eDong) {
         iCashTranferView = view;
         cashTranferModel = new CashTranferModel(view.getContextView());
         mEDong = eDong;
@@ -159,8 +83,113 @@ public class CashTranferPresenter implements ICashTranferPresenter{
         if (json == null)
             return;
 
+        final String maKH = "";
+        final String soTien = amount.toString();
+        final String kyPhatSinh = "";
 
         try {
+            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.CASH_TRANSFER, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+
+            SoapAPI.AsyncSoapCashTranfer.AsyncSoapCashTranferCallBack callBack = new SoapAPI.AsyncSoapCashTranfer.AsyncSoapCashTranferCallBack() {
+                @Override
+                public void onPre(final SoapAPI.AsyncSoapCashTranfer soapChangePass) {
+                    if (soapChangePass == null)
+                        return;
+
+                    //check wifi
+                    boolean isHasWifi = Common.isConnectingWifi(iCashTranferView.getContextView());
+                    boolean isHasNetwork = Common.isNetworkConnected(iCashTranferView.getContextView());
+
+                    if (!isHasWifi) {
+                        iCashTranferView.setVisibleBar(false);
+                        iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
+
+                        soapChangePass.setEndCallSoap(true);
+                        soapChangePass.cancel(true);
+                    }
+
+                    if (!isHasNetwork) {
+                        iCashTranferView.setVisibleBar(false);
+                        iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+
+                        soapChangePass.setEndCallSoap(true);
+                        soapChangePass.cancel(true);
+                    }
+
+                    iCashTranferView.setVisibleBar(true);
+                }
+
+                @Override
+                public void onUpdate(String message) {
+                    iCashTranferView.setVisibleBar(false);
+                    if (message == null || message.isEmpty() || message.trim().equals(""))
+                        return;
+
+                    iCashTranferView.showText(message);
+                }
+
+                @Override
+                public void onPost(CashTranferRespone response) {
+                    if (response == null)
+                        return;
+                    iCashTranferView.setVisibleBar(false);
+                    iCashTranferView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
+
+                    if (response == null) {
+                        try {
+                            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.CASH_TRANSFER, false);
+                        } catch (Exception e) {
+                            Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+                        }
+                        iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                        return;
+                    }
+
+                    String maLoi = "";
+                    String moTaLoi = "";
+                    if (response.getFooter() != null) {
+                        maLoi = response.getFooter().getResponseCode();
+                        moTaLoi = response.getFooter().getDescription();
+                    }
+
+                    try {
+                        Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, maLoi, moTaLoi, Common.COMMAND_ID.CASH_TRANSFER, false);
+                    } catch (Exception e) {
+                        Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+                    }
+
+                    if (response.getFooter().getResponseCode().equals("000")) //Success
+                    {
+
+                        Account account = cashTranferModel.getAccountInfo(mEDong);
+                        account.setBalance(account.getBalance() - response.getBody().getAmount());
+                        cashTranferModel.writeSqliteAccountTable(account);
+
+                        iCashTranferView.showText(response.getFooter().getDescription());
+
+                        iCashTranferView.onBack();
+                    } else {
+                        iCashTranferView.showText(response.getFooter().getDescription());
+                    }
+
+                }
+
+                @Override
+                public void onTimeOut(final SoapAPI.AsyncSoapCashTranfer soapChangePass) {
+                    //thread call asyntask is running. must call in other thread to update UI
+                    iCashTranferView.setVisibleBar(false);
+                    if (!soapChangePass.isEndCallSoap()) {
+                        soapChangePass.cancel(true);
+                        iCashTranferView.showText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                    }
+                }
+            };
+
             final SoapAPI.AsyncSoapCashTranfer soapChangePass = new SoapAPI.AsyncSoapCashTranfer(callBack);
 
             if (soapChangePass.getStatus() != AsyncTask.Status.RUNNING) {

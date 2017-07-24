@@ -3,12 +3,10 @@ package views.ecpay.com.postabletecpay.view.Main;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -16,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,8 +26,6 @@ import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabReselectListener;
 import com.roughike.bottombar.OnTabSelectListener;
 
-import org.apache.log4j.chainsaw.Main;
-
 import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.presenter.IMainPresenter;
@@ -42,6 +37,7 @@ import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
+import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_DOWNLOAD;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.REQUEST_BARCODE;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.RESPONSE_BARCODE;
 
@@ -59,25 +55,25 @@ public class MainActivity extends AppCompatActivity implements
     private static boolean isLoginCall;
 
     private ProgressDialog progressDialog;
+    private Handler progressBarHandler = new Handler();
+
     private String showProgress = "SHOW_DIALOG" ;
     private Handler mHander = new Handler();
     private Runnable mRunableCheckPostBill = new Runnable() {
         @Override
         public void run() {
             boolean currentConnect = Common.isNetworkConnected(MainActivity.this);
-            boolean posted= true;
+            boolean posted = true;
             if (!hasNetworkLast && currentConnect) {
                 if (iMainPresenter != null) {
-                    try
-                    {
+                    try {
                         posted = iMainPresenter.checkAndPostBill();
-                    }catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         MainActivity.this.finish();
                     }
                 }
             }
-            if(posted)
+            if (posted)
                 hasNetworkLast = currentConnect;
             if (mHander != null && mRunableCheckPostBill != null)
                 mHander.postDelayed(mRunableCheckPostBill, Common.TIME_OUT_CHECK_CONNECTION);
@@ -108,22 +104,62 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void startShowPbarDownload() {
-        if(progressDialog == null)
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Đang đồng bộ dữ liệu ...");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setCancelable(false);
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.show();
+        if (progressDialog == null)
+            progressDialog = new ProgressDialog(this);
+
+        progressBarHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.setCancelable(true);
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.setMessage("Bắt đầu quá trình đồng bộ ...");
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setProgress(0);
+                progressDialog.setMax(100);
+                progressDialog.show();
+            }
+        });
     }
 
     @Override
     public void finishHidePbarDownload() {
-        if(progressDialog != null&& progressDialog.isShowing())
-        {
-            progressDialog.dismiss();
-            refreshInfoMain();
-        }
+        if (progressDialog == null)
+            return;
+        progressBarHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
+                //kết thúc thì refresh lại thông tin nếu đang ở mainPage
+                refreshInfoMain();
+            }
+        });
+    }
+
+    @Override
+    public void updatePbarDownload(final String message, final int statusProcess) {
+        if (progressDialog == null)
+            return;
+        progressBarHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.setMessage(message);
+                progressDialog.setProgress(statusProcess);
+            }
+        });
+    }
+
+    @Override
+    public void updateDelayPbarDownload(final String title, final int statusProcess, final int timeDelay) {
+        if (progressDialog == null)
+            return;
+        progressBarHandler.postDelayed(new Runnable() {
+                                           @Override
+                                           public void run() {
+                                               progressDialog.setMessage(title);
+                                               progressDialog.setProgress(statusProcess);
+                                           }
+                                       }, timeDelay
+        );
     }
 
     public enum ID_MENU_BOTTOM {
@@ -208,7 +244,17 @@ public class MainActivity extends AppCompatActivity implements
             public void run() {
                 if (isLoginCall) {
                     try {
-                        iMainPresenter.synchronizePC();
+                        //start UI prgressbar
+                        startShowPbarDownload();
+                        iMainPresenter.sync();
+//                        new Thread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//
+//                                iMainPresenter.syncBookCmis();
+//                            }
+//                        }).start();
+
                     } catch (Exception e) {
                         showTextMessage(e.getMessage());
                         e.printStackTrace();
@@ -269,16 +315,16 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if(ev.getAction() == MotionEvent.ACTION_UP) {
+        if (ev.getAction() == MotionEvent.ACTION_UP) {
             final View view = getCurrentFocus();
 
-            if(view != null) {
+            if (view != null) {
                 final boolean consumed = super.dispatchTouchEvent(ev);
 
                 final View viewTmp = getCurrentFocus();
                 final View viewNew = viewTmp != null ? viewTmp : view;
 
-                if(viewNew.equals(view)) {
+                if (viewNew.equals(view)) {
                     final Rect rect = new Rect();
                     final int[] coordinates = new int[2];
 
@@ -289,11 +335,10 @@ public class MainActivity extends AppCompatActivity implements
                     final int x = (int) ev.getX();
                     final int y = (int) ev.getY();
 
-                    if(rect.contains(x, y)) {
+                    if (rect.contains(x, y)) {
                         return consumed;
                     }
-                }
-                else if(viewNew instanceof EditText) {
+                } else if (viewNew instanceof EditText) {
                     return consumed;
                 }
 
@@ -332,9 +377,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onDestroy() {
         if (mHander != null && mRunableCheckPostBill != null)
             mHander.removeCallbacks(mRunableCheckPostBill);
-//        if (progressDialog != null && progressDialog.isShowing()){
-//            progressDialog.cancel();
-//        }
+        isLoginCall = false;
         super.onDestroy();
     }
 
@@ -360,8 +403,10 @@ public class MainActivity extends AppCompatActivity implements
     public IOnPauseScannerBarcodeListner getPauseScannerBarcodeListner() {
         return pauseScannerBarcodeListner;
     }
+
     Toast toast;
     long lastTimePressed = 0;
+
     @Override
     public void onBackPressed() {
         Fragment currentFragment = this.getSupportFragmentManager().findFragmentById(R.id.frameLayout);
@@ -495,13 +540,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void showRespone(String code, String description) {
-        if(!Config.isShowRespone())
+        if (!Config.isShowRespone())
             return;
 
         try {
             Toast.makeText(this, "CODE: " + code + "\n DESCRIPTION: " + description, Toast.LENGTH_LONG).show();
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

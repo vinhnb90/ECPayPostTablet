@@ -1,6 +1,6 @@
 package views.ecpay.com.postabletecpay.util.webservice;
 
-import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import views.ecpay.com.postabletecpay.model.adapter.ChangePassRequestAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.EvnRequestAdapter;
 import views.ecpay.com.postabletecpay.model.adapter.LoginRequestAdapter;
-import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.request.Base.FooterRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.Base.HeaderRequest;
@@ -74,10 +73,6 @@ import views.ecpay.com.postabletecpay.util.entities.request.EntityMapCustomerCar
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.BodyPostBillRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.TransactionOffItem;
 import views.ecpay.com.postabletecpay.util.entities.request.EntityPostBill.PostBillRequest;
-import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchCustomer.BodySearchCustomerRequest;
-import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchCustomer.SearchCustomerRequest;
-import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchCustomerBill.BodySearchCustomerBillRequest;
-import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchCustomerBill.SearchCustomerBillRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.BodySearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.EntitySearchOnline.SearchOnlineRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.GetPCInfo.BodyGetPCInfoRequest;
@@ -85,25 +80,19 @@ import views.ecpay.com.postabletecpay.util.entities.request.GetPCInfo.FooterGetP
 import views.ecpay.com.postabletecpay.util.entities.request.GetPCInfo.GetPCInfoRequest;
 import views.ecpay.com.postabletecpay.util.entities.request.GetPCInfo.HeaderGetPCInfoRequest;
 import views.ecpay.com.postabletecpay.util.entities.response.Base.Respone;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityBillOnline.BillingOnlineRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityCashTranfer.CashTranferRespone;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityChangePass.ChangePassResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityCheckTrainOnline.CheckTrainOnlineResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityData.ListDataResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityDataZip.ListDataZipResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityDeleteBillOnline.DeleteBillOnlineRespone;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListEVNReponse;
+import views.ecpay.com.postabletecpay.util.entities.response.EntityEVN.ListBookCmisReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginResponseReponse;
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogout.LogoutResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntityPostBill.PostBillResponse;
-import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchCustomer.SearchCustomerRespone;
-import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchCustomerBill.SearchCustomerBillRespone;
-import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchOnline.SearchOnlineResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.GetPCInfo.GetPCInfoRespone;
+import views.ecpay.com.postabletecpay.view.Main.IMainView;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
-import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT_KSOAP;
 
 /**
@@ -963,7 +952,7 @@ public class SoapAPI {
                                                               long auditNumber, String macAdressHexValue, String diskDriver,
                                                               String signatureEncrypted, Long amount, String code, Long billId,
                                                               @Nullable String requestDate,
-                                                               String reasonDeleteBill, String accountId) {
+                                                              String reasonDeleteBill, String accountId) {
         boolean hasNull =
                 TextUtils.isEmpty(agent) ||
                         TextUtils.isEmpty(agentEncypted) ||
@@ -1380,19 +1369,17 @@ public class SoapAPI {
         private static final String URL = ENDPOINT_URL;
         private static final String SOAP_ACTION = "request action to eStore";
         private static final String METHOD_PARAM = "message";
-        private AsyncSoapGetPCInfoCallBack callBack;
-        private boolean isEndCallSoap = false;
-        private String mPhoneName;
+        private IMainView iMainView;
+        private String message;
 
-        public AsyncSoapGetPCInfo(String _phoneName, AsyncSoapGetPCInfoCallBack callBack) throws Exception {
-            this.callBack = callBack;
-            this.mPhoneName = _phoneName;
+        public AsyncSoapGetPCInfo(IMainView iMainView) throws Exception {
+            this.iMainView = iMainView;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            callBack.onPre(this);
+            iMainView.updatePbarDownload(Common.STATUS_DOWNLOAD.GET_PC_INFO_START.getTitle(), 0);
         }
 
         @Override
@@ -1419,14 +1406,14 @@ public class SoapAPI {
                 ht.call(SOAP_ACTION, envelope);
                 response = (SoapPrimitive) envelope.getResponse();
             } catch (Exception e) {
-                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
-                Log.e(this.getClass().getName(), "Không nhận được dữ liệu");
+                message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString();
+                publishProgress();
                 return null;
             }
 
             if (response == null) {
-                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
-                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString();
+                publishProgress();
                 return null;
             }
 
@@ -1439,7 +1426,8 @@ public class SoapAPI {
             }
 
             if (data.isEmpty()) {
-                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString();
+                publishProgress();
                 return null;
             }
 
@@ -1455,43 +1443,34 @@ public class SoapAPI {
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            String message = values[0];
-            isEndCallSoap = true;
-            callBack.onUpdate(message);
         }
 
         @Override
         protected void onPostExecute(GetPCInfoRespone respone) {
             super.onPostExecute(respone);
-            if (respone == null)
+
+            if (respone == null) {
+                try {
+                    Common.writeLogUser(MainActivity.mEdong, "", "", "", "", "", Common.COMMAND_ID.GET_PC_INFO, false);
+                } catch (Exception e) {
+                    Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                }
                 return;
-            isEndCallSoap = true;
-            callBack.onPost(respone, mPhoneName);
-        }
+            }
 
-        public static abstract class AsyncSoapGetPCInfoCallBack {
-            public abstract void onPre(final AsyncSoapGetPCInfo soap);
+            String maLoi = "";
+            String moTaLoi = "";
+            if (respone.getFooter() != null) {
+                maLoi = respone.getFooter().getResponseCode();
+                moTaLoi = respone.getFooter().getDescription();
+            }
 
-            public abstract void onUpdate(String message);
+            try {
+                Common.writeLogUser(MainActivity.mEdong, "", "", "", maLoi, moTaLoi, Common.COMMAND_ID.GET_PC_INFO, false);
+            } catch (Exception e) {
+                Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
 
-            public abstract void onPost(GetPCInfoRespone response, String phone);
-
-            public abstract void onTimeOut(final AsyncSoapGetPCInfo soap);
-        }
-
-        public void callCountdown(final AsyncSoapGetPCInfo soap) {
-            if (soap == null)
-                return;
-
-            callBack.onTimeOut(soap);
-        }
-
-        public boolean isEndCallSoap() {
-            return isEndCallSoap;
-        }
-
-        public void setEndCallSoap(boolean endCallSoap) {
-            isEndCallSoap = endCallSoap;
         }
     }
 
@@ -1909,7 +1888,7 @@ public class SoapAPI {
     }
 
     //region đồng bộ
-    public static class AsyncSoapSynchronizePC extends AsyncTask<String, String, ListEVNReponse> {
+    public static class SoapGetBookCMIS extends AsyncTask<String, String, ListBookCmisReponse> {
 
         //request action to eStore
         private static final String METHOD_NAME = "execute";
@@ -1917,21 +1896,21 @@ public class SoapAPI {
         private static final String URL = ENDPOINT_URL;
         private static final String SOAP_ACTION = "request action to eStore";
         private static final String METHOD_PARAM = "message";
-        private AsyncSoapSynchronizePCCallBack callBack;
-        private boolean isEndCallSoap = false;
+        String message;
+        IMainView iMainView;
 
-        public AsyncSoapSynchronizePC(AsyncSoapSynchronizePCCallBack callBack) throws Exception {
-            this.callBack = callBack;
+        public SoapGetBookCMIS(final IMainView iMainView) {
+            this.iMainView = iMainView;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            callBack.onPre(this);
+            iMainView.updatePbarDownload(Common.STATUS_DOWNLOAD.BOOK_CMIS_START.getTitle(), 0);
         }
 
         @Override
-        protected ListEVNReponse doInBackground(String... jsons) {
+        protected ListBookCmisReponse doInBackground(String... jsons) {
             String json = jsons[0];
 
             try {
@@ -1950,20 +1929,25 @@ public class SoapAPI {
             SoapPrimitive response = null;
 
             try {
-                ht = new HttpTransportSE(URL);
+                ht = new HttpTransportSE(URL, TIME_OUT_CONNECT_KSOAP);
                 ht.call(SOAP_ACTION, envelope);
                 response = (SoapPrimitive) envelope.getResponse();
             } catch (Exception e) {
                 e.printStackTrace();
+                message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString();
+                return null;
             }
 
             if (response == null) {
-                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
-                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString();
                 return null;
             }
 
             String data = response.toString();
+            if (data.isEmpty()) {
+                message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString();
+                return null;
+            }
 
             try {
                 Common.writeLog(data, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER.toString(), false);
@@ -1971,58 +1955,46 @@ public class SoapAPI {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
 
-            if (data.isEmpty()) {
-                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
-                return null;
-            }
-
-            ListEVNReponse listEVNReponse = null;
+            ListBookCmisReponse listBookCmisReponse = null;
             final GsonBuilder gsonBuilder = new GsonBuilder();
             final Gson gson = gsonBuilder.create();
 
-            listEVNReponse = gson.fromJson(data, ListEVNReponse.class);
+            listBookCmisReponse = gson.fromJson(data, ListBookCmisReponse.class);
 
-            return listEVNReponse;
+            return listBookCmisReponse;
         }
 
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            String message = values[0];
-            if (isEndCallSoap)
-                callBack.onUpdate(message);
+
         }
 
         @Override
-        protected void onPostExecute(ListEVNReponse listEVNReponse) {
-            super.onPostExecute(listEVNReponse);
-            if (!isEndCallSoap)
-                callBack.onPost(listEVNReponse);
-        }
+        protected void onPostExecute(ListBookCmisReponse listBookCmisReponse) {
+            super.onPostExecute(listBookCmisReponse);
 
-        public static abstract class AsyncSoapSynchronizePCCallBack {
-            public abstract void onPre(final AsyncSoapSynchronizePC soapSynchronizePC);
-
-            public abstract void onUpdate(String message);
-
-            public abstract void onPost(ListEVNReponse response);
-
-            public abstract void onTimeOut(final AsyncSoapSynchronizePC soapSynchronizePC);
-        }
-
-        public void callCountdown(final AsyncSoapSynchronizePC soapSynchronizePC) {
-            if (soapSynchronizePC == null)
+            if (listBookCmisReponse == null) {
+                try {
+                    Common.writeLogUser(MainActivity.mEdong, "", "", "", "", "", Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER, false);
+                } catch (Exception e) {
+                    Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                }
                 return;
+            }
 
-            callBack.onTimeOut(soapSynchronizePC);
-        }
+            String maLoi = "";
+            String moTaLoi = "";
+            if (listBookCmisReponse.getFooterListEVNResponse() != null) {
+                maLoi = listBookCmisReponse.getFooterListEVNResponse().getResponseCode();
+                moTaLoi = listBookCmisReponse.getFooterListEVNResponse().getDescription();
+            }
 
-        public boolean isEndCallSoap() {
-            return isEndCallSoap;
-        }
-
-        public void setEndCallSoap(boolean endCallSoap) {
-            isEndCallSoap = endCallSoap;
+            try {
+                Common.writeLogUser(MainActivity.mEdong, "", "", "", maLoi, moTaLoi, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER, false);
+            } catch (Exception e) {
+                Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
         }
     }
     //endregion
@@ -2036,19 +2008,17 @@ public class SoapAPI {
         private static final String URL = ENDPOINT_URL;
         private static final String SOAP_ACTION = "request action to eStore";
         private static final String METHOD_PARAM = "message";
-        private AsyncSoapSynchronizeDataCallBack callBack;
-        private boolean isEndCallSoap = false;
-        private Context context;
 
-        public AsyncSoapSynchronizeData(AsyncSoapSynchronizeDataCallBack callBack, Context contextView) throws Exception {
-            this.callBack = callBack;
-            this.context = contextView;
+        String message;
+        IMainView iMainView;
+
+        public AsyncSoapSynchronizeData(final IMainView iMainView) {
+            this.iMainView = iMainView;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            callBack.onPre(this);
         }
 
         @Override
@@ -2071,30 +2041,23 @@ public class SoapAPI {
             SoapPrimitive response = null;
 
             try {
-                ht = new HttpTransportSE(URL);
+                ht = new HttpTransportSE(URL, Common.TIME_OUT_CONNECT_KSOAP);
                 ht.call(SOAP_ACTION, envelope);
                 response = (SoapPrimitive) envelope.getResponse();
             } catch (Exception e) {
-                Log.e(this.getClass().getName(), "Lỗi HttpTransportSE(URL) " + e.getMessage());
+                e.printStackTrace();
+                message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString();
                 return null;
             }
 
             if (response == null) {
-                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
-                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString();
                 return null;
             }
 
             String data = response.toString();
-
-            try {
-                Common.writeLog(data, Common.COMMAND_ID.SYNC_DATA.toString(), false);
-            } catch (Exception e) {
-                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
-            }
-
             if (data.isEmpty()) {
-                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString();
                 return null;
             }
 
@@ -2110,44 +2073,37 @@ public class SoapAPI {
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            String message = values[0];
-            isEndCallSoap = true;
-            callBack.onUpdate(message);
         }
 
         @Override
         protected void onPostExecute(ListDataResponse listDataResponse) {
             super.onPostExecute(listDataResponse);
-            isEndCallSoap = true;
-            callBack.onPost(listDataResponse);
-        }
 
-        public static abstract class AsyncSoapSynchronizeDataCallBack {
-            public abstract void onPre(final AsyncSoapSynchronizeData soapSynchronizeData);
-
-            public abstract void onUpdate(String message);
-
-            public abstract void onPost(ListDataResponse response);
-
-            public abstract void onTimeOut(final AsyncSoapSynchronizeData soapSynchronizeData);
-        }
-
-        public void callCountdown(final AsyncSoapSynchronizeData soapSynchronizeData) {
-            if (soapSynchronizeData == null)
+            if (listDataResponse == null) {
+                try {
+                    Common.writeLogUser(MainActivity.mEdong, "", "", "", "", "", Common.COMMAND_ID.SYNC_DATA, false);
+                } catch (Exception e) {
+                    Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                }
                 return;
+            }
 
-            callBack.onTimeOut(soapSynchronizeData);
-        }
+            String maLoi = "";
+            String moTaLoi = "";
+            if (listDataResponse.getFooterListDataResponse() != null) {
+                maLoi = listDataResponse.getFooterListDataResponse().getResponse_code();
+                moTaLoi = listDataResponse.getFooterListDataResponse().getDescription();
+            }
 
-        public boolean isEndCallSoap() {
-            return isEndCallSoap;
-        }
+            try {
+                Common.writeLogUser(MainActivity.mEdong, "", "", "", maLoi, moTaLoi, Common.COMMAND_ID.SYNC_DATA, false);
+            } catch (Exception e) {
+                Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
 
-        public void setEndCallSoap(boolean endCallSoap) {
-            isEndCallSoap = endCallSoap;
         }
     }
-    //endregion
+//endregion
 
     //region đồng bộ file
     public static class AsyncSoapSynchronizeDataZip extends AsyncTask<String, String, ListDataZipResponse> {
@@ -2158,19 +2114,16 @@ public class SoapAPI {
         private static final String URL = ENDPOINT_URL;
         private static final String SOAP_ACTION = "request action to eStore";
         private static final String METHOD_PARAM = "message";
-        private AsyncSoapSynchronizeDataZipCallBack callBack;
-        private boolean isEndCallSoap = false;
-        private Context context;
+        String message;
+        IMainView iMainView;
 
-        public AsyncSoapSynchronizeDataZip(final AsyncSoapSynchronizeDataZipCallBack callBack, Context context) throws Exception {
-            this.callBack = callBack;
-            this.context = context;
+        public AsyncSoapSynchronizeDataZip(final IMainView iMainView) {
+            this.iMainView = iMainView;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            callBack.onPre(this);
         }
 
         @Override
@@ -2196,17 +2149,24 @@ public class SoapAPI {
                 ht = new HttpTransportSE(URL);
                 ht.call(SOAP_ACTION, envelope);
                 response = (SoapPrimitive) envelope.getResponse();
+
+
             } catch (Exception e) {
                 e.printStackTrace();
+                message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString();
+                return null;
             }
 
             if (response == null) {
-                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
-                Log.e(this.getClass().getName(), "doInBackground: Sai định dạng cấu trúc json response không chính xác.");
+                message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString();
                 return null;
             }
 
             String data = response.toString();
+            if (data.isEmpty()) {
+                message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString();
+                return null;
+            }
 
             try {
                 Common.writeLog(data, Common.COMMAND_ID.GET_FILE_GEN.toString(), false);
@@ -2214,17 +2174,9 @@ public class SoapAPI {
                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
 
-            if (data.isEmpty()) {
-                publishProgress(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
-                return null;
-            }
-
             ListDataZipResponse listDataZipResponse = null;
-            final GsonBuilder gsonBuilder = new GsonBuilder();
-//            gsonBuilder.registerTypeAdapter(ListEVNReponse.class, new LoginResponseAdapter());
-//            gsonBuilder.setPrettyPrinting();
-            final Gson gson = gsonBuilder.create();
-
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            Gson gson = gsonBuilder.create();
             listDataZipResponse = gson.fromJson(data, ListDataZipResponse.class);
 
             return listDataZipResponse;
@@ -2233,43 +2185,35 @@ public class SoapAPI {
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            String message = values[0];
-            isEndCallSoap = true;
-            callBack.onUpdate(message);
         }
 
         @Override
         protected void onPostExecute(ListDataZipResponse listDataZipResponse) {
             super.onPostExecute(listDataZipResponse);
-            isEndCallSoap = true;
-            callBack.onPost(listDataZipResponse);
-        }
 
-        public static abstract class AsyncSoapSynchronizeDataZipCallBack {
-            public abstract void onPre(final AsyncSoapSynchronizeDataZip soapSynchronizeDataZip);
-
-            public abstract void onUpdate(String message);
-
-            public abstract void onPost(ListDataZipResponse response);
-
-            public abstract void onTimeOut(final AsyncSoapSynchronizeDataZip soapSynchronizeDataZip);
-        }
-
-        public void callCountdown(final AsyncSoapSynchronizeDataZip soapSynchronizeDataZip) {
-            if (soapSynchronizeDataZip == null)
+            if (listDataZipResponse == null) {
+                try {
+                    Common.writeLogUser(MainActivity.mEdong, "", "", "", "", "", Common.COMMAND_ID.GET_FILE_GEN, false);
+                } catch (Exception e) {
+                    Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                }
                 return;
+            }
 
-            callBack.onTimeOut(soapSynchronizeDataZip);
-        }
+            String maLoi = "";
+            String moTaLoi = "";
+            if (listDataZipResponse.getFooterListDataZipResponse() != null) {
+                maLoi = listDataZipResponse.getFooterListDataZipResponse().getResponse_code();
+                moTaLoi = listDataZipResponse.getFooterListDataZipResponse().getDescription();
+            }
 
-        public boolean isEndCallSoap() {
-            return isEndCallSoap;
-        }
-
-        public void setEndCallSoap(boolean endCallSoap) {
-            isEndCallSoap = endCallSoap;
+            try {
+                Common.writeLogUser(MainActivity.mEdong, "", "", "", maLoi, moTaLoi, Common.COMMAND_ID.GET_FILE_GEN, false);
+            } catch (Exception e) {
+                Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
         }
     }
-    //endregion
+//endregion
 
 }

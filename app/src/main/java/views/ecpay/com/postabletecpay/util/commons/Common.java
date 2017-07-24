@@ -99,7 +99,7 @@ import static java.lang.System.lineSeparator;
  */
 
 public class Common {
-
+    public static boolean isBluetoothConnected = false;
     //region param account
     public enum TYPE_ACCOUNT {
         ADMIN_IT(-1, "Admin IT"),
@@ -338,6 +338,7 @@ public class Common {
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(temp).replaceAll("").replaceAll("Đ", "D").replace("đ", "d");
     }
+
     public enum STATE_OF_DEBT {
         NULL(0, ""),
         CHUA_CHAM(1, "Chưa chấm nợ"),
@@ -610,6 +611,9 @@ public class Common {
 
     //region Description key
     public static final String TAG = "TAG";
+    public static final String TAG_SYNC = "TAG SYNC";
+    public static final String TAG_SYNC_GET_FILE = "TAG GET-FILE-GEN";
+    public static final String TAG_SYNC_DATA = "TAG SYNC-DATA";
     public static final String KEY_EDONG = "EDONG";
     public static final String INTERFACE_MAIN = "INTERFACE_MAIN";
 
@@ -873,11 +877,9 @@ public class Common {
     }
 
 
-
-    public enum HINH_THUC_TTOAN
-    {
-        ONLINE ("01", "Online"),
-        OFFLINE ("02", "Offline");
+    public enum HINH_THUC_TTOAN {
+        ONLINE("01", "Online"),
+        OFFLINE("02", "Offline");
 
         HINH_THUC_TTOAN(String code, String message) {
             this.code = code;
@@ -896,13 +898,13 @@ public class Common {
         private final String code;
         private String message;
     }
-    public enum TRANG_THAI_TTOAN
-    {
+
+    public enum TRANG_THAI_TTOAN {
         NULL("00", "Khong Xac Dinh"),
-        DA_TTOAN ("02", "Da Thanh Toan"),
-        CHUA_TTOAN ("01", "Chua Thanh Toan"),
-        TTOAN_BOI_NGUON_KHAC ("03", "Thanh Toan Boi Nguon Khac"),
-        TTOAN_BOI_VI_KHAC ("04", "Thanh Toan Boi Vi Khac");
+        DA_TTOAN("02", "Da Thanh Toan"),
+        CHUA_TTOAN("01", "Chua Thanh Toan"),
+        TTOAN_BOI_NGUON_KHAC("03", "Thanh Toan Boi Nguon Khac"),
+        TTOAN_BOI_VI_KHAC("04", "Thanh Toan Boi Vi Khac");
 
         TRANG_THAI_TTOAN(String code, String message) {
             this.code = code;
@@ -919,7 +921,6 @@ public class Common {
         }
 
 
-
         public String getCode() {
             return code;
         }
@@ -928,19 +929,17 @@ public class Common {
             return message;
         }
 
-        public boolean equal(TRANG_THAI_TTOAN e)
-        {
-            return  this.getCode().equalsIgnoreCase(e.getCode());
+        public boolean equal(TRANG_THAI_TTOAN e) {
+            return this.getCode().equalsIgnoreCase(e.getCode());
         }
 
         private final String code;
         private String message;
     }
 
-    public enum TRANG_THAI_GIAO_THU
-    {
-        GIAO_THU ("01", "Giao Thu"),
-        VANG_LAI ("02", "Vang Lai");
+    public enum TRANG_THAI_GIAO_THU {
+        GIAO_THU("01", "Giao Thu"),
+        VANG_LAI("02", "Vang Lai");
 
         TRANG_THAI_GIAO_THU(String code, String message) {
             this.code = code;
@@ -960,13 +959,12 @@ public class Common {
         private String message;
     }
 
-    public enum TRANG_THAI_CHAM_NO
-    {
-        CHUA_CHAM ("01", "Chua Cham"),
-        DA_CHAM ("02", "Chua Cham"),
-        DANG_CHO_XU_LY ("03", "Dang Cho Xu Ly Cham No"),
-        CHAM_LOI ("04", "Cham Loi"),
-        KHONG_THANH_CONG ("05", "Khong Thanh Cong");
+    public enum TRANG_THAI_CHAM_NO {
+        CHUA_CHAM("01", "Chua Cham"),
+        DA_CHAM("02", "Chua Cham"),
+        DANG_CHO_XU_LY("03", "Dang Cho Xu Ly Cham No"),
+        CHAM_LOI("04", "Cham Loi"),
+        KHONG_THANH_CONG("05", "Khong Thanh Cong");
 
         TRANG_THAI_CHAM_NO(String code, String message) {
             this.code = code;
@@ -985,11 +983,11 @@ public class Common {
         private final String code;
         private String message;
     }
-    public enum TRANG_THAI_DAY_CHAM_NO
-    {
-        CHUA_DAY ("01", "Chua Day"),
-        DA_DAY ("02", "Da Day"),
-        KHONG_THANH_CONG ("03", "Khong Thanh Cong");
+
+    public enum TRANG_THAI_DAY_CHAM_NO {
+        CHUA_DAY("01", "Chua Day"),
+        DA_DAY("02", "Da Day"),
+        KHONG_THANH_CONG("03", "Khong Thanh Cong");
 
         TRANG_THAI_DAY_CHAM_NO(String code, String message) {
             this.code = code;
@@ -1008,9 +1006,9 @@ public class Common {
         private final String code;
         private String message;
     }
-    public enum TRANG_THAI_HOAN_TRA
-    {
-        CHUA_TRA ("01", "Chưa Trả");
+
+    public enum TRANG_THAI_HOAN_TRA {
+        CHUA_TRA("01", "Chưa Trả");
 
         TRANG_THAI_HOAN_TRA(String code, String message) {
             this.code = code;
@@ -1029,9 +1027,9 @@ public class Common {
         private final String code;
         private String message;
     }
-    public enum MA_GIAO_DICH
-    {
-        TTOAN_OFFLINE ("06", "Thanh Toán OFFLINE"),
+
+    public enum MA_GIAO_DICH {
+        TTOAN_OFFLINE("06", "Thanh Toán OFFLINE"),
         CAP_NHAT_TTHAI_NO("02", "Cập Nhật Trạng Thái "),
         TT_ONLINE_CHAM_NO_ONLINE("03", "Thanh Toán Online Chấm Nợ Online"),
         TT_ONLINE_CHAM_NO_OFFLINE("04", "Thanh Toán Online Chấm Nợ Offline"),
@@ -1060,12 +1058,9 @@ public class Common {
         private String message;
 
 
-        public static MA_GIAO_DICH findCode(String code)
-        {
-            for (int i = 0, n = values().length; i < n; i ++)
-            {
-                if(values()[i].getCode().equalsIgnoreCase(code))
-                {
+        public static MA_GIAO_DICH findCode(String code) {
+            for (int i = 0, n = values().length; i < n; i++) {
+                if (values()[i].getCode().equalsIgnoreCase(code)) {
                     return values()[i];
                 }
             }
@@ -1074,10 +1069,10 @@ public class Common {
     }
 
 
-    public enum TRANG_THAI_HUY
-    {
+    public enum TRANG_THAI_HUY {
         DA_HUY("01", "Da Huy"),
         CHO_HUY("02", "Cho Huy");
+
         TRANG_THAI_HUY(String code, String message) {
             this.code = code;
             this.message = message;
@@ -1300,6 +1295,37 @@ public class Common {
             return CODE_REPONSE_TRANSACTION_CANCELLATION.e9999;
         }
     }
+
+    public enum CODE_REPONSE_SYNC_DATA {
+        e000("000", "Khách hàng còn nợ!"),
+        e9999("9999", "Có lỗi xảy ra khi thực hiện nghiệp vụ");
+
+        CODE_REPONSE_SYNC_DATA(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        private final String code;
+        private String message;
+
+        public static CODE_REPONSE_SYNC_DATA findCodeMessage(String code) {
+            for (CODE_REPONSE_SYNC_DATA v : values()) {
+                if (v.getCode().equals(code)) {
+                    return v;
+                }
+            }
+            return CODE_REPONSE_SYNC_DATA.e9999;
+        }
+    }
+
     //endregion
 
     //region info communication server
@@ -1309,24 +1335,33 @@ public class Common {
     public static long TIME_OUT_CHECK_CONNECTION = 10000;
 
     public enum COMMAND_ID {
-        LOGIN,
-        CHANGE_PIN,
-        BILLING,
-        GET_BOOK_CMIS_BY_CASHIER,
-        SYNC_DATA,
-        CUSTOMER_BILL,
-        GET_FILE_GEN,
-        CHECK_TRANS,
-        TRANSACTION_CANCELLATION,
-        LOGOUT,
-        PUT_TRANSACTION_OFF,
-        CASH_TRANSFER,
-        GET_PC_INFO,
-        SEARCH_CUSTOMER,
-        SEARCH_CUSTOMER_BILL,
-        MAP_CUSTOMER_CARD,
-        BALANCE,
-        ACCOUNT;
+        LOGIN("Đăng nhập"),
+        CHANGE_PIN("Đổi mật khẩu"),
+        BILLING("Thanh toán online"),
+        GET_BOOK_CMIS_BY_CASHIER("Đồng bộ sổ ghi chỉ số"),
+        SYNC_DATA("Đồng bộ quét dữ liệu mới nhất"),
+        CUSTOMER_BILL("Tra cứu thông tin KH và thông tin các hóa đơn của KH đó"),
+        GET_FILE_GEN("Đồng bộ file"),
+        CHECK_TRANS("Kiểm tra trạng thái hóa đơn"),
+        TRANSACTION_CANCELLATION("Yêu cầu hủy hóa đơn"),
+        LOGOUT("Đăng xuất"),
+        PUT_TRANSACTION_OFF("Đẩy hóa đơn chấm nợ offline"),
+        CASH_TRANSFER("Chuyển tiền ví tổng"),
+        GET_PC_INFO("Đồng bộ thông tin điện lực"),
+        SEARCH_CUSTOMER("Tra cứu thông tin khách hàng"),
+        MAP_CUSTOMER_CARD("Đăng ký thẻ khách hàng, cập nhật thẻ khách hàng"),
+        BALANCE("Tra cứu thông tin tài khoản ví thu nhân viên"),
+        ACCOUNT("Tra cứu thông tin của tài khoản Thu nhân viên");
+
+        private String description;
+
+        COMMAND_ID(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
 
         @Override
         public String toString() {
@@ -1358,13 +1393,11 @@ public class Common {
                 return "GET-PC-INFO";
             if (this == SEARCH_CUSTOMER)
                 return "CUSTOMER";
-            if (this == SEARCH_CUSTOMER_BILL)
-                return "CUSTOMER-BILL";
             if (this == MAP_CUSTOMER_CARD)
                 return "MAP-CUSTOMER-CARD";
-            if(this == BALANCE)
+            if (this == BALANCE)
                 return "BALANCE";
-            if(this == ACCOUNT)
+            if (this == ACCOUNT)
                 return "ACCOUNT";
             return super.toString();
         }
@@ -1403,7 +1436,8 @@ public class Common {
     public static final String CONFIG_FILENAME = "config.cfg";
     public static final String[] CFG_COLUMN = {"PUBLIC_KEY", "PRIVATE_KEY", "AGENT", "PASS_WORD", "PC_CODE"};
     public static final String HELP_FILENAME = "help.txt";
-    public static final String LOG_FILENAME = "log.txt";
+    public static final String LOG_FILENAME = "logDev.txt";
+    public static final String LOG_USER_FILENAME = "log.txt";
     public static final String[] HELP_COLUMN = {"INFO_HELP"};
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -1540,9 +1574,38 @@ public class Common {
         return fileLog;
     }
 
-    public static void deleteAllFileFolderDownload() throws Exception{
+    public static File makeRootFolderUserLog() throws Exception {
         if (!isExternalStorageWritable())
-            return ;
+            return null;
+
+        File folderRoot = new File(PATH_FOLDER_ROOT);
+        if (!folderRoot.isDirectory()) {
+            folderRoot.mkdir();
+        }
+
+
+        File folderLog = new File(PATH_FOLDER_LOG);
+        if (!folderLog.isDirectory()) {
+            folderLog.mkdir();
+        }
+
+        File fileLog = new File(PATH_FOLDER_LOG + Common.LOG_USER_FILENAME);
+
+        if (!fileLog.exists()) {
+            try {
+                fileLog.createNewFile();
+            } catch (IOException e) {
+                throw e;
+            }
+        }
+
+        fileLog = new File(PATH_FOLDER_LOG + Common.LOG_USER_FILENAME);
+        return fileLog;
+    }
+
+    public static void deleteAllFileFolderDownload() throws Exception {
+        if (!isExternalStorageWritable())
+            return;
 
         File folderRoot = new File(PATH_FOLDER_ROOT);
         if (!folderRoot.isDirectory()) {
@@ -1558,7 +1621,7 @@ public class Common {
         for (int i = 0; i < allFilesDownload.length; i++) {
             allFilesDownload[i] = Common.PATH_FOLDER_DOWNLOAD + allFilesDownload[i];
             File aFile = new File(allFilesDownload[i]);
-            if(aFile.exists())
+            if (aFile.exists())
                 aFile.delete();
         }
 
@@ -2334,6 +2397,9 @@ public class Common {
 
     //delay animations when view is clicked
     public static final int TIME_DELAY_ANIM = 250;
+    public static final int TIME_DELAY_DOWNLOAD = 1000;
+    public static final int TIME_DELAY_MIN_DOWNLOAD = 100;
+    public static final int TIME_DELAY_ELEMENT_DOWNLOAD = 50;
     public static final int LONG_TIME_DELAY_ANIM = 1000;
     public static final int MORE_LONG_TIME_DELAY_ANIM = 2000;
 
@@ -2375,6 +2441,7 @@ public class Common {
         yyyyMMddHHmmssSSS,
         MMyyyy,
         ddMMyyyy,
+        ddMMyyyyHHmmss,
         FULL;
 
         @Override
@@ -2389,6 +2456,8 @@ public class Common {
                 return "MM/yyyy";
             if (this == ddMMyyyy)
                 return "dd/MM/yyyy";
+            if (this == ddMMyyyyHHmmss)
+                return "dd/MM/yyyy HH:mm:ss";
             if (this == FULL)
                 return "yyyy-MM-dd HH:mm:ss";
             return super.toString();
@@ -2400,6 +2469,32 @@ public class Common {
         ERROR,
         SUCCESS,
         FINISH;
+    }
+
+    public enum STATUS_DOWNLOAD {
+        BOOK_CMIS_START("Đang đồng bộ sổ..."),
+        BOOK_CMIS_ERROR("Không nhận được dữ liệu sổ..."),
+        BOOK_CMIS_END("Hoàn tất dồng bộ sổ."),
+
+        GET_PC_INFO_START("Đang đồng bộ Điện lực..."),
+        GET_PC_INFO_ERROR("Không nhận được dữ liệu Điện lực..."),
+        GET_PC_INFO_END("Hoàn tất dồng bộ Điện lực."),
+
+        GET_FILE_GEN_START("Đang đồng bộ file..."),
+        GET_FILE_GEN_END("Hoàn tất đồng bộ file."),
+
+        SYNC_DATA_START("Đang đồng bộ dữ liệu mới nhất..."),
+        SYNC_DATA_END("Hoàn tất đồng bộ dữ liệu mới nhất.");
+
+        private String title;
+
+        STATUS_DOWNLOAD(String title) {
+            this.title = title;
+        }
+
+        public String getTitle() {
+            return title;
+        }
     }
 
     public static String getDateTimeNow(Common.DATE_TIME_TYPE formatDate) {
@@ -2465,25 +2560,22 @@ public class Common {
     }
 
 
-    public static Date parseDate(String value, String format)
-    {
-        if(value == null)
-        {
-            return  null;
+    public static Date parseDate(String value, String format) {
+        if (value == null) {
+            return null;
         }
 
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
-        Date d=new Date();
+        Date d = new Date();
         try {
-            d =  dateFormat.parse(value);
+            d = dateFormat.parse(value);
         } catch (ParseException e) {
             Log.e("LOG", "PARSE DATE ERROR");
         }
         return d;
     }
 
-    public static String parse(Date value, String format)
-    {
+    public static String parse(Date value, String format) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         try {
             return dateFormat.format(value);
@@ -2539,7 +2631,7 @@ public class Common {
         buttonOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(clickYesNoDialog != null)
+                if (clickYesNoDialog != null)
                     clickYesNoDialog.doClickYes();
                 alertDialog.dismiss();
             }
@@ -2548,7 +2640,7 @@ public class Common {
         buttonCancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(clickYesNoDialog != null)
+                if (clickYesNoDialog != null)
                     clickYesNoDialog.doClickNo();
                 alertDialog.dismiss();
             }
@@ -2566,15 +2658,12 @@ public class Common {
         return screenWidth;
     }
 
-    public static String convertToDate(String time)
-    {
-        if(time == null || time.length() == 0)
-        {
+    public static String convertToDate(String time) {
+        if (time == null || time.length() == 0) {
             return getDateTimeNow(DATE_TIME_TYPE.yyyyMMddHHmmssSSS);
         }
         time = time.replaceAll("-", "");
-        for (int i = time.length(); i <= 17; i ++)
-        {
+        for (int i = time.length(); i <= 17; i++) {
             time += "0";
         }
 
@@ -2585,11 +2674,9 @@ public class Common {
         if (time == null || time.trim().isEmpty())
             return "";
 
-        if(typeDefault != DATE_TIME_TYPE.FULL)
-        {
+        if (typeDefault != DATE_TIME_TYPE.FULL) {
             time = time.replaceAll("-", "");
-            for (int i = time.length(); i <= 17; i ++)
-            {
+            for (int i = time.length(); i <= 17; i++) {
                 time += "0";
             }
         }
@@ -2636,7 +2723,7 @@ public class Common {
     }
 
     public void hideKeyboard(View view, Activity activity) {
-        InputMethodManager inputMethodManager =(InputMethodManager)activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
@@ -2788,6 +2875,61 @@ public class Common {
             writer.close();
         } catch (IOException e) {
             // do something
+        }
+    }
+
+    public static void writeLogUser(String soViQuay, String maKH, String soTien, String kyPhatSinh, String maLoi, String moTaLoi, Common.COMMAND_ID maGiaoDich, boolean isRequest) throws Exception {
+        try {
+            File fileLog = new File(PATH_FOLDER_LOG + Common.LOG_USER_FILENAME);
+            if (!fileLog.exists())
+                try {
+                    fileLog = Common.makeRootFolderLog();
+                } catch (Exception e) {
+                    throw e;
+                }
+            String textOld = Common.getDataFileLog(fileLog);
+
+            PrintWriter writer = new PrintWriter(fileLog, "UTF-8");
+            writer.print(textOld);
+            writer.print("\n");
+            writer.print("\n");
+            writer.print("\n");
+            writer.println("====================================================");
+            writer.println("====================" + maGiaoDich.toString() + "===================");
+            writer.println("====================================================");
+            if (isRequest) {
+                writer.println(" \n Request tới server" + maGiaoDich);
+            } else
+                writer.println(" \n Response từ server" + maGiaoDich);
+            writer.println("====================================================");
+            writer.print("\n");
+            writer.println("---Số ví quầy: " + soViQuay);
+            writer.print("\n");
+            writer.println("---Thời gian: " + Common.getDateTimeNow(DATE_TIME_TYPE.ddMMyyyyHHmmss));
+            writer.print("\n");
+            writer.println("---Mã giao dịch: " + maGiaoDich);
+            writer.print("\n");
+            writer.println("---Mã KH" + maKH);
+            writer.print("\n");
+            writer.println("---Số tiền: " + soTien);
+            writer.print("\n");
+            writer.println("---Kỳ phát sinh: " + kyPhatSinh);
+            writer.print("\n");
+            writer.println("Số định danh giao dịch: " + maGiaoDich.getDescription());
+            writer.print("\n");
+
+            if (isRequest) {
+            } else {
+                writer.println("---Mã trả về: " + maLoi);
+                writer.print("\n");
+                writer.println("---Mô tả lỗi: " + moTaLoi);
+                writer.print("\n");
+            }
+
+            writer.close();
+        } catch (IOException e) {
+            // do something
+        } finally {
         }
 
     }

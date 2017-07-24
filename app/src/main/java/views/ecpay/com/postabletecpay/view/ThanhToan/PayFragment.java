@@ -854,19 +854,18 @@ public class PayFragment extends Fragment implements
 
     @Override
     public void PrintThongBaoDien(PayAdapter.DataAdapter data) {
-//        isThongbao = true;
-//        if (!isBluetoothConnected) {
-//            dialogChonMayIn();
-//        }else
-//            if (!isSimply) {
-//                printer(true,data.getBill());
-//            }else {
-//                receipts = new ArrayList<byte[]>();
-//                receipts.add(ReceiptUtility.genReceiptTest(getContext()));
-//                controller.startPrinting(receipts.size(), 120, 120);
-//            }
-        Printer printer = new Printer(getActivity(),Printer.THONG_BAO,data.getBillKH().get(0));
-        printer.Action();
+        ArrayList<PayAdapter.BillEntityAdapter> billEntityAdapterArrayList = new ArrayList<PayAdapter.BillEntityAdapter>();
+        for (int i = 0, n = data.getBillKH().size(); i < n; i ++) {
+            if(data.getBillKH().get(i).isChecked()) {
+                billEntityAdapterArrayList.add(data.getBillKH().get(i));
+                Printer printer = new Printer(getActivity(),Printer.THONG_BAO,billEntityAdapterArrayList);
+                printer.Action();
+            }
+            if (billEntityAdapterArrayList.size() == 0){
+                Toast.makeText(getContext(),"Không có hóa đơn nào được chọn!",Toast.LENGTH_LONG).show();
+            }
+        }
+
     }
 
     @Override

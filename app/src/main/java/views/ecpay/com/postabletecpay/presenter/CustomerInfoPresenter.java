@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.presenter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -18,6 +19,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityMapCustomerCa
 import views.ecpay.com.postabletecpay.util.entities.response.EntitySearchCustomerBill.SearchCustomerBillRespone;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Customer;
 import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.TrangChu.ICustomerInfoView;
 
 /**
@@ -31,15 +33,14 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 
     Handler mHander = new Handler();
 
-    public CustomerInfoPresenter(ICustomerInfoView view)
-    {
+    public CustomerInfoPresenter(ICustomerInfoView view) {
         customerInfoView = view;
         customerInfoModel = new CustomerInfoModel(view.getContextView());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void register(final EntityKhachHang customer, final String mEDong, final String eCard, final String phoneEcpay, final String bankAcc,  final String bankName) {
+    public void register(final EntityKhachHang customer, final String mEDong, final String eCard, final String phoneEcpay, final String bankAcc, final String bankName) {
         Context context = customerInfoView.getContextView();
         ConfigInfo configInfo;
         String versionApp = "";
@@ -77,23 +78,21 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
         );
 
 
-
-        if (json == null)
-        {
-            try
-            {
+        if (json == null) {
+            try {
                 customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString(), Common.TYPE_DIALOG.LOI);
-            }catch (Exception e)
-            {
+            } catch (Exception e) {
 
             }
             return;
         }
 
 
-
-
         try {
+            final String maKH = customer.getMA_KHANG();
+            final String soTien = "";
+            final String kyPhatSinh = "";
+            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.MAP_CUSTOMER_CARD, true);
             final SoapAPI.AsyncSoapIncludeTimout<MapCustomerCardRespone> soapChangePass = new SoapAPI.AsyncSoapIncludeTimout<MapCustomerCardRespone>(mHander, MapCustomerCardRespone.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
                 @Override
                 public void onPre(SoapAPI.AsyncSoapIncludeTimout soap) {
@@ -104,11 +103,9 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                 public void onUpdate(String message) {
                     if (message == null || message.isEmpty() || message.trim().equals(""))
                         return;
-                    try
-                    {
+                    try {
                         customerInfoView.showMessageText(message, Common.TYPE_DIALOG.LOI);
-                    }catch (Exception e)
-                    {
+                    } catch (Exception e) {
 
                     }
                 }
@@ -116,22 +113,37 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                 @Override
                 public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
                     customerInfoView.setLoading(false);
-                    if(response == null)
-                    {
-                        try
-                        {
-                            customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString(), Common.TYPE_DIALOG.LOI);
-                        }catch (Exception e)
-                        {
 
+                    if (response == null) {
+                        try {
+                            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.MAP_CUSTOMER_CARD, false);
+                        } catch (Exception e) {
+                            Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                        }
+
+                        try {
+                            customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString(), Common.TYPE_DIALOG.LOI);
+                        } catch (Exception e) {
                         }
                         return;
                     }
 
+                    String maLoi = "";
+                    String moTaLoi = "";
+                    if (response.getFooter() != null) {
+                        maLoi = response.getFooter().getResponseCode();
+                        moTaLoi = response.getFooter().getDescription();
+                    }
+
+                    try {
+                        Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, maLoi, moTaLoi, Common.COMMAND_ID.MAP_CUSTOMER_CARD, false);
+                    } catch (Exception e) {
+                        Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                    }
+
 
                     customerInfoView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
-                    if(response.getFooter().getResponseCode().equals("000"))
-                    {
+                    if (response.getFooter().getResponseCode().equals("000")) {
                         customer.setMA_THE(eCard);
                         customer.setSDT_ECPAY(phoneEcpay);
 //                        customer.setBankName(bankName);
@@ -139,8 +151,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                         UpdateDataBase(customer);
                         customerInfoView.back();
                         customerInfoView.showMessageText("Thành công!", Common.TYPE_DIALOG.THANH_CONG);
-                    }else
-                    {
+                    } else {
 
                         customerInfoView.showMessageText(response.getFooter().getDescription(), Common.TYPE_DIALOG.LOI);
                     }
@@ -148,11 +159,9 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 
                 @Override
                 public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
-                    try
-                    {
+                    try {
                         customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
-                    }catch (Exception e)
-                    {
+                    } catch (Exception e) {
 
                     }
                 }
@@ -180,11 +189,9 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
             configInfo = Common.setupInfoRequest(context, mEDong, Common.COMMAND_ID.MAP_CUSTOMER_CARD.toString(), versionApp);
         } catch (Exception e) {
 
-            try
-            {
+            try {
                 customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString(), Common.TYPE_DIALOG.LOI);
-            }catch (Exception e1)
-            {
+            } catch (Exception e1) {
 
             }
             return;
@@ -210,23 +217,20 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
         );
 
 
-
-        if (json == null)
-        {
-            try
-            {
+        if (json == null) {
+            try {
                 customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_ENCRYPT_PASS.toString(), Common.TYPE_DIALOG.LOI);
-            }catch (Exception e)
-            {
+            } catch (Exception e) {
 
             }
             return;
         }
 
-
-
-
         try {
+            final String maKH = customer.getMA_KHANG();
+            final String soTien = "";
+            final String kyPhatSinh = "";
+            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.MAP_CUSTOMER_CARD, true);
             final SoapAPI.AsyncSoapIncludeTimout<MapCustomerCardRespone> soapChangePass = new SoapAPI.AsyncSoapIncludeTimout<MapCustomerCardRespone>(mHander, MapCustomerCardRespone.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
                 @Override
                 public void onPre(SoapAPI.AsyncSoapIncludeTimout soap) {
@@ -237,11 +241,9 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                 public void onUpdate(String message) {
                     if (message == null || message.isEmpty() || message.trim().equals(""))
                         return;
-                    try
-                    {
+                    try {
                         customerInfoView.showMessageText(message, Common.TYPE_DIALOG.LOI);
-                    }catch (Exception e)
-                    {
+                    } catch (Exception e) {
 
                     }
                 }
@@ -249,20 +251,37 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                 @Override
                 public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
                     customerInfoView.setLoading(false);
-                    if(response == null)
-                    {
-                        try
-                        {
-                            customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString(), Common.TYPE_DIALOG.LOI);
-                        }catch (Exception e)
-                        {
 
+                    if (response == null) {
+                        try {
+                            customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString(), Common.TYPE_DIALOG.LOI);
+                        } catch (Exception e) {
+
+                        }
+                        try {
+                            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.MAP_CUSTOMER_CARD, false);
+                        } catch (Exception e) {
+                            Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
                         }
                         return;
                     }
+
+                    String maLoi = "";
+                    String moTaLoi = "";
+                    if (response.getFooter() != null) {
+                        maLoi = response.getFooter().getResponseCode();
+                        moTaLoi = response.getFooter().getDescription();
+                    }
+
+                    try {
+                        Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, maLoi, moTaLoi, Common.COMMAND_ID.MAP_CUSTOMER_CARD, false);
+                    } catch (Exception e) {
+                        Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                    }
+
+
                     customerInfoView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
-                    if(response.getFooter().getResponseCode().equals("000"))
-                    {
+                    if (response.getFooter().getResponseCode().equals("000")) {
                         customer.setMA_THE(eCard);
                         customer.setSDT_ECPAY(phoneEcpay);
 //                        customer.setBankName(bankName);
@@ -270,8 +289,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                         UpdateDataBase(customer);
                         customerInfoView.back();
                         customerInfoView.showMessageText("Thành công!", Common.TYPE_DIALOG.THANH_CONG);
-                    }else
-                    {
+                    } else {
                         customerInfoView.showMessageText(response.getFooter().getDescription(), Common.TYPE_DIALOG.LOI);
 
                     }
@@ -279,11 +297,9 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
 
                 @Override
                 public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
-                    try
-                    {
+                    try {
                         customerInfoView.showMessageText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
-                    }catch (Exception e)
-                    {
+                    } catch (Exception e) {
 
                     }
                 }
@@ -295,8 +311,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
         }
     }
 
-    protected void UpdateDataBase(EntityKhachHang customer)
-    {
+    protected void UpdateDataBase(EntityKhachHang customer) {
         customerInfoModel.UpdateCustomer(customer);
         customerInfoView.refill(customer);
         customerInfoView.setLoading(false);

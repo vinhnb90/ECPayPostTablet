@@ -5,6 +5,6 @@ package views.ecpay.com.postabletecpay.presenter;
  */
 
 public interface ICashTranferPresenter {
-    public void send(Long amount, String sendPhone, String receivedPhone, String description);
+    void send(Long amount, String sendPhone, String receivedPhone, String description);
     Long getCurrentBalance();
 }

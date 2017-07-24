@@ -99,7 +99,7 @@ public class ESCPOSSample
 				posPtr.printNormal("Id Hoa don: "+billObj.getMA_HOA_DON()+"\n");
 			}
             posPtr.printNormal("Hinh thuc thanh toan: "+textHTTT+"\n");
-            posPtr.printNormal("Noi dung thanh toan tien dien: ky " + billObj.getTHANG_THANH_TOAN()+ "tu ngay "+ billObj.getTU_NGAY()+"den ngay "+billObj.getDEN_NGAY()+"\n\n");
+            posPtr.printNormal("Noi dung thanh toan tien dien: ky " + Common.parse(billObj.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString())+ " tu ngay "+ billObj.getTU_NGAY()+" den ngay "+billObj.getDEN_NGAY()+"\n\n");
             posPtr.printNormal("CSDK: "+billObj.getCSDK()+"\n");
             posPtr.printNormal("CSCK: "+billObj.getCSCK()+"\n");
             posPtr.printNormal("--------------------------------");
@@ -129,7 +129,7 @@ public class ESCPOSSample
 			posPtr.printNormal("Khach hang vui long giu lai bien nhan sau khi thanh toan.\n");
 			posPtr.printText("Xin cam on!" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText("Luu y:" +"\n\n", LKPrint.LK_ALIGNMENT_LEFT, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
-			posPtr.printText("ĐT sua chua: 0976208447" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
+			posPtr.printText("DT sua chua: 0976208447" +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText("--/lan in (2)/--"+"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_DEFAULT, LKPrint.LK_TXT_1WIDTH);
             posPtr.lineFeed(4);
             posPtr.cutPaper();
@@ -270,7 +270,7 @@ public class ESCPOSSample
 			posPtr.printText(Common.unAccent("THÔNG BÁO TIỀN ĐIỆN") +"\n", LKPrint.LK_ALIGNMENT_CENTER, LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
 			posPtr.printText(Common.unAccent("(Không có giá trị thanh toán)") +"\n", LKPrint.LK_ALIGNMENT_CENTER,
 					LKPrint.LK_FNT_BOLD, LKPrint.LK_TXT_1WIDTH);
-			posPtr.printNormal("Ky hoa don: "+ billEntityAdapter.getTHANG_THANH_TOAN() +"\n");
+			posPtr.printNormal("Ky hoa don: "+ Common.parse(billEntityAdapter.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString()) +"\n");
 			if (Character.toString(billEntityAdapter.getMA_DIEN_LUC().charAt(1)).equals("E")
 					||Character.toString(billEntityAdapter.getMA_DIEN_LUC().charAt(1)).equals("C")){
 				posPtr.printNormal("Tu: "+billEntityAdapter.getTU_NGAY() +" den: "+billEntityAdapter.getDEN_NGAY()+"\n");
