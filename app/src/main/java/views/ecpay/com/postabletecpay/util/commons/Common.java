@@ -99,7 +99,7 @@ import static java.lang.System.lineSeparator;
  */
 
 public class Common {
-
+    public static boolean isBluetoothConnected = false;
     //region param account
     public enum TYPE_ACCOUNT {
         ADMIN_IT(-1, "Admin IT"),

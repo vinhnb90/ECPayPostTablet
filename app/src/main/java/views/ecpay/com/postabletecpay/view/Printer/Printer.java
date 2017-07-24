@@ -40,6 +40,7 @@ import java.util.Vector;
 
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
+import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
 
 import static android.content.ContentValues.TAG;
@@ -65,7 +66,6 @@ public class Printer {
     private static ProgressDialog pDialog;
     private int isThongbao;
     private boolean isSimply;
-    private boolean isBluetoothConnected;
     protected static final String[] DEVICE_NAMES = new String[] { "BTPTR", "SIMPLY" };
     private SimplyPrintController controller;
     protected static ArrayAdapter<String> arrayAdapter;
@@ -76,11 +76,18 @@ public class Printer {
     private long tienGiao, tienThu,tienVangLai,tienTraKHt;
     private int hdThu,hdVangLai, hdTraKH;
     private PayAdapter.BillEntityAdapter billEntityAdapter;
+    private ArrayList<PayAdapter.BillEntityAdapter> dataAdapter;
 
     public Printer(FragmentActivity activity,int isThongbao, PayAdapter.BillEntityAdapter billEntityAdapter){
         this.context = activity;
         this.isThongbao = isThongbao;
         this.billEntityAdapter = billEntityAdapter;
+    }
+
+    public Printer(FragmentActivity activity,int isThongbao, ArrayList<PayAdapter.BillEntityAdapter> dataAdapter){
+        this.context = activity;
+        this.isThongbao = isThongbao;
+        this.dataAdapter = dataAdapter;
     }
     public Printer(FragmentActivity activity, int isThongbao, Account account, int hdGiao, long tienGiao, int hdThu, long tienThu, int hdVangLai, long tienVangLai, int hdTraKH, long tienTraKHt){
         this.context = activity;
@@ -97,7 +104,7 @@ public class Printer {
 
     }
     public void Action(){
-        if (!isBluetoothConnected) {
+        if (!Common.isBluetoothConnected) {
             dialogChonMayIn();
         }else
         if (!isSimply) {
@@ -383,7 +390,7 @@ public class Printer {
                     dialog.dismiss();
                 Toast toast = Toast.makeText(context, "Đã kết nối bluetooth", Toast.LENGTH_SHORT);
                 toast.show();
-                isBluetoothConnected =true;
+                Common.isBluetoothConnected =true;
                 printer(billEntityAdapter);
             }
             else	// Connection failed.
@@ -403,7 +410,9 @@ public class Printer {
                 results = sample.checkDienLuc(context,bill);
             }
             else if (isThongbao ==THONG_BAO ) {
-                results = sample.Thongbao(context, bill);
+                for (int i = 0, n = dataAdapter.size(); i < n; i ++) {
+                        results = sample.Thongbao(context, dataAdapter.get(i));
+                }
             }else {
                 results = sample.baoCao(context,account,hdGiao,tienGiao,hdThu,tienThu,hdVangLai,tienVangLai,hdTraKH,tienTraKHt);
             }
@@ -453,7 +462,7 @@ public class Printer {
 
         @Override
         public void onBTv2Connected(BluetoothDevice bluetoothDevice) {
-            isBluetoothConnected = true;
+            Common.isBluetoothConnected = true;
             receipts = new ArrayList<byte[]>();
 //                receipts.add(ReceiptUtility.genReceipt(MainActivity.this));
             receipts.add(ReceiptUtility.genReceiptTest(context));
