@@ -16,6 +16,7 @@ import com.google.gson.GsonBuilder;
 
 import org.apache.commons.codec.binary.Base64;
 import org.ecpay.client.test.SecurityUtils;
+import org.ecpay.client.zip.Gzip;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -503,7 +504,7 @@ public class MainPresenter implements IMainPresenter {
 
         final String maKH = "";
         final String soTien = "";
-        final  String kyPhatSinh = "";
+        final String kyPhatSinh = "";
 
         Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.SYNC_DATA, true);
 
@@ -800,8 +801,10 @@ public class MainPresenter implements IMainPresenter {
                                 throw new Exception("sDataCustomer empty!");
                             }
 
-                            byte[] zipByteCustomer = Base64.decodeBase64(sDataCustomer.getBytes());
-                            String sCustomer = Common.decompress(zipByteCustomer);
+                            String compress = Gzip.compress(sDataCustomer);
+                            String sCustomer = Gzip.decompress(compress);
+//                            byte[] zipByteCustomer = Base64.decodeBase64(sDataCustomer.getBytes());
+//                            String sCustomer = Common.decompress(zipByteCustomer);
                             JSONArray jsonArray = new JSONArray(sCustomer);
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject ja = jsonArray.getJSONObject(i);
