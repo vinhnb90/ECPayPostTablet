@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.presenter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -123,6 +124,110 @@ public class MainPagePresenter implements IMainPagePresenter {
         if (jsonRequestLogout == null)
             return;
         try {
+
+            final String maKH = "";
+            final String soTien = "";
+            final  String kyPhatSinh = "";
+            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.LOGOUT, true);
+            SoapAPI.AsyncSoapLogout.AsyncSoapLogoutCallBack asyncSoapLogoutCallBack = new SoapAPI.AsyncSoapLogout.AsyncSoapLogoutCallBack() {
+                private String edong;
+
+                @Override
+                public void onPre(final SoapAPI.AsyncSoapLogout soapLogout) {
+                    edong = soapLogout.getEdong();
+
+                    mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.BEGIN);
+
+                    //check wifi
+                    boolean isHasWifi = Common.isConnectingWifi(mIMainPageView.getContextView());
+                    boolean isHasNetwork = Common.isNetworkConnected(mIMainPageView.getContextView());
+
+//            if (!isHasWifi) {
+//                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
+//
+//                soapSearchOnline.setEndCallSoap(true);
+//                soapSearchOnline.cancel(true);
+//            }
+                    if (!isHasNetwork) {
+                        mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
+                        mIMainPageView.showMessageLogout(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+
+                        soapLogout.setEndCallSoap(true);
+                        soapLogout.cancel(true);
+                    }
+                }
+
+                @Override
+                public void onUpdate(final String message) {
+                    if (message == null || message.isEmpty() || message.trim().equals(""))
+                        return;
+
+                    mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
+                    mIMainPageView.showMessageLogout(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+
+                }
+
+                @Override
+                public void onPost(LogoutResponse response) {
+
+                    if (response == null) {
+                        try {
+                            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.CUSTOMER_BILL, false);
+                        } catch (Exception e) {
+                            Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                        }
+                        return;
+                    }
+
+                    String maLoi = "";
+                    String moTaLoi = "";
+                    if (response.getFooter() != null) {
+                        maLoi = response.getFooter().getResponseCode();
+                        moTaLoi =  response.getFooter().getDescription();
+                    }
+
+                    try {
+                        Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, maLoi, moTaLoi, Common.COMMAND_ID.CUSTOMER_BILL, false);
+                    } catch (Exception e) {
+                        Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                    }
+
+                    Common.CODE_REPONSE_LOGOUT codeResponse = Common.CODE_REPONSE_LOGOUT.findCodeMessage(response.getFooter().getResponseCode());
+                    if (codeResponse != Common.CODE_REPONSE_LOGOUT.e000) {
+                        mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
+                        mIMainPageView.showMessageLogout(codeResponse.getMessage());
+                        return;
+                    }
+
+                    mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.SUCCESS);
+                    mIMainPageView.showMessageLogout(Common.CODE_REPONSE_LOGOUT.e000.getMessage());
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mIMainPageView.showLoginForm();
+                        }
+                    }, Common.MORE_LONG_TIME_DELAY_ANIM);
+                }
+
+                @Override
+                public void onTimeOut(final SoapAPI.AsyncSoapLogout asyncSoapLogoutCallBack) {
+                    asyncSoapLogoutCallBack.cancel(true);
+
+                    //thread call asyntask is running. must call in other thread to update UI
+                    ((MainActivity) mIMainPageView.getContextView()).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!asyncSoapLogoutCallBack.isEndCallSoap()) {
+                                mIMainPageView.showMessageLogout(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                            }
+                        }
+                    });
+                }
+            };
+
+
+
             if (soapLogout == null) {
                 //if null then create new
                 soapLogout = new SoapAPI.AsyncSoapLogout(mEdong, asyncSoapLogoutCallBack);
@@ -156,84 +261,6 @@ public class MainPagePresenter implements IMainPagePresenter {
             return;
         }
     }
-
-    private SoapAPI.AsyncSoapLogout.AsyncSoapLogoutCallBack asyncSoapLogoutCallBack = new SoapAPI.AsyncSoapLogout.AsyncSoapLogoutCallBack() {
-        private String edong;
-
-        @Override
-        public void onPre(final SoapAPI.AsyncSoapLogout soapLogout) {
-            edong = soapLogout.getEdong();
-
-            mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.BEGIN);
-
-            //check wifi
-            boolean isHasWifi = Common.isConnectingWifi(mIMainPageView.getContextView());
-            boolean isHasNetwork = Common.isNetworkConnected(mIMainPageView.getContextView());
-
-//            if (!isHasWifi) {
-//                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
-//
-//                soapSearchOnline.setEndCallSoap(true);
-//                soapSearchOnline.cancel(true);
-//            }
-            if (!isHasNetwork) {
-                mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
-                mIMainPageView.showMessageLogout(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
-
-                soapLogout.setEndCallSoap(true);
-                soapLogout.cancel(true);
-            }
-        }
-
-        @Override
-        public void onUpdate(final String message) {
-            if (message == null || message.isEmpty() || message.trim().equals(""))
-                return;
-
-            mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
-            mIMainPageView.showMessageLogout(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
-
-        }
-
-        @Override
-        public void onPost(LogoutResponse response) {
-            if (response == null) {
-                return;
-            }
-
-            Common.CODE_REPONSE_LOGOUT codeResponse = Common.CODE_REPONSE_LOGOUT.findCodeMessage(response.getFooter().getResponseCode());
-            if (codeResponse != Common.CODE_REPONSE_LOGOUT.e000) {
-                mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.ERROR);
-                mIMainPageView.showMessageLogout(codeResponse.getMessage());
-                return;
-            }
-
-            mIMainPageView.showStatusProgressLogout(Common.STATUS_PROGRESS.SUCCESS);
-            mIMainPageView.showMessageLogout(Common.CODE_REPONSE_LOGOUT.e000.getMessage());
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mIMainPageView.showLoginForm();
-                }
-            }, Common.MORE_LONG_TIME_DELAY_ANIM);
-        }
-
-        @Override
-        public void onTimeOut(final SoapAPI.AsyncSoapLogout asyncSoapLogoutCallBack) {
-            asyncSoapLogoutCallBack.cancel(true);
-
-            //thread call asyntask is running. must call in other thread to update UI
-            ((MainActivity) mIMainPageView.getContextView()).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (!asyncSoapLogoutCallBack.isEndCallSoap()) {
-                        mIMainPageView.showMessageLogout(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
-                    }
-                }
-            });
-        }
-    };
 
     private Runnable runnableCountTimeLogout = new Runnable() {
         @Override

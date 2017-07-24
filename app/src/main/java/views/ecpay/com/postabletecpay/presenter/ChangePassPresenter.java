@@ -19,7 +19,9 @@ import views.ecpay.com.postabletecpay.util.webservice.SoapAPI;
 import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
 import views.ecpay.com.postabletecpay.view.DoiMatKhau.ChangePassActivity;
 import views.ecpay.com.postabletecpay.view.DoiMatKhau.IChangePassView;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
+import static android.content.ContentValues.TAG;
 import static android.content.Context.MODE_PRIVATE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.LONG_TIME_DELAY_ANIM;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM;
@@ -110,6 +112,12 @@ public class ChangePassPresenter implements IChangePassPresenter {
             return;
 
         try {
+            Common.writeLogUser(configInfo.getAccountId(), "", "", "", "", "", Common.COMMAND_ID.CHANGE_PIN, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
             final SoapAPI.AsyncSoapChangePass soapChangePass = new SoapAPI.AsyncSoapChangePass(mSoapChangePassCallBack);
 
             if (soapChangePass.getStatus() != AsyncTask.Status.RUNNING) {
@@ -195,8 +203,26 @@ public class ChangePassPresenter implements IChangePassPresenter {
             mIChangePassView.hidePbar();
             mIChangePassView.showRespone(response.getFooterChangePassResponse().getResponseCode(), response.getFooterChangePassResponse().getDescription());
             if (response == null) {
+                try {
+                    Common.writeLogUser(MainActivity.mEdong, "", "", "", "", "", Common.COMMAND_ID.CHANGE_PIN, false);
+                } catch (Exception e) {
+                    Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+                }
                 mIChangePassView.showText(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
                 return;
+            }
+
+            String maLoi = "";
+            String moTaLoi = "";
+            if (response.getFooterChangePassResponse() != null) {
+                maLoi = response.getFooterChangePassResponse().getResponseCode();
+                moTaLoi =  response.getFooterChangePassResponse().getDescription();
+            }
+
+            try {
+                Common.writeLogUser(MainActivity.mEdong, "", "", "", maLoi, moTaLoi, Common.COMMAND_ID.CHANGE_PIN, false);
+            } catch (Exception e) {
+                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
             }
 
             Common.CODE_REPONSE_CHANGE_PASS codeResponse = Common.CODE_REPONSE_CHANGE_PASS.findCodeMessage(response.getFooterChangePassResponse().getResponseCode());

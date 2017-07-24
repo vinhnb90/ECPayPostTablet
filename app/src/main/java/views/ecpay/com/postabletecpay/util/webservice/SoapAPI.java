@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.util.webservice;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -88,6 +89,7 @@ import views.ecpay.com.postabletecpay.util.entities.response.EntityLogin.LoginRe
 import views.ecpay.com.postabletecpay.util.entities.response.EntityLogout.LogoutResponse;
 import views.ecpay.com.postabletecpay.util.entities.response.GetPCInfo.GetPCInfoRespone;
 import views.ecpay.com.postabletecpay.view.Main.IMainView;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 
 import static android.content.ContentValues.TAG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.ENDPOINT_URL;
@@ -1446,6 +1448,29 @@ public class SoapAPI {
         @Override
         protected void onPostExecute(GetPCInfoRespone respone) {
             super.onPostExecute(respone);
+
+            if (respone == null) {
+                try {
+                    Common.writeLogUser(MainActivity.mEdong, "", "", "", "", "", Common.COMMAND_ID.GET_PC_INFO, false);
+                } catch (Exception e) {
+                    Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                }
+                return;
+            }
+
+            String maLoi = "";
+            String moTaLoi = "";
+            if (respone.getFooter() != null) {
+                maLoi = respone.getFooter().getResponseCode();
+                moTaLoi = respone.getFooter().getDescription();
+            }
+
+            try {
+                Common.writeLogUser(MainActivity.mEdong, "", "", "", maLoi, moTaLoi, Common.COMMAND_ID.GET_PC_INFO, false);
+            } catch (Exception e) {
+                Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
         }
     }
 
@@ -1948,6 +1973,28 @@ public class SoapAPI {
         @Override
         protected void onPostExecute(ListBookCmisReponse listBookCmisReponse) {
             super.onPostExecute(listBookCmisReponse);
+
+            if (listBookCmisReponse == null) {
+                try {
+                    Common.writeLogUser(MainActivity.mEdong, "", "", "", "", "", Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER, false);
+                } catch (Exception e) {
+                    Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                }
+                return;
+            }
+
+            String maLoi = "";
+            String moTaLoi = "";
+            if (listBookCmisReponse.getFooterListEVNResponse() != null) {
+                maLoi = listBookCmisReponse.getFooterListEVNResponse().getResponseCode();
+                moTaLoi = listBookCmisReponse.getFooterListEVNResponse().getDescription();
+            }
+
+            try {
+                Common.writeLogUser(MainActivity.mEdong, "", "", "", maLoi, moTaLoi, Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER, false);
+            } catch (Exception e) {
+                Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
         }
     }
     //endregion
@@ -1997,22 +2044,19 @@ public class SoapAPI {
                 ht = new HttpTransportSE(URL, Common.TIME_OUT_CONNECT_KSOAP);
                 ht.call(SOAP_ACTION, envelope);
                 response = (SoapPrimitive) envelope.getResponse();
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
                 message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString();
                 return null;
             }
 
-            if (response == null)
-            {
+            if (response == null) {
                 message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString();
                 return null;
             }
 
             String data = response.toString();
-            if (data.isEmpty())
-            {
+            if (data.isEmpty()) {
                 message = Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString();
                 return null;
             }
@@ -2034,6 +2078,29 @@ public class SoapAPI {
         @Override
         protected void onPostExecute(ListDataResponse listDataResponse) {
             super.onPostExecute(listDataResponse);
+
+            if (listDataResponse == null) {
+                try {
+                    Common.writeLogUser(MainActivity.mEdong, "", "", "", "", "", Common.COMMAND_ID.SYNC_DATA, false);
+                } catch (Exception e) {
+                    Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                }
+                return;
+            }
+
+            String maLoi = "";
+            String moTaLoi = "";
+            if (listDataResponse.getFooterListDataResponse() != null) {
+                maLoi = listDataResponse.getFooterListDataResponse().getResponse_code();
+                moTaLoi = listDataResponse.getFooterListDataResponse().getDescription();
+            }
+
+            try {
+                Common.writeLogUser(MainActivity.mEdong, "", "", "", maLoi, moTaLoi, Common.COMMAND_ID.SYNC_DATA, false);
+            } catch (Exception e) {
+                Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
+
         }
     }
 //endregion
@@ -2123,6 +2190,28 @@ public class SoapAPI {
         @Override
         protected void onPostExecute(ListDataZipResponse listDataZipResponse) {
             super.onPostExecute(listDataZipResponse);
+
+            if (listDataZipResponse == null) {
+                try {
+                    Common.writeLogUser(MainActivity.mEdong, "", "", "", "", "", Common.COMMAND_ID.GET_FILE_GEN, false);
+                } catch (Exception e) {
+                    Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                }
+                return;
+            }
+
+            String maLoi = "";
+            String moTaLoi = "";
+            if (listDataZipResponse.getFooterListDataZipResponse() != null) {
+                maLoi = listDataZipResponse.getFooterListDataZipResponse().getResponse_code();
+                moTaLoi = listDataZipResponse.getFooterListDataZipResponse().getDescription();
+            }
+
+            try {
+                Common.writeLogUser(MainActivity.mEdong, "", "", "", maLoi, moTaLoi, Common.COMMAND_ID.GET_FILE_GEN, false);
+            } catch (Exception e) {
+                Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+            }
         }
     }
 //endregion

@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.presenter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -176,6 +177,11 @@ public class MainPresenter implements IMainPresenter {
             return null;
         }
 
+        final String maKH = "";
+        final String soTien = "";
+        final  String kyPhatSinh = "";
+
+        Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER, true);
         SoapAPI.SoapGetBookCMIS soapSynchronizePC = new SoapAPI.SoapGetBookCMIS(mIMainView);
         soapSynchronizePC.execute(jsonRequestEVN);
 
@@ -242,6 +248,16 @@ public class MainPresenter implements IMainPresenter {
 
         if (jsonGetPCInfo == null) {
             return null;
+        }
+
+        final String maKH = "";
+        final String soTien = "";
+        final String kyPhatSinh = "";
+
+        try {
+            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.GET_PC_INFO, true);
+        } catch (Exception e) {
+            Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
         }
 
         SoapAPI.AsyncSoapGetPCInfo soapGetBookCMIS = new SoapAPI.AsyncSoapGetPCInfo(mIMainView);
@@ -404,7 +420,10 @@ public class MainPresenter implements IMainPresenter {
         if (jsonRequestZipData == null) {
             return null;
         }
-
+        final String maKH ="";
+        final String soTien = "";
+        final  String kyPhatSinh = "";
+        Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.GET_FILE_GEN, true);
         SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeDataZip = new SoapAPI.AsyncSoapSynchronizeDataZip(mIMainView);
         soapSynchronizeDataZip.execute(jsonRequestZipData);
 
@@ -482,127 +501,11 @@ public class MainPresenter implements IMainPresenter {
             return null;
         }
 
-//                SoapAPI.AsyncSoapSynchronizeData.AsyncSoapSynchronizeDataCallBack callBackData = new SoapAPI.AsyncSoapSynchronizeData.AsyncSoapSynchronizeDataCallBack() {
-//                    @Override
-//                    public void onPre(SoapAPI.AsyncSoapSynchronizeData soapSynchronizeInvoices) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onUpdate(String message) {
-//
-//                    }
-//
-//                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-//                    @Override
-//                    public void onPost(ListDataResponse response) {
-//                        //nếu kết thúc thì giảm đi 1 thread và kiểm tra nếu là thread cuối thì tắt progress dialog
-//                        allProcessDownload--;
-//
-//                        if (response == null) {
-//                            if (allProcessDownload == ZERO)
-//                                mIMainView.finishHidePbarDownload();
-//                            return;
-//                        }
-//
-//                        try {
-//                            String sDataCustomer = response.getBodyListDataResponse().getCustomer();
-//                            if (sDataCustomer != null && !sDataCustomer.isEmpty()) {
-//                                byte[] zipByteCustomer = org.apache.commons.codec.binary.Base64.decodeBase64(sDataCustomer.getBytes());
-//
-//                                try {
-//                                    String sCustomer = Common.decompress(zipByteCustomer);
-//
-//                                    JSONArray jsonArray = new JSONArray(sCustomer);
-//                                    for (int i = 0; i < jsonArray.length(); i++) {
-//                                        JSONObject ja = jsonArray.getJSONObject(i);
-//                                        GsonBuilder gsonBuilder = new GsonBuilder();
-//                                        Gson gson = gsonBuilder.create();
-//                                        CustomerResponse customerResponse = gson.fromJson(ja.toString(), CustomerResponse.class);
-//                                        if (customerResponse.getBodyCustomerResponse().getCustomerCode().equals("PH10000012075")) {
-//                                            Log.e(TAG, "syncData Customer " + customerResponse.getBodyCustomerResponse().getName());
-//                                        }
-//                                        if (mainModel.checkCustomerExist(customerResponse.getBodyCustomerResponse().getCustomerCode()) == 0) {
-//                                            if (mainModel.insertCustomer(customerResponse) != -1) {
-//                                                Log.i("INFO", "SUCCESS");
-//                                            }
-//                                        } else {
-//                                            if (mainModel.updateCustomer(customerResponse) != -1) {
-//                                                Log.i("INFO", "SUCCESS");
-//                                            }
-//                                        }
-//                                    }
-//                                } catch (IOException e) {
-//                                    e.printStackTrace();
-//                                } catch (JSONException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                            String sDataBill = response.getBodyListDataResponse().getBill();
-//                            if (sDataBill != null && !sDataBill.isEmpty()) {
-//                                byte[] zipByteBill = org.apache.commons.codec.binary.Base64.decodeBase64(sDataBill.getBytes());
-//
-//                                try {
-//                                    String sCustomer = Common.decompress(zipByteBill);
-//                                    JSONArray jsonArray = new JSONArray(sCustomer);
-//                                    Log.e(TAG, "syncData list bill " + jsonArray.length());
-//                                    for (int i = 0; i < jsonArray.length(); i++) {
-//                                        JSONObject ja = jsonArray.getJSONObject(i);
-//                                        GsonBuilder gsonBuilder = new GsonBuilder();
-//                                        Gson gson = gsonBuilder.create();
-//                                        BillResponse billResponse = gson.fromJson(ja.toString(), BillResponse.class);
-//                                        billResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
-//                                        if (mainModel.checkBillExist(billResponse.getBodyBillResponse().getBillId()) == 0) {
-//                                            if (mainModel.insertBill(billResponse) != -1) {
-//                                                Log.i("INFO", "SUCCESS");
-//                                            }
-//                                        } else {
-//                                            if (mainModel.updateBill(billResponse) != -1) {
-//                                                Log.i("INFO", "SUCCESS");
-//                                            }
-//                                        }
-//                                    }
-//
-//                                    //update data
-//                                    MainPresenter.this.refreshDataPayAdapter();
-//
-//                                } catch (IOException e) {
-//                                    throw e;
-//                                } catch (JSONException e) {
-//                                    throw e;
-//                                }
-//                            }
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        } finally {
-//                            ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    mIMainView.refreshInfoMain();
-//                                }
-//                            });
-//                            if (allProcessDownload == ZERO)
-//                                mIMainView.finishHidePbarDownload();
-//                        }
-//
-//                        ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                mIMainView.refreshInfoMain();
-//                            }
-//                        });
-//
-//                        if (allProcessDownload == ZERO)
-//                            mIMainView.finishHidePbarDownload();
-//                    }
-//
-//                    @Override
-//                    public void onTimeOut(final SoapAPI.AsyncSoapSynchronizeData soapSynchronizeInvoices) {
-//                        // time out thì tắt tiến trình
-//                        soapSynchronizeInvoices.setEndCallSoap(true);
-//                        soapSynchronizeInvoices.cancel(true);
-//                    }
-//                };
+        final String maKH = "";
+        final String soTien = "";
+        final  String kyPhatSinh = "";
+
+        Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.SYNC_DATA, true);
 
         SoapAPI.AsyncSoapSynchronizeData soapSyncData = new SoapAPI.AsyncSoapSynchronizeData(mIMainView);
         soapSyncData.execute(jsonRequestData);
@@ -1059,6 +962,11 @@ public class MainPresenter implements IMainPresenter {
             return;
         }
 
+        final String maKH = bill.getMA_KHACH_HANG();
+        final String soTien = amount.toString();
+        final String kyPhatSinh = Common.parse(bill.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString());
+
+        Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.BILLING, true);
 
         final SoapAPI.AsyncSoapIncludeTimout<BillingOnlineRespone> billingOnlineResponeAsyncSoap = new SoapAPI.AsyncSoapIncludeTimout<BillingOnlineRespone>(mHandler, BillingOnlineRespone.class,
                 new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
@@ -1073,11 +981,28 @@ public class MainPresenter implements IMainPresenter {
                     }
 
                     @Override
-                    public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
-
+                    public void onPost(final SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
                         if (response == null) {
                             CurrentPostBillAsync.remove(this);
+                            try {
+                                Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.BILLING, false);
+                            } catch (Exception e) {
+                                Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                            }
                             return;
+                        }
+
+                        String maLoi = "";
+                        String moTaLoi = "";
+                        if (response.getFooter() != null) {
+                            maLoi = response.getFooter().getResponseCode();
+                            moTaLoi = response.getFooter().getDescription();
+                        }
+
+                        try {
+                            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, maLoi, moTaLoi, Common.COMMAND_ID.BILLING, false);
+                        } catch (Exception e) {
+                            Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
                         }
 
                         //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu không thành công

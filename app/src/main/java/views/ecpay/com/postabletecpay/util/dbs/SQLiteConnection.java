@@ -38,6 +38,7 @@ import views.ecpay.com.postabletecpay.view.Main.MainActivity;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
 import static android.content.ContentValues.TAG;
+import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_CONFIG;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_DB;
 import static views.ecpay.com.postabletecpay.util.commons.Common.PATH_FOLDER_ROOT;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TAG_SYNC_DATA;
@@ -119,6 +120,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     private SQLiteConnection(Context context) {
         super(context, Common.PATH_FOLDER_DB + databaseName, null, DATABASE_VERSION);
+        this.checkFileDBExist();
         SQLiteDatabase.openOrCreateDatabase(Common.PATH_FOLDER_DB + databaseName, null);
     }
 
@@ -143,6 +145,21 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         if (instance == null)
             instance = new SQLiteConnection(context.getApplicationContext());
         return instance;
+    }
+
+    private void checkFileDBExist() {
+        File programDirectory = new File(PATH_FOLDER_ROOT);
+        if (!programDirectory.exists()) {
+            programDirectory.mkdirs();
+        }
+        File programDbDirectory = new File(PATH_FOLDER_DB);
+        if (!programDbDirectory.exists()) {
+            programDbDirectory.mkdirs();
+        }
+        File programConfigDirectory = new File(PATH_FOLDER_CONFIG);
+        if (!programConfigDirectory.exists()) {
+            programConfigDirectory.mkdirs();
+        }
     }
 
     @Override
@@ -210,7 +227,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         try {
             if (account == null)
                 return;
-
 
             ContentValues initialValues = new ContentValues();
             initialValues.put("edong", account.getEdong());
@@ -1145,7 +1161,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     bill.setDEN_NGAY(denNgay);
                     bill.setSO_HO(soHo);
 
-                    String fullname = mCursor.getString(mCursor.getColumnIndex("fullName"));
+                    String fullname = mCursor.getString(mCursor.getColumnIndex("MA_DL_MO_RONG"));
                     if (fullname == null) {
                         fullname = "";
                     }
@@ -1254,6 +1270,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     fullname = "";
                 }
                 bill.setMA_DL_MO_RONG(fullname);
+
                 bill.setCheckEnable(!bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()));
 
                 if (bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()) && MainActivity.mEdong.equalsIgnoreCase(viThanhToan))
