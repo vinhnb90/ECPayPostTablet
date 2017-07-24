@@ -1162,9 +1162,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     bill.setDEN_NGAY(denNgay);
                     bill.setSO_HO(soHo);
 
-                    if (mCursor != null && mCursor.moveToFirst()) {
-                        bill.setTEN_DIEN_LUC(mCursor.getString(mCursor.getColumnIndex("fullName")));
+                    String fullName = mCursor.getString(mCursor.getColumnIndex("fullName"));
+
+                    if (fullName == null) {
+                        fullName = "";
                     }
+                    bill.setTEN_DIEN_LUC(fullName);
 
                     bill.setMA_DIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
                     bill.setChecked(true);
@@ -1261,16 +1264,13 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 bill.setChecked(false);
                 bill.setMA_KHACH_HANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
 
-                String fullname = mCursor.getString(mCursor.getColumnIndex("fullName"));
-                if(fullname == null)
-                {
-                    mCursor.close();
-                    return null;
+
+                String fullName = mCursor.getString(mCursor.getColumnIndex("fullName"));
+
+                if (fullName == null) {
+                    fullName = "";
                 }
-                if (mCursor != null && mCursor.moveToFirst()) {
-                    bill.setTEN_DIEN_LUC(mCursor.getString(mCursor.getColumnIndex("fullName")));
-                }
-                bill.setTEN_DIEN_LUC(fullname);
+                bill.setTEN_DIEN_LUC(fullName);
 
                 bill.setCheckEnable(!bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()));
 
@@ -1799,7 +1799,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         initialValues.put("MA_HOA_DON", bodyBillResponse.getBillId());
         initialValues.put("E_DONG", bodyBillResponse.getEdong());
-        initialValues.put("MA_DL_MO_RONG", bodyBillResponse.getPcCodeExt());
+//        initialValues.put("MA_DL_MO_RONG", bodyBillResponse.getPcCodeExt());
         initialValues.put("TU_NGAY", bodyBillResponse.getStrFromDate());
         initialValues.put("DEN_NGAY", bodyBillResponse.getStrToDate());
         initialValues.put("CHI_TIET_KG", bodyBillResponse.getPriceDetail());
