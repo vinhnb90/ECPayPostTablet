@@ -1110,7 +1110,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             String qqq = "SELECT * FROM ( " + query + " ) AS BILL  LEFT JOIN " + TABLE_NAME_EVN_PC + " AS PC ON BILL.DIEN_LUC = PC.code";
 
 
-            Cursor mCursor = database.rawQuery(query, null);
+            Cursor mCursor = database.rawQuery(qqq, null);
             if (mCursor.getCount() == 0)
             {
                 mCursor.close();
