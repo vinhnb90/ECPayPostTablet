@@ -52,6 +52,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -61,6 +62,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.security.PrivateKey;
 import java.text.DecimalFormatSymbols;
 import java.text.Normalizer;
@@ -100,6 +102,7 @@ import static java.lang.System.lineSeparator;
 
 public class Common {
     public static boolean isBluetoothConnected = false;
+
     //region param account
     public enum TYPE_ACCOUNT {
         ADMIN_IT(-1, "Admin IT"),
@@ -2794,9 +2797,27 @@ public class Common {
 
         return true;
     }
+
     //endregion
+    public static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
+    public static final Charset US_ASCII = Charset.forName("US-ASCII");
+    public static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
     public static String decompress(byte[] compressed) throws IOException {
+        final int BUFFER_SIZE = 512;
+        ByteArrayInputStream is = new ByteArrayInputStream(compressed);
+        GZIPInputStream gis = new GZIPInputStream(is, BUFFER_SIZE);
+        byte[] data = new byte[BUFFER_SIZE];
+        int bytesRead;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        while ((bytesRead = gis.read(data)) != -1) {
+            baos.write(data, 0, bytesRead);
+        }
+        gis.close();
+        is.close();
+        return baos.toString("UTF-8");
+
+/*
         final int BUFFER_SIZE = 32;
         ByteArrayInputStream is = new ByteArrayInputStream(compressed);
         GZIPInputStream gis = new GZIPInputStream(is, BUFFER_SIZE);
@@ -2808,7 +2829,7 @@ public class Common {
         }
         gis.close();
         is.close();
-        return string.toString();
+        return string.toString();*/
     }
 
     public static String[] NAME_VI_TONG = {"-Chọn Ví Tổng-", "Ví tổng Hà Nội", "Ví tổng miền Bắc", "Ví tổng miền Nam", "Ví tổng miền Trung", "Ví tổng Hồ Chí Minh"};

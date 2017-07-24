@@ -566,7 +566,7 @@ public class MainPresenter implements IMainPresenter {
                     listBookCmisExist = new ArrayList<ListBookCmisResponse>();
                     listBookCmisNeedDownload = new ArrayList<ListBookCmisResponse>();
                     ListBookCmisReponse listBookCmisReponse = null;
-//                    GetPCInfoRespone getPCInfoRespone = null;
+                    GetPCInfoRespone getPCInfoRespone = null;
                     List<ListDataZipResponse> listGetFile = new ArrayList<>();
                     //endregion
 
@@ -645,7 +645,7 @@ public class MainPresenter implements IMainPresenter {
                     //endregion
 
                     //region Xử lý đồng bộ thông tin điện lực
-                    // getPCInfoRespone = syncPcEVN(listEvnPc);
+                     getPCInfoRespone = syncPcEVN(listEvnPc);
                     //endregion
 
                     //region Xử lý đồng bộ file
@@ -803,7 +803,7 @@ public class MainPresenter implements IMainPresenter {
 
 //                            String compress = Gzip.compress(sDataCustomer);
 //                            String sCustomer = Gzip.decompress(compress);
-                            byte[] zipByteCustomer = Base64.decodeBase64(sDataCustomer.getBytes());
+                            byte[] zipByteCustomer = Base64.decodeBase64(sDataCustomer.getBytes(Common.US_ASCII));
                             String sCustomer = Common.decompress(zipByteCustomer);
                             JSONArray jsonArray = new JSONArray(sCustomer);
                             for (int i = 0; i < jsonArray.length(); i++) {
