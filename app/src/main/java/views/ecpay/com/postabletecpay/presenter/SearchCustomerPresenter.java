@@ -186,7 +186,10 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
                     searchCustomerView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
 
                     if (!response.getFooter().getResponseCode().equalsIgnoreCase("000")) {
-                        searchCustomerView.showMessage(response.getFooter().getDescription());
+
+                        Common.CODE_REPONSE_SEARCH_ONLINE codeResponse = Common.CODE_REPONSE_SEARCH_ONLINE.findCodeMessage(response.getFooter().getResponseCode());
+
+                        searchCustomerView.showMessage(codeResponse.getMessage());
                         return;
                     }
 

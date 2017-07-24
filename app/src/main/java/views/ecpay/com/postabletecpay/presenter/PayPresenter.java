@@ -487,22 +487,18 @@ public class PayPresenter implements IPayPresenter {
         if (!isPayOnline) { //Thanh Toan Offline
             //Kiểm tra địa bàn thanh toán
 
-            List<String> pcCodes = mPayModel.getPcCodes(account.getEdong());
-            for (int i = 0, n = pcCodes.size(); i < n; i++) {
-                String pc = pcCodes.get(i).substring(0, 2).toUpperCase();
-                if (pc.equals("PD") || pc.equals("PE")) {
-                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e04.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
-                    mIPayView.showPayingRviewDialogFinish();
-                    return;
-                }
+            if(checkPCForOffline())
+            {
+                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e04.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+                mIPayView.showPayingRviewDialogFinish();
+                return;
             }
 
             countBillPayedSuccess = 0;
             for (int i = 0, n = bills.size(); i < n; i++) {
-                if (bills.get(i).isChecked() && bills.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode())) {
+                if (bills.get(i).isChecked() && bills.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()) && bills.get(i).getMessageError().length() == 0) {
                     try {
-                        payOffline(bills.get(i));
-                        countBillPayedSuccess++;
+                        payOffline(bills.get(i), false);
                         mIPayView.refreshAdapterPayRecyclerListBills(true);
 
                         this.refreshTextCountBillPayedSuccess();
@@ -531,6 +527,18 @@ public class PayPresenter implements IPayPresenter {
         }
 
 
+    }
+
+    boolean checkPCForOffline()
+    {
+        List<String> pcCodes = mPayModel.getPcCodes(MainActivity.mEdong);
+        for (int i = 0, n = pcCodes.size(); i < n; i++) {
+            String pc = pcCodes.get(i).substring(0, 2).toUpperCase();
+            if (pc.equals("PD") || pc.equals("PE")) {
+                return true;
+            }
+        }
+        return  false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -606,9 +614,8 @@ public class PayPresenter implements IPayPresenter {
                     public void onUpdate(final String message) {
                         billOnlineAsyncList.remove(this);
                         try {
-                            mIPayView.showMessageNotifyBillOnlineDialog(message, false, Common.TYPE_DIALOG.LOI, true);
-                            mIPayView.showPayingRviewDialogFinish();
-                            mIPayView.refreshAdapterPayRecyclerListBills(true);
+                            payOffline(bill, true);
+                            checkFinishPayOnline(true);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -624,9 +631,8 @@ public class PayPresenter implements IPayPresenter {
                             }
                             billOnlineAsyncList.remove(soap);
                             try {
-                                mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString(), false, Common.TYPE_DIALOG.THANH_CONG, true);
-                                mIPayView.showPayingRviewDialogFinish();
-                                mIPayView.refreshAdapterPayRecyclerListBills(true);
+                                payOffline(bill, true);
+                                checkFinishPayOnline(true);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -708,12 +714,8 @@ public class PayPresenter implements IPayPresenter {
                     @Override
                     public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
                         billOnlineAsyncList.remove(soap);
-                        ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                checkFinishPayOnline(true);
-                            }
-                        });
+                        payOffline(bill, true);
+                        checkFinishPayOnline(true);
                     }
                 });
 
@@ -862,9 +864,22 @@ public class PayPresenter implements IPayPresenter {
     }
 
 
-    void payOffline(PayAdapter.BillEntityAdapter bill) {
+    void payOffline(PayAdapter.BillEntityAdapter bill, boolean hasCheck) {
+
+
+        if(hasCheck)
+        {
+            if(checkPCForOffline())
+            {
+                bill.setMessageError(Common.CODE_REPONSE_BILL_OFFLINE.e04.getMessage());
+                return;
+            }
+        }
+
+        countBillPayedSuccess++;
         bill.setTRANG_THAI_TT(Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
         bill.setVI_TTOAN(MainActivity.mEdong);
+        bill.setMessageError(Common.CODE_REPONSE_BILL_ONLINE.ex10008.getMessage());
 
         mPayModel.updateHoaDonNo(bill.getBillId(), Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode(), MainActivity.mEdong);
         EntityHoaDonNo entityHoaDonNo = mPayModel.getHoaDonNo(bill.getBillId());

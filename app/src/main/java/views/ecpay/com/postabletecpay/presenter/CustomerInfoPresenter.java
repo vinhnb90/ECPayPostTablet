@@ -153,7 +153,7 @@ public class CustomerInfoPresenter implements ICustomerInfoPresenter {
                         customerInfoView.showMessageText("Thành công!", Common.TYPE_DIALOG.THANH_CONG);
                     } else {
 
-                        customerInfoView.showMessageText(response.getFooter().getDescription(), Common.TYPE_DIALOG.LOI);
+                        customerInfoView.showMessageText("Số thẻ chưa tồn tại!", Common.TYPE_DIALOG.LOI);
                     }
                 }
 
