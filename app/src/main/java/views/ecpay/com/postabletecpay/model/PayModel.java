@@ -177,17 +177,30 @@ public class PayModel extends CommonModel {
         return sqLiteConnection.selectInfoBillOfCustomerToRecycler(edong, code);
     }
 
-    public void writeSQLiteCustomerTableFromSearchOnline(String edong, EntityKhachHang customerResponse, List<BillInsideCustomer> lst) {
+    public List<PayAdapter.BillEntityAdapter> writeSQLiteCustomerTableFromSearchOnline(String edong, EntityKhachHang customerResponse, List<BillInsideCustomer> lst) {
+
+        List<Long> bills = new ArrayList<>();
+
         sqLiteConnection.insertOrUpdateCustomerFromSearchOnline( customerResponse);
+
+
+        if(lst.size() == 0)
+            return new ArrayList<>();
+
         for (int i = 0, n = lst.size(); i < n; i ++)
         {
             BillInsideCustomer bill = lst.get(i);
+
+            bills.add(bill.getBillId());
+
             if(bill.getCardNo() == null || bill.getCardNo().length() == 0)
             {
                 bill.setCardNo(customerResponse.getMA_THE());
             }
             sqLiteConnection.insertOrUpdateBillSearchOnline(edong, bill);
         }
+
+        return sqLiteConnection.selectHoaDonNoKhacId(edong, customerResponse.getMA_KHANG(), bills);
     }
 
 
@@ -252,10 +265,22 @@ public class PayModel extends CommonModel {
         private AsyncSoapCallBack callBack;
         private PayModel payModel;
         private int startIndex;
+
+        private  boolean isEnded;
+
         public AsyncSearchOffline(int index, PayModel payModel, AsyncSoapCallBack callBack) throws Exception {
             this.callBack = callBack;
             this.payModel = payModel;
             this.startIndex = index;
+            isEnded = false;
+        }
+
+        public boolean isEnded() {
+            return isEnded;
+        }
+
+        public void setEnded(boolean ended) {
+            isEnded = ended;
         }
 
         @Override
@@ -264,6 +289,7 @@ public class PayModel extends CommonModel {
             {
                 callBack.onPost(this.payModel.getInforRowCustomerFitterBy(startIndex, strings[0].first, strings[0].second));
             }
+            isEnded = true;
             return null;
         }
 

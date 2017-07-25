@@ -70,6 +70,7 @@ public class PayPresenter implements IPayPresenter {
     private PayModel mPayModel;
     private IPayView mIPayView;
     private Common.TYPE_SEARCH mTypeSearch;
+    private String searchInfo;
 
     SoapAPI.AsyncSoapIncludeTimout<SearchOnlineResponse> currentAsyncSearchOnline;
 
@@ -78,6 +79,8 @@ public class PayPresenter implements IPayPresenter {
     private int countBillPayedSuccess, totalBillsChooseDialogTemp;
     private long totalAmountBillPayedSuccess;
 
+
+    PayModel.AsyncSearchOffline asyncSearchOffline = null;
 
     //delay
     private Handler handlerDelay = new Handler();
@@ -130,50 +133,18 @@ public class PayPresenter implements IPayPresenter {
         mIPayView.showRecyclerFragment();
 
         this.mTypeSearch = typeSearch;
+        this.searchInfo = infoSearch;
 
 
         if (!isSeachOnline) {
-
+            if(asyncSearchOffline != null && !asyncSearchOffline.isEnded())
+            {
+                asyncSearchOffline.cancel(true);
+            }
             try {
-                PayModel.AsyncSearchOffline asyncSearchOffline = new PayModel.AsyncSearchOffline(pageIndex, mPayModel, new PayModel.AsyncSoapCallBack() {
+                asyncSearchOffline = new PayModel.AsyncSearchOffline(pageIndex, mPayModel, new PayModel.AsyncSoapCallBack() {
                     @Override
                     public void onPost(final Pair<List<PayAdapter.DataAdapter>, Integer> result) {
-                        /*
-                        List<PayAdapter.DataAdapter> fitter = new ArrayList<>();
-                        int indexBegin = 0;
-                        int indexEnd = 0;
-                        if (pageIndex == PayFragment.FIRST_PAGE_INDEX) {
-                            int index = 0;
-
-
-                            totalPage = result.size() / ROWS_ON_PAGE + PAGE_INCREMENT;
-
-                            indexEnd = pageIndex * ROWS_ON_PAGE;
-
-                            if (indexEnd > result.size())
-                                indexEnd = result.size();
-
-                            fitter = result.subList(indexBegin, indexEnd);
-
-                        } else {
-                            if (pageIndex > totalPage)
-                                return;
-
-                            indexBegin = ROWS_ON_PAGE * (pageIndex - PAGE_INCREMENT);
-                            indexEnd = ROWS_ON_PAGE * (pageIndex);
-                            if (indexEnd > result.size())
-                                indexEnd = result.size();
-
-                            int index = indexBegin;
-                            int maxIndex = indexEnd;
-
-                            fitter = result.subList(index, maxIndex);
-
-                        }
-                        final List<PayAdapter.DataAdapter> finalFitter = fitter;
-                        final int finalIndexBegin = indexBegin;
-                        final int finalIndexEnd = indexEnd;
-                        */
                         Activity activity = ((Activity) (mIPayView.getContextView()));
                         if (activity != null)
                             activity.runOnUiThread(new Runnable() {
@@ -236,7 +207,8 @@ public class PayPresenter implements IPayPresenter {
             isErr = true;
         }
         if (isErr) {
-            mIPayView.showMessageNotifySearchOnline(textMessage, Common.TYPE_DIALOG.LOI);
+            finishSearchOnline(null);
+            //mIPayView.showMessageNotifySearchOnline(textMessage, Common.TYPE_DIALOG.LOI);
             return;
         }
 
@@ -290,7 +262,7 @@ public class PayPresenter implements IPayPresenter {
                         ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mIPayView.showMessageNotifySearchOnline(message, Common.TYPE_DIALOG.LOI);
+                                //mIPayView.showMessageNotifySearchOnline(message, Common.TYPE_DIALOG.LOI);
                                 finishSearchOnline(null);
                             }
                         });
@@ -307,6 +279,7 @@ public class PayPresenter implements IPayPresenter {
                         } catch (Exception e) {
                             Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
                         }
+                        finishSearchOnline(null);
                         return;
                     }
 
@@ -327,7 +300,7 @@ public class PayPresenter implements IPayPresenter {
                         mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                         Common.CODE_REPONSE_SEARCH_ONLINE codeResponse = Common.CODE_REPONSE_SEARCH_ONLINE.findCodeMessage(response.getFooter().getResponseCode());
                         if (codeResponse != Common.CODE_REPONSE_SEARCH_ONLINE.e000) {
-                            mIPayView.showMessageNotifySearchOnline(codeResponse.getMessage(), Common.TYPE_DIALOG.LOI);
+                            //mIPayView.showMessageNotifySearchOnline(codeResponse.getMessage(), Common.TYPE_DIALOG.LOI);
                             finishSearchOnline(null);
                             return;
                         }
@@ -343,7 +316,7 @@ public class PayPresenter implements IPayPresenter {
                         ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
+                                //mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
                                 finishSearchOnline(null);
                             }
                         });
@@ -386,9 +359,9 @@ public class PayPresenter implements IPayPresenter {
                 khachHang.setGIAO_THU(Common.TRANG_THAI_GIAO_THU.VANG_LAI.getCode());
                 khachHang.setNGAY_GIAO_THU(Calendar.getInstance().getTime());
 
-                mPayModel.writeSQLiteCustomerTableFromSearchOnline(MainActivity.mEdong, khachHang, customerResponse.getListBill());
+                List<PayAdapter.BillEntityAdapter> bills = mPayModel.writeSQLiteCustomerTableFromSearchOnline(MainActivity.mEdong, khachHang, customerResponse.getListBill());
 
-                PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(khachHang, new ArrayList<PayAdapter.BillEntityAdapter>(), 0);
+
 
                 long totalMoney = 0;
                 for (int i = 0, n = customerResponse.getListBill().size(); i < n; i++) {
@@ -418,10 +391,11 @@ public class PayPresenter implements IPayPresenter {
 
                     bill.setRequestDate(Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
 
-                    dataAdapter.getBillKH().add(bill);
+                    bills.add(bill);
 
                 }
-                //dataAdapter.sortBills();
+                PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(khachHang, bills, 0);
+
                 dataAdapter.setTotalMoney(totalMoney);
 
                 List<PayAdapter.DataAdapter> adapters = new ArrayList<PayAdapter.DataAdapter>();
@@ -434,6 +408,40 @@ public class PayPresenter implements IPayPresenter {
                     mIPayView.hideSearchOnlineProcess();
                 }
 
+            }
+        }else
+        {
+            try {
+                PayModel.AsyncSearchOffline asyncSearchOffline = new PayModel.AsyncSearchOffline(1, mPayModel, new PayModel.AsyncSoapCallBack() {
+                    @Override
+                    public void onPost(final Pair<List<PayAdapter.DataAdapter>, Integer> result) {
+
+
+                        Activity activity = ((Activity) (mIPayView.getContextView()));
+                        if (activity != null)
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+
+                                    if(result.first.size() == 0)
+                                    {
+                                        mIPayView.showMessageNotifySearchOnline("Không có khách hàng!", Common.TYPE_DIALOG.LOI);
+                                        return;
+                                    }
+
+                                    try {
+                                        mIPayView.showPayRecyclerPage(result.first, 1, 1, "", false);
+                                    } catch (Exception e) {
+
+                                    }
+                                }
+                            });
+                    }
+                });
+                asyncSearchOffline.execute(new Pair<Common.TYPE_SEARCH, String>(Common.TYPE_SEARCH.MA_KH_SO_THE, this.searchInfo));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
@@ -1137,7 +1145,6 @@ public class PayPresenter implements IPayPresenter {
                 currentAsyncSearchOnline.cancel(true);
 
         }
-        this.finishSearchOnline(null);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)

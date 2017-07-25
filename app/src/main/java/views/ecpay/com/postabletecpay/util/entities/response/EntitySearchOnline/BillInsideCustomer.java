@@ -17,7 +17,7 @@ public class BillInsideCustomer implements Serializable {
     private String customerPayCode;
     @SerializedName("billId")
     @Expose
-    private Integer billId;
+    private Long billId;
     @SerializedName("term")
     @Expose
     private String term;
@@ -228,11 +228,11 @@ public class BillInsideCustomer implements Serializable {
         this.customerPayCode = customerPayCode;
     }
 
-    public Integer getBillId() {
+    public Long getBillId() {
         return billId;
     }
 
-    public void setBillId(Integer billId) {
+    public void setBillId(Long billId) {
         this.billId = billId;
     }
 
