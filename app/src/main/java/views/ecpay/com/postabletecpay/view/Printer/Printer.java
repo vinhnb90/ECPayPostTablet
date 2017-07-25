@@ -42,6 +42,8 @@ import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
+import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
 import static android.content.ContentValues.TAG;
 
@@ -53,19 +55,18 @@ public class Printer {
     public static final int THONG_BAO = 1;
     public static final int BIEN_NHAN = 2;
     public static final int BAO_CAO = 3;
+    static Dialog dialog;
     private FragmentActivity context;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothPort bluetoothPort;
     ArrayAdapter<String> adapter;
     private Vector<BluetoothDevice> remoteDevices;
-    private static final int REQUEST_ENABLE_BT = 2;
     private ListView listBluetooth;
     private Thread hThread;
     private BroadcastReceiver discoveryResult;
     private BroadcastReceiver searchFinish;
     private static ProgressDialog pDialog;
     private int isThongbao;
-    private boolean isSimply;
     protected static final String[] DEVICE_NAMES = new String[] { "BTPTR", "SIMPLY" };
     private SimplyPrintController controller;
     protected static ArrayAdapter<String> arrayAdapter;
@@ -103,25 +104,16 @@ public class Printer {
         this.hdTraKH = hdTraKH;
 
     }
-    public void Action(){
-        if (!Common.isBluetoothConnected) {
-            dialogChonMayIn();
-        }else
-        if (!isSimply) {
-            printer(billEntityAdapter);
+    public void Action() {
+        if (bluetoothPort != null && bluetoothPort.isConnected()){
         }else {
-            receipts = new ArrayList<byte[]>();
-            for (int i = 0, n = dataAdapter.size(); i < n; i ++) {
-                receipts.add(ReceiptUtility.genReceiptTest(context,dataAdapter.get(i)));
-            }
-
-            controller.startPrinting(receipts.size(), 120, 120);
+            bluetoothSetup();
         }
     }
 
     //region Chon May In
     public void dialogChonMayIn() {
-        final Dialog dialog = new Dialog(context);
+        dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_listbluetooth);
 
         final String[] connections = new String[2];
@@ -135,7 +127,7 @@ public class Printer {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(position == 0) {
-                    isSimply = true;
+                    Common.isSimply = true;
                     controller = new SimplyPrintController(context, new SimplyConnection());
                     Object[] pairedObjects = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray();
                     final BluetoothDevice[] pairedDevices = new BluetoothDevice[pairedObjects.length];
@@ -164,8 +156,8 @@ public class Printer {
                     });
                     dialog.show();
                 } else if(position == 1) {
-                    bluetoothSetup();
-                    isSimply = false;
+                    openBluetooth();
+                    Common.isSimply = false;
                     dialog.dismiss();
                     if (!bluetoothPort.isConnected()) {
                         if (!mBluetoothAdapter.isDiscovering()) {
@@ -180,7 +172,7 @@ public class Printer {
                             mBluetoothAdapter.cancelDiscovery();
                         }
                     }else {
-                            printer(billEntityAdapter);
+                        printerSewoo(billEntityAdapter);
                     }
                 }
             }
@@ -202,10 +194,14 @@ public class Printer {
         }
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            context.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            openBluetooth();
-        }else {
-            openBluetooth();
+            context.startActivityForResult(enableBtIntent, PayFragment.REQUEST_ENABLE_BT);
+        }
+        if (!Common.isBluetoothConnected) {
+            dialogChonMayIn();
+        } else if (!Common.isSimply) {
+            printerSewoo(billEntityAdapter);
+        } else {
+            printerSimply(billEntityAdapter);
         }
     }
 
@@ -215,7 +211,6 @@ public class Printer {
 
     // region Setup Bluetooth
     private void openBluetooth(){
-        loadSettingFile();
         adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1);
         addPairedDevices();
         discoveryResult = new BroadcastReceiver()
@@ -394,7 +389,7 @@ public class Printer {
                 Toast toast = Toast.makeText(context, "Đã kết nối bluetooth", Toast.LENGTH_SHORT);
                 toast.show();
                 Common.isBluetoothConnected =true;
-                printer(billEntityAdapter);
+                printerSewoo(billEntityAdapter);
             }
             else	// Connection failed.
             {
@@ -405,7 +400,7 @@ public class Printer {
         }
     }
 
-    private void printer(PayAdapter.BillEntityAdapter bill){
+    private void printerSewoo(PayAdapter.BillEntityAdapter bill){
         int results = 0;
         ESCPOSSample sample = new ESCPOSSample();
         try {
@@ -433,6 +428,38 @@ public class Printer {
                 case ESCPOSConst.STS_PAPERNEAREMPTY:
                     Log.e(getClass().getName(),"page near empty");
                     break;
+            }
+        }
+    }
+
+    private void printerSimply(PayAdapter.BillEntityAdapter bill){
+        if (receipts == null)
+            receipts = new ArrayList<byte[]>();
+        if (controller == null)
+            controller = new SimplyPrintController(context, new SimplyConnection());
+        else
+            controller.resetSimplyPrintController();
+        if (isThongbao == BIEN_NHAN) {
+            if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("H")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("A")
+                    ||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("D")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("C")){
+                receipts.add(ReceiptUtility.genReceiptTest(context,bill));
+            }else if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("E")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("B")){
+                receipts.add(ReceiptUtility.BiennhanHcmc(context,bill));
+            }
+            controller.startPrinting(receipts.size(), 120, 120);
+        }
+        else if (isThongbao ==THONG_BAO ) {
+            for (int i = 0, n = dataAdapter.size(); i < n; i ++) {
+                if (ReceiptUtility.thongbao(context,dataAdapter.get(i)) != null)
+                    receipts.add(ReceiptUtility.thongbao(context,dataAdapter.get(i)));
+                    controller.startPrinting(receipts.size(), 120, 120);
+            }
+        }else {
+            try {
+                receipts.add(ReceiptUtility.baoCao(context,account,hdGiao,tienGiao,hdThu,tienThu,hdVangLai,tienVangLai,hdTraKH,tienTraKHt));
+                controller.startPrinting(receipts.size(), 120, 120);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -466,12 +493,7 @@ public class Printer {
         @Override
         public void onBTv2Connected(BluetoothDevice bluetoothDevice) {
             Common.isBluetoothConnected = true;
-            receipts = new ArrayList<byte[]>();
-//                receipts.add(ReceiptUtility.genReceipt(MainActivity.this));
-            for (int i = 0, n = dataAdapter.size(); i < n; i ++) {
-                receipts.add(ReceiptUtility.genReceiptTest(context,dataAdapter.get(i)));
-            }
-            controller.startPrinting(receipts.size(), 120, 120);
+            printerSimply(billEntityAdapter);
         }
 
         @Override
@@ -591,4 +613,5 @@ public class Printer {
             }
         }
     }
+
 }

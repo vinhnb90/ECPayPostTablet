@@ -240,6 +240,7 @@ public class PayFragment extends Fragment implements
     private View rootView;
     private Dialog dialogPayingOnline, dialogDeleteBillOnline;
     public static final int REQUEST_BARCODE = 999;
+    public static final int REQUEST_ENABLE_BT = 2;
     public static final int RESPONSE_BARCODE = 1000;
 
 
@@ -805,7 +806,7 @@ public class PayFragment extends Fragment implements
         {
             setUpRecyclerDialog();
 
-            payBillsDialogAdapter = new PayBillsDialogAdapter(this, listBillChecked, false);
+            payBillsDialogAdapter = new PayBillsDialogAdapter(getActivity(),this, listBillChecked, false);
             rvListBillDialog.setAdapter(payBillsDialogAdapter);
 
             rvListBillDialog.invalidate();

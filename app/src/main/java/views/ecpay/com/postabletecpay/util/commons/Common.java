@@ -102,6 +102,8 @@ import static java.lang.System.lineSeparator;
 
 public class Common {
     public static boolean isBluetoothConnected = false;
+    public static boolean isBluetooth = false;
+    public static boolean isSimply;
 
     //region param account
     public enum TYPE_ACCOUNT {
@@ -1533,6 +1535,16 @@ public class Common {
                 folderConfig.mkdir();
             }
 
+            File folderBCChiTiet = new File(PATH_FOLDER_BAO_CAO_CHI_TIET);
+            if (!folderBCChiTiet.exists()) {
+                folderBCChiTiet.mkdir();
+            }
+
+            File folderBCHoanTra = new File(PATH_FOLDER_BAO_CAO_HOAN_TRA);
+            if (!folderBCHoanTra.exists()) {
+                folderBCHoanTra.mkdir();
+            }
+
             File fileConfig = new File(PATH_FOLDER_CONFIG + Common.CONFIG_FILENAME);
             if (fileConfig.exists()) {
                 //get info config
@@ -1663,6 +1675,26 @@ public class Common {
             }
             if (allFilesHelp != null)
                 scanFile(ctx, allFilesHelp);
+
+
+            // Load BaoCaoChiTiet folder
+            File fileBCCT = new File(Common.PATH_FOLDER_BAO_CAO_CHI_TIET);
+            String[] allFilesBCCT = fileBCCT.list();
+            for (int i = 0; i < allFilesBCCT.length; i++) {
+                allFilesBCCT[i] = Common.PATH_FOLDER_BAO_CAO_CHI_TIET + allFilesBCCT[i];
+            }
+            if (allFilesBCCT != null)
+                scanFile(ctx, allFilesBCCT);
+
+            // Load BaoCaoHoanTra folder
+
+            File fileBCHT = new File(Common.PATH_FOLDER_BAO_CAO_HOAN_TRA);
+            String[] allFilesBCHT = fileBCHT.list();
+            for (int i = 0; i < allFilesBCHT.length; i++) {
+                allFilesBCHT[i] = Common.PATH_FOLDER_BAO_CAO_HOAN_TRA + allFilesBCHT[i];
+            }
+            if (allFilesBCHT != null)
+                scanFile(ctx, allFilesBCHT);
 
             // Load db folder
             File file_db = new File(Common.PATH_FOLDER_DB);
@@ -2479,11 +2511,11 @@ public class Common {
     public enum STATUS_DOWNLOAD {
         BOOK_CMIS_START("Đang đồng bộ sổ..."),
         BOOK_CMIS_ERROR("Không nhận được dữ liệu sổ..."),
-        BOOK_CMIS_END("Hoàn tất dồng bộ sổ."),
+        BOOK_CMIS_END("Hoàn tất đồng bộ sổ."),
 
         GET_PC_INFO_START("Đang đồng bộ Điện lực..."),
         GET_PC_INFO_ERROR("Không nhận được dữ liệu Điện lực..."),
-        GET_PC_INFO_END("Hoàn tất dồng bộ Điện lực."),
+        GET_PC_INFO_END("Hoàn tất đồng bộ Điện lực."),
 
         GET_FILE_GEN_START("Đang đồng bộ file..."),
         GET_FILE_GEN_END("Hoàn tất đồng bộ file."),

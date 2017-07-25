@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.model.adapter;
 
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
@@ -18,6 +19,7 @@ import butterknife.OnClick;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.Main.MainActivity;
+import views.ecpay.com.postabletecpay.view.Printer.Printer;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.STATUS_BILLING.CHUA_THANH_TOAN;
 import static views.ecpay.com.postabletecpay.util.commons.Common.STATUS_BILLING.DA_THANH_TOAN;
@@ -31,17 +33,18 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
     private  List<PayAdapter.BillEntityAdapter> listBillChecked;
     private  OnInteractionBillDialogRecycler iPayView;
     private  boolean isDisableCheckbox = false;
+    FragmentActivity activity;
 
-    public PayBillsDialogAdapter(OnInteractionBillDialogRecycler payView, List<PayAdapter.BillEntityAdapter> listBillChecked, boolean isDisableCheckbox) {
+    public PayBillsDialogAdapter(FragmentActivity activity,OnInteractionBillDialogRecycler payView, List<PayAdapter.BillEntityAdapter> listBillChecked, boolean isDisableCheckbox) {
         this.listBillChecked = listBillChecked;
         this.iPayView = payView;
         this.isDisableCheckbox = isDisableCheckbox;
+        this.activity = activity;
 
         for (int i = 0, n = this.listBillChecked.size(); i < n; i ++)
         {
             this.listBillChecked.get(i).setMessageError("");
         }
-
 
         Collections.sort(this.listBillChecked, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
 
@@ -66,7 +69,7 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
 
     @Override
     public void onBindViewHolder(BillDialogViewHorder holder, int position) {
-        PayAdapter.BillEntityAdapter billChecked = listBillChecked.get(position);
+        final PayAdapter.BillEntityAdapter billChecked = listBillChecked.get(position);
 
         holder.getCbChoose().setChecked(billChecked.isChecked());
         holder.getTvCode().setText(String.valueOf(billChecked.getMA_KHACH_HANG()));
@@ -80,6 +83,13 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
        holder.ibtnPrint.setVisibility(billChecked.getTRANG_THAI_TT().equalsIgnoreCase(CHUA_THANH_TOAN.getCode()) ? View.INVISIBLE : View.VISIBLE);
 
         String status = Common.STATUS_BILLING.findCodeMessage(billChecked.getTRANG_THAI_TT()).getMessage();
+        holder.ibtnPrint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Printer printer = new Printer(activity,Printer.BIEN_NHAN,billChecked);
+                printer.Action();
+            }
+        });
 
         if(!TextUtils.isEmpty(message))
         {

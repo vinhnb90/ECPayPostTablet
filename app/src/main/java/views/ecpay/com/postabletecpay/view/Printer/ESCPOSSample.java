@@ -35,14 +35,14 @@ public class ESCPOSSample
 	// 0x1B
 	private final char ESC = ESCPOS.ESC;
 	
-	public ESCPOSSample()
+	ESCPOSSample()
 	{
 		posPtr = new ESCPOSPrinter();
 	}
 	
 //	private final String TAG = "PrinterStsChecker";
 	private int rtn;
-	private String demtext(int t, String text){
+	static String demtext(int t, String text){
 		String space = "";
 		int length = t - text.length();
 		for(int i = 1; i < length; i ++){
@@ -51,7 +51,7 @@ public class ESCPOSSample
 		return space;
 	}
 	
-    public int bienNhanHN(Context activity,PayAdapter.BillEntityAdapter billObj) throws InterruptedException {
+    private int bienNhanHN(Context activity, PayAdapter.BillEntityAdapter billObj) throws InterruptedException {
 		try
 		{
 			rtn = posPtr.printerSts();
@@ -139,7 +139,7 @@ public class ESCPOSSample
 		return 0;
     }
 
-	public int bienNhanHCMC(Context activity, PayAdapter.BillEntityAdapter billObj) throws InterruptedException {
+	private int bienNhanHCMC(Context activity, PayAdapter.BillEntityAdapter billObj) throws InterruptedException {
 		try
 		{
 			rtn = posPtr.printerSts();
@@ -215,7 +215,7 @@ public class ESCPOSSample
 		return 0;
 	}
 
-	public static Bitmap drawableToBitmap (Drawable drawable) {
+	private static Bitmap drawableToBitmap(Drawable drawable) {
 		Bitmap bitmap = null;
 
 		if (drawable instanceof BitmapDrawable) {
@@ -237,7 +237,7 @@ public class ESCPOSSample
 		return bitmap;
 	}
 
-	public int Thongbao(Context activity, PayAdapter.BillEntityAdapter billEntityAdapter) throws InterruptedException {
+	int Thongbao(Context activity, PayAdapter.BillEntityAdapter billEntityAdapter) throws InterruptedException {
 		try
 		{
 			rtn = posPtr.printerSts();
@@ -446,7 +446,7 @@ public class ESCPOSSample
 	public int checkDienLuc(Context context,PayAdapter.BillEntityAdapter bill){
 		int result =0;
 		if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("H")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("A")
-				||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("D")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("c")){
+				||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("D")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("C")){
 			try {
 				result = bienNhanHN(context,bill);
 			} catch (InterruptedException e) {

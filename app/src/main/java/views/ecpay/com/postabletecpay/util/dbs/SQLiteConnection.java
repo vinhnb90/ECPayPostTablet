@@ -1106,8 +1106,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
 
             Cursor mCursor = database.rawQuery(qqq, null);
-            if (mCursor.getCount() == 0)
-            {
+            if (mCursor.getCount() == 0) {
                 mCursor.close();
                 return billList;
             }
@@ -1160,7 +1159,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     bill.setTU_NGAY(tuNgay);
                     bill.setDEN_NGAY(denNgay);
                     bill.setSO_HO(soHo);
-
                     String fullName = mCursor.getString(mCursor.getColumnIndex("fullName"));
 
                     if (fullName == null) {
@@ -1192,11 +1190,11 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 mCursor.close();
             }
         }
-
         return billList;
     }
 
-    public Pair<List<PayAdapter.BillEntityAdapter>, Long> selectInfoBillOfCustomerToRecycler(String edong, String code) {
+    public Pair<List<PayAdapter.BillEntityAdapter>, Long> selectInfoBillOfCustomerToRecycler
+            (String edong, String code) {
 
         List<PayAdapter.BillEntityAdapter> billList = new ArrayList<>();
 
@@ -1263,13 +1261,8 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 bill.setChecked(false);
                 bill.setMA_KHACH_HANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
 
-
-                String fullName = mCursor.getString(mCursor.getColumnIndex("fullName"));
-
-                if (fullName == null) {
-                    fullName = "";
-                }
-                bill.setTEN_DIEN_LUC(fullName);
+                String fullname = mCursor.getString(mCursor.getColumnIndex("fullName"));
+                bill.setTEN_DIEN_LUC(fullname);
 
                 bill.setCheckEnable(!bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()));
 
@@ -1938,7 +1931,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         initialValues.put("E_DONG", bodyBillResponse.getEdong());
         initialValues.put("MA_HOA_DON", bodyBillResponse.getBillId());
         initialValues.put("SERI_HDON", bodyBillResponse.getSeri());
-
         initialValues.put("MA_THE", bodyBillResponse.getCardNo());
         initialValues.put("TEN_KHANG", bodyBillResponse.getName());
         initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
