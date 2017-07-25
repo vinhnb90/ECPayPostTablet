@@ -70,6 +70,7 @@ public class PayPresenter implements IPayPresenter {
     private PayModel mPayModel;
     private IPayView mIPayView;
     private Common.TYPE_SEARCH mTypeSearch;
+    private String searchInfo;
 
     SoapAPI.AsyncSoapIncludeTimout<SearchOnlineResponse> currentAsyncSearchOnline;
 
@@ -130,6 +131,7 @@ public class PayPresenter implements IPayPresenter {
         mIPayView.showRecyclerFragment();
 
         this.mTypeSearch = typeSearch;
+        this.searchInfo = infoSearch;
 
 
         if (!isSeachOnline) {
@@ -236,7 +238,8 @@ public class PayPresenter implements IPayPresenter {
             isErr = true;
         }
         if (isErr) {
-            mIPayView.showMessageNotifySearchOnline(textMessage, Common.TYPE_DIALOG.LOI);
+            finishSearchOnline(null);
+            //mIPayView.showMessageNotifySearchOnline(textMessage, Common.TYPE_DIALOG.LOI);
             return;
         }
 
@@ -290,7 +293,7 @@ public class PayPresenter implements IPayPresenter {
                         ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mIPayView.showMessageNotifySearchOnline(message, Common.TYPE_DIALOG.LOI);
+                                //mIPayView.showMessageNotifySearchOnline(message, Common.TYPE_DIALOG.LOI);
                                 finishSearchOnline(null);
                             }
                         });
@@ -307,6 +310,7 @@ public class PayPresenter implements IPayPresenter {
                         } catch (Exception e) {
                             Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
                         }
+                        finishSearchOnline(null);
                         return;
                     }
 
@@ -327,7 +331,7 @@ public class PayPresenter implements IPayPresenter {
                         mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                         Common.CODE_REPONSE_SEARCH_ONLINE codeResponse = Common.CODE_REPONSE_SEARCH_ONLINE.findCodeMessage(response.getFooter().getResponseCode());
                         if (codeResponse != Common.CODE_REPONSE_SEARCH_ONLINE.e000) {
-                            mIPayView.showMessageNotifySearchOnline(codeResponse.getMessage(), Common.TYPE_DIALOG.LOI);
+                            //mIPayView.showMessageNotifySearchOnline(codeResponse.getMessage(), Common.TYPE_DIALOG.LOI);
                             finishSearchOnline(null);
                             return;
                         }
@@ -343,7 +347,7 @@ public class PayPresenter implements IPayPresenter {
                         ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
+                                //mIPayView.showMessageNotifySearchOnline(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
                                 finishSearchOnline(null);
                             }
                         });
@@ -435,6 +439,40 @@ public class PayPresenter implements IPayPresenter {
                     mIPayView.hideSearchOnlineProcess();
                 }
 
+            }
+        }else
+        {
+            try {
+                PayModel.AsyncSearchOffline asyncSearchOffline = new PayModel.AsyncSearchOffline(1, mPayModel, new PayModel.AsyncSoapCallBack() {
+                    @Override
+                    public void onPost(final Pair<List<PayAdapter.DataAdapter>, Integer> result) {
+
+
+                        Activity activity = ((Activity) (mIPayView.getContextView()));
+                        if (activity != null)
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+
+                                    if(result.first.size() == 0)
+                                    {
+                                        mIPayView.showMessageNotifySearchOnline("Không có khách hàng!", Common.TYPE_DIALOG.LOI);
+                                        return;
+                                    }
+
+                                    try {
+                                        mIPayView.showPayRecyclerPage(result.first, 1, 1, "", false);
+                                    } catch (Exception e) {
+
+                                    }
+                                }
+                            });
+                    }
+                });
+                asyncSearchOffline.execute(new Pair<Common.TYPE_SEARCH, String>(Common.TYPE_SEARCH.MA_KH_SO_THE, this.searchInfo));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
@@ -1138,7 +1176,6 @@ public class PayPresenter implements IPayPresenter {
                 currentAsyncSearchOnline.cancel(true);
 
         }
-        this.finishSearchOnline(null);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
