@@ -528,8 +528,8 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getTEN_DIEN_LUC() {
-            return TEN_DIEN_LUC;}
-
+            return (TEN_DIEN_LUC == null) ? "" : TEN_DIEN_LUC;
+        }
         public void setTEN_DIEN_LUC(String TEN_DIEN_LUC) {
             this.TEN_DIEN_LUC = TEN_DIEN_LUC;
         }

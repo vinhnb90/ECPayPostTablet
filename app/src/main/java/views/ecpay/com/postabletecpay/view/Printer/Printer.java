@@ -65,7 +65,6 @@ public class Printer {
     private BroadcastReceiver searchFinish;
     private static ProgressDialog pDialog;
     private int isThongbao;
-    private boolean isSimply;
     protected static final String[] DEVICE_NAMES = new String[] { "BTPTR", "SIMPLY" };
     private SimplyPrintController controller;
     protected static ArrayAdapter<String> arrayAdapter;
@@ -106,16 +105,10 @@ public class Printer {
     public void Action(){
         if (!Common.isBluetoothConnected) {
             dialogChonMayIn();
-        }else
-        if (!isSimply) {
-            printer(billEntityAdapter);
+        }else if (!Common.isSimply) {
+            printerSewoo(billEntityAdapter);
         }else {
-            receipts = new ArrayList<byte[]>();
-            for (int i = 0, n = dataAdapter.size(); i < n; i ++) {
-                receipts.add(ReceiptUtility.genReceiptTest(context,dataAdapter.get(i)));
-            }
-
-            controller.startPrinting(receipts.size(), 120, 120);
+            printerSimply(billEntityAdapter);
         }
     }
 
@@ -135,7 +128,7 @@ public class Printer {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(position == 0) {
-                    isSimply = true;
+                    Common.isSimply = true;
                     controller = new SimplyPrintController(context, new SimplyConnection());
                     Object[] pairedObjects = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray();
                     final BluetoothDevice[] pairedDevices = new BluetoothDevice[pairedObjects.length];
@@ -165,7 +158,7 @@ public class Printer {
                     dialog.show();
                 } else if(position == 1) {
                     bluetoothSetup();
-                    isSimply = false;
+                    Common.isSimply = false;
                     dialog.dismiss();
                     if (!bluetoothPort.isConnected()) {
                         if (!mBluetoothAdapter.isDiscovering()) {
@@ -180,7 +173,7 @@ public class Printer {
                             mBluetoothAdapter.cancelDiscovery();
                         }
                     }else {
-                            printer(billEntityAdapter);
+                        printerSewoo(billEntityAdapter);
                     }
                 }
             }
@@ -394,7 +387,7 @@ public class Printer {
                 Toast toast = Toast.makeText(context, "Đã kết nối bluetooth", Toast.LENGTH_SHORT);
                 toast.show();
                 Common.isBluetoothConnected =true;
-                printer(billEntityAdapter);
+                printerSewoo(billEntityAdapter);
             }
             else	// Connection failed.
             {
@@ -405,7 +398,7 @@ public class Printer {
         }
     }
 
-    private void printer(PayAdapter.BillEntityAdapter bill){
+    private void printerSewoo(PayAdapter.BillEntityAdapter bill){
         int results = 0;
         ESCPOSSample sample = new ESCPOSSample();
         try {
@@ -437,6 +430,30 @@ public class Printer {
         }
     }
 
+    private void printerSimply(PayAdapter.BillEntityAdapter bill){
+        if (isThongbao == BIEN_NHAN) {
+            receipts = new ArrayList<byte[]>();
+            if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("H")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("A")
+                    ||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("D")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("C")){
+                receipts.add(ReceiptUtility.genReceiptTest(context,bill));
+            }else if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("E")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("B")){
+                receipts.add(ReceiptUtility.BiennhanHcmc(context,bill));
+            }
+        }
+        else if (isThongbao ==THONG_BAO ) {
+            for (int i = 0, n = dataAdapter.size(); i < n; i ++) {
+                receipts.add(ReceiptUtility.thongbao(context,dataAdapter.get(i)));
+            }
+        }else {
+            try {
+                receipts.add(ReceiptUtility.baoCao(context,account,hdGiao,tienGiao,hdThu,tienThu,hdVangLai,tienVangLai,hdTraKH,tienTraKHt));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        controller.startPrinting(receipts.size(), 120, 120);
+    }
+
     public void stopConnection() {
         SimplyPrintController.ConnectionMode connectionMode = controller.getConnectionMode();
         if(connectionMode == SimplyPrintController.ConnectionMode.BLUETOOTH_2) {
@@ -466,12 +483,7 @@ public class Printer {
         @Override
         public void onBTv2Connected(BluetoothDevice bluetoothDevice) {
             Common.isBluetoothConnected = true;
-            receipts = new ArrayList<byte[]>();
-//                receipts.add(ReceiptUtility.genReceipt(MainActivity.this));
-            for (int i = 0, n = dataAdapter.size(); i < n; i ++) {
-                receipts.add(ReceiptUtility.genReceiptTest(context,dataAdapter.get(i)));
-            }
-            controller.startPrinting(receipts.size(), 120, 120);
+            printerSimply(billEntityAdapter);
         }
 
         @Override

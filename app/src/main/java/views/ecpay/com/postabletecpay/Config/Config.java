@@ -5,7 +5,7 @@ package views.ecpay.com.postabletecpay.Config;
  */
 
 public class Config {
-    private  static  boolean RELEASE = false;
+    private  static  boolean RELEASE = true;
 
 
     private  static boolean SHOW_RESPONE = true;

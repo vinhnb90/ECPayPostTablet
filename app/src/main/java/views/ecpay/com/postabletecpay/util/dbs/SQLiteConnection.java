@@ -100,7 +100,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, `SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
             "`MA_THE` TEXT, `TEN_KHANG` TEXT, `DIA_CHI` TEXT, `THANG_TTOAN` DATE, `PHIEN_TTOAN` TEXT, `SO_TIEN_TTOAN` INTEGER, " +
             "`SO_GCS` TEXT, `DIEN_LUC` TEXT, `SO_HO` TEXT, `SO_DAU_KY` TEXT, `SO_CUOI_KY` TEXT, `SO_CTO` TEXT, `SDT_ECPAY` TEXT, " +
-            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT, `CHI_TIET_KG` TEXT, `CHI_TIET_MCS` TEXT, `CHI_TIET_TIEN_MCS` TEXT, `DNTT` TEXT," +
+            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT, `CHI_TIET_KG` TEXT, `CHI_TIET_MCS` TEXT, `CHI_TIET_TIEN_MCS` TEXT, `DNTT` TEXT,"+
             "`TONG_TIEN_CHUA_THUE` INTEGER, `TIEN_THUE` INTEGER, `TEN_DIEN_LUC` TEXT, `TU_NGAY` TEXT, `DEN_NGAY` TEXT)";
 
     private String CREATE_TABLE_DEBT_COLLECTION = "CREATE TABLE `" + TABLE_NAME_DEBT_COLLECTION + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, `SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
@@ -1160,9 +1160,12 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                     bill.setTU_NGAY(tuNgay);
                     bill.setDEN_NGAY(denNgay);
                     bill.setSO_HO(soHo);
+                    String fullName = mCursor.getString(mCursor.getColumnIndex("fullName"));
 
-                    String fullname = mCursor.getString(mCursor.getColumnIndex("fullName"));
-                    bill.setTEN_DIEN_LUC(fullname);
+                    if (fullName == null) {
+                        fullName = "";
+                    }
+                    bill.setTEN_DIEN_LUC(fullName);
 
                     bill.setMA_DIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
                     bill.setChecked(true);
@@ -1789,7 +1792,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         initialValues.put("MA_HOA_DON", bodyBillResponse.getBillId());
         initialValues.put("E_DONG", bodyBillResponse.getEdong());
-        initialValues.put("MA_DL_MO_RONG", bodyBillResponse.getPcCodeExt());
+//        initialValues.put("MA_DL_MO_RONG", bodyBillResponse.getPcCodeExt());
         initialValues.put("TU_NGAY", bodyBillResponse.getStrFromDate());
         initialValues.put("DEN_NGAY", bodyBillResponse.getStrToDate());
         initialValues.put("CHI_TIET_KG", bodyBillResponse.getPriceDetail());

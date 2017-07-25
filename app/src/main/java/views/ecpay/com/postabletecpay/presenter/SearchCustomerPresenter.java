@@ -81,12 +81,12 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
 
     protected void searchOffline(String maxKH, String tenKH, String dcKH, String phoneKH, String gtKH)
     {
-        List<EntityKhachHang> lst = customerSearchModel.getListCustomer(maxKH, tenKH, dcKH, phoneKH, gtKH);
+        List<EntityKhachHang> lst = customerSearchModel.getListCustomer(maxKH.trim(), tenKH.trim(), dcKH.trim(), phoneKH.trim(), gtKH.trim());
         searchCustomerView.refreshView(lst);
 
         if(lst.size() == 0)
         {
-            searchCustomerView.showMessage("Mã khách hàng không tồn tại!");
+            searchCustomerView.showMessage("Khách hàng không tồn tại!");
         }
 
     }

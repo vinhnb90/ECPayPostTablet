@@ -805,7 +805,7 @@ public class PayFragment extends Fragment implements
         {
             setUpRecyclerDialog();
 
-            payBillsDialogAdapter = new PayBillsDialogAdapter(this, listBillChecked, false);
+            payBillsDialogAdapter = new PayBillsDialogAdapter(getActivity(),this, listBillChecked, false);
             rvListBillDialog.setAdapter(payBillsDialogAdapter);
 
             rvListBillDialog.invalidate();
