@@ -160,21 +160,6 @@ public class Printer {
                     bluetoothSetup();
                     Common.isSimply = false;
                     dialog.dismiss();
-                    if (!bluetoothPort.isConnected()) {
-                        if (!mBluetoothAdapter.isDiscovering()) {
-                            clearBtDevData();
-                            adapter.clear();
-                            mBluetoothAdapter.startDiscovery();
-                            pDialog = new ProgressDialog(context);
-                            pDialog.show();
-                            pDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                            pDialog.setContentView(R.layout.progress_dialog);
-                        } else {
-                            mBluetoothAdapter.cancelDiscovery();
-                        }
-                    }else {
-                        printerSewoo(billEntityAdapter);
-                    }
                 }
             }
 
@@ -208,7 +193,6 @@ public class Printer {
 
     // region Setup Bluetooth
     private void openBluetooth(){
-        loadSettingFile();
         adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1);
         addPairedDevices();
         discoveryResult = new BroadcastReceiver()
@@ -247,6 +231,21 @@ public class Printer {
             }
         };
         context.registerReceiver(searchFinish, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+        if (!bluetoothPort.isConnected()) {
+            if (!mBluetoothAdapter.isDiscovering()) {
+                clearBtDevData();
+                adapter.clear();
+                mBluetoothAdapter.startDiscovery();
+                pDialog = new ProgressDialog(context);
+                pDialog.show();
+                pDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                pDialog.setContentView(R.layout.progress_dialog);
+            } else {
+                mBluetoothAdapter.cancelDiscovery();
+            }
+        }else {
+            printerSewoo(billEntityAdapter);
+        }
 
     }
 
