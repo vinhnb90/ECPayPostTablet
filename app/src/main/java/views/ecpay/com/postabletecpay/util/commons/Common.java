@@ -102,6 +102,7 @@ import static java.lang.System.lineSeparator;
 
 public class Common {
     public static boolean isBluetoothConnected = false;
+    public static boolean isBluetooth = false;
     public static boolean isSimply;
 
     //region param account

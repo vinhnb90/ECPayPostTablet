@@ -39,12 +39,12 @@ public class PayBillsDialogAdapter extends RecyclerView.Adapter<PayBillsDialogAd
         this.listBillChecked = listBillChecked;
         this.iPayView = payView;
         this.isDisableCheckbox = isDisableCheckbox;
+        this.activity = activity;
 
         for (int i = 0, n = this.listBillChecked.size(); i < n; i ++)
         {
             this.listBillChecked.get(i).setMessageError("");
         }
-
 
         Collections.sort(this.listBillChecked, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
 

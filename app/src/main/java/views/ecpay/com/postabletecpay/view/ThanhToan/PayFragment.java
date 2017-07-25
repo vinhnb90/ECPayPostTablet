@@ -240,6 +240,7 @@ public class PayFragment extends Fragment implements
     private View rootView;
     private Dialog dialogPayingOnline, dialogDeleteBillOnline;
     public static final int REQUEST_BARCODE = 999;
+    public static final int REQUEST_ENABLE_BT = 2;
     public static final int RESPONSE_BARCODE = 1000;
 
 

@@ -42,6 +42,8 @@ import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.model.adapter.PayAdapter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.util.entities.sqlite.Account;
+import views.ecpay.com.postabletecpay.view.Main.MainActivity;
+import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 
 import static android.content.ContentValues.TAG;
 
@@ -53,12 +55,12 @@ public class Printer {
     public static final int THONG_BAO = 1;
     public static final int BIEN_NHAN = 2;
     public static final int BAO_CAO = 3;
+    static Dialog dialog;
     private FragmentActivity context;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothPort bluetoothPort;
     ArrayAdapter<String> adapter;
     private Vector<BluetoothDevice> remoteDevices;
-    private static final int REQUEST_ENABLE_BT = 2;
     private ListView listBluetooth;
     private Thread hThread;
     private BroadcastReceiver discoveryResult;
@@ -102,19 +104,16 @@ public class Printer {
         this.hdTraKH = hdTraKH;
 
     }
-    public void Action(){
-        if (!Common.isBluetoothConnected) {
-            dialogChonMayIn();
-        }else if (!Common.isSimply) {
-            printerSewoo(billEntityAdapter);
+    public void Action() {
+        if (bluetoothPort != null && bluetoothPort.isConnected()){
         }else {
-            printerSimply(billEntityAdapter);
+            bluetoothSetup();
         }
     }
 
     //region Chon May In
     public void dialogChonMayIn() {
-        final Dialog dialog = new Dialog(context);
+        dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_listbluetooth);
 
         final String[] connections = new String[2];
@@ -157,9 +156,24 @@ public class Printer {
                     });
                     dialog.show();
                 } else if(position == 1) {
-                    bluetoothSetup();
+                    openBluetooth();
                     Common.isSimply = false;
                     dialog.dismiss();
+                    if (!bluetoothPort.isConnected()) {
+                        if (!mBluetoothAdapter.isDiscovering()) {
+                            clearBtDevData();
+                            adapter.clear();
+                            mBluetoothAdapter.startDiscovery();
+                            pDialog = new ProgressDialog(context);
+                            pDialog.show();
+                            pDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                            pDialog.setContentView(R.layout.progress_dialog);
+                        } else {
+                            mBluetoothAdapter.cancelDiscovery();
+                        }
+                    }else {
+                        printerSewoo(billEntityAdapter);
+                    }
                 }
             }
 
@@ -180,10 +194,14 @@ public class Printer {
         }
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            context.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            openBluetooth();
-        }else {
-            openBluetooth();
+            context.startActivityForResult(enableBtIntent, PayFragment.REQUEST_ENABLE_BT);
+        }
+        if (!Common.isBluetoothConnected) {
+            dialogChonMayIn();
+        } else if (!Common.isSimply) {
+            printerSewoo(billEntityAdapter);
+        } else {
+            printerSimply(billEntityAdapter);
         }
     }
 
@@ -231,21 +249,6 @@ public class Printer {
             }
         };
         context.registerReceiver(searchFinish, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
-        if (!bluetoothPort.isConnected()) {
-            if (!mBluetoothAdapter.isDiscovering()) {
-                clearBtDevData();
-                adapter.clear();
-                mBluetoothAdapter.startDiscovery();
-                pDialog = new ProgressDialog(context);
-                pDialog.show();
-                pDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                pDialog.setContentView(R.layout.progress_dialog);
-            } else {
-                mBluetoothAdapter.cancelDiscovery();
-            }
-        }else {
-            printerSewoo(billEntityAdapter);
-        }
 
     }
 
@@ -430,27 +433,35 @@ public class Printer {
     }
 
     private void printerSimply(PayAdapter.BillEntityAdapter bill){
-        if (isThongbao == BIEN_NHAN) {
+        if (receipts == null)
             receipts = new ArrayList<byte[]>();
+        if (controller == null)
+            controller = new SimplyPrintController(context, new SimplyConnection());
+        else
+            controller.resetSimplyPrintController();
+        if (isThongbao == BIEN_NHAN) {
             if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("H")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("A")
                     ||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("D")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("C")){
                 receipts.add(ReceiptUtility.genReceiptTest(context,bill));
             }else if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("E")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("B")){
                 receipts.add(ReceiptUtility.BiennhanHcmc(context,bill));
             }
+            controller.startPrinting(receipts.size(), 120, 120);
         }
         else if (isThongbao ==THONG_BAO ) {
             for (int i = 0, n = dataAdapter.size(); i < n; i ++) {
-                receipts.add(ReceiptUtility.thongbao(context,dataAdapter.get(i)));
+                if (ReceiptUtility.thongbao(context,dataAdapter.get(i)) != null)
+                    receipts.add(ReceiptUtility.thongbao(context,dataAdapter.get(i)));
+                    controller.startPrinting(receipts.size(), 120, 120);
             }
         }else {
             try {
                 receipts.add(ReceiptUtility.baoCao(context,account,hdGiao,tienGiao,hdThu,tienThu,hdVangLai,tienVangLai,hdTraKH,tienTraKHt));
+                controller.startPrinting(receipts.size(), 120, 120);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        controller.startPrinting(receipts.size(), 120, 120);
     }
 
     public void stopConnection() {
@@ -602,4 +613,5 @@ public class Printer {
             }
         }
     }
+
 }

@@ -32,6 +32,7 @@ import views.ecpay.com.postabletecpay.presenter.IMainPresenter;
 import views.ecpay.com.postabletecpay.presenter.MainPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
+import views.ecpay.com.postabletecpay.view.Printer.Printer;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
@@ -395,7 +396,10 @@ public class MainActivity extends AppCompatActivity implements
             if (fragmentVisibling == null || fragmentVisibling.isVisible() == false) {
                 return;
             }
-
+        }
+        if (requestCode == PayFragment.REQUEST_ENABLE_BT && data == null){
+            Common.isBluetoothConnected = false;
+        }else {
 
         }
     }

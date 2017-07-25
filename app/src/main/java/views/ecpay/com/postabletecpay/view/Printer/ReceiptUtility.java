@@ -195,14 +195,8 @@ public class ReceiptUtility {
             writeLongText(baos, textDiaChi, size0NoEmphasizeLineWidth);
             String maKH = "Mã KH: "+billObj.getMA_KHACH_HANG();
             writeLongText(baos, maKH, size0NoEmphasizeLineWidth);
-            String s1 = "Số Công tơ: "+ billObj.getSO_CONG_TO();
-            String s2 = "Số hộ: "+ billObj.getSO_HO();
-
-            List<String> mutilText_2 = new ArrayList<>();
-            mutilText_2.add(s1);
-            mutilText_2.add(s2);
-            int padding = 4;
-            writeLongTextMultiCollum(baos, lineWidth, padding, TYPE_TEXT.UNICODE_2_COLLUMN, mutilText_2);
+            String s1 = "Số Công tơ: "+ billObj.getSO_CONG_TO() + "      Số hộ: "+ billObj.getSO_HO();
+            writeLongText(baos, s1, size0NoEmphasizeLineWidth);
             writeLongText(baos, "Seri HĐTT: "+ billObj.getBillId(), size0NoEmphasizeLineWidth);
             writeLongText(baos, "Hình thức thanh toán: Tiền mặt", size0NoEmphasizeLineWidth);
             String noiDung = "Nội dung: thanh toán hóa đơn tiền điện kỳ "+ Common.parse(billObj.getTHANG_THANH_TOAN(),Common.DATE_TIME_TYPE.MMyyyy.toString())+" từ ngày "+ billObj.getTU_NGAY()+" đến ngày " + billObj.getDEN_NGAY();
@@ -272,7 +266,7 @@ public class ReceiptUtility {
             baos.write(NEW_LINE);
             baos.write(NEW_LINE);
             baos.write(ALIGN_RIGHT);
-            baos.write(SimplyPrintController.getUnicodeCommand("-- /Lần in 1 --"));
+            baos.write(SimplyPrintController.getUnicodeCommand("-- /Lần in 1/ --"));
             baos.write(NEW_LINE);
             baos.write(NEW_LINE);
             baos.write(NEW_LINE);
@@ -338,14 +332,8 @@ public class ReceiptUtility {
             writeLongText(baos, maKH, size0NoEmphasizeLineWidth);
             writeLongText(baos, "Sổ GCS " + billObj.getSO_GCS(), size0NoEmphasizeLineWidth);
             if (Character.toString(billObj.getMA_DIEN_LUC().charAt(1)).equals("E")){
-                String s1 = "Số Công tơ: "+ billObj.getSO_CONG_TO();
-                String s2 = "Số hộ: "+ billObj.getSO_HO();
-
-                List<String> mutilText_2 = new ArrayList<>();
-                mutilText_2.add(s1);
-                mutilText_2.add(s2);
-                int padding = 4;
-                writeLongTextMultiCollum(baos, lineWidth, padding, TYPE_TEXT.UNICODE_2_COLLUMN, mutilText_2);
+                String s1 = "Số Công tơ: "+ billObj.getSO_CONG_TO() + "     Số hộ: "+ billObj.getSO_HO();
+                writeLongText(baos, s1, size0NoEmphasizeLineWidth);
             }
 
             writeLongText(baos, "Hình thức thanh toán: Tiền mặt", size0NoEmphasizeLineWidth);
@@ -513,7 +501,6 @@ public class ReceiptUtility {
                 baos.write(temp);
                 baos.write(NEW_LINE);
             }
-
             baos.write(NEW_LINE);
             baos.write(FONT_SIZE_0);
             baos.write(EMPHASIZE_ON);
@@ -539,13 +526,8 @@ public class ReceiptUtility {
             writeLongText(baos, textDiaChi, size0NoEmphasizeLineWidth);
             String maKH = "Mã KH: "+billObj.getMA_KHACH_HANG();
             writeLongText(baos, maKH, size0NoEmphasizeLineWidth);
-            String s1 = "Số Công tơ: "+ billObj.getSO_CONG_TO();
-            String s2 = "Số hộ: "+ billObj.getSO_HO();
-            List<String> mutilText_2 = new ArrayList<>();
-            mutilText_2.add(s1);
-            mutilText_2.add(s2);
-            int padding = 4;
-            writeLongTextMultiCollum(baos, lineWidth, padding, TYPE_TEXT.UNICODE_2_COLLUMN, mutilText_2);
+            String s1 = "Số Công tơ: "+ billObj.getSO_CONG_TO() + "      Số hộ: "+ billObj.getSO_HO();
+            writeLongText(baos, s1, size0NoEmphasizeLineWidth);
             if (Character.toString(billObj.getMA_DIEN_LUC().charAt(1)).equals("B")){
                 writeLongText(baos,"So GCS: "+ billObj.getSO_GCS(), size0NoEmphasizeLineWidth);
             }
@@ -632,80 +614,6 @@ public class ReceiptUtility {
         }
         return result;
     }
-
-    private static void writeLongTextMultiCollum(final ByteArrayOutputStream baos, int lineWidth, int padding, TYPE_TEXT type, final List<String> mutilText) throws Exception {
-        try {
-            int collumn = mutilText.size();
-
-            int numOfCharacterPerLine = (int) lineWidth / type.getFontSize();
-
-            if (numOfCharacterPerLine % 2 != 0)
-                numOfCharacterPerLine++;
-            if (padding % 2 != 0)
-                padding++;
-            int halfPadding = padding / 2;
-            int numMaxOfEveryText = (int) numOfCharacterPerLine / collumn;
-
-
-            int soCotHetKyTuText = 0;
-
-            do {
-                String noiDungInDong = "";
-                for (int cot = 0; cot < collumn; cot++) {
-                    Boolean cotTextHetKiTu = false;
-                    //thêm kí tự trắng nếu in ko đủ cột này
-                    if (mutilText.get(cot).length() <= numMaxOfEveryText - halfPadding) {
-                        noiDungInDong += mutilText.get(cot);
-                        for (int viTrikyTuThem = 0; viTrikyTuThem < numMaxOfEveryText - mutilText.get(cot).length() - halfPadding; viTrikyTuThem++) {
-                            noiDungInDong += " ";
-                        }
-
-                        //tạo 1 cờ tránh việc tăng soCotHetKyTuText trường hợp cả một dòng của cột text này toàn kí tự trắng
-                        if (numMaxOfEveryText - mutilText.get(cot).length() == numMaxOfEveryText)
-                            cotTextHetKiTu = true;
-
-                        //xóa bớt kí tự ban đầu
-                        mutilText.set(cot, "");
-                    } else {
-                        noiDungInDong += mutilText.get(cot).substring(0, numMaxOfEveryText - halfPadding);
-                        //xóa bớt kí tự ban đầu
-                        String sS = mutilText.get(cot).substring(numMaxOfEveryText - halfPadding, mutilText.get(cot).length());
-                        mutilText.set(cot, sS);
-                    }
-
-                    if (cot < collumn - 1) {
-                        //thêm kí tự trắng padding
-                        for (int viTrikyTuThem = 0; viTrikyTuThem < padding; viTrikyTuThem++) {
-                            noiDungInDong += " ";
-                        }
-                    }
-
-                    //nếu cột text đó đã hết hoặc không phải trường hợp in toàn kí tự trắng cột đó
-                    if (cotTextHetKiTu) {
-
-                    } else if (mutilText.get(cot).length() == 0) {
-                        soCotHetKyTuText++;
-                    }
-                }
-
-                //Khi có kí tự thì in
-                if (noiDungInDong.length() > numOfCharacterPerLine) {
-                    Log.d(TAG, "writeLongTextMultiCollum: ");
-                }
-
-                baos.write(ALIGN_LEFT);
-                baos.write(SimplyPrintController.getUnicodeCommand(noiDungInDong));
-                baos.write(NEW_LINE);
-
-            }
-            while (soCotHetKyTuText != collumn);
-
-        } catch (Exception e) {
-            throw e;
-        }
-
-    }
-
 
     private static void writeLongText(final ByteArrayOutputStream baos, String text, int size0NoEmphasizeLineWidth) throws Exception {
         try {
