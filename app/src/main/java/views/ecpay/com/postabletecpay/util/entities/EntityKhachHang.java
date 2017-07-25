@@ -12,7 +12,9 @@ public class EntityKhachHang {
     private String MA_KHANG;
     private String MA_THE;
     private String TEN_KHANG;
+    private String TEN_KHANG_KHONG_DAU;
     private String DIA_CHI;
+    private String DIA_CHI_KHONG_DAU;
     private String PHIEN_TTOAN;
     private String LO_TRINH;
     private String SO_GCS;
@@ -21,6 +23,8 @@ public class EntityKhachHang {
     private String SDT_ECPAY;
     private String SDT_EVN;
     private String GIAO_THU;
+    private String STK_NGAN_HANG;
+    private String TEN_NGAN_HANG;
     private Date NGAY_GIAO_THU;
 
     public String getE_DONG() {
@@ -133,5 +137,37 @@ public class EntityKhachHang {
 
     public void setGIAO_THU(String GIAO_THU) {
         this.GIAO_THU = GIAO_THU;
+    }
+
+    public String getTEN_KHANG_KHONG_DAU() {
+        return TEN_KHANG_KHONG_DAU;
+    }
+
+    public void setTEN_KHANG_KHONG_DAU(String TEN_KHANG_KHONG_DAU) {
+        this.TEN_KHANG_KHONG_DAU = TEN_KHANG_KHONG_DAU;
+    }
+
+    public String getDIA_CHI_KHONG_DAU() {
+        return DIA_CHI_KHONG_DAU;
+    }
+
+    public void setDIA_CHI_KHONG_DAU(String DIA_CHI_KHONG_DAU) {
+        this.DIA_CHI_KHONG_DAU = DIA_CHI_KHONG_DAU;
+    }
+
+    public String getSTK_NGAN_HANG() {
+        return STK_NGAN_HANG;
+    }
+
+    public void setSTK_NGAN_HANG(String STK_NGAN_HANG) {
+        this.STK_NGAN_HANG = STK_NGAN_HANG;
+    }
+
+    public String getTEN_NGAN_HANG() {
+        return TEN_NGAN_HANG;
+    }
+
+    public void setTEN_NGAN_HANG(String TEN_NGAN_HANG) {
+        this.TEN_NGAN_HANG = TEN_NGAN_HANG;
     }
 }
