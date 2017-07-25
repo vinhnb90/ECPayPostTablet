@@ -267,9 +267,9 @@ public class UserInfoFragment extends Fragment implements IUserInfoView, ILogout
         if (numberAccount == null)
             numberAccount = "";
 
-        tvTaiKhoan.setText(accountName);
         tvNgayDangKy.setText(dateRegister);
-        tvTenTaiKhoan.setText(userName);
+        tvTenTaiKhoan.setText(accountName);
+        tvTaiKhoan.setText(userName);
         tvCMND.setText(indentityCard);
         tvDienThoai.setText(phone);
         tvEmail.setText(email);

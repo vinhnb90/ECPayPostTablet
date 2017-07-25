@@ -90,8 +90,8 @@ public class MainModel extends CommonModel {
         return sqLiteConnection.selectOfflineBill();
     }
 
-    public long checkCustomerExist(String code) {
-        return sqLiteConnection.checkCustomerExist(code);
+    public long checkCustomerExist(String code, String edong) {
+        return sqLiteConnection.checkCustomerExist(code, edong);
     }
 
     public long insertCustomer(ListCustomerResponse listCustomerResponse) {
@@ -187,6 +187,10 @@ public class MainModel extends CommonModel {
     {
         sqLiteConnection.updateHoaDonThu( MA_HOA_DON,  VI_TTOAN, TRANG_THAI_TTOAN,
                  TRANG_THAI_CHAM_NO,  TRANG_THAI_DAY_CHAM_NO,  NGAY_DAY,  TRANG_THAI_HOAN_TRA);
+    }
+
+    public Cursor getCursorEvnPc(String edong) {
+        return sqLiteConnection.getCursorEvnPc(edong);
     }
     //endregion
 }

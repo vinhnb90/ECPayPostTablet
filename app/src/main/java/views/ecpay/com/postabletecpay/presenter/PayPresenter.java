@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -105,14 +106,12 @@ public class PayPresenter implements IPayPresenter {
     }
 
     @Override
-    public IPayView getIPayView()
-    {
+    public IPayView getIPayView() {
         return mIPayView;
     }
 
     @Override
-    public void addSelectBillToPay(PayAdapter.BillEntityAdapter bill, boolean isSelect)
-    {
+    public void addSelectBillToPay(PayAdapter.BillEntityAdapter bill, boolean isSelect) {
         mPayModel.selectBill(bill, isSelect);
 
         mIPayView.updateBillSelectToPay(mPayModel.getListBillSelected());
@@ -133,8 +132,7 @@ public class PayPresenter implements IPayPresenter {
         this.mTypeSearch = typeSearch;
 
 
-        if(!isSeachOnline)
-        {
+        if (!isSeachOnline) {
 
             try {
                 PayModel.AsyncSearchOffline asyncSearchOffline = new PayModel.AsyncSearchOffline(pageIndex, mPayModel, new PayModel.AsyncSoapCallBack() {
@@ -176,30 +174,27 @@ public class PayPresenter implements IPayPresenter {
                         final int finalIndexBegin = indexBegin;
                         final int finalIndexEnd = indexEnd;
                         */
-                        Activity activity = ((Activity)(mIPayView.getContextView()));
-                        if(activity!= null)
+                        Activity activity = ((Activity) (mIPayView.getContextView()));
+                        if (activity != null)
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
 //                                    refreshTotalBillsAndTotalMoneyInFragment(edong, Common.STATUS_BILLING.CHUA_THANH_TOAN);
-                                    try
-                                    {
-                                        mIPayView.showPayRecyclerPage(result.first, pageIndex, (int)Math.ceil(result.second * 1.0 / PayFragment.ROWS_ON_PAGE), infoSearch, isSeachOnline);
-                                    }catch (Exception e)
-                                    {
+                                    try {
+                                        mIPayView.showPayRecyclerPage(result.first, pageIndex, (int) Math.ceil(result.second * 1.0 / PayFragment.ROWS_ON_PAGE), infoSearch, isSeachOnline);
+                                    } catch (Exception e) {
 
                                     }
                                 }
                             });
                     }
-                }) ;
+                });
                 asyncSearchOffline.execute(new Pair<Common.TYPE_SEARCH, String>(typeSearch, infoSearch));
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-        }else
-        {
+        } else {
             callSearchOnline(MainActivity.mEdong, infoSearch, false);
 //            List<PayAdapter.DataAdapter> fitter = new ArrayList<>();
 //            int indexBegin = 0;
@@ -269,13 +264,18 @@ public class PayPresenter implements IPayPresenter {
                 mIPayView.getProviderCodeSelected().getCode(),
                 configInfo.getAccountId());
 
-        if (jsonRequestSearchOnline == null)
-        {
+        if (jsonRequestSearchOnline == null) {
             finishSearchOnline(null);
             return;
         }
 
         try {
+            final String maKH = infoSearch;
+            final String soTien = "";
+            final String kyPhatSinh = "";
+
+            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.CUSTOMER_BILL, true);
+
             currentAsyncSearchOnline = new SoapAPI.AsyncSoapIncludeTimout<SearchOnlineResponse>(handlerDelay, SearchOnlineResponse.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
                 @Override
                 public void onPre(SoapAPI.AsyncSoapIncludeTimout soap) {
@@ -286,8 +286,7 @@ public class PayPresenter implements IPayPresenter {
                 public void onUpdate(final String message) {
                     if (message == null || message.isEmpty() || message.trim().equals(""))
                         return;
-                    try
-                    {
+                    try {
                         ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -295,16 +294,36 @@ public class PayPresenter implements IPayPresenter {
                                 finishSearchOnline(null);
                             }
                         });
-                    }catch (Exception e)
-                    {
+                    } catch (Exception e) {
 
                     }
                 }
 
                 @Override
                 public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
-                    if(response != null)
-                    {
+                    if (response == null) {
+                        try {
+                            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.CUSTOMER_BILL, false);
+                        } catch (Exception e) {
+                            Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                        }
+                        return;
+                    }
+
+                    String maLoi = "";
+                    String moTaLoi = "";
+                    if (response.getFooter() != null) {
+                        maLoi = response.getFooter().getResponseCode();
+                        moTaLoi = response.getFooter().getDescription();
+                    }
+
+                    try {
+                        Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, maLoi, moTaLoi, Common.COMMAND_ID.CUSTOMER_BILL, false);
+                    } catch (Exception e) {
+                        Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                    }
+
+                    if (response != null) {
                         mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                         Common.CODE_REPONSE_SEARCH_ONLINE codeResponse = Common.CODE_REPONSE_SEARCH_ONLINE.findCodeMessage(response.getFooter().getResponseCode());
                         if (codeResponse != Common.CODE_REPONSE_SEARCH_ONLINE.e000) {
@@ -320,8 +339,7 @@ public class PayPresenter implements IPayPresenter {
 
                 @Override
                 public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
-                    try
-                    {
+                    try {
                         ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -329,8 +347,7 @@ public class PayPresenter implements IPayPresenter {
                                 finishSearchOnline(null);
                             }
                         });
-                    }catch (Exception e)
-                    {
+                    } catch (Exception e) {
 
                     }
                 }
@@ -343,10 +360,8 @@ public class PayPresenter implements IPayPresenter {
 
     }
 
-    void finishSearchOnline(BodySearchOnlineResponse response)
-    {
-        if(response != null)
-        {
+    void finishSearchOnline(BodySearchOnlineResponse response) {
+        if (response != null) {
             CustomerInsideBody customerResponse = null;
             try {
                 customerResponse = new Gson().fromJson(response.getCustomer(), CustomerInsideBody.class);
@@ -354,8 +369,7 @@ public class PayPresenter implements IPayPresenter {
                 e.printStackTrace();
             }
 
-            if(customerResponse != null)
-            {
+            if (customerResponse != null) {
                 EntityKhachHang khachHang = new EntityKhachHang();
                 khachHang.setE_DONG(MainActivity.mEdong);
                 khachHang.setMA_KHANG(customerResponse.getCode());
@@ -377,8 +391,7 @@ public class PayPresenter implements IPayPresenter {
                 PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(khachHang, new ArrayList<PayAdapter.BillEntityAdapter>(), 0);
 
                 long totalMoney = 0;
-                for (int i = 0, n = customerResponse.getListBill().size(); i < n; i ++)
-                {
+                for (int i = 0, n = customerResponse.getListBill().size(); i < n; i++) {
                     BillInsideCustomer billInsideCustomer = customerResponse.getListBill().get(i);
 
 
@@ -429,8 +442,7 @@ public class PayPresenter implements IPayPresenter {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void callPay()
-    {
+    public void callPay() {
         boolean isPayOnline = Common.isNetworkConnected(mIPayView.getContextView());
 
         mIPayView.showPayingRViewDialogStart();
@@ -438,9 +450,7 @@ public class PayPresenter implements IPayPresenter {
         List<PayAdapter.BillEntityAdapter> bills = mPayModel.getListBillSelected();
 
 
-
-        if(bills.size() == 0)
-        {
+        if (bills.size() == 0) {
             mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10000.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
 
             mIPayView.showPayingRviewDialogFinish();
@@ -449,18 +459,16 @@ public class PayPresenter implements IPayPresenter {
 
         long totalMoney = 0;
         totalBillsChooseDialogTemp = 0;
-        for (int i = 0, n = bills.size(); i < n; i++)
-        {
+        for (int i = 0, n = bills.size(); i < n; i++) {
             PayAdapter.BillEntityAdapter bill = bills.get(i);
-            if(bill.isChecked() && bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode())) {
+            if (bill.isChecked() && bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode())) {
                 totalMoney += bill.getTIEN_THANH_TOAN();
-                totalBillsChooseDialogTemp ++;
+                totalBillsChooseDialogTemp++;
             }
         }
 
 
-        if(totalBillsChooseDialogTemp == 0)
-        {
+        if (totalBillsChooseDialogTemp == 0) {
             mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10000.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
 
             mIPayView.showPayingRviewDialogFinish();
@@ -469,62 +477,48 @@ public class PayPresenter implements IPayPresenter {
 
 
         Account account = mPayModel.getAccountInfo(MainActivity.mEdong);
-        if(totalMoney > account.getBalance())
-        {
+        if (totalMoney > account.getBalance()) {
             mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e03.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
 
             mIPayView.showPayingRviewDialogFinish();
             return;
         }
 //TODO mark
-        if(!isPayOnline) { //Thanh Toan Offline
+        if (!isPayOnline) { //Thanh Toan Offline
             //Kiểm tra địa bàn thanh toán
 
-            List<String> pcCodes = mPayModel.getPcCodes(account.getEdong());
-            for (int i = 0, n = pcCodes.size(); i < n; i ++)
+            if(checkPCForOffline())
             {
-                String pc = pcCodes.get(i).substring(0, 2).toUpperCase();
-                if (pc.equals("PD") || pc.equals("PE")) {
-                    mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e04.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
-                    mIPayView.showPayingRviewDialogFinish();
-                    return;
-                }
+                mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_OFFLINE.e04.getMessage(), false, Common.TYPE_DIALOG.LOI, true);
+                mIPayView.showPayingRviewDialogFinish();
+                return;
             }
 
             countBillPayedSuccess = 0;
-            for (int i = 0, n = bills.size(); i < n; i ++)
-            {
-                if(bills.get(i).isChecked() && bills.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()))
-                {
-                    try
-                    {
-                        payOffline(bills.get(i));
-                        countBillPayedSuccess ++;
+            for (int i = 0, n = bills.size(); i < n; i++) {
+                if (bills.get(i).isChecked() && bills.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()) && bills.get(i).getMessageError().length() == 0) {
+                    try {
+                        payOffline(bills.get(i), false);
                         mIPayView.refreshAdapterPayRecyclerListBills(true);
 
                         this.refreshTextCountBillPayedSuccess();
 
-                    }catch (Exception e)
-                    {
+                    } catch (Exception e) {
 
                     }
                 }
             }
             billOnlineAsyncList.clear();
             this.checkFinishPayOnline(false);
-        }else //Thanh Toan Online
+        } else //Thanh Toan Online
         {
             countBillPayedSuccess = 0;
             mIPayView.refreshAdapterPayRecyclerListBills(true);
-            for (int i = 0, n = bills.size(); i < n; i ++)
-            {
-                if(bills.get(i).isChecked() && bills.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()))
-                {
-                    try
-                    {
+            for (int i = 0, n = bills.size(); i < n; i++) {
+                if (bills.get(i).isChecked() && bills.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode())) {
+                    try {
                         payOnline(bills.get(i));
-                    }catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         this.checkFinishPayOnline(true);
                     }
                 }
@@ -533,10 +527,18 @@ public class PayPresenter implements IPayPresenter {
         }
 
 
+    }
 
-
-
-
+    boolean checkPCForOffline()
+    {
+        List<String> pcCodes = mPayModel.getPcCodes(MainActivity.mEdong);
+        for (int i = 0, n = pcCodes.size(); i < n; i++) {
+            String pc = pcCodes.get(i).substring(0, 2).toUpperCase();
+            if (pc.equals("PD") || pc.equals("PE")) {
+                return true;
+            }
+        }
+        return  false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -597,7 +599,10 @@ public class PayPresenter implements IPayPresenter {
             return;
         }
 
-
+        final String maKH = bill.getMA_KHACH_HANG();
+        final String soTien = amount.toString();
+        final String kyPhatSinh = Common.parse(bill.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString());
+        Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.BILLING, true);
         final SoapAPI.AsyncSoapIncludeTimout<BillingOnlineRespone> billingOnlineResponeAsyncSoap = new SoapAPI.AsyncSoapIncludeTimout<BillingOnlineRespone>(handlerDelay, BillingOnlineRespone.class,
                 new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
                     @Override
@@ -608,33 +613,45 @@ public class PayPresenter implements IPayPresenter {
                     @Override
                     public void onUpdate(final String message) {
                         billOnlineAsyncList.remove(this);
-                        try
-                        {
-                            mIPayView.showMessageNotifyBillOnlineDialog(message, false, Common.TYPE_DIALOG.LOI, true);
-                            mIPayView.showPayingRviewDialogFinish();
-                            mIPayView.refreshAdapterPayRecyclerListBills(true);
-                        }catch (Exception e)
-                        {
+                        try {
+                            payOffline(bill, true);
+                            checkFinishPayOnline(true);
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
 
                     @Override
                     public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
-
                         if (response == null) {
+                            try {
+                                Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.BILLING, false);
+                            } catch (Exception e) {
+                                Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                            }
                             billOnlineAsyncList.remove(soap);
-                            try
-                            {
-                                mIPayView.showMessageNotifyBillOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString(), false, Common.TYPE_DIALOG.THANH_CONG, true);
-                                mIPayView.showPayingRviewDialogFinish();
-                                mIPayView.refreshAdapterPayRecyclerListBills(true);
-                            }catch (Exception e)
-                            {
+                            try {
+                                payOffline(bill, true);
+                                checkFinishPayOnline(true);
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                             return;
                         }
+
+                        String maLoi = "";
+                        String moTaLoi = "";
+                        if (response.getFooter() != null) {
+                            maLoi = response.getFooter().getResponseCode();
+                            moTaLoi = response.getFooter().getDescription();
+                        }
+
+                        try {
+                            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, maLoi, moTaLoi, Common.COMMAND_ID.BILLING, false);
+                        } catch (Exception e) {
+                            Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                        }
+
                         mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                         //TODO Xử lý nhận kết quả thanh toán các hóa đơn từ server ----- Nếu không thành công
                         final Common.CODE_REPONSE_BILL_ONLINE codeResponse = Common.CODE_REPONSE_BILL_ONLINE.findCodeMessage(response.getFooter().getResponseCode());
@@ -649,10 +666,10 @@ public class PayPresenter implements IPayPresenter {
                             bill.setVI_TTOAN("");
                             bill.setMessageError(Common.CODE_REPONSE_BILL_ONLINE.ex10006.getMessage());
 
-                            countBillPayedSuccess ++;
+                            countBillPayedSuccess++;
                             mIPayView.refreshAdapterPayRecyclerListBills(true);
 
-                        }else if (codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e814.getCode())) {
+                        } else if (codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e814.getCode())) {
                             /**
                              * Trường hợp hóa đơn đã được thanh toán bởi ví khác: Không thực hiện thanh toán hóa đơn
                              */
@@ -660,9 +677,9 @@ public class PayPresenter implements IPayPresenter {
                             bill.setTRANG_THAI_TT(Common.TRANG_THAI_TTOAN.TTOAN_BOI_VI_KHAC.getCode());
                             bill.setVI_TTOAN(body.getPaymentEdong());
                             bill.setMessageError(Common.CODE_REPONSE_BILL_ONLINE.ex10007.getMessage());
-                            countBillPayedSuccess ++;
+                            countBillPayedSuccess++;
                             mIPayView.refreshAdapterPayRecyclerListBills(true);
-                        }else if (!codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e000.getCode())
+                        } else if (!codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e000.getCode())
                                 &&
                                 !codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e095.getCode())) {
                             /**
@@ -671,14 +688,11 @@ public class PayPresenter implements IPayPresenter {
                             hoaDonChamNoLoi(body);
                             bill.setMessageError(Common.CODE_REPONSE_BILL_ONLINE.ex10009.getMessage());
                             mIPayView.refreshAdapterPayRecyclerListBills(true);
-                        }else
-                        {
+                        } else {
                             String gateEVN = body.getBillingType();
-                            if(codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e000.getCode()) && gateEVN.equalsIgnoreCase("ON"))
-                            {//Thanh Toan THanh Cong Trong Gio Mo Ket Noi ECPay -> EVN
+                            if (codeResponse.getCode().equalsIgnoreCase(Common.CODE_REPONSE_BILL_ONLINE.e000.getCode()) && gateEVN.equalsIgnoreCase("ON")) {//Thanh Toan THanh Cong Trong Gio Mo Ket Noi ECPay -> EVN
                                 hoaDonThanhCongTrongGioMoKetNoi(body);
-                            }else
-                            {//Thanh Toan Thanh Cong Trong Gio Dong Ket Noi ECPay -> EVN
+                            } else {//Thanh Toan Thanh Cong Trong Gio Dong Ket Noi ECPay -> EVN
                                 hoaDonThanhCongTrongGioDongKetNoi(body);
                             }
 
@@ -687,9 +701,8 @@ public class PayPresenter implements IPayPresenter {
                             bill.setMessageError(Common.CODE_REPONSE_BILL_ONLINE.ex10008.getMessage());
                             mIPayView.refreshAdapterPayRecyclerListBills(true);
 
-                            countBillPayedSuccess ++;
+                            countBillPayedSuccess++;
                         }
-
 
 
                         refreshTextCountBillPayedSuccess();
@@ -701,12 +714,8 @@ public class PayPresenter implements IPayPresenter {
                     @Override
                     public void onTimeOut(SoapAPI.AsyncSoapIncludeTimout soap) {
                         billOnlineAsyncList.remove(soap);
-                        ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                checkFinishPayOnline(true);
-                            }
-                        });
+                        payOffline(bill, true);
+                        checkFinishPayOnline(true);
                     }
                 });
 
@@ -715,12 +724,10 @@ public class PayPresenter implements IPayPresenter {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    void checkFinishPayOnline(boolean isOnline)
-    {
+    void checkFinishPayOnline(boolean isOnline) {
 
-        if(isOnline && countBillPayedSuccess > 0)
-        {
-            if(billOnlineAsyncList.size() == 0) //call cap nhat vi
+        if (isOnline && countBillPayedSuccess > 0) {
+            if (billOnlineAsyncList.size() == 0) //call cap nhat vi
             {
                 //Update tien trong vi
                 final long tienTT_THanhCong = this.refreshTotalBillsAndTotalMoneyInDialogWhenChecked(Common.STATUS_BILLING.DA_THANH_TOAN);
@@ -752,6 +759,11 @@ public class PayPresenter implements IPayPresenter {
                 }
 
                 try {
+                    final String maKH = "";
+                    final String soTien = "";
+                    final String kyPhatSinh = "";
+                    Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.BALANCE, true);
+
                     SoapAPI.AsyncSoapIncludeTimout<BalanceRespone> accountResponeAsyncSoap = new SoapAPI.AsyncSoapIncludeTimout<BalanceRespone>(handlerDelay, BalanceRespone.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
                         @Override
                         public void onPre(SoapAPI.AsyncSoapIncludeTimout soap) {
@@ -773,18 +785,36 @@ public class PayPresenter implements IPayPresenter {
 
                         @Override
                         public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
-
-                            if(response == null)
-                            {
+                            if (response == null) {
                                 mIPayView.showPayingRviewDialogFinish();
                                 mIPayView.refreshAdapterPayRecyclerListBills(false);
+                                try {
+                                    Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.BALANCE, false);
+                                } catch (Exception e) {
+                                    Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                                }
+                                return;
                             }
-                            if(response != null && response.getFooter().getResponseCode().equalsIgnoreCase("000"))
-                            {
+
+                            String maLoi = "";
+                            String moTaLoi = "";
+                            if (response.getFooter() != null) {
+                                maLoi = response.getFooter().getResponseCode();
+                                moTaLoi = response.getFooter().getDescription();
+                            }
+
+                            try {
+                                Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, maLoi, moTaLoi, Common.COMMAND_ID.BALANCE, false);
+                            } catch (Exception e) {
+                                Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                            }
+
+
+                            if (response != null && response.getFooter().getResponseCode().equalsIgnoreCase("000")) {
                                 final GsonBuilder gsonBuilder = new GsonBuilder();
                                 final Gson gson = gsonBuilder.create();
 
-                                BodyBalanceRespone.ResponseRequestBalance resBalance = gson.fromJson(((BodyBalanceRespone)response.getBody()).getResponseRequestBalance(), BodyBalanceRespone.ResponseRequestBalance.class);
+                                BodyBalanceRespone.ResponseRequestBalance resBalance = gson.fromJson(((BodyBalanceRespone) response.getBody()).getResponseRequestBalance(), BodyBalanceRespone.ResponseRequestBalance.class);
                                 mPayModel.updateSoDuKhaDung(resBalance.geteDong(), resBalance.getBalance(), resBalance.getLockMoney());
                             }
                             mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
@@ -815,34 +845,43 @@ public class PayPresenter implements IPayPresenter {
                     mIPayView.refreshAdapterPayRecyclerListBills(false);
                 }
             }
-        }else
-        {
-            if(billOnlineAsyncList.size() == 0)
-            {
+        } else {
+            if (billOnlineAsyncList.size() == 0) {
                 //Update tien trong vi
                 long tienTT_THanhCong = this.refreshTotalBillsAndTotalMoneyInDialogWhenChecked(Common.STATUS_BILLING.DA_THANH_TOAN);
                 mPayModel.truTienTrongVi(MainActivity.mEdong, tienTT_THanhCong);
 
                 showMessageSuccess(tienTT_THanhCong);
-               mIPayView.showPayingRviewDialogFinish();
+                mIPayView.showPayingRviewDialogFinish();
                 mIPayView.refreshAdapterPayRecyclerListBills(false);
             }
         }
 
     }
 
-    void showMessageSuccess(long totalMoney)
-    {
+    void showMessageSuccess(long totalMoney) {
         mIPayView.showMessageNotifyBillOnlineDialog(Common.CODE_REPONSE_BILL_ONLINE.getMessageSuccess(countBillPayedSuccess, totalMoney), false, Common.TYPE_DIALOG.THANH_CONG, true);
     }
 
 
-    void payOffline(PayAdapter.BillEntityAdapter bill)
-    {
+    void payOffline(PayAdapter.BillEntityAdapter bill, boolean hasCheck) {
+
+
+        if(hasCheck)
+        {
+            if(checkPCForOffline())
+            {
+                bill.setMessageError(Common.CODE_REPONSE_BILL_OFFLINE.e04.getMessage());
+                return;
+            }
+        }
+
+        countBillPayedSuccess++;
         bill.setTRANG_THAI_TT(Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
         bill.setVI_TTOAN(MainActivity.mEdong);
+        bill.setMessageError(Common.CODE_REPONSE_BILL_ONLINE.ex10008.getMessage());
 
-        mPayModel.updateHoaDonNo(bill.getBillId(),Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode(), MainActivity.mEdong);
+        mPayModel.updateHoaDonNo(bill.getBillId(), Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode(), MainActivity.mEdong);
         EntityHoaDonNo entityHoaDonNo = mPayModel.getHoaDonNo(bill.getBillId());
 
         //Lưu vào danh sách THU
@@ -881,7 +920,7 @@ public class PayPresenter implements IPayPresenter {
 
     @Override
     public void callProcessDeleteBillOnline(String edong, PayAdapter.BillEntityAdapter bill, PayAdapter.BillInsidePayAdapter adapter) {
-        boolean fail = TextUtils.isEmpty(edong)|| bill == null;
+        boolean fail = TextUtils.isEmpty(edong) || bill == null;
         if (fail)
             return;
 
@@ -974,6 +1013,15 @@ public class PayPresenter implements IPayPresenter {
         mIPayView.showDeleteBillOnlineProcess();
         mIPayView.showPbarDeleteBillOnline();
 
+        final String maKH = billDeleteOnline.getMA_KHACH_HANG();
+        final String soTien = String.valueOf(billDeleteOnline.getTIEN_THANH_TOAN());
+        final String kyPhatSinh = Common.parse(billDeleteOnline.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString());
+        try {
+            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.CHECK_TRANS, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         try {
             SoapAPI.AsyncSoapIncludeTimout<CheckTrainOnlineResponse> async = new SoapAPI.AsyncSoapIncludeTimout<CheckTrainOnlineResponse>(handlerDelay, CheckTrainOnlineResponse.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
                 @Override
@@ -990,13 +1038,11 @@ public class PayPresenter implements IPayPresenter {
                     ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            try
-                            {
+                            try {
                                 mIPayView.showMessageNotifyDeleteOnlineDialog("Lỗi kết nối server!", Common.TYPE_DIALOG.LOI);
                                 mIPayView.visibleButtonDeleteDialog(SHOW_ALL);
                                 return;
-                            }catch (Exception e)
-                            {
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
@@ -1005,18 +1051,38 @@ public class PayPresenter implements IPayPresenter {
 
                 @Override
                 public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
+
                     if (response == null) {
-                        try
-                        {
+                        try {
                             mIPayView.showMessageNotifyDeleteOnlineDialog("Lỗi hệ thống!", Common.TYPE_DIALOG.LOI);
                             mIPayView.visibleButtonDeleteDialog(SHOW_ALL);
                             return;
-                        }catch (Exception e)
-                        {
+                        } catch (Exception e) {
                             e.printStackTrace();
+                        }
+
+                        try {
+                            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.CHECK_TRANS, false);
+                        } catch (Exception e) {
+                            Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
                         }
                         return;
                     }
+
+                    String maLoi = "";
+                    String moTaLoi = "";
+                    if (response.getFooter() != null) {
+                        maLoi = response.getFooter().getResponseCode();
+                        moTaLoi = response.getFooter().getDescription();
+                    }
+
+                    try {
+                        Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, maLoi, moTaLoi, Common.COMMAND_ID.CHECK_TRANS, false);
+                    } catch (Exception e) {
+                        Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                    }
+
+
                     mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                     // Kiểm tra trạng thái thanh toán hóa đơn (tương đương API CHECK-TRANS)
                     // Nếu hóa đơn không do TNV thanh toán  Thông báo lỗi
@@ -1024,18 +1090,16 @@ public class PayPresenter implements IPayPresenter {
 
                     Common.CODE_REPONSE_API_CHECK_TRAINS codeResponse = Common.CODE_REPONSE_API_CHECK_TRAINS.findCodeMessage(response.getFooter().getResponseCode());
                     if (codeResponse != Common.CODE_REPONSE_API_CHECK_TRAINS.eBILLING) {
-                        try
-                        {
+                        try {
                             mIPayView.showMessageNotifyDeleteOnlineDialog("Lỗi hệ thống!", Common.TYPE_DIALOG.LOI);
                             mIPayView.visibleButtonDeleteDialog(SHOW_ALL);
                             return;
-                        }catch (Exception e)
-                        {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
 
-                    callAPITransationCancellation(edong, (CheckTrainOnlineResponse) response, reasonDeleteBill);
+                    callAPITransationCancellation(edong, (CheckTrainOnlineResponse) response, reasonDeleteBill, kyPhatSinh);
                 }
 
                 @Override
@@ -1044,10 +1108,9 @@ public class PayPresenter implements IPayPresenter {
                         @Override
                         public void run() {
 
-                            try{
+                            try {
                                 mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
-                            }catch (Exception e)
-                            {
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
@@ -1057,10 +1120,9 @@ public class PayPresenter implements IPayPresenter {
             });
             async.execute(jsonRequestCheckTrainOnline);
         } catch (Exception e) {
-            try{
+            try {
                 mIPayView.showMessageNotifyDeleteOnlineDialog(e.getMessage(), Common.TYPE_DIALOG.LOI);
-            }catch (Exception e1)
-            {
+            } catch (Exception e1) {
                 e1.printStackTrace();
             }
         }
@@ -1070,9 +1132,8 @@ public class PayPresenter implements IPayPresenter {
 
     @Override
     public void cancelSeachOnline() {
-        if(currentAsyncSearchOnline != null)
-        {
-            if(!currentAsyncSearchOnline.isEndCallSoap())
+        if (currentAsyncSearchOnline != null) {
+            if (!currentAsyncSearchOnline.isEndCallSoap())
                 currentAsyncSearchOnline.cancel(true);
 
         }
@@ -1084,8 +1145,8 @@ public class PayPresenter implements IPayPresenter {
     public void reseachOnline(String edong) {
         cancelSeachOnline();
         if (currentAsyncSearchOnline != null) {
-            mIPayView.showEditTextSearch((String)currentAsyncSearchOnline.getUserData());
-            callSearchOnline(edong, (String)currentAsyncSearchOnline.getUserData(), true);
+            mIPayView.showEditTextSearch((String) currentAsyncSearchOnline.getUserData());
+            callSearchOnline(edong, (String) currentAsyncSearchOnline.getUserData(), true);
         } else {
             mIPayView.showMessageNotifySearchOnline(Common.CODE_REPONSE_SEARCH_ONLINE.e9999.getMessage(), Common.TYPE_DIALOG.LOI);
             Log.e(TAG, "reseachOnline: soapSearchOnline không được khởi tạo");
@@ -1136,12 +1197,10 @@ public class PayPresenter implements IPayPresenter {
         int totalBillsChooseDialog = 0;
         long totalMoneyBillChooseDialog = 0;
 
-        for (int i = 0, n = mPayModel.getListBillSelected().size(); i < n; i ++)
-        {
+        for (int i = 0, n = mPayModel.getListBillSelected().size(); i < n; i++) {
             PayAdapter.BillEntityAdapter bill = mPayModel.getListBillSelected().get(i);
-            if(bill.isChecked() && bill.getTRANG_THAI_TT().equalsIgnoreCase(statusBilling.getCode()))
-            {
-                totalBillsChooseDialog ++;
+            if (bill.isChecked() && bill.getTRANG_THAI_TT().equalsIgnoreCase(statusBilling.getCode())) {
+                totalBillsChooseDialog++;
                 totalMoneyBillChooseDialog += bill.getTIEN_THANH_TOAN();
             }
         }
@@ -1153,7 +1212,7 @@ public class PayPresenter implements IPayPresenter {
 
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void callAPITransationCancellation(String edong, CheckTrainOnlineResponse response, final String reasonDeleteBill) {
+    private void callAPITransationCancellation(String edong, CheckTrainOnlineResponse response, final String reasonDeleteBill, final String term) {
 
 
         mIPayView.showDeleteBillOnlineProcess();
@@ -1182,7 +1241,7 @@ public class PayPresenter implements IPayPresenter {
         }
 
 
-        BodyCheckTrainOnlineResponse body = (BodyCheckTrainOnlineResponse)response.getBody();
+        BodyCheckTrainOnlineResponse body = (BodyCheckTrainOnlineResponse) response.getBody();
 
         Long amount = body.getAmount();
         String code = body.getCustomerCode();
@@ -1218,6 +1277,12 @@ public class PayPresenter implements IPayPresenter {
         mIPayView.showPbarDeleteBillOnline();
 
         try {
+            final String maKH = body.getCustomerCode();
+            final String soTien = body.getAmount().toString();
+            final String kyPhatSinh = term;
+
+            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.TRANSACTION_CANCELLATION, true);
+
             SoapAPI.AsyncSoapIncludeTimout<DeleteBillOnlineRespone> async = new SoapAPI.AsyncSoapIncludeTimout<DeleteBillOnlineRespone>(handlerDelay, DeleteBillOnlineRespone.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
 
                 @Override
@@ -1241,8 +1306,27 @@ public class PayPresenter implements IPayPresenter {
                 @Override
                 public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
                     if (response == null) {
+                        try {
+                            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.TRANSACTION_CANCELLATION, false);
+                        } catch (Exception e) {
+                            Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                        }
                         return;
                     }
+
+                    String maLoi = "";
+                    String moTaLoi = "";
+                    if (response.getFooter() != null) {
+                        maLoi = response.getFooter().getResponseCode();
+                        moTaLoi =  response.getFooter().getDescription();
+                    }
+
+                    try {
+                        Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, maLoi, moTaLoi, Common.COMMAND_ID.TRANSACTION_CANCELLATION, false);
+                    } catch (Exception e) {
+                        Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                    }
+
                     mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                     // Kiểm tra trạng thái thanh toán hóa đơn (tương đương API CHECK-TRANS)
                     // Nếu hóa đơn không do TNV thanh toán  Thông báo lỗi
@@ -1269,11 +1353,10 @@ public class PayPresenter implements IPayPresenter {
                         ((MainActivity) mIPayView.getContextView()).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                            mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
+                                mIPayView.showMessageNotifyDeleteOnlineDialog(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString(), Common.TYPE_DIALOG.LOI);
                             }
                         });
-                    }catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -1285,6 +1368,7 @@ public class PayPresenter implements IPayPresenter {
         }
 
     }
+
     private void hoaDonThanhCongTrongGioDongKetNoi(BodyBillingOnlineRespone respone) {
         //TODO mark
         /**
@@ -1319,7 +1403,6 @@ public class PayPresenter implements IPayPresenter {
         entityLichSuThanhToan.setMA_GIAO_DICH(Common.MA_GIAO_DICH.TT_ONLINE_CHAM_NO_OFFLINE.getCode());
         mPayModel.insertLichSuThanhToan(entityLichSuThanhToan);
     }
-
 
 
     private void hoaDonThanhCongTrongGioMoKetNoi(BodyBillingOnlineRespone respone) {

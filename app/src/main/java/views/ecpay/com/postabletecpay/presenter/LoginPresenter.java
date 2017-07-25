@@ -6,11 +6,13 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.log4j.chainsaw.Main;
 import org.ecpay.client.test.SecurityUtils;
 
 import java.lang.reflect.Type;
@@ -32,6 +34,7 @@ import views.ecpay.com.postabletecpay.util.webservice.SoapAPI.AsyncSoapLogin.Asy
 import views.ecpay.com.postabletecpay.view.DangNhap.ILoginView;
 import views.ecpay.com.postabletecpay.view.DangNhap.LoginActivity;
 
+import static android.content.ContentValues.TAG;
 import static android.content.Context.MODE_PRIVATE;
 import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_OUT_CONNECT;
 
@@ -143,9 +146,184 @@ public class LoginPresenter implements ILoginPresenter {
                 pinLoginEncrypted,
                 configInfo.getAccountId(),
                 configInfo.getVersionApp());
+        final String soViQuay = configInfo.getAccountId();
+        try {
+            Common.writeLogUser(soViQuay, "", "", "", "", "", Common.COMMAND_ID.LOGIN, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            Common.loadFolder((LoginActivity)mILoginView.getContextView());
+        }
 
         if (jsonRequestLogin != null) {
             try {
+                AsyncSoapLoginCallBack soapLoginCallBack = new AsyncSoapLoginCallBack() {
+                    @Override
+                    public void onPre(final SoapAPI.AsyncSoapLogin soapLogin) {
+                        mILoginView.hideTextMessage();
+                        mILoginView.showPbarLogin();
+
+                        boolean isHasNetwork = Common.isNetworkConnected(mILoginView.getContextView());
+
+                        if (!isHasNetwork) {
+                            mILoginView.hidePbarLogin();
+                            mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
+
+                            soapLogin.setEndCallSoap(true);
+                            soapLogin.cancel(true);
+                        }
+                    }
+
+                    @Override
+                    public void onUpdate(String message) {
+                        mILoginView.hidePbarLogin();
+                        if (message == null || message.isEmpty() || message.trim().equals(""))
+                            return;
+
+                        mILoginView.showTextMessage(message);
+                    }
+
+                    @Override
+                    public void onPost(LoginResponseReponse response) {
+                        if (response == null) {
+                            try {
+                                Common.writeLogUser(soViQuay, "", "", "", "", "", Common.COMMAND_ID.LOGIN, false);
+                            } catch (Exception e) {
+                                Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+                            }
+                            finally {
+                                Common.loadFolder((LoginActivity)mILoginView.getContextView());
+                            }
+                            return;
+                        }
+
+                        String maLoi = "";
+                        String moTaLoi = "";
+                        if (response.getFooterLoginResponse() != null) {
+                            maLoi = response.getFooterLoginResponse().getResponseCode();
+                            moTaLoi = response.getFooterLoginResponse().getDescription();
+                        }
+
+                        try {
+                            Common.writeLogUser(soViQuay, "", "", "", maLoi, moTaLoi, Common.COMMAND_ID.LOGIN, false);
+                        } catch (Exception e) {
+                            Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
+                        }
+                        finally {
+                            Common.loadFolder((LoginActivity)mILoginView.getContextView());
+                        }
+
+                        mILoginView.showRespone(response.getFooterLoginResponse().getResponseCode(), response.getFooterLoginResponse().getDescription());
+                        mILoginView.hidePbarLogin();
+
+                        if (response == null) {
+                            mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
+                            return;
+                        }
+
+                        CODE_REPONSE_LOGIN codeResponse = CODE_REPONSE_LOGIN.findCodeMessage(response.getFooterLoginResponse().getResponseCode());
+                        if (codeResponse != CODE_REPONSE_LOGIN.e000) {
+                            mILoginView.showTextMessage(codeResponse.getMessage());
+                            return;
+                        }
+
+                        //get responseLoginResponse from body response
+                        //because server return string not object
+                        String responseLoginResponseData = response.getBodyLoginResponse().getResponseLoginResponse();
+                        // định dạng kiểu Object JSON
+                        Type type = new TypeToken<ResponseLoginResponse>() {
+                        }.getType();
+                        ResponseLoginResponse responseLoginResponse = null;
+                        try {
+                            responseLoginResponse = new Gson().fromJson(responseLoginResponseData, type);
+                        } catch (JsonSyntaxException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (responseLoginResponse == null)
+                            return;
+
+                        //get AccountLoginResponse from body response
+                        AccountLoginResponse accountLoginResponse = responseLoginResponse.getAccountLoginResponse();
+//                    response.getBodyLoginResponse().getResponseLoginResponse().getAccountLoginResponse();
+
+                        //get account
+                        Account account = null;
+                        if (accountLoginResponse != null) {
+                            account = new Account(
+                                    accountLoginResponse.getEdong(),
+                                    accountLoginResponse.getName(),
+                                    accountLoginResponse.getAddress(),
+                                    accountLoginResponse.getPhone(),
+                                    accountLoginResponse.getEmail(),
+                                    accountLoginResponse.getBirthday(),
+                                    accountLoginResponse.getSession(),
+                                    accountLoginResponse.getBalance(),
+                                    accountLoginResponse.getLockMoney(),
+                                    accountLoginResponse.getChangedPIN(),
+                                    accountLoginResponse.getVerified(),
+                                    accountLoginResponse.getMac(),
+                                    accountLoginResponse.getIp(),
+                                    (String) accountLoginResponse.getStrLoginTime(),
+                                    (String) accountLoginResponse.getStrLogoutTime(),
+                                    accountLoginResponse.getType(),
+                                    accountLoginResponse.getStatus(),
+                                    accountLoginResponse.getIdNumber(),
+                                    accountLoginResponse.getIdNumberDate(),
+                                    accountLoginResponse.getIdNumberPlace(),
+                                    accountLoginResponse.getParentEdong()
+                            );
+
+                            //write database
+                            mLoginModel.writeSqliteAccountTable(account);
+                        }
+
+            /*//get List<ListEvnPCLoginResponse> from body response
+            List<ListEvnPCLoginResponse> evnPCList = responseLoginResponse.getListEvnPCLoginResponse();
+//                    response.getBodyLoginResponse().getResponseLoginResponse().getListEvnPCLoginResponse();
+
+            if (evnPCList != null) {
+                for (ListEvnPCLoginResponse pc :
+                        evnPCList) {
+                    EvnPC evnPC = new EvnPC();
+
+                    evnPC.setParentId(pc.getParentId());
+                    evnPC.setPcId(pc.getPcId());
+                    evnPC.setCode(pc.getCode());
+                    evnPC.setExt(pc.getExt());
+                    evnPC.setFullName(pc.getFullName());
+                    evnPC.setShortName(pc.getShortName());
+                    evnPC.setAddress((String) pc.getAddress());
+                    evnPC.setTaxCode((String) pc.getTaxCode());
+                    evnPC.setPhone1((String) pc.getPhone1());
+                    evnPC.setPhone2((String) pc.getPhone2());
+                    evnPC.setFax((String) pc.getFax());
+                    evnPC.setLevel(pc.getLevel());
+
+                    //write database
+                    mLoginModel.writeSqliteEvnPcTable(evnPC, account.getEdong());
+                }
+            }*/
+                        //show main
+                        mILoginView.showMainScreen(account.getEdong());
+                    }
+
+                    @Override
+                    public void onTimeOut(final SoapAPI.AsyncSoapLogin soapLogin) {
+                        soapLogin.cancel(true);
+
+                        //thread call asyntask is running. must call in other thread to update UI
+                        ((LoginActivity) mILoginView).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mILoginView.hidePbarLogin();
+                                if (!soapLogin.isEndCallSoap()) {
+                                    mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
+                                }
+                            }
+                        });
+                    }
+                };
 
                 if (soapLogin == null) {
                     //if null then create new
@@ -250,159 +428,6 @@ public class LoginPresenter implements ILoginPresenter {
     }
 
     private ILoginView mILoginView;
-
-    private AsyncSoapLoginCallBack soapLoginCallBack = new AsyncSoapLoginCallBack() {
-        @Override
-        public void onPre(final SoapAPI.AsyncSoapLogin soapLogin) {
-            mILoginView.hideTextMessage();
-            mILoginView.showPbarLogin();
-
-            //check wifi
-//            boolean isHasWifi = Common.isConnectingWifi(mILoginView.getContextView());
-            boolean isHasNetwork = Common.isNetworkConnected(mILoginView.getContextView());
-
-//            if (!isHasWifi) {
-//                mILoginView.hidePbarLogin();
-//                mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_WIFI.toString());
-//
-//                soapLogin.setEndCallSoap(true);
-//                soapLogin.cancel(true);
-//            }
-
-            if (!isHasNetwork) {
-                mILoginView.hidePbarLogin();
-                mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_NETWORK.toString());
-
-                soapLogin.setEndCallSoap(true);
-                soapLogin.cancel(true);
-            }
-        }
-
-        @Override
-        public void onUpdate(String message) {
-            mILoginView.hidePbarLogin();
-            if (message == null || message.isEmpty() || message.trim().equals(""))
-                return;
-
-            mILoginView.showTextMessage(message);
-        }
-
-        @Override
-        public void onPost(LoginResponseReponse response) {
-            if (response == null)
-                return;
-
-            mILoginView.showRespone(response.getFooterLoginResponse().getResponseCode(), response.getFooterLoginResponse().getDescription());
-            mILoginView.hidePbarLogin();
-
-            if (response == null) {
-                mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_EMPTY.toString());
-                return;
-            }
-
-            CODE_REPONSE_LOGIN codeResponse = CODE_REPONSE_LOGIN.findCodeMessage(response.getFooterLoginResponse().getResponseCode());
-            if (codeResponse != CODE_REPONSE_LOGIN.e000) {
-                mILoginView.showTextMessage(codeResponse.getMessage());
-                return;
-            }
-
-            //get responseLoginResponse from body response
-            //because server return string not object
-            String responseLoginResponseData = response.getBodyLoginResponse().getResponseLoginResponse();
-            // định dạng kiểu Object JSON
-            Type type = new TypeToken<ResponseLoginResponse>() {
-            }.getType();
-            ResponseLoginResponse responseLoginResponse = null;
-            try {
-                responseLoginResponse = new Gson().fromJson(responseLoginResponseData, type);
-            } catch (JsonSyntaxException e) {
-                e.printStackTrace();
-            }
-
-            if (responseLoginResponse == null)
-                return;
-
-            //get AccountLoginResponse from body response
-            AccountLoginResponse accountLoginResponse = responseLoginResponse.getAccountLoginResponse();
-//                    response.getBodyLoginResponse().getResponseLoginResponse().getAccountLoginResponse();
-
-            //get account
-            Account account = null;
-            if (accountLoginResponse != null) {
-                account = new Account(
-                        accountLoginResponse.getEdong(),
-                        accountLoginResponse.getName(),
-                        accountLoginResponse.getAddress(),
-                        accountLoginResponse.getPhone(),
-                        accountLoginResponse.getEmail(),
-                        accountLoginResponse.getBirthday(),
-                        accountLoginResponse.getSession(),
-                        accountLoginResponse.getBalance(),
-                        accountLoginResponse.getLockMoney(),
-                        accountLoginResponse.getChangedPIN(),
-                        accountLoginResponse.getVerified(),
-                        accountLoginResponse.getMac(),
-                        accountLoginResponse.getIp(),
-                        (String) accountLoginResponse.getStrLoginTime(),
-                        (String) accountLoginResponse.getStrLogoutTime(),
-                        accountLoginResponse.getType(),
-                        accountLoginResponse.getStatus(),
-                        accountLoginResponse.getIdNumber(),
-                        accountLoginResponse.getIdNumberDate(),
-                        accountLoginResponse.getIdNumberPlace(),
-                        accountLoginResponse.getParentEdong()
-                );
-
-                //write database
-                mLoginModel.writeSqliteAccountTable(account);
-            }
-
-            /*//get List<ListEvnPCLoginResponse> from body response
-            List<ListEvnPCLoginResponse> evnPCList = responseLoginResponse.getListEvnPCLoginResponse();
-//                    response.getBodyLoginResponse().getResponseLoginResponse().getListEvnPCLoginResponse();
-
-            if (evnPCList != null) {
-                for (ListEvnPCLoginResponse pc :
-                        evnPCList) {
-                    EvnPC evnPC = new EvnPC();
-
-                    evnPC.setParentId(pc.getParentId());
-                    evnPC.setPcId(pc.getPcId());
-                    evnPC.setCode(pc.getCode());
-                    evnPC.setExt(pc.getExt());
-                    evnPC.setFullName(pc.getFullName());
-                    evnPC.setShortName(pc.getShortName());
-                    evnPC.setAddress((String) pc.getAddress());
-                    evnPC.setTaxCode((String) pc.getTaxCode());
-                    evnPC.setPhone1((String) pc.getPhone1());
-                    evnPC.setPhone2((String) pc.getPhone2());
-                    evnPC.setFax((String) pc.getFax());
-                    evnPC.setLevel(pc.getLevel());
-
-                    //write database
-                    mLoginModel.writeSqliteEvnPcTable(evnPC, account.getEdong());
-                }
-            }*/
-            //show main
-            mILoginView.showMainScreen(account.getEdong());
-        }
-
-        @Override
-        public void onTimeOut(final SoapAPI.AsyncSoapLogin soapLogin) {
-            soapLogin.cancel(true);
-
-            //thread call asyntask is running. must call in other thread to update UI
-            ((LoginActivity) mILoginView).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mILoginView.hidePbarLogin();
-                    if (!soapLogin.isEndCallSoap()) {
-                        mILoginView.showTextMessage(Common.MESSAGE_NOTIFY.ERR_CALL_SOAP_TIME_OUT.toString());
-                    }
-                }
-            });
-        }
-    };
 
     private SharePrefManager mSharedPrefLogin;
 

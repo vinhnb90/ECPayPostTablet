@@ -1,5 +1,6 @@
 package views.ecpay.com.postabletecpay.presenter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -91,7 +92,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    protected void searchOnline(String maKH)
+    protected void searchOnline(String customerCode)
     {
 
         if(currentAsyncSearchOnline != null && currentAsyncSearchOnline.isEndCallSoap())
@@ -116,7 +117,7 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
                 configInfo.getMacAdressHexValue(),
                 configInfo.getDiskDriver(),
                 configInfo.getSignatureEncrypted(),
-                maKH,
+                customerCode,
                 "",
                 configInfo.getAccountId());
 
@@ -127,6 +128,12 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
         }
 
         try {
+            final String maKH = customerCode;
+            final String soTien = "";
+            final String kyPhatSinh = "";
+
+            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.CUSTOMER_BILL, true);
+
             currentAsyncSearchOnline = new SoapAPI.AsyncSoapIncludeTimout<SearchOnlineResponse>(handlerDelay, SearchOnlineResponse.class, new SoapAPI.AsyncSoapIncludeTimout.AsyncSoapCallBack() {
                 @Override
                 public void onPre(SoapAPI.AsyncSoapIncludeTimout soap) {
@@ -148,21 +155,41 @@ public class SearchCustomerPresenter implements ISearchCustomerPresenter {
 
                 @Override
                 public void onPost(SoapAPI.AsyncSoapIncludeTimout soap, Respone response) {
+
                     if (response == null) {
                         try {
                             searchCustomerView.showMessage("Mã khách hàng không tồn tại!");
                         } catch (Exception e) {
 
                         }
+                        try {
+                            Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.CUSTOMER_BILL, false);
+                        } catch (Exception e) {
+                            Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
+                        }
                         return;
+                    }
+
+                    String maLoi = "";
+                    String moTaLoi = "";
+                    if (response.getFooter() != null) {
+                        maLoi = response.getFooter().getResponseCode();
+                        moTaLoi =  response.getFooter().getDescription();
+                    }
+
+                    try {
+                        Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, maLoi, moTaLoi, Common.COMMAND_ID.CUSTOMER_BILL, false);
+                    } catch (Exception e) {
+                        Log.e(ContentValues.TAG, "doInBackground: Lỗi khi không tạo được file log");
                     }
 
                     searchCustomerView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
 
-
-
                     if (!response.getFooter().getResponseCode().equalsIgnoreCase("000")) {
-                        searchCustomerView.showMessage(response.getFooter().getDescription());
+
+                        Common.CODE_REPONSE_SEARCH_ONLINE codeResponse = Common.CODE_REPONSE_SEARCH_ONLINE.findCodeMessage(response.getFooter().getResponseCode());
+
+                        searchCustomerView.showMessage(codeResponse.getMessage());
                         return;
                     }
 

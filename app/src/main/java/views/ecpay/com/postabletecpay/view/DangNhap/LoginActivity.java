@@ -61,6 +61,7 @@ import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_ANIM
 public class LoginActivity extends BaseActivity implements ILoginView {
     private static final int MY_REQUEST_CODE = 100;
     Bundle savedInstanceState;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +90,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
                 return true;
             }
             return false;
-        }else {
+        } else {
             return false;
         }
     }
@@ -98,7 +99,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
     //region ILoginView
     @Override
     public Context getContextView() {
-        return this.getApplicationContext();
+        return this;
     }
 
     @Override
@@ -144,7 +145,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
             return;
         }
 
-        //this.LoadPCInfo(edong, "01683861612");
+        //this.syncPcEVN(edong, "01683861612");
 
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.putExtra(KEY_EDONG, edong);
@@ -163,7 +164,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
                         || grantResults[2] != PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(LoginActivity.this, "Unable to show permission required", Toast.LENGTH_LONG).show();
                     Log.e(getClass().getName(), "Unable to show permission required");
-                }else {
+                } else {
                     initSource();
                     setAction(savedInstanceState);
                 }
@@ -172,121 +173,18 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    protected void LoadPCInfo(String edong, String phoneName) {
-        Context context = this.getContext();
-        ConfigInfo configInfo;
-        String versionApp = "";
-        try {
-            versionApp = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            configInfo = Common.setupInfoRequest(context, edong, Common.COMMAND_ID.GET_PC_INFO.toString(), versionApp);
-        } catch (Exception e) {
-
-            return;
-        }
-
-
-        String json = SoapAPI.getJsonGetPCInfo(
-                configInfo.getAGENT(),
-                configInfo.getAgentEncypted(),
-                configInfo.getCommandId(),
-                configInfo.getAuditNumber(),
-                configInfo.getMacAdressHexValue(),
-                configInfo.getDiskDriver(),
-                configInfo.getSignatureEncrypted(),
-                "",
-                "",
-                "",
-                "",
-                "",
-                configInfo.getAccountId()
-        );
-
-
-        if (json == null)
-            return;
-
-
-        try {
-            final SoapAPI.AsyncSoapGetPCInfo soap = new SoapAPI.AsyncSoapGetPCInfo(phoneName, new SoapAPI.AsyncSoapGetPCInfo.AsyncSoapGetPCInfoCallBack() {
-                @Override
-                public void onPre(SoapAPI.AsyncSoapGetPCInfo soap) {
-
-                }
-
-                @Override
-                public void onUpdate(String message) {
-
-                }
-
-                @Override
-                public void onPost(GetPCInfoRespone response, String phone) {
-                    Log.d("LOG", "phone = " + phone);
-
-                    String responseLoginResponseData = ((BodyGetPCInfoRespone) response.getBody()).getListEvnPCLoginResponse();
-                    // định dạng kiểu Object JSON
-                    Type type = new TypeToken<List<ListEvnPCLoginResponse>>() {
-                    }.getType();
-                    List<ListEvnPCLoginResponse> responseLoginResponse = null;
-                    try {
-                        responseLoginResponse = new Gson().fromJson(responseLoginResponseData, type);
-                    } catch (JsonSyntaxException e) {
-                        e.printStackTrace();
-                    }
-
-
-                }
-
-                @Override
-                public void onTimeOut(SoapAPI.AsyncSoapGetPCInfo soap) {
-
-                }
-            });
-
-            if (soap.getStatus() != AsyncTask.Status.RUNNING) {
-                soap.execute(json);
-
-                //thread time out
-                final Thread soapChangePassThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ChangePassResponse changePassResponse = null;
-
-                        //call time out
-                        try {
-                            Thread.sleep(Common.TIME_OUT_CONNECT);
-                        } catch (InterruptedException e) {
-                        } finally {
-                            if (changePassResponse == null) {
-                                soap.callCountdown(soap);
-                            }
-                        }
-                    }
-                });
-
-                soapChangePassThread.start();
-            }
-        } catch (Exception e) {
-            return;
-        }
-    }
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if(ev.getAction() == MotionEvent.ACTION_UP) {
+        if (ev.getAction() == MotionEvent.ACTION_UP) {
             final View view = getCurrentFocus();
 
-            if(view != null) {
+            if (view != null) {
                 final boolean consumed = super.dispatchTouchEvent(ev);
 
                 final View viewTmp = getCurrentFocus();
                 final View viewNew = viewTmp != null ? viewTmp : view;
 
-                if(viewNew.equals(view)) {
+                if (viewNew.equals(view)) {
                     final Rect rect = new Rect();
                     final int[] coordinates = new int[2];
 
@@ -297,11 +195,10 @@ public class LoginActivity extends BaseActivity implements ILoginView {
                     final int x = (int) ev.getX();
                     final int y = (int) ev.getY();
 
-                    if(rect.contains(x, y)) {
+                    if (rect.contains(x, y)) {
                         return consumed;
                     }
-                }
-                else if(viewNew instanceof EditText) {
+                } else if (viewNew instanceof EditText) {
                     return consumed;
                 }
 
@@ -341,24 +238,26 @@ public class LoginActivity extends BaseActivity implements ILoginView {
         hidePbarLogin();
         hideTextMessage();
     }
+
     @Override
     protected void initSource() {
-            mILoginPresenter = new LoginPresenter(this);
+        mILoginPresenter = new LoginPresenter(this);
     }
 
     @Override
     protected void setAction(@Nullable Bundle savedInstanceState) {
-            try {
+        try {
             Common.makeRootFolderAndGetDataConfig(this);
             Common.makeRootFolderAndGetDataHelp(this);
             Common.makeRootFolderLog();
-         } catch (Exception e) {
+            Common.makeRootFolderUserLog();
+        } catch (Exception e) {
             showTextMessage(e.getMessage());
             return;
-            }
-         SQLiteConnection.getInstance(this).getWritableDatabase();
+        }
+        SQLiteConnection.getInstance(this).getWritableDatabase();
 
-         Common.loadFolder(this);
+        Common.loadFolder(this);
     }
 
     @Override
@@ -423,13 +322,12 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
     @Override
     public void showRespone(String code, String description) {
-        if(!Config.isShowRespone())
+        if (!Config.isShowRespone())
             return;
 
         try {
             Toast.makeText(this, "CODE: " + code + "\n DESCRIPTION: " + description, Toast.LENGTH_LONG).show();
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

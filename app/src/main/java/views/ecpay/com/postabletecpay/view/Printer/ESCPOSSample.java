@@ -446,7 +446,7 @@ public class ESCPOSSample
 	public int checkDienLuc(Context context,PayAdapter.BillEntityAdapter bill){
 		int result =0;
 		if (Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("H")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("A")
-				||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("D")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("c")){
+				||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("D")||Character.toString(bill.getMA_DIEN_LUC().charAt(1)).equals("C")){
 			try {
 				result = bienNhanHN(context,bill);
 			} catch (InterruptedException e) {

@@ -49,7 +49,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     private IPayPresenter payPresenter;
 
     private List<DataAdapter> data = new ArrayList<>();
-//    private List<PayEntityAdapter BillEntityAdapter> billList = new ArrayList<>();
+    //    private List<PayEntityAdapter BillEntityAdapter> billList = new ArrayList<>();
     @BindDrawable(R.drawable.bg_button)
     Drawable green;
     @BindDrawable(R.drawable.bg_button_orange)
@@ -66,23 +66,17 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     }
 
 
-    public void UpdateAdapter(List<DataAdapter> data, int indexBegin, int indexEnd)
-    {
+    public void UpdateAdapter(List<DataAdapter> data, int indexBegin, int indexEnd) {
         this.data = data;
         this.notifyDataSetChanged();
 
     }
 
-    public void UpdateBill(PayAdapter.BillEntityAdapter bill )
-    {
-        for(int i = 0, n = this.data.size(); i < n; i ++)
-        {
-            if(this.data.get(i).getInfoKH().getMA_KHANG().equalsIgnoreCase(bill.getMA_KHACH_HANG()))
-            {
-                for (int j = 0, n2 = this.data.get(i).getBillKH().size(); j < n2; j ++)
-                {
-                    if(this.data.get(i).getBillKH().get(j).getBillId() == bill.getBillId())
-                    {
+    public void UpdateBill(PayAdapter.BillEntityAdapter bill) {
+        for (int i = 0, n = this.data.size(); i < n; i++) {
+            if (this.data.get(i).getInfoKH().getMA_KHANG().equalsIgnoreCase(bill.getMA_KHACH_HANG())) {
+                for (int j = 0, n2 = this.data.get(i).getBillKH().size(); j < n2; j++) {
+                    if (this.data.get(i).getBillKH().get(j).getBillId() == bill.getBillId()) {
                         this.data.get(i).getBillKH().get(j).setTRANG_THAI_TT(bill.getTRANG_THAI_TT());
                         this.data.get(i).getBillKH().get(j).setVI_TTOAN(bill.getVI_TTOAN());
                     }
@@ -135,10 +129,8 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
 
         boolean isShowBill = false;
-        for (int i = 0, n = data.get(position).getBillKH().size(); i < n; i ++)
-        {
-            if(payPresenter.getPayModel().containBillInSelected(data.get(position).getBillKH().get(i).getBillId()))
-            {
+        for (int i = 0, n = data.get(position).getBillKH().size(); i < n; i++) {
+            if (payPresenter.getPayModel().containBillInSelected(data.get(position).getBillKH().get(i).getBillId())) {
                 isShowBill = true;
                 data.get(position).setBill(data.get(position).getBillKH().get(i));
                 break;
@@ -155,9 +147,8 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
     private DataAdapter getObjectDataAdapter(String code) {
         DataAdapter dataAdapter = null;
         int index = 0;
-        for(; index<data.size(); index++)
-        {
-            if(data.get(index).getInfoKH().getMA_KHANG().equals(code)) {
+        for (; index < data.size(); index++) {
+            if (data.get(index).getInfoKH().getMA_KHANG().equals(code)) {
                 dataAdapter = data.get(index);
                 break;
             }
@@ -242,16 +233,13 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             this.dataAdapter = dataAdapter;
         }
 
-        public void showBills(boolean show)
-        {
+        public void showBills(boolean show) {
 
             rvBill.setVisibility(show ? View.VISIBLE : View.GONE);
 
-            if(isPayed)
-            {
+            if (isPayed) {
                 ll_row_thanhtoan_recycler_print.setVisibility(View.GONE);
-            }else
-            {
+            } else {
                 ll_row_thanhtoan_recycler_print.setVisibility(show ? View.VISIBLE : View.GONE);
             }
 
@@ -273,7 +261,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
     }
 
-    public static class BillEntityAdapter implements Comparable<BillEntityAdapter>{
+    public static class BillEntityAdapter implements Comparable<BillEntityAdapter> {
 
         private Date THANG_THANH_TOAN;
         private long TIEN_THANH_TOAN;
@@ -314,7 +302,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getMessageError() {
-            return messageError;
+            return (messageError == null) ? "" : messageError;
         }
 
         public void setMessageError(String messageError) {
@@ -322,7 +310,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getTEN_KHACH_HANG() {
-            return TEN_KHACH_HANG;
+            return (TEN_KHACH_HANG == null) ? "" : TEN_KHACH_HANG;
         }
 
         public void setTEN_KHACH_HANG(String TEN_KHACH_HANG) {
@@ -330,7 +318,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getMA_KHACH_HANG() {
-            return MA_KHACH_HANG;
+            return (MA_KHACH_HANG == null) ? "" : MA_KHACH_HANG;
         }
 
         public void setMA_KHACH_HANG(String MA_KHACH_HANG) {
@@ -338,7 +326,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getSO_GCS() {
-            return SO_GCS;
+            return (SO_GCS == null) ? "" : SO_GCS;
         }
 
         public void setSO_GCS(String SO_GCS) {
@@ -346,7 +334,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getPHIEN_THANH_TOAN() {
-            return PHIEN_THANH_TOAN;
+            return (PHIEN_THANH_TOAN == null) ? "" : PHIEN_THANH_TOAN;
         }
 
         public void setPHIEN_THANH_TOAN(String PHIEN_THANH_TOAN) {
@@ -354,7 +342,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getDIA_CHI() {
-            return DIA_CHI;
+            return (DIA_CHI == null) ? "" : DIA_CHI;
         }
 
         public void setDIA_CHI(String DIA_CHI) {
@@ -402,7 +390,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getTRANG_THAI_TT() {
-            return TRANG_THAI_TT;
+            return (TRANG_THAI_TT == null) ? "" : TRANG_THAI_TT;
         }
 
         public void setTRANG_THAI_TT(String TRANG_THAI_TT) {
@@ -414,7 +402,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getMA_DIEN_LUC() {
-            return MA_DIEN_LUC;
+            return (MA_DIEN_LUC == null) ? "" : MA_DIEN_LUC;
         }
 
         public void setMA_DIEN_LUC(String MA_DIEN_LUC) {
@@ -426,7 +414,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getRequestDate() {
-            return requestDate;
+            return (requestDate == null) ? "" : requestDate;
         }
 
         public void setRequestDate(String requestDate) {
@@ -443,7 +431,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
 
 
         public String getVI_TTOAN() {
-            return billingBy;
+            return (billingBy == null) ? "" : billingBy;
         }
 
         public void setVI_TTOAN(String billingBy) {
@@ -451,7 +439,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getSO_HO() {
-            return SO_HO;
+            return (SO_HO == null) ? "" : SO_HO;
         }
 
         public void setSO_HO(String SO_HO) {
@@ -459,7 +447,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getSO_CONG_TO() {
-            return SO_CONG_TO;
+            return (SO_CONG_TO == null) ? "" : SO_CONG_TO;
         }
 
         public void setSO_CONG_TO(String SO_CONG_TO) {
@@ -467,7 +455,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getCSDK() {
-            return CSDK;
+            return (CSDK == null) ? "" : CSDK;
         }
 
         public void setCSDK(String CSDK) {
@@ -475,15 +463,16 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getCSCK() {
-            return CSCK;
+            return (CSCK == null) ? "" : CSCK;
         }
 
         public void setCSCK(String CSCK) {
             this.CSCK = CSCK;
         }
 
-        public String getMA_HOA_DON() {
-            return MA_HOA_DON;
+        public String getMA_HOA_DON()
+        {
+            return (MA_HOA_DON == null) ? "" : MA_HOA_DON;
         }
 
         public void setMA_HOA_DON(String MA_HOA_DON) {
@@ -491,7 +480,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getCHI_TIET_KG() {
-            return CHI_TIET_KG;
+            return (CHI_TIET_KG == null) ? "" : CHI_TIET_KG;
         }
 
         public void setCHI_TIET_KG(String CHI_TIET_KG) {
@@ -499,7 +488,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getCHI_TIET_MCS() {
-            return CHI_TIET_MCS;
+            return (CHI_TIET_MCS == null) ? "" : CHI_TIET_MCS;
         }
 
         public void setCHI_TIET_MCS(String CHI_TIET_MCS) {
@@ -507,7 +496,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getCHI_TIET_TIEN_MCS() {
-            return CHI_TIET_TIEN_MCS;
+            return (CHI_TIET_TIEN_MCS == null) ? "" : CHI_TIET_TIEN_MCS;
         }
 
         public void setCHI_TIET_TIEN_MCS(String CHI_TIET_TIEN_MCS) {
@@ -515,7 +504,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getDNTT() {
-            return DNTT;
+            return (DNTT == null) ? "" : DNTT;
         }
 
         public void setDNTT(String DNTT) {
@@ -523,7 +512,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getTONG_TIEN_CHUA_THUE() {
-            return TONG_TIEN_CHUA_THUE;
+            return (TONG_TIEN_CHUA_THUE == null) ? "" : TONG_TIEN_CHUA_THUE;
         }
 
         public void setTONG_TIEN_CHUA_THUE(String TONG_TIEN_CHUA_THUE) {
@@ -531,7 +520,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getTONG_TIEN_THUE() {
-            return TONG_TIEN_THUE;
+            return (TONG_TIEN_THUE == null) ? "" : TONG_TIEN_THUE;
         }
 
         public void setTONG_TIEN_THUE(String TONG_TIEN_THUE) {
@@ -539,15 +528,14 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getTEN_DIEN_LUC() {
-            return TEN_DIEN_LUC;
-        }
+            return TEN_DIEN_LUC;}
 
         public void setTEN_DIEN_LUC(String TEN_DIEN_LUC) {
             this.TEN_DIEN_LUC = TEN_DIEN_LUC;
         }
 
         public String getTU_NGAY() {
-            return TU_NGAY;
+            return (TU_NGAY == null) ? "" : TU_NGAY;
         }
 
         public void setTU_NGAY(String TU_NGAY) {
@@ -555,7 +543,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
         }
 
         public String getDEN_NGAY() {
-            return DEN_NGAY;
+            return (DEN_NGAY == null) ? "" : DEN_NGAY;
         }
 
         public void setDEN_NGAY(String DEN_NGAY) {
@@ -567,15 +555,14 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             long termThis = this.getTHANG_THANH_TOAN().getTime();
             long termThat = billEntityAdapter.getTHANG_THANH_TOAN().getTime();
 
-            if(termThat > termThis)
-                return  -1;
-            else if(termThat < termThis)
-                return  1;
-            else
-            {
-                if(!billEntityAdapter.getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()))
+            if (termThat > termThis)
+                return -1;
+            else if (termThat < termThis)
+                return 1;
+            else {
+                if (!billEntityAdapter.getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()))
                     return -1;
-                if(!this.getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()))
+                if (!this.getTRANG_THAI_TT().equalsIgnoreCase(Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode()))
                     return 1;
                 return 0;
             }
@@ -647,24 +634,26 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             if (entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())) {
                 holder.cb.setEnabled(true);
                 holder.ibtnDelete.setVisibility(View.INVISIBLE);
-
                 holder.tvStatusBill.setText(Common.STATUS_BILLING.CHUA_THANH_TOAN.getMessage());
+
+                holder.ibtnPrintInside.setVisibility(View.INVISIBLE);
             } else {
                 holder.cb.setEnabled(false);
                 holder.cb.setChecked(true);
                 holder.ibtnDelete.setVisibility(View.VISIBLE);
                 holder.tvStatusBill.setText(Common.STATUS_BILLING.DA_THANH_TOAN.getMessage());
                 entity.setPrint(entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()));
+                holder.ibtnPrintInside.setVisibility(View.VISIBLE);
             }
             holder.tvDate.setText(Common.parse(entity.getTHANG_THANH_TOAN(), Common.DATE_TIME_TYPE.MMyyyy.toString()));
             holder.tvMoneyBill.setText(Common.convertLongToMoney(entity.getTIEN_THANH_TOAN()));
 
-            if (entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())){
+            if (entity.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode())) {
                 holder.tvStatusBill.setTextColor(ContextCompat.getColor(sContext, R.color.colorRed));
             } else {
                 holder.tvStatusBill.setTextColor(ContextCompat.getColor(sContext, R.color.colorTextGreen));
             }
-            holder.ibtnPrintInside.setVisibility(entity.isPrint ? View.VISIBLE : View.INVISIBLE);
+
 
         }
 
@@ -755,8 +744,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                             });
 
                             for (indexNotPayedTermOldest += 1; indexNotPayedTermOldest < billList.size(); indexNotPayedTermOldest++) {
-                                if (billList.get(indexNotPayedTermOldest).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && billList.get(indexNotPayedTermOldest).isChecked())
-                                {
+                                if (billList.get(indexNotPayedTermOldest).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && billList.get(indexNotPayedTermOldest).isChecked()) {
                                     payPresenter.getIPayView().processUnCheckedBillDialog(Common.CODE_REPONSE_BILL_ONLINE.ex10005.getMessage() + Common.TEXT_MULTI_SPACE + billList.get(indexNotPayedTermOldest).getMA_KHACH_HANG(), Common.TYPE_DIALOG.LOI);
 //                                    payPresenter.getIPayView().showMessageNotifyPayfrag(Common.CODE_REPONSE_BILL_ONLINE.ex10005.getMessage() + Common.TEXT_MULTI_SPACE + bill.getMA_KHACH_HANG());
                                     return;
@@ -777,12 +765,9 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                         bill.setChecked(checked);
                         payPresenter.addSelectBillToPay(bill, false);
                         boolean hasChange = false;
-                        for (int i = 0; i < position; i ++)
-                        {
-                            if(billList.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && billList.get(i).compareTo(bill) != 0)
-                            {
-                                if(i != position && billList.get(i).isChecked())
-                                {
+                        for (int i = 0; i < position; i++) {
+                            if (billList.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()) && billList.get(i).compareTo(bill) != 0) {
+                                if (i != position && billList.get(i).isChecked()) {
                                     hasChange = true;
                                 }
                                 billList.get(i).setChecked(false);
@@ -790,8 +775,7 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
                             }
                         }
 
-                        if(hasChange)
-                        {
+                        if (hasChange) {
                             notifyDataSetChanged();
                         }
 
@@ -888,18 +872,15 @@ public class PayAdapter extends RecyclerView.Adapter<PayAdapter.PayViewHolder> {
             return billKH;
         }
 
-        public void sortBills()
-        {
+        public void sortBills() {
 
             Collections.sort(billKH, PayAdapter.BillEntityAdapter.TermComparatorBillEntityAdapter);
         }
 
 
-        public boolean isPayed()
-        {
-            for (int i = 0; i < billKH.size(); i ++)
-            {
-                if(billKH.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()))
+        public boolean isPayed() {
+            for (int i = 0; i < billKH.size(); i++) {
+                if (billKH.get(i).getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.CHUA_THANH_TOAN.getCode()))
                     return false;
             }
             return true;
