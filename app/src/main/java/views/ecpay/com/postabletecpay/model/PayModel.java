@@ -265,10 +265,22 @@ public class PayModel extends CommonModel {
         private AsyncSoapCallBack callBack;
         private PayModel payModel;
         private int startIndex;
+
+        private  boolean isEnded;
+
         public AsyncSearchOffline(int index, PayModel payModel, AsyncSoapCallBack callBack) throws Exception {
             this.callBack = callBack;
             this.payModel = payModel;
             this.startIndex = index;
+            isEnded = false;
+        }
+
+        public boolean isEnded() {
+            return isEnded;
+        }
+
+        public void setEnded(boolean ended) {
+            isEnded = ended;
         }
 
         @Override
@@ -277,6 +289,7 @@ public class PayModel extends CommonModel {
             {
                 callBack.onPost(this.payModel.getInforRowCustomerFitterBy(startIndex, strings[0].first, strings[0].second));
             }
+            isEnded = true;
             return null;
         }
 

@@ -80,6 +80,8 @@ public class PayPresenter implements IPayPresenter {
     private long totalAmountBillPayedSuccess;
 
 
+    PayModel.AsyncSearchOffline asyncSearchOffline = null;
+
     //delay
     private Handler handlerDelay = new Handler();
 
@@ -135,47 +137,14 @@ public class PayPresenter implements IPayPresenter {
 
 
         if (!isSeachOnline) {
-
+            if(asyncSearchOffline != null && !asyncSearchOffline.isEnded())
+            {
+                asyncSearchOffline.cancel(true);
+            }
             try {
-                PayModel.AsyncSearchOffline asyncSearchOffline = new PayModel.AsyncSearchOffline(pageIndex, mPayModel, new PayModel.AsyncSoapCallBack() {
+                asyncSearchOffline = new PayModel.AsyncSearchOffline(pageIndex, mPayModel, new PayModel.AsyncSoapCallBack() {
                     @Override
                     public void onPost(final Pair<List<PayAdapter.DataAdapter>, Integer> result) {
-                        /*
-                        List<PayAdapter.DataAdapter> fitter = new ArrayList<>();
-                        int indexBegin = 0;
-                        int indexEnd = 0;
-                        if (pageIndex == PayFragment.FIRST_PAGE_INDEX) {
-                            int index = 0;
-
-
-                            totalPage = result.size() / ROWS_ON_PAGE + PAGE_INCREMENT;
-
-                            indexEnd = pageIndex * ROWS_ON_PAGE;
-
-                            if (indexEnd > result.size())
-                                indexEnd = result.size();
-
-                            fitter = result.subList(indexBegin, indexEnd);
-
-                        } else {
-                            if (pageIndex > totalPage)
-                                return;
-
-                            indexBegin = ROWS_ON_PAGE * (pageIndex - PAGE_INCREMENT);
-                            indexEnd = ROWS_ON_PAGE * (pageIndex);
-                            if (indexEnd > result.size())
-                                indexEnd = result.size();
-
-                            int index = indexBegin;
-                            int maxIndex = indexEnd;
-
-                            fitter = result.subList(index, maxIndex);
-
-                        }
-                        final List<PayAdapter.DataAdapter> finalFitter = fitter;
-                        final int finalIndexBegin = indexBegin;
-                        final int finalIndexEnd = indexEnd;
-                        */
                         Activity activity = ((Activity) (mIPayView.getContextView()));
                         if (activity != null)
                             activity.runOnUiThread(new Runnable() {
