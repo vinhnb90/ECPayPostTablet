@@ -386,9 +386,9 @@ public class PayPresenter implements IPayPresenter {
                 khachHang.setGIAO_THU(Common.TRANG_THAI_GIAO_THU.VANG_LAI.getCode());
                 khachHang.setNGAY_GIAO_THU(Calendar.getInstance().getTime());
 
-                mPayModel.writeSQLiteCustomerTableFromSearchOnline(MainActivity.mEdong, khachHang, customerResponse.getListBill());
+                List<PayAdapter.BillEntityAdapter> bills = mPayModel.writeSQLiteCustomerTableFromSearchOnline(MainActivity.mEdong, khachHang, customerResponse.getListBill());
 
-                PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(khachHang, new ArrayList<PayAdapter.BillEntityAdapter>(), 0);
+
 
                 long totalMoney = 0;
                 for (int i = 0, n = customerResponse.getListBill().size(); i < n; i++) {
@@ -418,10 +418,11 @@ public class PayPresenter implements IPayPresenter {
 
                     bill.setRequestDate(Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
 
-                    dataAdapter.getBillKH().add(bill);
+                    bills.add(bill);
 
                 }
-                //dataAdapter.sortBills();
+                PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(khachHang, bills, 0);
+
                 dataAdapter.setTotalMoney(totalMoney);
 
                 List<PayAdapter.DataAdapter> adapters = new ArrayList<PayAdapter.DataAdapter>();

@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements
         public void run() {
             boolean currentConnect = Common.isNetworkConnected(MainActivity.this);
             boolean posted = true;
-            if (!hasNetworkLast && currentConnect) {
+            if (currentConnect) {
                 if (iMainPresenter != null) {
                     try {
                         posted = iMainPresenter.checkAndPostBill();
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements
                         MainActivity.this.finish();
                     }
                 }
-            }
+           }
             if (posted)
                 hasNetworkLast = currentConnect;
             if (mHander != null && mRunableCheckPostBill != null)

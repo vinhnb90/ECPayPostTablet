@@ -1409,6 +1409,108 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     }
 
+    public List<PayAdapter.BillEntityAdapter> selectHoaDonNoKhacId(String edong, String code, List<Long> bills) {
+
+        List<PayAdapter.BillEntityAdapter> billList = new ArrayList<>();
+
+        String qqqq = "";
+
+        for (int i = 0, n = bills.size(); i < n; i ++)
+        {
+            qqqq += " AND MA_HOA_DON != '" + bills.get(i) + "'";
+        }
+
+
+        database = this.getReadableDatabase();
+        String query = "SELECT * FROM ( " + "SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and MA_KHANG ='" + code + "' " + qqqq + " ORDER BY THANG_TTOAN DESC ) AS BILL " +
+                " LEFT JOIN " + TABLE_NAME_EVN_PC + " AS PC ON BILL.DIEN_LUC = PC.code";
+        Cursor mCursor = database.rawQuery(query, null);
+
+        if (mCursor.getCount() == 0) {
+            mCursor.close();
+            return billList;
+        }
+        if (mCursor.moveToFirst()) {
+            do {
+                String tenKHang = mCursor.getString(mCursor.getColumnIndex("TEN_KHANG"));
+                String diaChi = mCursor.getString(mCursor.getColumnIndex("DIA_CHI"));
+                String viThanhToan = mCursor.getString(mCursor.getColumnIndex("VI_TTOAN"));
+                String chiTietKhungGia = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_KG"));
+                String chiTietMucChiSo = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_MCS"));
+                String chiTietTienTheoChiSo = mCursor.getString(mCursor.getColumnIndex("CHI_TIET_TIEN_MCS"));
+                String dienNangTieuThu = mCursor.getString(mCursor.getColumnIndex("DNTT"));
+                String soGCS = mCursor.getString(mCursor.getColumnIndex("SO_GCS"));
+                String phienTT = mCursor.getString(mCursor.getColumnIndex("PHIEN_TTOAN"));
+                String soHo = mCursor.getString(mCursor.getColumnIndex("SO_HO"));
+                String soDauKy = mCursor.getString(mCursor.getColumnIndex("SO_DAU_KY"));
+                String soCuoiKy = mCursor.getString(mCursor.getColumnIndex("SO_CUOI_KY"));
+                String soCto = mCursor.getString(mCursor.getColumnIndex("SO_CTO"));
+                String tuNgay = mCursor.getString(mCursor.getColumnIndex("TU_NGAY"));
+                String denNgay = mCursor.getString(mCursor.getColumnIndex("DEN_NGAY"));
+                int billId = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("MA_HOA_DON")));
+                int amount = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("SO_TIEN_TTOAN")));
+                int tienChuaThue = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("TONG_TIEN_CHUA_THUE")));
+                int tienThue = intConvertNull(mCursor.getInt(mCursor.getColumnIndex("TIEN_THUE")));
+                String status = mCursor.getString(mCursor.getColumnIndex("TRANG_THAI_TTOAN"));
+
+                String dateRequest = stringConvertNull(mCursor.getString(mCursor.getColumnIndex("NGAY_GIAO_THU")));
+
+                PayAdapter.BillEntityAdapter bill = new PayAdapter.BillEntityAdapter();
+                bill.setTEN_KHACH_HANG(tenKHang);
+                bill.setDIA_CHI(diaChi);
+                bill.setBillId(billId);
+                bill.setVI_TTOAN(viThanhToan);
+                bill.setSO_GCS(soGCS);
+                bill.setTIEN_THANH_TOAN(amount);
+                bill.setTHANG_THANH_TOAN(Common.parseDate(mCursor.getString(mCursor.getColumnIndex("THANG_TTOAN")), Common.DATE_TIME_TYPE.FULL.toString()));
+                bill.setTRANG_THAI_TT(status);
+                bill.setPHIEN_THANH_TOAN(phienTT);
+                bill.setCHI_TIET_KG(chiTietKhungGia);
+                bill.setCHI_TIET_MCS(chiTietMucChiSo);
+                bill.setCHI_TIET_TIEN_MCS(chiTietTienTheoChiSo);
+                bill.setDNTT(dienNangTieuThu);
+                bill.setTONG_TIEN_CHUA_THUE(tienChuaThue + "");
+                bill.setTONG_TIEN_THUE(tienThue + "");
+                bill.setCSDK(soDauKy);
+                bill.setCSCK(soCuoiKy);
+                bill.setSO_CONG_TO(soCto);
+                bill.setSO_HO(soHo);
+                bill.setTU_NGAY(tuNgay);
+                bill.setDEN_NGAY(denNgay);
+                bill.setMA_DIEN_LUC(mCursor.getString(mCursor.getColumnIndex("DIEN_LUC")));
+                bill.setChecked(false);
+                bill.setMA_KHACH_HANG(mCursor.getString(mCursor.getColumnIndex("MA_KHANG")));
+
+
+                String fullName = mCursor.getString(mCursor.getColumnIndex("fullName"));
+
+                if (fullName == null) {
+                    fullName = "";
+                }
+                bill.setTEN_DIEN_LUC(fullName);
+
+                bill.setCheckEnable(!bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()));
+
+                if (bill.getTRANG_THAI_TT().equalsIgnoreCase(Common.STATUS_BILLING.DA_THANH_TOAN.getCode()) && MainActivity.mEdong.equalsIgnoreCase(viThanhToan))
+                    bill.setPrintEnable(true);
+                else
+                    bill.setPrintEnable(false);
+
+                bill.setRequestDate(dateRequest);
+
+                billList.add(bill);
+            }
+            while (mCursor.moveToNext());
+        }
+
+
+        if (mCursor != null && !mCursor.isClosed()) {
+            mCursor.close();
+        }
+        return billList;
+    }
+
+
 
     public String selectSessionAccount(String edong) {
         if (TextUtils.isEmpty(edong))
