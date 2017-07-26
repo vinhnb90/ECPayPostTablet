@@ -28,6 +28,7 @@ import com.roughike.bottombar.OnTabSelectListener;
 
 import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
+import views.ecpay.com.postabletecpay.presenter.IBluetoothPresenter;
 import views.ecpay.com.postabletecpay.presenter.IMainPresenter;
 import views.ecpay.com.postabletecpay.presenter.MainPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
@@ -54,7 +55,8 @@ public class MainActivity extends AppCompatActivity implements
     public static String mEdong;
     private IMainPresenter iMainPresenter;
     private static boolean isLoginCall;
-
+    IBluetoothPresenter iBluetoothPresenter;
+    public static MainActivity mainActivityOBJ;
     private ProgressDialog progressDialog;
     private Handler progressBarHandler = new Handler();
 
@@ -180,6 +182,12 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    public void startActivityResult(IBluetoothPresenter iBluetoothPresenter, Intent intent, int requestCode)
+    {
+        this.iBluetoothPresenter = iBluetoothPresenter;
+        startActivityForResult(intent,requestCode);
+    }
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -219,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mainActivityOBJ = this;
         if (progressDialog != null) {
             savedInstanceState.putBoolean(showProgress, progressDialog.isShowing());
         }
@@ -397,10 +406,10 @@ public class MainActivity extends AppCompatActivity implements
                 return;
             }
         }
-        if (requestCode == PayFragment.REQUEST_ENABLE_BT && data == null){
-            Common.isBluetoothConnected = false;
-        }else {
-
+        if (requestCode == PayFragment.REQUEST_ENABLE_BT){
+            if (iBluetoothPresenter != null){
+                iBluetoothPresenter.getOnActivityResult(requestCode,resultCode,data);
+            }
         }
     }
 
