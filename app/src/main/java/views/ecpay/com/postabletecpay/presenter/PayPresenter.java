@@ -139,6 +139,7 @@ public class PayPresenter implements IPayPresenter {
         if (!isSeachOnline) {
             if(asyncSearchOffline != null && !asyncSearchOffline.isEnded())
             {
+                asyncSearchOffline.setEnded(true);
                 asyncSearchOffline.cancel(true);
             }
             try {
@@ -166,6 +167,12 @@ public class PayPresenter implements IPayPresenter {
             }
 
         } else {
+            if(asyncSearchOffline != null && !asyncSearchOffline.isEnded())
+            {
+                asyncSearchOffline.setEnded(true);
+                asyncSearchOffline.cancel(true);
+            }
+
             callSearchOnline(MainActivity.mEdong, infoSearch, false);
 //            List<PayAdapter.DataAdapter> fitter = new ArrayList<>();
 //            int indexBegin = 0;
@@ -300,8 +307,63 @@ public class PayPresenter implements IPayPresenter {
                         mIPayView.showRespone(response.getFooter().getResponseCode(), response.getFooter().getDescription());
                         Common.CODE_REPONSE_SEARCH_ONLINE codeResponse = Common.CODE_REPONSE_SEARCH_ONLINE.findCodeMessage(response.getFooter().getResponseCode());
                         if (codeResponse != Common.CODE_REPONSE_SEARCH_ONLINE.e000) {
-                            //mIPayView.showMessageNotifySearchOnline(codeResponse.getMessage(), Common.TYPE_DIALOG.LOI);
-                            finishSearchOnline(null);
+
+                            if(codeResponse == Common.CODE_REPONSE_SEARCH_ONLINE.e0025)
+                            {
+                                CustomerInsideBody customerResponse = null;
+                                try {
+                                    customerResponse = new Gson().fromJson(((BodySearchOnlineResponse) response.getBody()).getCustomer(), CustomerInsideBody.class);
+                                } catch (JsonSyntaxException e) {
+                                    customerResponse = null;
+                                    e.printStackTrace();
+                                }
+
+                                if(customerResponse == null)
+                                {
+                                    finishSearchOnline(null);
+                                }else
+                                {
+                                    EntityKhachHang khachHang = new EntityKhachHang();
+                                    khachHang.setE_DONG(MainActivity.mEdong);
+                                    khachHang.setMA_KHANG(customerResponse.getCode());
+                                    khachHang.setMA_THE(customerResponse.getCardNo());
+                                    khachHang.setTEN_KHANG(customerResponse.getName());
+                                    khachHang.setDIA_CHI(customerResponse.getAddress());
+                                    khachHang.setPHIEN_TTOAN(customerResponse.getInning());
+                                    khachHang.setLO_TRINH(customerResponse.getRoad());
+                                    khachHang.setSO_GCS(customerResponse.getBookCmis());
+                                    khachHang.setDIEN_LUC(customerResponse.getPcCode());
+                                    khachHang.setSO_HO("");
+                                    khachHang.setSDT_ECPAY(customerResponse.getPhoneByecp());
+                                    khachHang.setSDT_EVN(customerResponse.getPhoneByevn());
+                                    khachHang.setGIAO_THU(Common.TRANG_THAI_GIAO_THU.VANG_LAI.getCode());
+                                    khachHang.setNGAY_GIAO_THU(Calendar.getInstance().getTime());
+
+                                    List<PayAdapter.BillEntityAdapter> bills = mPayModel.writeSQLiteCustomerTableFromSearchOnline(MainActivity.mEdong, khachHang, customerResponse.getListBill());
+
+
+                                    PayAdapter.DataAdapter dataAdapter = new PayAdapter.DataAdapter(khachHang, bills, 0);
+
+                                    dataAdapter.setTotalMoney(0);
+
+                                    List<PayAdapter.DataAdapter> adapters = new ArrayList<PayAdapter.DataAdapter>();
+                                    adapters.add(dataAdapter);
+
+                                    try {
+                                        mIPayView.showPayRecyclerPage(adapters, 1, 1, "", false);
+                                        mIPayView.hideSearchOnlineProcess();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        mIPayView.hideSearchOnlineProcess();
+                                    }
+                                }
+
+                            }else
+                            {
+                                finishSearchOnline(null);
+                            }
+
+
                             return;
                         }
 
