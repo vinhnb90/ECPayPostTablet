@@ -184,22 +184,22 @@ public class PayModel extends CommonModel {
         sqLiteConnection.insertOrUpdateCustomerFromSearchOnline( customerResponse);
 
 
-        if(lst.size() == 0)
-            return new ArrayList<>();
-
-        for (int i = 0, n = lst.size(); i < n; i ++)
+        if(lst != null)
         {
-            BillInsideCustomer bill = lst.get(i);
-
-            bills.add(bill.getBillId());
-
-            if(bill.getCardNo() == null || bill.getCardNo().length() == 0)
+            for (int i = 0, n = lst.size(); i < n; i ++)
             {
-                bill.setCardNo(customerResponse.getMA_THE());
-            }
-            sqLiteConnection.insertOrUpdateBillSearchOnline(edong, bill);
-        }
+                BillInsideCustomer bill = lst.get(i);
 
+                bills.add(bill.getBillId());
+
+                if(bill.getCardNo() == null || bill.getCardNo().length() == 0)
+                {
+                    bill.setCardNo(customerResponse.getMA_THE());
+                }
+                sqLiteConnection.insertOrUpdateBillSearchOnline(edong, bill);
+            }
+
+        }
         return sqLiteConnection.selectHoaDonNoKhacId(edong, customerResponse.getMA_KHANG(), bills);
     }
 
@@ -285,7 +285,7 @@ public class PayModel extends CommonModel {
 
         @Override
         protected Void doInBackground(Pair<Common.TYPE_SEARCH, String>... strings) {
-            if(callBack != null)
+            if(callBack != null && !isEnded)
             {
                 callBack.onPost(this.payModel.getInforRowCustomerFitterBy(startIndex, strings[0].first, strings[0].second));
             }
