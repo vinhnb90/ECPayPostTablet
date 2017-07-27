@@ -157,7 +157,14 @@ public class MainPageFragment extends Fragment implements
         mIMainPagePresenter = new MainPagePresenter(this);
         mILogoutPresenter = new LogoutPresenter(this);
     }
-
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        ViewGroup viewGroup = (ViewGroup) getView();
+        assert viewGroup != null;
+        viewGroup.removeAllViewsInLayout();
+        View view = onCreateView(getActivity().getLayoutInflater(), viewGroup, null); viewGroup.addView(view);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         curentFragment = inflater.inflate(R.layout.fragment_trang_chu, container, false);
@@ -174,11 +181,6 @@ public class MainPageFragment extends Fragment implements
         ((MainActivity) this.getContextView()).switchNavigationBottomMenu(MainActivity.ID_MENU_BOTTOM.HOME);
         this.refreshInfoMain();
         return curentFragment;
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
     }
 
     @Override

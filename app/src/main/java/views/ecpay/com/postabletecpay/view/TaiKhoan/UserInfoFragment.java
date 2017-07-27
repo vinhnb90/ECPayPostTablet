@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -154,6 +155,14 @@ public class UserInfoFragment extends Fragment implements IUserInfoView, ILogout
         } else {
             throw new RuntimeException(context.toString() + " must implement OnPayFragmentInteractionListener");
         }
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        ViewGroup viewGroup = (ViewGroup) getView();
+        assert viewGroup != null;
+        viewGroup.removeAllViewsInLayout();
+        View view = onCreateView(getActivity().getLayoutInflater(), viewGroup, null); viewGroup.addView(view);
     }
 
     @Override

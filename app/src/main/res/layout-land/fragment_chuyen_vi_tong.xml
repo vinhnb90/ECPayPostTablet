@@ -241,7 +241,7 @@
                 <Button
                     android:id="@+id/btnBack"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_30sdp"
+                    android:layout_height="@dimen/_20sdp"
                     android:layout_marginLeft="@dimen/_8sdp"
                     android:layout_marginRight="@dimen/_8sdp"
                     android:layout_weight="1"
@@ -252,7 +252,7 @@
                 <Button
                     android:id="@+id/btnNext"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_30sdp"
+                    android:layout_height="@dimen/_20sdp"
                     android:layout_marginLeft="@dimen/_10sdp"
                     android:layout_weight="1"
                     android:textSize="@dimen/_8sdp"

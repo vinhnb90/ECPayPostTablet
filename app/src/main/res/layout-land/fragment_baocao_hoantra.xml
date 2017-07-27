@@ -16,7 +16,7 @@
             android:layout_marginRight="@dimen/_5sdp"
             android:id="@+id/etSearch"
             android:layout_width="0dp"
-            android:layout_height="@dimen/_24sdp"
+            android:layout_height="@dimen/_15sdp"
             android:layout_marginLeft="@dimen/_5sdp"
             android:layout_weight="1"
             android:background="@drawable/bg_edittext_border"
@@ -58,13 +58,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ll_top"
-        android:layout_margin="@dimen/_3sdp"
+        android:layout_margin="@dimen/_1sdp"
         android:orientation="horizontal">
         <TextView
             android:gravity="center_vertical|center_horizontal"
             android:id="@+id/tvGachNgang"
             android:layout_width="@dimen/_8sdp"
-            android:layout_height="@dimen/_20sdp"
+            android:layout_height="@dimen/_15sdp"
             android:layout_centerHorizontal="true"
             android:textStyle="bold"
             android:textSize="@dimen/_15sdp"
@@ -74,7 +74,8 @@
             android:layout_toLeftOf="@+id/tvGachNgang"
             android:id="@+id/etTuNgay"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_20sdp"
+            android:layout_height="@dimen/_15sdp"
+            android:layout_marginLeft="@dimen/_4sdp"
             android:background="@drawable/bg_edittext_border"
             android:drawableLeft="@mipmap/ic_calendar"
             android:hint="Từ ngày"
@@ -86,8 +87,9 @@
             android:layout_toRightOf="@id/tvGachNgang"
             android:id="@+id/etDenNgay"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_20sdp"
+            android:layout_height="@dimen/_15sdp"
             android:textSize="@dimen/_8sdp"
+            android:layout_marginRight="@dimen/_5sdp"
             android:background="@drawable/bg_edittext_border"
             android:drawableLeft="@mipmap/ic_calendar"
             android:hint="Đến ngày" />
@@ -97,7 +99,7 @@
     <Button
         android:id="@+id/btTimKiem"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/_20sdp"
+        android:layout_height="@dimen/_15sdp"
         android:layout_below="@+id/ll_top2"
         android:layout_centerHorizontal="true"
         android:background="@drawable/bg_button"
@@ -108,7 +110,7 @@
         android:textColor="@color/colorTextWhite" />
 
     <android.support.v7.widget.RecyclerView
-        android:layout_margin="@dimen/_3sdp"
+        android:layout_margin="@dimen/_2sdp"
         android:id="@+id/rvDanhSach"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

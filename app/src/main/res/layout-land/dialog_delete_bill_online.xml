@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/_15sdp"
+    android:orientation="vertical"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="3dp"
+    app:cardElevation="3dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorTextWhite">
+
+        <TextView
+            android:id="@+id/tv_dialog_delete_bill_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:background="@color/colorBlue"
+            android:gravity="center_horizontal"
+            android:padding="@dimen/_5sdp"
+            android:text="LÝ DO HỦY"
+            android:textAllCaps="true"
+            android:textColor="@color/colorTextWhite"
+            android:textSize="@dimen/_10sdp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_dialog_delete_bill_title"
+            android:layout_margin="@dimen/_2sdp"
+            android:layout_marginTop="@dimen/_25sdp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_dialog_delete_bill_online_1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Mã khách hàng"
+                    android:textSize="@dimen/_10sdp" />
+
+                <TextView
+                    android:id="@+id/tv_dialog_delete_bill_online_code_customer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_20sdp"
+                    android:layout_weight="1"
+                    android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:textSize="@dimen/_10sdp"
+                    tools:text="PDABC" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_dialog_delete_bill_online_2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Mã khách hàng:"
+                    android:textSize="@dimen/_10sdp" />
+
+
+                <TextView
+                    android:id="@+id/tv_dialog_delete_bill_online_name_customer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_20sdp"
+                    android:layout_toRightOf="@+id/tv_dialog_delete_bill_online_2"
+                    android:layout_weight="1"
+                    android:scrollHorizontally="true"
+                    android:textSize="@dimen/_10sdp"
+                    tools:text="Tên khách hàng:" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_dialog_delete_bill_online_3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Kỳ:"
+                    android:textSize="@dimen/_10sdp" />
+
+                <TextView
+                    android:id="@+id/tv_dialog_delete_bill_online_term"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_20sdp"
+                    android:layout_weight="1"
+                    android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:textSize="@dimen/_10sdp"
+                    tools:text="Kỳ:" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_dialog_delete_bill_online_4"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Số tiền:"
+                    android:textSize="@dimen/_10sdp" />
+
+
+                <TextView
+                    android:id="@+id/tv_dialog_delete_bill_online_amount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_20sdp"
+                    android:layout_weight="1"
+                    android:scrollHorizontally="true"
+                    android:textSize="@dimen/_10sdp"
+                    tools:text="Số tiền:" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:orientation="horizontal">
+
+
+                <TextView
+                    android:id="@+id/tv_dialog_delete_bill_online_5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Lý do hủy:"
+                    android:textSize="@dimen/_10sdp" />
+
+                <EditText
+                    android:id="@+id/et_dialog_delete_bill_online_reason"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_20sdp"
+                    android:layout_weight="1"
+                    android:inputType="text"
+                    android:paddingRight="@dimen/_10sdp"
+                    android:lines="1"
+                    android:textSize="@dimen/_10sdp"
+                    tools:text="Lý do hủydo hủdo hủdo hủdo hủdo hủdo hủdo hủdo hủdo hủdo hủ:" />
+            </LinearLayout>
+
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_dialog_delete_bill_online_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:orientation="vertical"
+                app:cardBackgroundColor="@color/colorDarkOrange"
+                app:cardCornerRadius="@dimen/_4sdp">
+
+                <ProgressBar
+                    android:id="@+id/pbar_dialog_delete_bill_online"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_10sdp"
+                    android:layout_marginRight="@dimen/_10sdp"
+
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/colorTextWhite"
+                    android:indeterminateTintMode="src_atop"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:inputType="text"
+                    android:id="@+id/tv_dialog_delete_bill_message_online"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:lines="1"
+                    android:padding="@dimen/_2sdp"
+                    android:scrollHorizontally="true"
+                    android:textColor="@color/colorTextWhite"
+                    android:textSize="@dimen/_10sdp"
+                    android:visibility="visible"
+                    tools:text="Message" />
+            </android.support.v7.widget.CardView>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_15sdp"
+                android:gravity="center_horizontal"
+                android:weightSum="4">
+
+                <Button
+                    android:id="@+id/btn_dialog_delete_bill_ignore"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:background="@drawable/bg_button_gray"
+                    android:textSize="@dimen/_8sdp"
+                    android:text="Bỏ qua"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btn_dialog_delete_bill_continued"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_30sdp"
+                    android:textSize="@dimen/_8sdp"
+                    android:layout_weight="1.2"
+                    android:background="@drawable/bg_button_orange"
+                    android:text="Tiếp tục"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorTextWhite" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+
+</android.support.v7.widget.CardView>

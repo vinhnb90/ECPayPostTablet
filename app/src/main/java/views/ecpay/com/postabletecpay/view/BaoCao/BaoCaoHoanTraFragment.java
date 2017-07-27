@@ -2,6 +2,7 @@ package views.ecpay.com.postabletecpay.view.BaoCao;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -147,7 +148,14 @@ public class BaoCaoHoanTraFragment extends Fragment implements View.OnClickListe
         super.onDestroyView();
         unbinder.unbind();
     }
-
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        ViewGroup viewGroup = (ViewGroup) getView();
+        assert viewGroup != null;
+        viewGroup.removeAllViewsInLayout();
+        View view = onCreateView(getActivity().getLayoutInflater(), viewGroup, null); viewGroup.addView(view);
+    }
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.etTuNgay)
@@ -230,8 +238,7 @@ public class BaoCaoHoanTraFragment extends Fragment implements View.OnClickListe
     public void showMessage(String message) {
         try{
             Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT).show();
-        }catch (Exception e)
-        {
+        }catch (Exception e) {
 
         }
     }

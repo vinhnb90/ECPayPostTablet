@@ -115,6 +115,14 @@ public class BaoCaoTongHopFragment extends Fragment implements View.OnClickListe
         unbinder.unbind();
     }
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        ViewGroup viewGroup = (ViewGroup) getView();
+        assert viewGroup != null;
+        viewGroup.removeAllViewsInLayout();
+        View view = onCreateView(getActivity().getLayoutInflater(), viewGroup, null); viewGroup.addView(view);
+    }
+    @Override
     public void onStart() {
         super.onStart();
         this.baoCaoView.showBackBtn(false);

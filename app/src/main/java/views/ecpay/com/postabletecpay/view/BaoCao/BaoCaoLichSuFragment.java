@@ -1,6 +1,7 @@
 package views.ecpay.com.postabletecpay.view.BaoCao;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -105,6 +106,14 @@ public class BaoCaoLichSuFragment extends Fragment implements View.OnClickListen
         {
             reportLichSuThanhToanPresenter.search(rbMaKH.isChecked() , etSearch.getText().toString());
         }
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        ViewGroup viewGroup = (ViewGroup) getView();
+        assert viewGroup != null;
+        viewGroup.removeAllViewsInLayout();
+        View view = onCreateView(getActivity().getLayoutInflater(), viewGroup, null); viewGroup.addView(view);
     }
 
     @Override

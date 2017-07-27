@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -620,6 +621,16 @@ public class PayFragment extends Fragment implements
     }
 
     //TODO mark Trang
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        ViewGroup viewGroup = (ViewGroup) getView();
+        assert viewGroup != null;
+        viewGroup.removeAllViewsInLayout();
+        View view = onCreateView(getActivity().getLayoutInflater(), viewGroup, null); viewGroup.addView(view);
+    }
+
     @Override
     public void showPayRecyclerPage(List<PayAdapter.DataAdapter> adapterList, int indexBegin, int totalPage, String infoSearch, boolean isSeachOnline) {
         try

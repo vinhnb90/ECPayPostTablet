@@ -10,7 +10,7 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_190sdp"
+            android:layout_height="@dimen/_110sdp"
             android:adjustViewBounds="true"
             android:background="@drawable/bg_taikhoan" />
     </LinearLayout>
@@ -42,7 +42,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="4">
+            android:layout_weight="4.2">
 
             <ScrollView
                 android:layout_width="match_parent"
@@ -279,8 +279,6 @@
             android:layout_weight="1"
             android:orientation="horizontal"
             android:visibility="visible">
-
-
             <LinearLayout
                 android:id="@+id/llInfo1"
                 android:layout_width="0dp"
@@ -292,7 +290,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginTop="@dimen/_2sdp"
                     android:text="SỐ TÀI KHOẢN"
                     android:textSize="@dimen/_8sdp"
                     android:textStyle="bold" />
@@ -303,7 +301,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/_8sdp"
                     android:layout_marginRight="@dimen/_8sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginTop="@dimen/_3sdp"
                     android:maxLines="4"
                     android:scrollbars="vertical"
                     android:text="2345"
@@ -317,7 +315,7 @@
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="@dimen/_15sdp"
-                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:background="@color/colorDisable" />
 
             <LinearLayout
@@ -331,7 +329,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginTop="@dimen/_2sdp"
                     android:text="SỐ DƯ KHẢ DỤNG"
                     android:textSize="@dimen/_8sdp"
                     android:textStyle="bold" />
@@ -342,7 +340,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/_8sdp"
                     android:layout_marginRight="@dimen/_8sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginTop="@dimen/_3sdp"
                     android:maxLines="4"
                     android:scrollbars="vertical"
                     android:text="2.000.0002.000.0002.000.0002.000.0002.000.0002.000.0002.000.0002.000.000"
@@ -355,7 +353,7 @@
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="@dimen/_15sdp"
-                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:background="@color/colorDisable" />
 
             <LinearLayout
@@ -369,7 +367,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_3sdp"
+                    android:layout_marginTop="@dimen/_2sdp"
                     android:text="LOẠI TÀI KHOẢN"
                     android:textSize="@dimen/_8sdp"
                     android:textStyle="bold" />
@@ -380,7 +378,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/_8sdp"
                     android:layout_marginRight="@dimen/_8sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginTop="@dimen/_3sdp"
                     android:maxLines="4"
                     android:scrollbars="vertical"
                     android:text="12"
@@ -397,8 +395,8 @@
             android:layout_height="0dp"
             android:layout_marginLeft="@dimen/_15sdp"
             android:layout_marginRight="@dimen/_15sdp"
-            android:layout_marginTop="@dimen/_13sdp"
-            android:layout_weight="1"
+            android:layout_marginTop="@dimen/_3sdp"
+            android:layout_weight="0.8"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:visibility="visible">

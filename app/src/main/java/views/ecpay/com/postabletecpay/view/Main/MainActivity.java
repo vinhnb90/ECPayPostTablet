@@ -3,6 +3,7 @@ package views.ecpay.com.postabletecpay.view.Main;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,13 +34,11 @@ import views.ecpay.com.postabletecpay.presenter.IMainPresenter;
 import views.ecpay.com.postabletecpay.presenter.MainPresenter;
 import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
-import views.ecpay.com.postabletecpay.view.Printer.Printer;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
-import static views.ecpay.com.postabletecpay.util.commons.Common.TIME_DELAY_DOWNLOAD;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.REQUEST_BARCODE;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.RESPONSE_BARCODE;
 
@@ -316,12 +315,16 @@ public class MainActivity extends AppCompatActivity implements
     public void onRestoreInstanceState(Bundle state) {
         super.onRestoreInstanceState(state);
         if (state != null){
-            if (state.getBoolean("SHOW_DIALOG") && progressDialog.isShowing()){
+            if (state.getBoolean(showProgress) && progressDialog.isShowing()){
                 startShowPbarDownload();
             }
         }
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {

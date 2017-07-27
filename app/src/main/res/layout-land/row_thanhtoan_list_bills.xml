@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_margin="@dimen/_1sdp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal|center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <LinearLayout
+            android:id="@+id/ll1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cb_row_thanhtoan_list_bills_choose"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_5sdp"
+                android:gravity="left"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_row_thanhtoan_list_bills_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/cb_row_thanhtoan_list_bills_choose"
+                    android:lines="1"
+                    android:textSize="@dimen/_7sdp"
+                    android:scrollHorizontally="true"
+                    android:text="PD384728938" />
+
+                <TextView
+                    android:id="@+id/tv_row_thanhtoan_list_bills_term"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tv_row_thanhtoan_list_bills_code"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:layout_toRightOf="@+id/cb_row_thanhtoan_list_bills_choose"
+                    android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:textSize="@dimen/_7sdp"
+                    android:text="Kỳ 03/2017" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/_5sdp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_row_thanhtoan_list_bills_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textSize="@dimen/_7sdp"
+                android:scrollHorizontally="true"
+                tools:text="TenTenTen"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_row_thanhtoan_list_bills_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_1sdp"
+                android:gravity="center_horizontal"
+                android:lines="1"
+                android:scrollHorizontally="true"
+                android:textSize="@dimen/_7sdp"
+                android:text="100.000 đ100100.000 đ.000 đ100100.000 đ.000 đ100.000 đ100.000 đ" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:layout_height="match_parent">
+
+            <ImageButton
+                android:visibility="visible"
+                android:id="@+id/ibtn_row_thanhtoan_list_bills_print"
+                android:background="@drawable/ic_print"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="@dimen/_8sdp"
+                android:layout_width="@dimen/_14sdp"
+                android:layout_height="@dimen/_14sdp" />
+
+
+            <TextView
+                android:id="@+id/tv_row_thanhtoan_list_bills_status_pay"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_15sdp"
+                android:layout_toLeftOf="@+id/ibtn_row_thanhtoan_list_bills_print"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="Chưa thanh toán"
+                android:textSize="@dimen/_7sdp"
+                android:textColor="@color/colorDarkOrange" />
+
+        </RelativeLayout>
+    </LinearLayout>
+</RelativeLayout>

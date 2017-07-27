@@ -1,6 +1,7 @@
 package views.ecpay.com.postabletecpay.view.BaoCao;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -85,6 +86,14 @@ public class BaoCaoFragment extends Fragment implements View.OnClickListener, IB
     public void onDetach() {
         super.onDetach();
         listener = null;
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        ViewGroup viewGroup = (ViewGroup) getView();
+        assert viewGroup != null;
+        viewGroup.removeAllViewsInLayout();
+        View view = onCreateView(getActivity().getLayoutInflater(), viewGroup, null); viewGroup.addView(view);
     }
 
     @Override

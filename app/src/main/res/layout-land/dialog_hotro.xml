@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <RelativeLayout
+        android:layout_margin="@dimen/_5sdp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/dialog_holo_light_frame"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:id="@+id/ivLogo"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_24sdp"
+            android:layout_marginTop="@dimen/_3sdp"
+            android:layout_centerHorizontal="true"
+            android:adjustViewBounds="true"
+            android:src="@drawable/logoecpay" />
+
+
+        <TextView
+            android:id="@+id/tvText1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Liên hệ để được hỗ trợ"
+            android:textSize="@dimen/_8sdp"
+            android:layout_below="@+id/ivLogo"
+            android:layout_marginTop="@dimen/_5sdp"/>
+
+        <LinearLayout
+            android:id="@+id/llText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/tvText1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/_8sdp"
+                android:text="Điện thoại: "
+                android:layout_marginTop="@dimen/_3sdp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/_8sdp"
+                android:text="1900 561 230 - 04 2222 3456"
+                android:textColor="@color/colorRed"
+                android:layout_marginTop="@dimen/_3sdp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_dialog_help_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textSize="@dimen/_8sdp"
+            android:text="Email: hotro@ecpay.vn"
+            android:layout_below="@+id/llText"
+            android:layout_marginTop="@dimen/_3sdp"/>
+
+        <Button
+            android:id="@+id/btOK"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_15sdp"
+            android:text="OK"
+            android:background="@drawable/bg_button"
+            android:textColor="@color/colorTextWhite"
+            android:layout_centerHorizontal="true"
+            android:textSize="@dimen/_8sdp"
+            android:layout_below="@+id/tv_dialog_help_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_5sdp"/>
+
+    </RelativeLayout>
+
+    <ImageButton
+        android:layout_gravity="right"
+        android:id="@+id/ibClose"
+        android:layout_width="@dimen/_24sdp"
+        android:layout_height="@dimen/_24sdp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:background="@mipmap/ic_close_blue"/>
+
+</FrameLayout>

@@ -283,7 +283,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_below="@+id/llHoanTra"
-        android:layout_margin="@dimen/_15sdp"
+        android:layout_margin="@dimen/_5sdp"
         android:layout_centerHorizontal="true"
         android:gravity="center">
 
@@ -313,6 +313,7 @@
         android:layout_below="@+id/llLuuy"
         android:textSize="@dimen/_8sdp"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/_10sdp"
         android:drawableLeft="@mipmap/ic_printer"
         android:paddingLeft="@dimen/_5sdp"
         android:paddingRight="@dimen/_15sdp"/>

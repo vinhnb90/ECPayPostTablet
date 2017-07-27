@@ -51,8 +51,8 @@
 
             <ImageButton
                 android:id="@+id/btnScanCode"
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
+                android:layout_width="@dimen/_15sdp"
+                android:layout_height="@dimen/_15sdp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="@dimen/_10sdp"
@@ -62,11 +62,11 @@
             <EditText
                 android:id="@+id/eSearchCustomer"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_20sdp"
+                android:layout_height="@dimen/_15sdp"
                 android:layout_alignBaseline="@+id/ibtn_frag_thanhtoan_qrcode"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_margin="@dimen/_3sdp"
+                android:layout_margin="@dimen/_2sdp"
                 android:layout_toLeftOf="@+id/btnScanCode"
                 android:layout_toStartOf="@+id/btnScanCode"
                 android:background="@drawable/bg_edittext"
@@ -108,7 +108,7 @@
                 <EditText
                     android:id="@+id/eSearchTen"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_20sdp"
+                    android:layout_height="@dimen/_15sdp"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:layout_weight="1"
@@ -116,7 +116,7 @@
                     android:imeOptions="actionSearch"
                     android:inputType="textNoSuggestions|textVisiblePassword"
                     android:lines="1"
-                    android:padding="10dp"
+                    android:padding="@dimen/_3sdp"
                     android:textSize="@dimen/_8sdp"
                     android:scrollHorizontally="true"
                     android:text="" />
@@ -141,7 +141,7 @@
                 <EditText
                     android:id="@+id/eSearchAddress"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_20sdp"
+                    android:layout_height="@dimen/_15sdp"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:textSize="@dimen/_8sdp"
@@ -174,7 +174,7 @@
                 <EditText
                     android:id="@+id/eSearchDT"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_20sdp"
+                    android:layout_height="@dimen/_15sdp"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:textSize="@dimen/_8sdp"
@@ -208,7 +208,7 @@
                 <EditText
                     android:id="@+id/eSearchBookCmis"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_20sdp"
+                    android:layout_height="@dimen/_15sdp"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:layout_weight="1"
@@ -233,7 +233,7 @@
 
             <ImageButton
                 android:id="@+id/btnExpand"
-                android:layout_width="@dimen/_15sdp"
+                android:layout_width="@dimen/_10sdp"
                 android:layout_height="@dimen/_10sdp"
                 android:layout_alignParentTop="true"
                 android:layout_centerInParent="true"
@@ -258,7 +258,7 @@
                 <Button
                     android:id="@+id/btnSearch2"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_20sdp"
+                    android:layout_height="@dimen/_15sdp"
                     android:layout_marginLeft="@dimen/_10sdp"
                     android:layout_marginRight="@dimen/_10sdp"
                     android:layout_weight="1"

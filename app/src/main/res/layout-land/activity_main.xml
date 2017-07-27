@@ -13,7 +13,7 @@
     <com.roughike.bottombar.BottomBar
         android:id="@+id/navigation_ac_main"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_30sdp"
+        android:layout_height="@dimen/_25sdp"
         android:layout_alignParentBottom="true"
         android:backgroundTint="@color/colorPrimary"
         app:bb_badgeBackgroundColor="@color/colorPrimary"
