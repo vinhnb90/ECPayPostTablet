@@ -2,6 +2,7 @@ package views.ecpay.com.postabletecpay.view.TrangChu;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -183,6 +184,15 @@ public class CashTranferFragment extends Fragment implements View.OnClickListene
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        ViewGroup viewGroup = (ViewGroup) getView();
+        assert viewGroup != null;
+        viewGroup.removeAllViewsInLayout();
+        View view = onCreateView(getActivity().getLayoutInflater(), viewGroup, null); viewGroup.addView(view);
     }
 
     @Override

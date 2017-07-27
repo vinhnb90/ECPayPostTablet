@@ -36,7 +36,9 @@ import views.ecpay.com.postabletecpay.util.commons.Common;
 import views.ecpay.com.postabletecpay.view.BaoCao.BaoCaoFragment;
 import views.ecpay.com.postabletecpay.view.TaiKhoan.UserInfoFragment;
 import views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment;
+import views.ecpay.com.postabletecpay.view.TrangChu.CashTranferFragment;
 import views.ecpay.com.postabletecpay.view.TrangChu.MainPageFragment;
+import views.ecpay.com.postabletecpay.view.TrangChu.SearchCustomerFragment;
 
 import static views.ecpay.com.postabletecpay.util.commons.Common.KEY_EDONG;
 import static views.ecpay.com.postabletecpay.view.ThanhToan.PayFragment.REQUEST_BARCODE;
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements
     private ProgressDialog progressDialog;
     private Handler progressBarHandler = new Handler();
 
-    private String showProgress = "SHOW_DIALOG" ;
+    private String showProgress = "SHOW_DIALOG";
     private Handler mHander = new Handler();
     private Runnable mRunableCheckPostBill = new Runnable() {
         @Override
@@ -74,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements
                         MainActivity.this.finish();
                     }
                 }
-           }
+            }
             if (posted)
                 hasNetworkLast = currentConnect;
             if (mHander != null && mRunableCheckPostBill != null)
@@ -181,10 +183,9 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void startActivityResult(IBluetoothPresenter iBluetoothPresenter, Intent intent, int requestCode)
-    {
+    public void startActivityResult(IBluetoothPresenter iBluetoothPresenter, Intent intent, int requestCode) {
         this.iBluetoothPresenter = iBluetoothPresenter;
-        startActivityForResult(intent,requestCode);
+        startActivityForResult(intent, requestCode);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -308,14 +309,26 @@ public class MainActivity extends AppCompatActivity implements
         sNavigation.setOnTabReselectListener(new OnTabReselectListener() {
             @Override
             public void onTabReSelected(@IdRes int tabId) {
+                switch (tabId) {
+                    case R.id.navigation_home:
+                        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+                        if (fragment instanceof CashTranferFragment || fragment instanceof SearchCustomerFragment) {
+                            fragment = MainPageFragment.newInstance(mEdong);
+                            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                            fragmentTransaction.replace(R.id.frameLayout, fragment);
+                            fragmentTransaction.commit();
+                        }
+                        break;
+                }
             }
         });
     }
+
     @Override
     public void onRestoreInstanceState(Bundle state) {
         super.onRestoreInstanceState(state);
-        if (state != null){
-            if (state.getBoolean(showProgress) && progressDialog.isShowing()){
+        if (state != null) {
+            if (state.getBoolean(showProgress) && progressDialog.isShowing()) {
                 startShowPbarDownload();
             }
         }
@@ -409,9 +422,9 @@ public class MainActivity extends AppCompatActivity implements
                 return;
             }
         }
-        if (requestCode == PayFragment.REQUEST_ENABLE_BT){
-            if (iBluetoothPresenter != null){
-                iBluetoothPresenter.getOnActivityResult(requestCode,resultCode,data);
+        if (requestCode == PayFragment.REQUEST_ENABLE_BT) {
+            if (iBluetoothPresenter != null) {
+                iBluetoothPresenter.getOnActivityResult(requestCode, resultCode, data);
             }
         }
     }
