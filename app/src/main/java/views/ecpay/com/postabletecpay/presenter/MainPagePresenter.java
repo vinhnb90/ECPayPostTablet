@@ -48,9 +48,8 @@ public class MainPagePresenter implements IMainPagePresenter {
 
         try {
             Common.deleteAllFileFolderDownload();
-            Common.loadFolder((MainActivity)mIMainPageView.getContextView());
-        }catch (Exception e)
-        {
+            Common.loadFolder((MainActivity) mIMainPageView.getContextView());
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -62,8 +61,10 @@ public class MainPagePresenter implements IMainPagePresenter {
     @Override
     public void callInfoMain(String edong) {
         Account account = mainPageModel.getAccountInfo(edong);
+        if (account == null)
+            return;
         int countTotalBill = mainPageModel.getTotalBill(edong);
-        int countTotalMoney = mainPageModel.getTotalMoney(edong);
+        long countTotalMoney = mainPageModel.getTotalMoney(edong);
 
         mIMainPageView.showMainPageInfo(account.getName(), account.getBalance(), countTotalBill, countTotalMoney);
     }
@@ -127,7 +128,7 @@ public class MainPagePresenter implements IMainPagePresenter {
 
             final String maKH = "";
             final String soTien = "";
-            final  String kyPhatSinh = "";
+            final String kyPhatSinh = "";
             Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.LOGOUT, true);
             SoapAPI.AsyncSoapLogout.AsyncSoapLogoutCallBack asyncSoapLogoutCallBack = new SoapAPI.AsyncSoapLogout.AsyncSoapLogoutCallBack() {
                 private String edong;
@@ -183,7 +184,7 @@ public class MainPagePresenter implements IMainPagePresenter {
                     String moTaLoi = "";
                     if (response.getFooter() != null) {
                         maLoi = response.getFooter().getResponseCode();
-                        moTaLoi =  response.getFooter().getDescription();
+                        moTaLoi = response.getFooter().getDescription();
                     }
 
                     try {
@@ -225,7 +226,6 @@ public class MainPagePresenter implements IMainPagePresenter {
                     });
                 }
             };
-
 
 
             if (soapLogout == null) {

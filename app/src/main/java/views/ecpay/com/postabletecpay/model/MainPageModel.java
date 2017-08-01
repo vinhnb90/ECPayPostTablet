@@ -25,7 +25,7 @@ public class MainPageModel extends CommonModel {
         return sqLiteConnection.countBill(edong);
     }
 
-    public int getTotalMoney(String edong) {
+    public long getTotalMoney(String edong) {
         return sqLiteConnection.countMoneyAllBill(edong);
     }
 

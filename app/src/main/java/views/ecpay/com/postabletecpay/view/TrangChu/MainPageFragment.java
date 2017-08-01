@@ -340,7 +340,7 @@ public class MainPageFragment extends Fragment implements
 
     //region IMainPageView
     @Override
-    public void showMainPageInfo(String userName, long balance, int totalBills, int totalMoney) {
+    public void showMainPageInfo(String userName, long balance, int totalBills, long totalMoney) {
         if (userName == null)
             userName = TEXT_EMPTY;
         try {

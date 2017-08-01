@@ -151,8 +151,6 @@ public class LoginPresenter implements ILoginPresenter {
             Common.writeLogUser(soViQuay, "", "", "", "", "", Common.COMMAND_ID.LOGIN, true);
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
-            Common.loadFolder((LoginActivity)mILoginView.getContextView());
         }
 
         if (jsonRequestLogin != null) {
@@ -192,7 +190,6 @@ public class LoginPresenter implements ILoginPresenter {
                                 Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
                             }
                             finally {
-                                Common.loadFolder((LoginActivity)mILoginView.getContextView());
                             }
                             return;
                         }
@@ -210,7 +207,6 @@ public class LoginPresenter implements ILoginPresenter {
                             Log.e(TAG, "doInBackground: Lỗi khi không tạo được file log");
                         }
                         finally {
-                            Common.loadFolder((LoginActivity)mILoginView.getContextView());
                         }
 
                         mILoginView.showRespone(response.getFooterLoginResponse().getResponseCode(), response.getFooterLoginResponse().getDescription());
