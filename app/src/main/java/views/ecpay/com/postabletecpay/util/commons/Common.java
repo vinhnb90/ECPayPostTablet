@@ -88,6 +88,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import views.ecpay.com.postabletecpay.Config.Config;
 import views.ecpay.com.postabletecpay.R;
 import views.ecpay.com.postabletecpay.util.AlgorithmRSA.AsymmetricCryptography;
 import views.ecpay.com.postabletecpay.util.DialogHelper.Inteface.IActionClickYesNoDialog;
@@ -2903,6 +2904,8 @@ public class Common {
     }
 
     public static void writeLog(String text, String nameAPI, boolean isRequest) throws Exception {
+        if (!Config.isShowRespone())
+            return;
         try {
             File fileLog = new File(PATH_FOLDER_LOG + Common.LOG_FILENAME);
             if (!fileLog.exists())
@@ -2953,9 +2956,9 @@ public class Common {
             writer.println("====================" + maGiaoDich.toString() + "===================");
             writer.println("====================================================");
             if (isRequest) {
-                writer.println(" \n Request tới server" + maGiaoDich);
+                writer.println(" \n Request tới server " + maGiaoDich);
             } else
-                writer.println(" \n Response từ server" + maGiaoDich);
+                writer.println(" \n Response từ server " + maGiaoDich);
             writer.println("====================================================");
             writer.print("\n");
             writer.println("---Số ví quầy: " + soViQuay);

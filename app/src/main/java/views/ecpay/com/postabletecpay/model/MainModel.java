@@ -42,7 +42,7 @@ public class MainModel extends CommonModel {
         return sqLiteConnection.countBill(edong);
     }
 
-    public int getTotalMoney(String edong) {
+    public long getTotalMoney(String edong) {
         return sqLiteConnection.countMoneyAllBill(edong);
     }
 
@@ -186,7 +186,7 @@ public class MainModel extends CommonModel {
                                 String TRANG_THAI_CHAM_NO, String TRANG_THAI_DAY_CHAM_NO, String NGAY_DAY, String TRANG_THAI_HOAN_TRA)
     {
         sqLiteConnection.updateHoaDonThu( MA_HOA_DON,  VI_TTOAN, TRANG_THAI_TTOAN,
-                 TRANG_THAI_CHAM_NO,  TRANG_THAI_DAY_CHAM_NO,  NGAY_DAY,  TRANG_THAI_HOAN_TRA);
+                TRANG_THAI_CHAM_NO,  TRANG_THAI_DAY_CHAM_NO,  NGAY_DAY,  TRANG_THAI_HOAN_TRA);
     }
 
     public Cursor getCursorEvnPc(String edong) {

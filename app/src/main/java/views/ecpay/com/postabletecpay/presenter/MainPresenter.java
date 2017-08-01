@@ -180,7 +180,7 @@ public class MainPresenter implements IMainPresenter {
 
         final String maKH = "";
         final String soTien = "";
-        final  String kyPhatSinh = "";
+        final String kyPhatSinh = "";
 
         Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.GET_BOOK_CMIS_BY_CASHIER, true);
         SoapAPI.SoapGetBookCMIS soapSynchronizePC = new SoapAPI.SoapGetBookCMIS(mIMainView);
@@ -421,9 +421,9 @@ public class MainPresenter implements IMainPresenter {
         if (jsonRequestZipData == null) {
             return null;
         }
-        final String maKH ="";
+        final String maKH = "";
         final String soTien = "";
-        final  String kyPhatSinh = "";
+        final String kyPhatSinh = "";
         Common.writeLogUser(MainActivity.mEdong, maKH, soTien, kyPhatSinh, "", "", Common.COMMAND_ID.GET_FILE_GEN, true);
         SoapAPI.AsyncSoapSynchronizeDataZip soapSynchronizeDataZip = new SoapAPI.AsyncSoapSynchronizeDataZip(mIMainView);
         soapSynchronizeDataZip.execute(jsonRequestZipData);
@@ -645,7 +645,7 @@ public class MainPresenter implements IMainPresenter {
                     //endregion
 
                     //region Xử lý đồng bộ thông tin điện lực
-                     getPCInfoRespone = syncPcEVN(listEvnPc);
+                    getPCInfoRespone = syncPcEVN(listEvnPc);
                     //endregion
 
                     //region Xử lý đồng bộ file
@@ -661,12 +661,21 @@ public class MainPresenter implements IMainPresenter {
                         try {
                             dataFileGen = syncFileGen(listBookCmisNeedDownload.get(i - 1));
                         } catch (Exception e) {
-                            Log.e(TAG_SYNC_GET_FILE, "không download được file " + listBookCmisNeedDownload.get(i - 1).getBookCmis());
+                            Log.e(TAG_SYNC_GET_FILE, "lỗi không download được file " + listBookCmisNeedDownload.get(i - 1).getPcCode() + " " + listBookCmisNeedDownload.get(i - 1).getBookCmis());
+                            break;
+                        }
+
+                        if (dataFileGen == null) {
+                            Log.e(TAG_SYNC_GET_FILE, "dataFileGen null không download được file " + listBookCmisNeedDownload.get(i - 1).getPcCode() + " " + listBookCmisNeedDownload.get(i - 1).getBookCmis());
                             break;
                         }
                         listGetFile.add(dataFileGen);
 
                         //Thao tác với file
+                        if (dataFileGen.getBodyListDataResponse() == null)
+                            break;
+                        if (dataFileGen.getBodyListDataResponse().getFile_data() == null)
+                            break;
                         String bookCmis = listBookCmisNeedDownload.get(i - 1).getBookCmis();
                         String sData = dataFileGen.getBodyListDataResponse().getFile_data();
                         if (sData.isEmpty() || sData.isEmpty()) {
@@ -700,8 +709,17 @@ public class MainPresenter implements IMainPresenter {
                                             gson = gsonBuilder.create();
                                             FileGenResponse fileGenResponse = gson.fromJson(ja.toString(), FileGenResponse.class);
 
+                                            if (fileGenResponse == null) {
+                                                Log.e(TAG_SYNC_GET_FILE, "fileGenResponse null");
+                                                break;
+                                            }
+
+                                            Long idChanged = new Long(0);
+                                            if (fileGenResponse.getId_changed() != null) {
+                                                idChanged = fileGenResponse.getId_changed();
+                                            }
                                             //set các tham số id_change
-                                            mainModel.setChangedGenFile(edong, bookCmis, fileGenResponse.getId_changed(), fileGenResponse.getDate_changed());
+                                            mainModel.setChangedGenFile(edong, bookCmis, idChanged, fileGenResponse.getDate_changed());
 
                                             for (ListCustomerResponse listCustomerResponse : fileGenResponse.getCustomerResponse()) {
                                                 if (listCustomerResponse.getBodyCustomerResponse() == null) {
@@ -750,13 +768,6 @@ public class MainPresenter implements IMainPresenter {
                             }
                         } catch (Exception e) {
                             throw e;
-                        } finally {
-                            ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mIMainView.refreshInfoMain();
-                                }
-                            });
                         }
 
                         int statusProcess = (i * 100) / listBook.size();
@@ -784,21 +795,36 @@ public class MainPresenter implements IMainPresenter {
                         try {
                             dataSync = syncData(listBookCmis.get(index - 1));
                         } catch (Exception e) {
-                            Log.e(TAG_SYNC_GET_FILE, "không download được file " + listBookCmis.get(index - 1).getBookCmis());
+                            Log.e(TAG_SYNC_GET_FILE, "không lấy được dữ liệu mới nhất " + listBookCmis.get(index - 1).getBookCmis());
                             break;
                         }
 
                         try {
                             //Thao tác với dữ liệu tải về
                             //check code response
+                            if (dataSync == null) {
+                                Log.e(TAG_SYNC_GET_FILE, "dataSync null không lấy được dữ liệu mới nhất  " + listBookCmisNeedDownload.get(index - 1).getBookCmis());
+                                break;
+                            }
+                            if (dataSync.getFooterListDataResponse() == null)
+                                break;
+                            if (dataSync.getFooterListDataResponse().getResponse_code() == null)
+                                break;
                             String responseCode = dataSync.getFooterListDataResponse().getResponse_code();
                             if (!responseCode.equals(Common.CODE_REPONSE_SYNC_DATA.e000.getCode())) {
-                                throw new Exception("Common.CODE_REPONSE_SYNC_DATA.findCodeMessage(responseCode).getMessage()");
+                                Log.e(TAG_SYNC_DATA, "responseCode = " + Common.CODE_REPONSE_SYNC_DATA.findCodeMessage(responseCode).getMessage());
+                                break;
                             }
 
+                            if (dataSync.getBodyListDataResponse() == null)
+                                break;
+                            if (dataSync.getBodyListDataResponse().getCustomer() == null)
+                                break;
+
                             String sDataCustomer = dataSync.getBodyListDataResponse().getCustomer();
-                            if (sDataCustomer.isEmpty()) {
-                                throw new Exception("sDataCustomer empty!");
+                            if (TextUtils.isEmpty(sDataCustomer)) {
+                                Log.e(TAG_SYNC_DATA, "sDataCustomer empty!");
+                                break;
                             }
 
 //                            String compress = Gzip.compress(sDataCustomer);
@@ -811,9 +837,14 @@ public class MainPresenter implements IMainPresenter {
                                 gsonBuilder = new GsonBuilder();
                                 gson = gsonBuilder.create();
                                 CustomerResponse customerResponse = gson.fromJson(ja.toString(), CustomerResponse.class);
-                                String customerCode = customerResponse.getBodyCustomerResponse().getCustomerCode();
 
-                                if (customerCode.isEmpty()) {
+                                if (customerResponse == null)
+                                    break;
+                                if (customerResponse.getBodyCustomerResponse() == null)
+                                    break;
+
+                                String customerCode = customerResponse.getBodyCustomerResponse().getCustomerCode();
+                                if (TextUtils.isEmpty(customerCode)) {
                                     Log.e(TAG_SYNC_DATA, "customerCode isEmpty");
                                     break;
                                 }
@@ -829,10 +860,13 @@ public class MainPresenter implements IMainPresenter {
                                 }
                             }
 
+                            if (dataSync.getBodyListDataResponse() == null)
+                                break;
 
                             String sDataBill = dataSync.getBodyListDataResponse().getBill();
-                            if (sDataBill.isEmpty()) {
-                                throw new Exception("sDataBill is isEmpty!");
+                            if (TextUtils.isEmpty(sDataBill)) {
+                                Log.e(TAG_SYNC_DATA, "dữ liệu sDataBill syncData rỗng! " +  listBookCmis.get(index - 1).getPcCode() + " " + listBookCmis.get(index - 1).getBookCmis() + " " + dataSync.getBodyListDataResponse().getCustomer());
+                                break;
                             }
 
                             byte[] zipByteBill = Base64.decodeBase64(sDataBill.getBytes());
@@ -844,12 +878,17 @@ public class MainPresenter implements IMainPresenter {
                                 gsonBuilder = new GsonBuilder();
                                 gson = gsonBuilder.create();
                                 BillResponse billResponse = gson.fromJson(ja.toString(), BillResponse.class);
+                                if (billResponse == null)
+                                    break;
+                                if (billResponse.getBodyBillResponse() == null)
+                                    break;
+
                                 billResponse.getBodyBillResponse().setEdong(MainActivity.mEdong);
 
                                 String billID = billResponse.getBodyBillResponse().getBillId();
 
-                                if (billID.isEmpty()) {
-                                    Log.e(TAG_SYNC_DATA, "billID.isEmpty()");
+                                if (TextUtils.isEmpty(billID)) {
+                                    Log.e(TAG_SYNC_DATA, "Trường billID không có " + billResponse.getBodyBillResponse().getPcCode() + " tại sổ: " + billResponse.getBodyBillResponse().getBookCmis() + " có mã KH: " + billResponse.getBodyBillResponse().getCustomerCode());
                                     break;
                                 }
 
@@ -869,15 +908,7 @@ public class MainPresenter implements IMainPresenter {
                             throw e;
                         } catch (Exception e) {
                             throw e;
-                        } finally {
-                            ((MainActivity) mIMainView.getContextView()).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mIMainView.refreshInfoMain();
-                                }
-                            });
                         }
-
                         int statusProcess = (index * 100) / listBook.size();
                         mIMainView.updatePbarDownload(Common.STATUS_DOWNLOAD.SYNC_DATA_START.getTitle(), statusProcess);
                         Thread.sleep(timeDelayElement);
@@ -897,11 +928,6 @@ public class MainPresenter implements IMainPresenter {
                     Log.e(TAG_SYNC, "Lỗi trong quá trình đồng bộ và đẩy chấm nợ offline" + e.getMessage());
                 } finally {
                     //kết thúc download
-                    try {
-                        Thread.sleep(TIME_DELAY_DOWNLOAD);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                     mIMainView.finishHidePbarDownload();
                 }
             }

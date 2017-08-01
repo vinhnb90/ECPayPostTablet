@@ -100,7 +100,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     private String CREATE_TABLE_BILL = "CREATE TABLE `" + TABLE_NAME_BILL + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, `SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
             "`MA_THE` TEXT, `TEN_KHANG` TEXT, `DIA_CHI` TEXT, `THANG_TTOAN` DATE, `PHIEN_TTOAN` TEXT, `SO_TIEN_TTOAN` INTEGER, " +
             "`SO_GCS` TEXT, `DIEN_LUC` TEXT, `SO_HO` TEXT, `SO_DAU_KY` TEXT, `SO_CUOI_KY` TEXT, `SO_CTO` TEXT, `SDT_ECPAY` TEXT, " +
-            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT, `CHI_TIET_KG` TEXT, `CHI_TIET_MCS` TEXT, `CHI_TIET_TIEN_MCS` TEXT, `DNTT` TEXT,"+
+            "`SDT_EVN` TEXT, `GIAO_THU` TEXT, `NGAY_GIAO_THU` DATE, `TRANG_THAI_TTOAN` TEXT, `VI_TTOAN` TEXT, `CHI_TIET_KG` TEXT, `CHI_TIET_MCS` TEXT, `CHI_TIET_TIEN_MCS` TEXT, `DNTT` TEXT," +
             "`TONG_TIEN_CHUA_THUE` INTEGER, `TIEN_THUE` INTEGER, `TEN_DIEN_LUC` TEXT, `TU_NGAY` TEXT, `DEN_NGAY` TEXT)";
 
     private String CREATE_TABLE_DEBT_COLLECTION = "CREATE TABLE `" + TABLE_NAME_DEBT_COLLECTION + "` ( `ID` INTEGER PRIMARY KEY AUTOINCREMENT , `E_DONG` TEXT, `MA_HOA_DON` TEXT, `SERI_HDON` TEXT, `MA_KHANG` TEXT, " +
@@ -279,67 +279,72 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             return null;
 
         database = getReadableDatabase();
-        Cursor mCursor =
-                database.query(true, TABLE_NAME_ACCOUNT, new String[]{
-                                "edong",
-                                "name",
-                                "address",
-                                "phone",
-                                "email",
-                                "birthday",
-                                "session",
-                                "balance",
-                                "lockMoney",
-                                "changePIN",
-                                "verified",
-                                "mac",
-                                "ip",
-                                "strLoginTime",
-                                "strLogoutTime",
-                                "type",
-                                "status",
-                                "idNumber",
-                                "idNumberDate",
-                                "idNumberPlace",
-                                "parentEdong",
-                                "notYetPushMoney"
-                        },
-                        "edong =?",
-                        new String[]{edong},
-                        null, null, null, null);
 
+        Cursor mCursor = null;
         Account account = null;
-        if (mCursor.moveToFirst()) {
+        try {
+            mCursor = database.query(true, TABLE_NAME_ACCOUNT, new String[]{
+                            "edong",
+                            "name",
+                            "address",
+                            "phone",
+                            "email",
+                            "birthday",
+                            "session",
+                            "balance",
+                            "lockMoney",
+                            "changePIN",
+                            "verified",
+                            "mac",
+                            "ip",
+                            "strLoginTime",
+                            "strLogoutTime",
+                            "type",
+                            "status",
+                            "idNumber",
+                            "idNumberDate",
+                            "idNumberPlace",
+                            "parentEdong",
+                            "notYetPushMoney"
+                    },
+                    "edong =?",
+                    new String[]{edong},
+                    null, null, null, null);
 
-            account = new Account(
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edong"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("address"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phone"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("email"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("birthday"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("session"))),
-                    longConvertNull(mCursor.getLong(mCursor.getColumnIndex("balance"))),
-                    intConvertNull(mCursor.getInt(mCursor.getColumnIndex("lockMoney"))),
-                    (mCursor.getInt(mCursor.getColumnIndex("changePIN")) == 1) ? true : false,
-                    intConvertNull(mCursor.getInt(mCursor.getColumnIndex("verified"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("mac"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("ip"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strLoginTime"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strLogoutTime"))),
-                    intConvertNull(mCursor.getInt(mCursor.getColumnIndex("type"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("status"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idNumber"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idNumberDate"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idNumberPlace"))),
-                    stringConvertNull(mCursor.getString(mCursor.getColumnIndex("parentEdong")))
+            if (mCursor.moveToFirst()) {
+
+                account = new Account(
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("edong"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("name"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("address"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("phone"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("email"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("birthday"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("session"))),
+                        longConvertNull(mCursor.getLong(mCursor.getColumnIndex("balance"))),
+                        intConvertNull(mCursor.getInt(mCursor.getColumnIndex("lockMoney"))),
+                        (mCursor.getInt(mCursor.getColumnIndex("changePIN")) == 1) ? true : false,
+                        intConvertNull(mCursor.getInt(mCursor.getColumnIndex("verified"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("mac"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("ip"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strLoginTime"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("strLogoutTime"))),
+                        intConvertNull(mCursor.getInt(mCursor.getColumnIndex("type"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("status"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idNumber"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idNumberDate"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("idNumberPlace"))),
+                        stringConvertNull(mCursor.getString(mCursor.getColumnIndex("parentEdong")))
 //                    ,  intConvertNull(mCursor.getInt(mCursor.getColumnIndex("notYetPushMoney")))
-            );
-        }
+                );
+            }
 
-        if (mCursor != null && !mCursor.isClosed()) {
+        } catch (Exception e) {
+
+        } finally {
             mCursor.close();
         }
+
         return account;
     }
 
@@ -710,20 +715,24 @@ public class SQLiteConnection extends SQLiteOpenHelper {
             return 0;
 
         database = this.getReadableDatabase();
-
+        Cursor mCursor = null;
+        int count = 0;
 //        String query = "SELECT COUNT(*) AS COUNT FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "' " +
 //                " and TRANG_THAI_TTOAN = '" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "'";// + "' and status = " + ZERO;
+        try {
+            String query = "SELECT COUNT(*) AS COUNT FROM(SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and TRANG_THAI_TTOAN ='" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "' ) AS BILL " +
+                    "JOIN (SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "') AS CUSTOMER ON BILL.MA_KHANG = CUSTOMER.MA_KHANG";
+            mCursor = database.rawQuery(query, null);
+            count = mCursor.getCount();
+            if (count != ZERO) {
+                mCursor.moveToFirst();
+                count = Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT")));
+            }
+        } catch (Exception e) {
 
-        String query = "SELECT COUNT(*) AS COUNT FROM(SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and TRANG_THAI_TTOAN ='" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "' ) AS BILL " +
-                "JOIN (SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "') AS CUSTOMER ON BILL.MA_KHANG = CUSTOMER.MA_KHANG";
-        Cursor mCursor = database.rawQuery(query, null);
-        int count = mCursor.getCount();
-        if (count != ZERO) {
-            mCursor.moveToFirst();
-            count = Integer.parseInt(mCursor.getString(mCursor.getColumnIndex("COUNT")));
-        }
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
+        } finally {
+            if (mCursor != null)
+                mCursor.close();
         }
         return count;
     }
@@ -950,7 +959,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 whereQuery2 = " t2.E_DONG = '" + edong + "' and t2.MA_KHANG like '%" + infoSearch + "%'";
                 break;
             case 2:
-                whereQuery1 = " t1.E_DONG = '" + edong + "' and (t1.TEN_KHANG like '%" + infoSearch + "%' OR t1.TEN_KHANG_KHONG_DAU like '%"+ infoSearch + "%' ) ";
+                whereQuery1 = " t1.E_DONG = '" + edong + "' and (t1.TEN_KHANG like '%" + infoSearch + "%' OR t1.TEN_KHANG_KHONG_DAU like '%" + infoSearch + "%' ) ";
                 whereQuery2 = " t2.E_DONG = '" + edong + "' and (t2.TEN_KHANG like '%" + infoSearch + "%' OR t2.TEN_KHANG_KHONG_DAU like '% " + infoSearch + "%' ) ";
                 break;
             case 3:
@@ -958,7 +967,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
                 whereQuery2 = " t2.E_DONG = '" + edong + "' and t2.SDT_EVN like '%" + infoSearch + "%'";
                 break;
             case 4:
-                whereQuery1 = " t1.E_DONG = '" + edong + "' and (t1.DIA_CHI like '%" + infoSearch + "%' OR t1.DIA_CHI_KHONG_DAU like '%" +infoSearch +"%' ) ";
+                whereQuery1 = " t1.E_DONG = '" + edong + "' and (t1.DIA_CHI like '%" + infoSearch + "%' OR t1.DIA_CHI_KHONG_DAU like '%" + infoSearch + "%' ) ";
                 whereQuery2 = " t2.E_DONG = '" + edong + "' and (t2.DIA_CHI like '%" + infoSearch + "%' OR t2.DIA_CHI_KHONG_DAU like '%" + infoSearch + "%' ) ";
                 break;
             case 5:
@@ -1033,7 +1042,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         }
 
         if (_name.length() > 0) {
-            query += (hasWhere ? "and " : "") + "(TEN_KHANG like '%" + _name + "%' OR TEN_KHANG_KHONG_DAU like '%"+ _name + "%' )";
+            query += (hasWhere ? "and " : "") + "(TEN_KHANG like '%" + _name + "%' OR TEN_KHANG_KHONG_DAU like '%" + _name + "%' )";
             hasWhere = true;
         }
 
@@ -1285,24 +1294,24 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         return new Pair<>(billList, total);
     }
 
-    public int countMoneyAllBill(String edong) {
+    public long countMoneyAllBill(String edong) {
         database = this.getReadableDatabase();
-//        String query = "SELECT  FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and GIAO_THU = '" + Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode() + "' " +
-//                " and TRANG_THAI_TTOAN = '" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "'";// and status = " + ZERO;
+        Cursor mCursor = null;
+        long totalMoney = 0;
 
-        String query = "SELECT SUM(SO_TIEN_TTOAN) FROM(SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and TRANG_THAI_TTOAN ='" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "' ) AS BILL " +
-                "JOIN (SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "') AS CUSTOMER ON BILL.MA_KHANG = CUSTOMER.MA_KHANG";
+        try {
+            String query = "SELECT SUM(SO_TIEN_TTOAN) FROM(SELECT * FROM " + TABLE_NAME_BILL + " WHERE E_DONG = '" + edong + "' and TRANG_THAI_TTOAN ='" + Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode() + "' ) AS BILL " +
+                    "JOIN (SELECT * FROM " + TABLE_NAME_CUSTOMER + " WHERE E_DONG = '" + edong + "') AS CUSTOMER ON BILL.MA_KHANG = CUSTOMER.MA_KHANG";
+            mCursor = database.rawQuery(query, null);
+            if (mCursor.moveToFirst())
+                totalMoney = mCursor.getLong(0);
+            else
+                totalMoney = ERROR_OCCUR;
 
-
-        Cursor mCursor = database.rawQuery(query, null);
-        int totalMoney = ERROR_OCCUR;
-        if (mCursor.moveToFirst())
-            totalMoney = mCursor.getInt(0);
-        else
-            totalMoney = ERROR_OCCUR;
-
-        if (mCursor != null && !mCursor.isClosed()) {
-            mCursor.close();
+        } catch (Exception e) {
+        } finally {
+            if (mCursor != null)
+                mCursor.close();
         }
         return totalMoney;
     }
@@ -1411,8 +1420,7 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
         String qqqq = "";
 
-        for (int i = 0, n = bills.size(); i < n; i ++)
-        {
+        for (int i = 0, n = bills.size(); i < n; i++) {
             qqqq += " AND MA_HOA_DON != '" + bills.get(i) + "'";
         }
 
@@ -1505,7 +1513,6 @@ public class SQLiteConnection extends SQLiteOpenHelper {
         }
         return billList;
     }
-
 
 
     public String selectSessionAccount(String edong) {
@@ -1758,54 +1765,64 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
     public long insertCustomer(CustomerResponse customerResponse) {
-        ContentValues initialValues = new ContentValues();
+        int rowAffect = -1;
+        try {
+            ContentValues initialValues = new ContentValues();
 
-        views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.BodyCustomerResponse bodyCustomerResponse = customerResponse.getBodyCustomerResponse();
+            views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.BodyCustomerResponse bodyCustomerResponse = customerResponse.getBodyCustomerResponse();
 
-        initialValues.put("MA_KHANG", bodyCustomerResponse.getCustomerCode());
-        initialValues.put("TEN_KHANG", bodyCustomerResponse.getName());
-        initialValues.put("MA_THE", bodyCustomerResponse.getCardNo());
-        initialValues.put("DIA_CHI", bodyCustomerResponse.getAddress());
-        initialValues.put("PHIEN_TTOAN", bodyCustomerResponse.getInning());
-        initialValues.put("LO_TRINH", bodyCustomerResponse.getRoad());
-        initialValues.put("SO_GCS", bodyCustomerResponse.getBookCmis());
-        initialValues.put("DIEN_LUC", bodyCustomerResponse.getPcCode());
-        initialValues.put("SO_HO", "");
-        initialValues.put("E_DONG", MainActivity.mEdong);
-        initialValues.put("SDT_ECPAY", bodyCustomerResponse.getPhoneByECP());
-        initialValues.put("SDT_EVN", bodyCustomerResponse.getPhoneByEVN());
-        initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
-        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
-        initialValues.put("TEN_KHANG_KHONG_DAU", bodyCustomerResponse.getNameNosign());
-        initialValues.put("DIA_CHI_KHONG_DAU", bodyCustomerResponse.getAddressNosign());
+            initialValues.put("MA_KHANG", bodyCustomerResponse.getCustomerCode());
+            initialValues.put("TEN_KHANG", bodyCustomerResponse.getName());
+            initialValues.put("MA_THE", bodyCustomerResponse.getCardNo());
+            initialValues.put("DIA_CHI", bodyCustomerResponse.getAddress());
+            initialValues.put("PHIEN_TTOAN", bodyCustomerResponse.getInning());
+            initialValues.put("LO_TRINH", bodyCustomerResponse.getRoad());
+            initialValues.put("SO_GCS", bodyCustomerResponse.getBookCmis());
+            initialValues.put("DIEN_LUC", bodyCustomerResponse.getPcCode());
+            initialValues.put("SO_HO", "");
+            initialValues.put("E_DONG", MainActivity.mEdong);
+            initialValues.put("SDT_ECPAY", bodyCustomerResponse.getPhoneByECP());
+            initialValues.put("SDT_EVN", bodyCustomerResponse.getPhoneByEVN());
+            initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
+            initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL));
+            initialValues.put("TEN_KHANG_KHONG_DAU", bodyCustomerResponse.getNameNosign());
+            initialValues.put("DIA_CHI_KHONG_DAU", bodyCustomerResponse.getAddressNosign());
 
-        database = getWritableDatabase();
-        int rowAffect = (int) database.insert(TABLE_NAME_CUSTOMER, null, initialValues);
+            database = getWritableDatabase();
+            rowAffect = (int) database.insertOrThrow(TABLE_NAME_CUSTOMER, null, initialValues);
+        } catch (Exception e) {
+            Log.e(TAG, "insertCustomer: ");
+        }
         return rowAffect;
     }
 
 
     public long updateCustomer(CustomerResponse customerResponse) {
-        ContentValues initialValues = new ContentValues();
+        int rowAffect = -1;
+        try {
+            ContentValues initialValues = new ContentValues();
 
-        views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.BodyCustomerResponse bodyCustomerResponse = customerResponse.getBodyCustomerResponse();
+            views.ecpay.com.postabletecpay.util.entities.response.EntityCustomer.BodyCustomerResponse bodyCustomerResponse = customerResponse.getBodyCustomerResponse();
 
-        initialValues.put("TEN_KHANG", bodyCustomerResponse.getName());
-        initialValues.put("TEN_KHANG_KHONG_DAU", bodyCustomerResponse.getNameNosign());
-        initialValues.put("DIA_CHI_KHONG_DAU", bodyCustomerResponse.getAddressNosign());
-        initialValues.put("MA_THE", bodyCustomerResponse.getCardNo());
-        initialValues.put("DIA_CHI", bodyCustomerResponse.getAddress());
-        initialValues.put("PHIEN_TTOAN", bodyCustomerResponse.getInning());
-        initialValues.put("LO_TRINH", bodyCustomerResponse.getRoad());
-        initialValues.put("SO_GCS", bodyCustomerResponse.getBookCmis());
-        initialValues.put("DIEN_LUC", bodyCustomerResponse.getPcCode());
-        initialValues.put("SO_HO", "");
-        initialValues.put("E_DONG", MainActivity.mEdong);
-        initialValues.put("SDT_ECPAY", bodyCustomerResponse.getPhoneByECP());
-        initialValues.put("SDT_EVN", bodyCustomerResponse.getPhoneByEVN());
+            initialValues.put("TEN_KHANG", bodyCustomerResponse.getName());
+            initialValues.put("TEN_KHANG_KHONG_DAU", bodyCustomerResponse.getNameNosign());
+            initialValues.put("DIA_CHI_KHONG_DAU", bodyCustomerResponse.getAddressNosign());
+            initialValues.put("MA_THE", bodyCustomerResponse.getCardNo());
+            initialValues.put("DIA_CHI", bodyCustomerResponse.getAddress());
+            initialValues.put("PHIEN_TTOAN", bodyCustomerResponse.getInning());
+            initialValues.put("LO_TRINH", bodyCustomerResponse.getRoad());
+            initialValues.put("SO_GCS", bodyCustomerResponse.getBookCmis());
+            initialValues.put("DIEN_LUC", bodyCustomerResponse.getPcCode());
+            initialValues.put("SO_HO", "");
+            initialValues.put("E_DONG", MainActivity.mEdong);
+            initialValues.put("SDT_ECPAY", bodyCustomerResponse.getPhoneByECP());
+            initialValues.put("SDT_EVN", bodyCustomerResponse.getPhoneByEVN());
 
-        database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_CUSTOMER, initialValues, "MA_KHANG = ?", new String[]{bodyCustomerResponse.getCustomerCode()});
+            database = getWritableDatabase();
+            rowAffect = (int) database.update(TABLE_NAME_CUSTOMER, initialValues, "MA_KHANG = ?", new String[]{bodyCustomerResponse.getCustomerCode()});
+        } catch (Exception e) {
+            Log.e(TAG, "insertCustomer: ");
+        }
         return rowAffect;
     }
 
@@ -1837,11 +1854,21 @@ public class SQLiteConnection extends SQLiteOpenHelper {
 
     public long checkCustomerExist(String code, String edong) {
         database = this.getReadableDatabase();
-        String query = "SELECT COUNT(*) FROM " + TABLE_NAME_CUSTOMER + " WHERE MA_KHANG = '" + code + "' and E_DONG = '" + edong + "'";
-        Cursor mCursor = database.rawQuery(query, null);
-        if (mCursor.moveToFirst())
-            return mCursor.getInt(0);
-        return 0;
+        String query = "";
+        Cursor mCursor = null;
+        int countRow = 0;
+        try {
+            query = "SELECT COUNT(*) FROM " + TABLE_NAME_CUSTOMER + " WHERE MA_KHANG = '" + code + "' and E_DONG = '" + edong + "'";
+            mCursor = database.rawQuery(query, null);
+            if (mCursor.moveToFirst())
+                countRow = mCursor.getInt(0);
+        } catch (Exception e) {
+
+        } finally {
+            if (mCursor != null)
+                mCursor.close();
+        }
+        return countRow;
     }
 
     public EntityKhachHang getCustomer(String code) {
@@ -1921,122 +1948,128 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
     public long insertBill(BillResponse listBillResponse) {
-        ContentValues initialValues = new ContentValues();
+        int rowAffect = 0;
+        try {
 
-        views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BodyBillResponse bodyBillResponse = listBillResponse.getBodyBillResponse();
+            ContentValues initialValues = new ContentValues();
+
+            views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BodyBillResponse bodyBillResponse = listBillResponse.getBodyBillResponse();
 
 
-        //các giá trị bắt buộc insert
-        initialValues.put("MA_KHANG", bodyBillResponse.getCustomerCode());
-        initialValues.put("E_DONG", bodyBillResponse.getEdong());
-        initialValues.put("MA_HOA_DON", bodyBillResponse.getBillId());
-        initialValues.put("SERI_HDON", bodyBillResponse.getSeri());
-        initialValues.put("MA_THE", bodyBillResponse.getCardNo());
-        initialValues.put("TEN_KHANG", bodyBillResponse.getName());
-        initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
-        initialValues.put("THANG_TTOAN", Common.parse(Common.parseDate(Common.convertToDate(bodyBillResponse.getTerm()), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
-        initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
-        initialValues.put("SO_TIEN_TTOAN", Common.parseInt(bodyBillResponse.getAmount()));
-        initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
-        initialValues.put("DIEN_LUC", bodyBillResponse.getPcCode());
-        initialValues.put("SO_HO", bodyBillResponse.getHome());
-        initialValues.put("SO_DAU_KY", bodyBillResponse.getOldIndex());
-        initialValues.put("SO_CUOI_KY", bodyBillResponse.getNewIndex());
-        initialValues.put("SO_CTO", bodyBillResponse.getElectricityMeter());
+            //các giá trị bắt buộc insert
+            initialValues.put("MA_KHANG", bodyBillResponse.getCustomerCode());
+            initialValues.put("E_DONG", bodyBillResponse.getEdong());
+            initialValues.put("MA_HOA_DON", bodyBillResponse.getBillId());
+            initialValues.put("SERI_HDON", bodyBillResponse.getSeri());
+            initialValues.put("MA_THE", bodyBillResponse.getCardNo());
+            initialValues.put("TEN_KHANG", bodyBillResponse.getName());
+            initialValues.put("DIA_CHI", bodyBillResponse.getAddress());
+            initialValues.put("THANG_TTOAN", Common.parse(Common.parseDate(Common.convertToDate(bodyBillResponse.getTerm()), Common.DATE_TIME_TYPE.yyyyMMddHHmmssSSS.toString()), Common.DATE_TIME_TYPE.FULL.toString()));
+            initialValues.put("PHIEN_TTOAN", Common.parseInt(bodyBillResponse.getPeriod()));
+            initialValues.put("SO_TIEN_TTOAN", Common.parseInt(bodyBillResponse.getAmount()));
+            initialValues.put("SO_GCS", bodyBillResponse.getBookCmis());
+            initialValues.put("DIEN_LUC", bodyBillResponse.getPcCode());
+            initialValues.put("SO_HO", bodyBillResponse.getHome());
+            initialValues.put("SO_DAU_KY", bodyBillResponse.getOldIndex());
+            initialValues.put("SO_CUOI_KY", bodyBillResponse.getNewIndex());
+            initialValues.put("SO_CTO", bodyBillResponse.getElectricityMeter());
 //        initialValues.put("MA_DL_MO_RONG", bodyBillResponse.getPcCodeExt());
-        initialValues.put("TU_NGAY", bodyBillResponse.getStrFromDate());
-        initialValues.put("DEN_NGAY", bodyBillResponse.getStrToDate());
-        initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
-        initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
-        initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
-        initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy));
-        initialValues.put("CHI_TIET_KG", bodyBillResponse.getPriceDetail());
-        initialValues.put("CHI_TIET_MCS", bodyBillResponse.getNumeDetail());
-        initialValues.put("CHI_TIET_TIEN_MCS", bodyBillResponse.getAmountDetail());
-        initialValues.put("DNTT", bodyBillResponse.getNume());
-        initialValues.put("TONG_TIEN_CHUA_THUE", Common.parseInt(bodyBillResponse.getAmountNotTax()));
-        initialValues.put("TIEN_THUE", Common.parseInt(bodyBillResponse.getAmountTax()));
-        initialValues.put("SO_GCS", Common.parseInt(bodyBillResponse.getBookCmis()));
+            initialValues.put("TU_NGAY", bodyBillResponse.getStrFromDate());
+            initialValues.put("DEN_NGAY", bodyBillResponse.getStrToDate());
+            initialValues.put("SDT_ECPAY", bodyBillResponse.getPhoneByecp());
+            initialValues.put("SDT_EVN", bodyBillResponse.getPhoneByevn());
+            initialValues.put("GIAO_THU", Common.TRANG_THAI_GIAO_THU.GIAO_THU.getCode());
+            initialValues.put("NGAY_GIAO_THU", Common.getDateTimeNow(Common.DATE_TIME_TYPE.ddMMyyyy));
+            initialValues.put("CHI_TIET_KG", bodyBillResponse.getPriceDetail());
+            initialValues.put("CHI_TIET_MCS", bodyBillResponse.getNumeDetail());
+            initialValues.put("CHI_TIET_TIEN_MCS", bodyBillResponse.getAmountDetail());
+            initialValues.put("DNTT", bodyBillResponse.getNume());
+            initialValues.put("TONG_TIEN_CHUA_THUE", Common.parseInt(bodyBillResponse.getAmountNotTax()));
+            initialValues.put("TIEN_THUE", Common.parseInt(bodyBillResponse.getAmountTax()));
+            initialValues.put("SO_GCS", Common.parseInt(bodyBillResponse.getBookCmis()));
 
-        //check các trường hợp
-        int status = Common.parseInt(bodyBillResponse.getStatus());
+            //check các trường hợp
+            int status = Common.parseInt(bodyBillResponse.getStatus());
 
-        if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("SOURCE_OTHER")) //Hoá đơn được thanh toán từ nguồn khác:
-        {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
-            this.insertLichSuThanhToan(bodyBillResponse, "", "03", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "02");
-        } else if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("EDONG_OTHER")) //Hoá đơn được thanh toán bởi số ví khác:
-        {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
-            initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
+            if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("SOURCE_OTHER")) //Hoá đơn được thanh toán từ nguồn khác:
+            {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+                this.insertLichSuThanhToan(bodyBillResponse, "", "03", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "02");
+            } else if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("EDONG_OTHER")) //Hoá đơn được thanh toán bởi số ví khác:
+            {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+                initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "04", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "02");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "04", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "02");
 
-            //Chấm nợ thành công
-        } else if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("BILLING") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+                //Chấm nợ thành công
+            } else if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("BILLING") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
-            this.insertHoaDonThu(bodyBillResponse, "", "02", "02", "", "", "", "", 0, "", "");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
+                this.insertHoaDonThu(bodyBillResponse, "", "02", "02", "", "", "", "", 0, "", "");
 
-            //Chấm nợ không thành công, thanh toan bởi nguồn khác
-        } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("SOURCE_OTHER") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+                //Chấm nợ không thành công, thanh toan bởi nguồn khác
+            } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("SOURCE_OTHER") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "03", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
-            this.insertHoaDonThu(bodyBillResponse, "", "03", "05", "", "01", "", "", 0, "", "");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "03", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
+                this.insertHoaDonThu(bodyBillResponse, "", "03", "05", "", "01", "", "", 0, "", "");
 
-            //Chấm nợ không thành công, thanh toan bởi ví khác
-        } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("EDONG_OTHER")) {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
-            initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
+                //Chấm nợ không thành công, thanh toan bởi ví khác
+            } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("EDONG_OTHER")) {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+                initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "04", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
-            this.insertHoaDonThu(bodyBillResponse, "", "04", "05", "", "01", "", "", 0, "", "");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "04", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
+                this.insertHoaDonThu(bodyBillResponse, "", "04", "05", "", "01", "", "", 0, "", "");
 
-            //Chấm nợ không thành công, chấm
-        } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("ERROR") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
+                //Chấm nợ không thành công, chấm
+            } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("ERROR") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "04", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
-            this.insertHoaDonThu(bodyBillResponse, "", "02", "04", "", "", "", "", 0, "", "");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "02", "04", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
+                this.insertHoaDonThu(bodyBillResponse, "", "02", "04", "", "", "", "", 0, "", "");
 
-            //Huỷ hoá đơn thành
-        } else if (bodyBillResponse.getBillingType().equalsIgnoreCase("REVERT")) {
-            if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                //Huỷ hoá đơn thành
+            } else if (bodyBillResponse.getBillingType().equalsIgnoreCase("REVERT")) {
+                if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                    initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
+                    initialValues.put("VI_TTOAN", "");
+
+                    this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "08");
+                    this.insertHoaDonThu(bodyBillResponse, "", "", "", "01", "01", "", "", 0, "", "");
+
+                } else {//Huỷ hoá đơn thành, tk != tk dang nhap
+                    initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
+                    initialValues.put("VI_TTOAN", "");
+
+                    this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "08");
+                }
+            } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("TIMEOUT")) {
                 initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
                 initialValues.put("VI_TTOAN", "");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "", "01", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "09");
+                if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                    this.insertHoaDonThu(bodyBillResponse, "", "", "", "", "01", "01", "", 0, "", "");
+                }
 
-                this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "08");
-                this.insertHoaDonThu(bodyBillResponse, "", "", "", "01", "01", "", "", 0, "", "");
-
-            } else {//Huỷ hoá đơn thành, tk != tk dang nhap
-                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
-                initialValues.put("VI_TTOAN", "");
-
-                this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "08");
-            }
-        } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("TIMEOUT")) {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
-            initialValues.put("VI_TTOAN", "");
-            this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "", "01", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "09");
-            if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
-                this.insertHoaDonThu(bodyBillResponse, "", "", "", "", "01", "01", "", 0, "", "");
+            } else if (bodyBillResponse.getBillingType().equalsIgnoreCase("TIMEOUT")) {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+                initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
+                this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "02", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "09");
+                if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                    this.insertHoaDonThu(bodyBillResponse, "", "", "", "", "", "02", "", 0, "", "");
+                }
+            } else {
+                Log.e(TAG_SYNC_DATA, "insertBill fail với billingType = " + bodyBillResponse.getBillingType() + " và status = " + bodyBillResponse.getStatus());
             }
 
-        } else if (bodyBillResponse.getBillingType().equalsIgnoreCase("TIMEOUT")) {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
-            initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
-            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "02", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "09");
-            if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
-                this.insertHoaDonThu(bodyBillResponse, "", "", "", "", "", "02", "", 0, "", "");
-            }
-        } else {
-            Log.e(TAG_SYNC_DATA, "insertBill: trường hợp insert bill đặc biệt. Không thể có giá trị insert TRANG_THAI_TTOAN và VI_TTOAN");
+            database = getWritableDatabase();
+            rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
+        } catch (Exception e) {
+            Log.e(TAG, "insertBill: ");
         }
-
-        database = getWritableDatabase();
-        int rowAffect = (int) database.insert(TABLE_NAME_BILL, null, initialValues);
         return rowAffect;
     }
 
@@ -2453,92 +2486,98 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     }
 
     public long updateBill(BillResponse listBillResponse) {
-        ContentValues initialValues = new ContentValues();
+        int rowAffect = 0;
+        try {
+            ContentValues initialValues = new ContentValues();
 
-        views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BodyBillResponse bodyBillResponse = listBillResponse.getBodyBillResponse();
+            views.ecpay.com.postabletecpay.util.entities.response.EntityBill.BodyBillResponse bodyBillResponse = listBillResponse.getBodyBillResponse();
 
-        int status = Common.parseInt(bodyBillResponse.getStatus());
+            int status = Common.parseInt(bodyBillResponse.getStatus());
         /*
         Hoá đơn được thanh toán từ nguồn khác:
          */
 
-        if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("SOURCE_OTHER")) //Hoá đơn được thanh toán từ nguồn khác:
-        {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
-            this.insertLichSuThanhToan(bodyBillResponse, "", "03", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "02");
-        } else if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("EDONG_OTHER")) //Hoá đơn được thanh toán bởi số ví khác:
-        {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
-            initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
+            if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("SOURCE_OTHER")) //Hoá đơn được thanh toán từ nguồn khác:
+            {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+                this.insertLichSuThanhToan(bodyBillResponse, "", "03", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "02");
+            } else if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("EDONG_OTHER")) //Hoá đơn được thanh toán bởi số ví khác:
+            {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+                initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "04", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "02");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "04", "", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "02");
 
-            //Chấm nợ thành công
-        } else if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("BILLING") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+                //Chấm nợ thành công
+            } else if (status == 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("BILLING") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
-            this.insertHoaDonThu(bodyBillResponse, "", "02", "02", "", "", "", "", 0, "", "");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
+                this.insertHoaDonThu(bodyBillResponse, "", "02", "02", "", "", "", "", 0, "", "");
 
-            //Chấm nợ không thành công, thanh toan bởi nguồn khác
-        } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("SOURCE_OTHER") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+                //Chấm nợ không thành công, thanh toan bởi nguồn khác
+            } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("SOURCE_OTHER") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "03", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
-            this.insertHoaDonThu(bodyBillResponse, "", "03", "05", "", "01", "", "", 0, "", "");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "03", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
+                this.insertHoaDonThu(bodyBillResponse, "", "03", "05", "", "01", "", "", 0, "", "");
 
-            //Chấm nợ không thành công, thanh toan bởi ví khác
-        } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("EDONG_OTHER")) {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
-            initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
+                //Chấm nợ không thành công, thanh toan bởi ví khác
+            } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("EDONG_OTHER")) {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+                initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "04", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
-            this.insertHoaDonThu(bodyBillResponse, "", "04", "05", "", "01", "", "", 0, "", "");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "04", "05", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
+                this.insertHoaDonThu(bodyBillResponse, "", "04", "05", "", "01", "", "", 0, "", "");
 
-            //Chấm nợ không thành công, chấm
-        } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("ERROR") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
+                //Chấm nợ không thành công, chấm
+            } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("ERROR") && bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
 
-            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "04", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
-            this.insertHoaDonThu(bodyBillResponse, "", "02", "04", "", "", "", "", 0, "", "");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "02", "04", "", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "07");
+                this.insertHoaDonThu(bodyBillResponse, "", "02", "04", "", "", "", "", 0, "", "");
 
-            //Huỷ hoá đơn thành
-        } else if (bodyBillResponse.getBillingType().equalsIgnoreCase("REVERT")) {
-            if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                //Huỷ hoá đơn thành
+            } else if (bodyBillResponse.getBillingType().equalsIgnoreCase("REVERT")) {
+                if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                    initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
+                    initialValues.put("VI_TTOAN", "");
+
+                    this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "08");
+                    this.insertHoaDonThu(bodyBillResponse, "", "", "", "01", "01", "", "", 0, "", "");
+
+                } else {//Huỷ hoá đơn thành, tk != tk dang nhap
+                    initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
+                    initialValues.put("VI_TTOAN", "");
+
+                    this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "08");
+                }
+            } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("TIMEOUT")) {
                 initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
                 initialValues.put("VI_TTOAN", "");
+                this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "", "01", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "09");
+                if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                    this.insertHoaDonThu(bodyBillResponse, "", "", "", "", "01", "01", "", 0, "", "");
+                }
 
-                this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "08");
-                this.insertHoaDonThu(bodyBillResponse, "", "", "", "01", "01", "", "", 0, "", "");
-
-            } else {//Huỷ hoá đơn thành, tk != tk dang nhap
-                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
-                initialValues.put("VI_TTOAN", "");
-
-                this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "01", "", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "08");
-            }
-        } else if (status != 1 && bodyBillResponse.getBillingType().equalsIgnoreCase("TIMEOUT")) {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.CHUA_TTOAN.getCode());
-            initialValues.put("VI_TTOAN", "");
-            this.insertLichSuThanhToan(bodyBillResponse, "", "01", "", "", "01", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "09");
-            if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
-                this.insertHoaDonThu(bodyBillResponse, "", "", "", "", "01", "01", "", 0, "", "");
+            } else if (bodyBillResponse.getBillingType().equalsIgnoreCase("TIMEOUT")) {
+                initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
+                initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
+                this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "02", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "09");
+                if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
+                    this.insertHoaDonThu(bodyBillResponse, "", "", "", "", "", "02", "", 0, "", "");
+                }
+            } else {
+                Log.e(TAG_SYNC_DATA, "updateBill fail với billingType = " + bodyBillResponse.getBillingType() + " và status = " + bodyBillResponse.getStatus());
             }
 
-        } else if (bodyBillResponse.getBillingType().equalsIgnoreCase("TIMEOUT")) {
-            initialValues.put("TRANG_THAI_TTOAN", Common.TRANG_THAI_TTOAN.DA_TTOAN.getCode());
-            initialValues.put("VI_TTOAN", bodyBillResponse.getBillingBy());
-            this.insertLichSuThanhToan(bodyBillResponse, "", "02", "02", "", "02", 0, "", Common.getDateTimeNow(Common.DATE_TIME_TYPE.FULL), "09");
-            if (bodyBillResponse.getBillingBy().equalsIgnoreCase(MainActivity.mEdong)) {
-                this.insertHoaDonThu(bodyBillResponse, "", "", "", "", "", "02", "", 0, "", "");
-            }
-        } else {
-            Log.e(TAG_SYNC_DATA, "updateBill: trường hợp updateBill bill đặc biệt. Không thể có giá trị updateBill TRANG_THAI_TTOAN và VI_TTOAN");
+
+            database = getWritableDatabase();
+
+            rowAffect = (int) database.update(TABLE_NAME_BILL, initialValues, "MA_HOA_DON=?", new String[]{String.valueOf(bodyBillResponse.getBillId())});
+        } catch (Exception e) {
+            Log.e(TAG, "updateBill: ");
         }
-
-
-        database = getWritableDatabase();
-        int rowAffect = (int) database.update(TABLE_NAME_BILL, initialValues, "MA_HOA_DON=?", new String[]{String.valueOf(bodyBillResponse.getBillId())});
         return rowAffect;
     }
 
@@ -2553,10 +2592,19 @@ public class SQLiteConnection extends SQLiteOpenHelper {
     public long checkBillExist(String billId) {
         database = this.getReadableDatabase();
         String query = "SELECT COUNT(*) FROM " + TABLE_NAME_BILL + " WHERE MA_HOA_DON = '" + billId + "'";
-        Cursor mCursor = database.rawQuery(query, null);
-        if (mCursor.moveToFirst())
-            return mCursor.getInt(0);
-        return 0;
+        Cursor mCursor = null;
+        int countRow = 0;
+        try {
+            mCursor = database.rawQuery(query, null);
+            if (mCursor.moveToFirst())
+                countRow = mCursor.getInt(0);
+        } catch (Exception e) {
+
+        } finally {
+            if (mCursor != null)
+                mCursor.close();
+        }
+        return countRow;
     }
 
     //endregion

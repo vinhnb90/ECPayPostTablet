@@ -36,22 +36,14 @@
             android:configChanges="keyboardHidden|screenSize"
             android:label="@string/app_name"
             android:windowSoftInputMode="stateHidden|adjustPan|adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAINACTIVITY" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".view.DoiMatKhau.ChangePassActivity"
             android:configChanges="keyboardHidden|screenSize"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize|adjustPan">
-            <intent-filter>
-                <action android:name="android.intent.action.DOIMATKHAU" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
     </application>
 

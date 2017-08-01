@@ -9,7 +9,7 @@ import views.ecpay.com.postabletecpay.view.Logout.ILogoutView;
  */
 
 public interface IMainPageView extends ICommonView, ILogoutView {
-    void showMainPageInfo(String userName, long balance, int totalBills, int totalMoney);
+    void showMainPageInfo(String userName, long balance, int totalBills, long totalMoney);
     void showTextMessage(String message);
 
 //    void showStatusProgressLogout(Common.STATUS_PROGRESS statusProgress);
